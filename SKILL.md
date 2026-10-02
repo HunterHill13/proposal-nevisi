@@ -11,16 +11,16 @@ description: >
   produces an emergent reference set with zero arbitrary caps, enforces strict novelty phrasing boundaries, applies the 6-layer
   anti-AI detection academic protocol, produces beautifully formatted Word documents featuring Dubai Persian typography,
   native RTL bidi XML (<w:bidi/>, <w:rtlGutter/>), Complex Script bolding (<w:bCs/>), zero divider dashes (---),
-  formula callout boxes, styled tables, embedded Word Citation Manager sources via COM, and executes an automated 18-test self-audit.
+  formula callout boxes, styled tables, embedded Word Citation Manager sources via COM, and executes an automated 20-test self-audit suite.
 ---
 
-# Proposal-Nevisi (مهارت جامع نگارش پروپوزال‌های پژوهشی علوم پزشکی و موتور Deep Research 3.0)
+# Proposal-Nevisi (مهارت جامع نگارش پروپوزال‌های پژوهشی علوم پزشکی و موتور Deep Research 4.0)
 
-این مهارت یک راهکار خودکار، تعاملی، پیشرفته و با استاندارد سخت‌گیرانه برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی است که مجهز به موتور اختصاصی **Deep Research 3.0** مبتنی بر شواهد پدیدارشده (Evidence-Driven)، بازیابی ۴ پایگاهی، اعتبارسنجی شیمیایی/مسیری زنده، ممیزی استلزام ادعا-شواهد (Claim-Evidence Entailment)، و نگارش انسان‌محور ضد هوش مصنوعی می‌باشد.
+این مهارت یک راهکار خودکار، تعاملی، پیشرفته و با استاندارد سخت‌گیرانه برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی است که مجهز به موتور اختصاصی **Deep Research 4.0** مبتنی بر شواهد پدیدارشده (Evidence-Driven)، بازیابی ۴ پایگاهی، اعتبارسنجی شیمیایی/مسیری زنده، ممیزی استلزام ادعا-شواهد (Claim-Evidence Entailment)، و نگارش انسان‌محور ضد هوش مصنوعی می‌باشد.
 
 ---
 
-## اصول کلیدی و استانداردهای الزامی (Core Standards v3.0)
+## اصول کلیدی و استانداردهای الزامی (Core Standards v4.0)
 
 1. **معماری ۱۵ مرحله‌ای بازیابی و استخراج شواهد (The 15-Stage Evidence Funnel):**
    ```text
