@@ -1,0 +1,88 @@
+{
+  "project_id": "FIXTURE_EPIDEMIOLOGY_PECO",
+  "domain": "pulmonology",
+  "framework": "PECO",
+  "research_problem_model": {
+    "model_id": "RPM_EPIDEM_001",
+    "research_title_fa": "بررسی اثرات مواجهه بلندمدت با ذرات معلق PM2.5 بر تشدید بیماری انسدادی مزمن ریه در کوهورت جمعیتی",
+    "research_title_en": "Evaluation of Long-Term Ambient Fine Particulate Matter (PM2.5) Exposure on Chronic Obstructive Pulmonary Disease Exacerbations in a Prospective Longitudinal Cohort",
+    "domain": "pulmonology",
+    "framework": "PECO",
+    "target_condition": {
+      "name_en": "Chronic Obstructive Pulmonary Disease",
+      "name_fa": "بیماری انسدادی مزمن ریه",
+      "mesh_term": "Pulmonary Disease, Chronic Obstructive",
+      "synonyms": ["COPD", "chronic airflow limitation"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Community-dwelling adult cohort aged >= 45 years with spirometry-confirmed COPD",
+      "secondary_systems": ["Metropolitan and industrial airsheds"],
+      "normal_control_system": "COPD patients residing in low-exposure baseline air quality zones"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Particulate Matter PM2.5",
+        "chemical_or_biological_class": "Airborne Environmental Pollutant",
+        "role": "EXPOSURE_FACTOR",
+        "mesh_terms": ["Particulate Matter", "Air Pollutants"],
+        "synonyms": ["fine particulate air pollution", "ambient PM2.5"]
+      }
+    ],
+    "comparators": [
+      {"name": "Low ambient PM2.5 concentration (< 5 ug/m3)", "type": "BASELINE_EXPOSURE"}
+    ],
+    "primary_outcomes": [
+      {"name": "Severe Acute COPD Exacerbation Incidence", "type": "HAZARD_RATIO", "measurement_unit": "Adjusted Hazard Ratio per 5 ug/m3"}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "Airway Oxidative Stress and Alveolar Macrophage Activation", "target_molecules": ["IL-8", "TNF-alpha", "8-isoprostane"], "expected_modulation": "UPREGULATION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Air Pollution", "Pulmonary Disease, Chronic Obstructive"],
+      "all_synonyms": ["fine dust", "air quality index"],
+      "exclusion_terms": ["asthma only", "acute occupational chemical accidents"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_AIRCOHORT_2023",
+      "study_family_id": "FAM_AIRCOHORT",
+      "doi": "10.1016/S2542-5196(23)00142-X",
+      "title": "Long-term exposure to ambient air pollution and incidence of COPD exacerbations in the National Cohort",
+      "authors": ["Chen H", "Burnett RT", "Stieb DM", "Jerrett M"],
+      "year": 2023,
+      "journal": "Lancet Planetary Health",
+      "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL",
+      "design_specific_attributes": {
+        "target_population_criteria": "245,000 adults with baseline COPD followed for 10 years",
+        "exposure_assessment": "Satellite-based spatiotemporal hybrid land-use regression model",
+        "statistical_adjustment": "Cox proportional hazards adjusted for smoking history, age, sex, BMI, and socioeconomic status"
+      },
+      "risk_of_bias": {"tool_used": "ROBINS_E", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_PM25_COPD_HAZARD"]
+    },
+    {
+      "study_id": "ST_AIRCOHORT_SUB_BIOMARKER",
+      "study_family_id": "FAM_AIRCOHORT",
+      "doi": "10.1164/rccm.202302-0284OC",
+      "title": "Systemic and alveolar inflammatory markers associated with PM2.5 in COPD patients",
+      "authors": ["Burnett RT", "Chen H", "Brook RD"],
+      "year": 2024,
+      "journal": "American Journal of Respiratory and Critical Care Medicine",
+      "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL",
+      "design_specific_attributes": {
+        "target_population_criteria": "Sub-cohort of 1,200 individuals with serum/sputum biobanking",
+        "primary_readout": "Sputum IL-8 and plasma 8-isoprostane levels"
+      },
+      "risk_of_bias": {"tool_used": "ROBINS_E", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_PM25_OXIDATIVE_INFLAMMATION"]
+    }
+  ]
+}

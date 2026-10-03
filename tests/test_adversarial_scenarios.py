@@ -130,6 +130,40 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertTrue(res["numerical_traceability"]["hallucination_risk"])
         self.assertIn("98.5%", res["numerical_traceability"]["untraced_numbers"])
 
+    def test_13_no_synergy_fallacy_gate(self):
+        """Test 13: Claiming synergy from two monotherapy studies triggers SYNERGY_NOT_ESTABLISHED (Point 29)."""
+        study = {"study_id": "S_MONO", "study_design": "IN_VITRO_EXPERIMENTAL"}
+        facts = [{"directness": "DIRECT_EVIDENCE", "text_or_data": "Agent A shows active monotherapy inhibition."}]
+        res = GenericClaimEntailmentEngine.evaluate_claim_entailment(
+            "CLM_SYN", "Agent A and Agent B exert strong synergistic cell death.", study, facts
+        )
+        self.assertEqual(res["synergy_fallacy_audit"]["synergy_status"], "SYNERGY_NOT_ESTABLISHED")
+
+    def test_14_no_evidence_not_evidence_of_no_effect(self):
+        """Test 14: Zero literature retrieved cannot be reported as evidence of no effect (Point 28)."""
+        res = GenericContradictionEngine.distinguish_no_evidence_vs_no_effect(0, [])
+        self.assertEqual(res["epistemic_state"], "NO_EVIDENCE_IDENTIFIED")
+        self.assertFalse(res["is_evidence_of_no_effect"])
+
+    def test_15_proposal_structure_drift_gate(self):
+        """Test 15: Omitting a mandatory proposal section triggers FAIL in validator (Point 15)."""
+        from proposal_structure_validator import ProposalStructureValidator
+        # Defective proposal omitting section 10 (دستاوردها)
+        defective_text = "## 1. موضوع\n## 2. بیان مسئله\n## 11. جدول متغیرها\n| متغیر |\n"
+        val = ProposalStructureValidator.validate_proposal_text(defective_text)
+        self.assertEqual(val["PROPOSAL_STRUCTURE_VALIDATION"], "FAIL")
+        self.assertIn("دستاوردها", val["missing_sections"])
+
+    def test_16_data_provenance_traceability(self):
+        """Test 16: Granular source location tracking in data provenance (Point 26)."""
+        record_with_loc = {"study_id": "S_01", "source_location": {"page": 142, "table": "Table 2"}}
+        record_without_loc = {"study_id": "S_02", "source_location": {}}
+        aud1 = GenericClaimEntailmentEngine.audit_data_provenance(record_with_loc)
+        aud2 = GenericClaimEntailmentEngine.audit_data_provenance(record_without_loc)
+        self.assertTrue(aud1["is_provenance_traceable"])
+        self.assertFalse(aud2["is_provenance_traceable"])
+
 
 if __name__ == "__main__":
     unittest.main()
+

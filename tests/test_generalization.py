@@ -11,6 +11,8 @@ import os
 import sys
 import json
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 TESTS_DIR = os.path.dirname(__file__)
 FIXTURES_DIR = os.path.join(TESTS_DIR, "fixtures")
 SCRIPTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, "..", "scripts"))
@@ -24,17 +26,21 @@ from generic_contradiction_engine import GenericContradictionEngine
 from generic_claim_entailment_engine import GenericClaimEntailmentEngine
 from generic_reference_auditor import GenericReferenceAuditor
 from generic_evidence_synthesis import GenericEvidenceSynthesizer
+from generic_study_relationships import GenericStudyRelationshipEngine
+from generic_gap_detector import GenericGapDetector
+from dynamic_protocol_designer import DynamicProtocolDesigner
 
 FIXTURE_DIRS = [
     "oncology_lupeol_ndv",
     "cardiovascular_sglt2",
     "infectious_antiviral",
-    "diagnostic_biomarker"
+    "diagnostic_biomarker",
+    "epidemiological_cohort"
 ]
 
 def test_all_fixtures() -> bool:
     print("=" * 70)
-    print("RUNNING MULTI-DOMAIN GENERALIZATION EVALUATION")
+    print("RUNNING MULTI-DOMAIN GENERALIZATION EVALUATION (5 DOMAINS)")
     print("=" * 70)
 
     total_fixtures = len(FIXTURE_DIRS)
@@ -55,7 +61,7 @@ def test_all_fixtures() -> bool:
             model = ProblemModelBuilder.create_from_specification(data["research_problem_model"])
             print(f"  - Model initialized: ID={model.model_id}, Domain={model.domain}, Framework={model.framework}")
 
-            # 2. Search Planner
+            # 2. Search Planner with 9 Layers
             planner = GenericSearchPlanner(model)
             matrix = planner.build_query_matrix()
             supp_count = matrix["dual_path_execution"]["supporting_search_count"]
@@ -73,14 +79,30 @@ def test_all_fixtures() -> bool:
             comp = GenericComparabilityEngine.evaluate_cohort(studies)
             print(f"  - Comparability: {comp['summary']['total_pairs_evaluated']} pairs evaluated (High={comp['summary']['high_comparability_count']})")
 
-            # 5. Contradiction & Negative Engine
+            # 5. Dynamic Relationship Graph
+            rel_graph = GenericStudyRelationshipEngine.build_relationship_graph(studies)
+            print(f"  - Relationship Graph: {rel_graph['total_nodes']} nodes, {rel_graph['total_edges']} edges mapped")
+
+            # 6. Contradiction & Negative Engine
             neg_findings = []
             for s in studies:
                 neg_findings.extend(s.get("negative_or_null_findings", []))
             contra_report = GenericContradictionEngine.build_contradiction_report(neg_findings, matrix["search_boundary"])
             print(f"  - Contradiction status: {contra_report['contradiction_status']}")
 
-            # 6. Evidence Synthesis
+            # 7. Evidence-Based Research Gaps
+            gaps = GenericGapDetector.identify_gaps(model.to_dict(), studies, contra_report.get("discrepancy_analyses", []))
+            print(f"  - Research Gaps: {gaps['active_gaps_identified']} active gaps identified")
+
+            # 8. Dynamic Protocol Components
+            variables = DynamicProtocolDesigner.generate_variable_table(model.to_dict())
+            timeline = DynamicProtocolDesigner.generate_timeline(model.framework)
+            stat_plan = DynamicProtocolDesigner.generate_statistical_plan(model.to_dict())
+            print(f"  - Protocol Components: {len(variables)} variables, {len(timeline)} timeline phases, stat test: {stat_plan['primary_analysis'][:40]}...")
+            assert len(variables) >= 3, "Variable table must extract at least 3 variables"
+            assert len(timeline) >= 4, "Timeline must define at least 4 phases"
+
+            # 9. Evidence Synthesis
             syn = GenericEvidenceSynthesizer.evaluate_claim_synthesis(
                 f"CLM_{model.domain.upper()}_PRIMARY",
                 f"{model.interventions_or_exposures[0].name} addresses {model.target_condition.name_en}",
@@ -89,7 +111,7 @@ def test_all_fixtures() -> bool:
             )
             print(f"  - Synthesis Certainty: {syn['overall_evidence_certainty']}, Verdict: {syn['synthesis_verdict']}")
 
-            # 7. Reference Audit
+            # 10. Reference Audit
             auditor = GenericReferenceAuditor(min_required_references=1)
             for s in studies:
                 tier_res = auditor.audit_temporal_tier(s)

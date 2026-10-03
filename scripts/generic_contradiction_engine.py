@@ -38,9 +38,14 @@ class GenericContradictionEngine:
         neg_ctx = negative_finding.get("context_parameters", {})
 
         mismatches = []
-        for key in ["dose", "exposure_time", "cell_line_or_model", "species", "formulation", "assay"]:
-            val_pos = str(pos_ctx.get(key, "")).lower()
-            val_neg = str(neg_ctx.get(key, "")).lower()
+        divergence_keys = [
+            "cell_line_or_model", "species", "strain", "dose", "exposure_time",
+            "formulation", "purity", "assay", "endpoint", "experimental_condition",
+            "sample_size", "statistical_method", "biological_context"
+        ]
+        for key in divergence_keys:
+            val_pos = str(pos_ctx.get(key, "")).lower().strip()
+            val_neg = str(neg_ctx.get(key, "")).lower().strip()
             if val_pos and val_neg and val_pos != val_neg:
                 mismatches.append(f"{key}: '{val_pos}' vs '{val_neg}'")
 
@@ -63,6 +68,33 @@ class GenericContradictionEngine:
             "scientific_rationale": rationale,
             "positive_study_id": positive_finding.get("study_id"),
             "negative_study_id": negative_finding.get("study_id")
+        }
+
+    @staticmethod
+    def distinguish_no_evidence_vs_no_effect(retrieval_count: int, empirical_findings: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Strictly differentiates between absence of studies and presence of confirmed null effects (Point 28)."""
+        if retrieval_count == 0 or not empirical_findings:
+            return {
+                "epistemic_state": "NO_EVIDENCE_IDENTIFIED",
+                "is_evidence_of_no_effect": False,
+                "scientific_conclusion": "No literature retrieved within boundary; does NOT prove absence of biological effect.",
+                "permissible_claim": "The effect remains uninvestigated or unpublished under designated search parameters."
+            }
+
+        null_studies = [f for f in empirical_findings if f.get("category") in ["NULL_RESULT", "NO_EFFECT"]]
+        if null_studies:
+            return {
+                "epistemic_state": "EVIDENCE_OF_NO_EFFECT_IDENTIFIED",
+                "is_evidence_of_no_effect": True,
+                "null_study_count": len(null_studies),
+                "scientific_conclusion": "Rigorous empirical testing demonstrated statistically significant lack of effect or biological inertness.",
+                "permissible_claim": "Published trials document no significant biological effect at tested doses."
+            }
+
+        return {
+            "epistemic_state": "ACTIVE_EFFECTS_REPORTED",
+            "is_evidence_of_no_effect": False,
+            "scientific_conclusion": "Literature reports non-null biological or clinical responses."
         }
 
     @classmethod
@@ -92,11 +124,16 @@ class GenericContradictionEngine:
 
 
 if __name__ == "__main__":
-    pos = {"study_id": "STUDY_A", "context_parameters": {"dose": "10 uM", "cell_line_or_model": "A549", "assay": "MTT"}}
-    neg = {"study_id": "STUDY_B", "category": "NULL_RESULT", "context_parameters": {"dose": "10 uM", "cell_line_or_model": "A549", "assay": "MTT"}}
+    pos = {"study_id": "STUDY_A", "context_parameters": {"dose": "10 uM", "cell_line_or_model": "Model_X", "assay": "Assay_1"}}
+    neg = {"study_id": "STUDY_B", "category": "NULL_RESULT", "context_parameters": {"dose": "10 uM", "cell_line_or_model": "Model_X", "assay": "Assay_1"}}
     res = GenericContradictionEngine.analyze_discrepancy(pos, neg)
     print("Identical params result:", res["contradiction_type"])
 
-    neg_diff = {"study_id": "STUDY_C", "category": "DOSE_LIMITATION", "context_parameters": {"dose": "0.5 uM", "cell_line_or_model": "A549", "assay": "MTT"}}
+    neg_diff = {"study_id": "STUDY_C", "category": "DOSE_LIMITATION", "context_parameters": {"dose": "0.5 uM", "cell_line_or_model": "Model_X", "assay": "Assay_1"}}
+    res_diff = GenericContradictionEngine.analyze_discrepancy(pos, neg_diff)
+    print("Different params result:", res_diff["contradiction_type"])
+    
+    no_evi = GenericContradictionEngine.distinguish_no_evidence_vs_no_effect(0, [])
+    print("Zero retrieval check:", no_evi["epistemic_state"])
     res_diff = GenericContradictionEngine.analyze_discrepancy(pos, neg_diff)
     print("Different params result:", res_diff["contradiction_type"], "Mismatches:", res_diff["contextual_divergences"])

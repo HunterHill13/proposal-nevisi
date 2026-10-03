@@ -17,6 +17,8 @@ import sys
 import subprocess
 import time
 
+sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
+
 TESTS_DIR = os.path.dirname(__file__)
 SCRIPTS_DIR = os.path.abspath(os.path.join(TESTS_DIR, "..", "scripts"))
 PYTHON_EXE = sys.executable
@@ -26,7 +28,7 @@ def run_test_module(name: str, cmd: list) -> tuple:
     print(f"EXECUTING SUITE: {name}")
     print("=" * 75)
     start_time = time.time()
-    proc = subprocess.run(cmd, capture_output=True, text=True, cwd=os.path.join(TESTS_DIR, ".."))
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=os.path.join(TESTS_DIR, ".."))
     elapsed = time.time() - start_time
     print(proc.stdout)
     if proc.stderr:
@@ -42,8 +44,8 @@ def main():
 
     suites = [
         ("Static Analysis Hard-Code Leakage Audit", [PYTHON_EXE, "tests/test_hard_code_leakage.py"], 1),
-        ("Multi-Domain Generalization Test Suite", [PYTHON_EXE, "tests/test_generalization.py"], 4),
-        ("Adversarial Stress Scenarios (12 Tests)", [PYTHON_EXE, "tests/test_adversarial_scenarios.py"], 12),
+        ("Multi-Domain Generalization Test Suite (5 Domains)", [PYTHON_EXE, "tests/test_generalization.py"], 5),
+        ("Adversarial Stress Scenarios (16 Tests)", [PYTHON_EXE, "tests/test_adversarial_scenarios.py"], 16),
         ("Benchmark Tri-Tier Self-Audit Suite", [PYTHON_EXE, "scripts/self_audit_suite.py"], 60)
     ]
 

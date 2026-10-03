@@ -3,21 +3,21 @@ name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
   evidence synthesis, humanization, and Word (.docx) publication engine (v8.0). Operates across diverse biomedical domains
-  (oncology, cardiology, infectious diseases, diagnostics, immunology, basic experimental science). Generates dynamic
-  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes dual-path 8-facet literature searches
-  (SUPPORTING_SEARCH & CONTRADICTING_SEARCH across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence
-  Records (STUDY_EVIDENCE_RECORD_SCHEMA), performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
+  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, basic experimental science). Generates dynamic
+  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes 9-layer dynamic literature searches
+  (Layers A-I across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
+  maps 22 cross-study relationship types, detects gaps across 11 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
   clusters study families and trial registries to prevent evidence double-counting, resolves contradictions across an extensible
-  15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT), enforces 7-level claim entailment and causal
-  language boundaries (blocking causal leaps from observational data), guarantees numerical traceability in EVIDENCE_LEDGER,
+  15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT), enforces epistemic rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
+  enforces 7-level claim entailment and causal language boundaries (blocking causal leaps from observational data), guarantees numerical traceability in EVIDENCE_LEDGER,
   enforces the 6-year temporal boundary with explicit foundational justifications, renders publication-grade 14-section Word proposals
-  with individual reference paragraphs, Dubai Persian typography, native RTL bidi XML, and passes a unified 77-assertion test harness
-  (Static analysis zero leakage, 4-domain generalization fixtures, 12 adversarial stress tests, and 60-test benchmark).
+  with individual reference paragraphs, dynamic variable table, Gantt timeline, statistical plan, Dubai Persian typography, native RTL bidi XML, and passes a unified 82-assertion test harness
+  (Static analysis zero leakage, 5-domain generalization fixtures, 16 adversarial stress tests, and 60-test benchmark).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.0)
 
-این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.0 با بازطراحی بنیادین معماری، از وابستگی به یک موضوع خاص رها شده و به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
+این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.0 با بازطراحی بنیادین معماری، از وابستگی به یک موضوع خاص رها شده و به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی، اپیدمیولوژیک و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
 
 ---
 
@@ -29,14 +29,14 @@ description: >
            ▼
 [ ۱. مدل‌سازی پویای مسئله پژوهش (Research Problem Model) ]
 ├── انتخاب چارچوب متناسب: PICO / PECO / Diagnostic / Prognostic / Mechanistic
-├── شناسایی جمعیت/مدل (Human, Animal, Cell Culture, Diagnostic)
+├── شناسایی جمعیت/مدل (Human, Animal, Cell Culture, Diagnostic, Epidemiological)
 ├── اصطلاحات کنترل‌شده MeSH و واژگان تخصصی
            │
            ▼
-[ ۲. طراحی جستجوی دومسیره و ماتریس ۸ طبقه‌ای (Dual-Path Search Plan) ]
-├── مسیر حمایتی (SUPPORTING_SEARCH): اثربخشی، سینرژی، فرضیه مثبت
-├── مسیر معکوس (CONTRADICTING_SEARCH): فقدان اثر (Null)، مقاومت، سمیت، آنتاگونیسم
-├── ماتریس کوئری ۸ طبقه‌ای: مستقیم، اجزاء، ترکیبی، مکانیسمی، ترنسلیشنال، منفی، ایمنی، روش‌شناختی
+[ ۲. استراتژی جستجوی پویای ۹ لایه‌ای و اشباع شواهد (9-Layer Search & Saturation) ]
+├── لایه‌های نه‌گانه (A: مستقیم، B: اجزاء، C: مکانیسمی، D: مدل، E: ترنسلیشنال، F: ایمنی/سمیت، G: شواهد منفی/پوچ، H: متناقض، I: روش‌شناختی)
+├── زنجیره‌سازی استنادی پیش‌رو و پس‌رو (Forward/Backward Citation Chaining)
+├── سنجش اشباع شواهد (Search Saturation Assessment: دیمینیشینگ ریترن و کفایت متدولوژیک)
            │
            ▼
 [ ۳. بازیابی چندپایگاهی و حسابداری PRISMA 2020 ]
@@ -46,7 +46,7 @@ description: >
            ▼
 [ ۴. اعتبارسنجی فیلد-محور کتابشناختی و مرز زمانی ]
 ├── تطبیق دقیق DOI, PMID, Title, First Author, Journal, Year
-├── اعمال قانون زمانی ۶ ساله (Main Evidence >= 2020)
+├── اعمال قانون زمانی ۶ ساله (Main Evidence >= CURRENT_YEAR - 6)
 ├── تایید استثناهای بنیادین با توجیه معتبر (FOUNDATIONAL_JUSTIFICATION)
            │
            ▼
@@ -55,9 +55,9 @@ description: >
 ├── قانون اکید: وضعیت NOT_REPORTED هرگز به LOW_RISK تبدیل نمی‌شود
            │
            ▼
-[ ۶. ماتریس همسنجی متناسب با طراحی مطالعه (Study-Design-Aware Comparability) ]
-├── ارزیابی ابعاد بر اساس ماهیت مطالعه (سلولی، حیوانی، کارآزمایی بالینی، تشخیصی)
-├── تمایز فواصل ترجمانی و بیولوژیک بین مطالعات
+[ ۶. گراف روابط مطالعات و تحلیل شکاف‌های پژوهشی (Study Relationships & Gaps) ]
+├── ترسیم روابط بین‌مطالعه‌ای در ۲۲ بعد پویا (DIRECT_REPLICATION, EXTENSION, TRANSLATIONAL_EXTENSION, SUPPORTS, CONTRADICTS, ...)
+├── شناسایی نظام‌مند شکاف‌های پژوهشی در ۱۱ طبقه تاکسونومی (KNOWLEDGE_GAP, MECHANISTIC_GAP, POPULATION_GAP, METHODOLOGICAL_GAP, ...)
            │
            ▼
 [ ۷. ردیابی خوشه‌های مطالعاتی و ممانعت از دوباره‌شماری (Study Family Clustering) ]
@@ -65,16 +65,16 @@ description: >
 ├── تفکیک مقالات مروری سیستماتیک از مطالعات اولیه برای جلوگیری از شمارش مضاعف شواهد
            │
            ▼
-[ ۸. موتور تحلیل شواهد منفی و تناقضات بر مبنای تاکسونومی ۱۵ گانه ]
-├── تفکیک هوشمندانه «تناقض واقعی» (TRUE_CONTRADICTION) از «اختلاف زمینه‌ای» (CONTEXTUAL_DISAGREEMENT)
-├── تحلیل علل اختلاف: دوز، مدت مواجهه، زمینه ژنتیکی، مرحله بیماری، روش سنجش
-├── قاعده معرفت‌شناختی: ثبت NO_RELEVANT_CONTRADICTING_EVIDENCE_IDENTIFIED به جای نفی مطلق
+[ ۸. موتور تحلیل شواهد منفی، تناقضات و واگرایی پارامتری ]
+├── رده‌بندی تناقضات در ۱۵ شاخه تاکسونومی و تفکیک TRUE_CONTRADICTION از CONTEXTUAL_DISAGREEMENT
+├── تحلیل واگرایی پارامتری (گونه، رده سلولی، دوز، مدت، حامل، روش سنجش)
+├── اعمال قواعد معرفت‌شناختی: No Evidence != Evidence of No Effect و No Synergy Fallacy
            │
            ▼
 [ ۹. موتور التزام گزاره-شواهد و دروازه زبان علّی (Claim Entailment & Causal Gate) ]
 ├── تفکیک ادعاهای اتمیک و درجه‌بندی التزام در مقیاس ۷ سطحی
 ├── مسدودسازی ادعای علیت (Causes/Induces) در مطالعات مشاهده‌ای و همبستگی
-├── ره‌گیری کامل مقادیر عددی در دفتر شواهد (EVIDENCE_LEDGER) و مقابله با توهم اعداد
+├── ره‌گیری کامل مقادیر عددی در دفتر شواهد (EVIDENCE_LEDGER) و ممانعت از توهم اعداد
            │
            ▼
 [ ۱۰. سنتز چندبعدی شواهد بدون رای‌گیری اکثریتی ]
@@ -82,15 +82,17 @@ description: >
 ├── ممنوعیت قاطع ساده‌سازی به رای‌گیری اکثریتی (Vote Counting)
            │
            ▼
-[ ۱۱. نگارش و تدوین پروپوزال ساختارمند ۱۴ گانه دانشگاهی ]
-├── نگارش کامل ۱۴ بخش استاندارد مصوب معاونت پژوهشی
-├── اختصاص یک پاراگراف تحلیلی مستقل و تفصیلی برای تک‌تک مراجع در بخش مرور منابع
-├── جدول متغیرها، جدول زمان‌بندی گانت و متدولوژی تفصیلی ۱۴ محوره
+[ ۱۱. طراحی پروتکل پویا، اعتبارسنجی ساختار و نگارش پروپوزال ۱۴ گانه ]
+├── طراحی پویای جدول متغیرها (مستقل، وابسته، مخدوش‌کننده، کوواریات، کنترل)
+├── طراحی پویای گانت چارت زمان‌بندی و برنامه جامع تحلیل آماری متناسب با مقیاس متغیرها
+├── اعمال دروازه اعتبارسنجی ساختاری ۱۴ گانه (PROPOSAL_STRUCTURE_VALIDATION = PASS/FAIL) با پشتیبانی نیم‌فاصله و ارقام فارسی
+├── نگارش کامل یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع در بخش مرور منابع
 ├── فرمت‌بندی رسمی با فونت Dubai، تگ‌های native RTL bidi XML و خروجی Word (.docx)
            │
            ▼
-[ ۱۲. ممیزی خودکار یکپارچه و آزمون‌های رفتاری ]
-├── اجرای سوئیت تست یکپارچه (۷۷ نقطه آزمون واقعی و بدون ادعای ساختگی)
+[ ۱۲. ممیزی خودکار چندبعدی و دروازه کیفیت پیش از پرواز (9D QA Gate) ]
+├── ارزیابی ۹ بعد کیفی نهایی: تمامیت ساختار، ره‌گیری استنادها، استقلال موضوعی، مرز زمانی، کنترل علیت، تعادل تناقض، انسجام متغیرها، دقت آماری و آزمون‌های رفتاری
+├── اجرای سوئیت تست یکپارچه ۸۲ تستی با قبولی ۱۰۰٪
 ```
 
 ---
@@ -100,8 +102,8 @@ description: >
 1. **ممنوعیت کامل Hard-Code شدن موجودیت‌های یک طرح در کدهای هسته:**
    تمام نام‌های ترکیبات، سویه‌ها، رده‌های سلولی، دوزها و بیماری‌ها به عنوان ورودی و در مدل `ResearchProblemModel` تعریف می‌شوند. کدهای اصلی در `scripts/` فاقد هرگونه پیش‌فرض محدودکننده به یک موضوع خاص هستند.
 
-2. **قاعده جستجوی دومسیره و الزامی شواهد منفی (Dual-Path Search):**
-   هیچ جستجویی نباید صرفاً تأییدطلبانه (Confirmation-Seeking) باشد. در کنار جستجوی شواهد مثبت، جستجوی شواهد منفی (Null, Toxicity, Antagonism, Failure, Resistance) به صورت سیستمی اجرا می‌شود.
+2. **استراتژی جستجوی ۹ لایه‌ای و شواهد منفی الزامی (9-Layer Search):**
+   هیچ جستجویی نباید صرفاً تأییدطلبانه (Confirmation-Seeking) باشد. جستجوی فعال شواهد منفی (Null, Toxicity, Antagonism, Failure, Resistance, Dose Limits) به صورت لایه‌بندی شده و سیستمی اجرا می‌شود.
 
 3. **اصل تفکیک ارتباط از التزام (Relevance vs. Entailment):**
    مرتبط بودن موضوعی یک مقاله به هیچ عنوان به معنای اثبات ادعای متن پروپوزال توسط آن مقاله نیست. هر استناد باید بر پایه التزام دقیق محتوایی در مقیاس ۷ سطحی (`DIRECTLY_SUPPORTED` تا `CONTRADICTED`) تایید شود.
@@ -112,10 +114,16 @@ description: >
 5. **دروازه زبان علّی (Anti-Overclaim Causal Gate):**
    تبدیل عبارات همبستگی در مطالعات مشاهده‌ای به ادعاهای علیت اکیداً ممنوع بوده و به صورت خودکار با پرچم `OVERCLAIM_RISK` متوقف و اصلاح می‌گردد.
 
-6. **قاعده ره‌گیری عددی و ممانعت از توهم ارقام:**
+6. **مغالطه سینرژی بدون آزمون تجربی (No Synergy Fallacy):**
+   اثبات اثربخشی جداگانه دو مداخله به هیچ وجه نباید به عنوان اثبات سینرژی (هم‌افزایی) بیان شود. سینرژی نیازمند آزمون مستقیم ترکیبی با ماتریس دوز و شاخص‌های آماری نظیر Chou-Talalay CI یا Bliss Independence است؛ در غیر این صورت وضعیت الزاما `SYNERGY_NOT_ESTABLISHED` است.
+
+7. **تمایز فقدان شواهد از شواهد فقدان اثر (No Evidence != Evidence of No Effect):**
+   اگر کارآزمایی بالینی برای یک مداخله انجام نشده است، نباید ادعا کرد «این مداخله فاقد اثر بالینی است». فرمول‌بندی معرفت‌شناختی دقیق `NO_DIRECT_EVALUATION_FOUND` الزامی است.
+
+8. **قاعده ره‌گیری عددی و ممانعت از توهم ارقام:**
    تمام اعداد علمی اعم از دوز، $IC_{50}$، نسبت خطر، مقادیر $p$ و حجم نمونه باید مستقیماً از متن مقاله مرجع استخراج و در `EVIDENCE_LEDGER` ثبت شده باشند. در صورت عدم ذکر، وضعیت `NOT_REPORTED` ثبت شده و حدس زدن عدد اکیداً ممنوع است.
 
-7. **قانون زمانی مراجع و توجیه منابع بنیادین:**
+9. **قانون زمانی مراجع و توجیه منابع بنیادین:**
    شواهد اصلی اولیه باید در پنجره ۶ سال اخیر ($\text{Year} \ge \text{CURRENT\_YEAR} - 6$) باشند. ارجاع به مقالات قدیمی‌تر تنها در صورت داشتن برچسب توجیه بنیادین (`FOUNDATIONAL_JUSTIFICATION` نظیر مدل‌های ریاضی، روش‌های سنجش استاندارد، یا کشف‌های تاریخی مرجع) مجاز است.
 
 ---
@@ -135,7 +143,7 @@ description: >
 10. **دستاوردها:** برشمردن دستاوردهای ملموس علمی، تولید شواهد و چاپ مقالات.
 11. **جدول متغیرها:** جدول ساختارمند شامل نام متغیر، نقش، نوع، مقیاس و ابزار اندازه‌گیری.
 12. **جدول زمان‌بندی و مراحل اجرا:** گانت چارت زمان‌بندی ماهانه.
-13. **روش اجرا:** تفکیک متدولوژی در ۱۴ محور استاندارد (نوع مطالعه، جامعه، محل، ورود، خروج، ابزارها، روایی، پایایی، حجم نمونه و فرمول، تحلیل داده‌ها، ملاحظات اخلاقی، حفاظت زیستی، محدودیت‌ها، و شیوه اجرایی گام‌به‌گام).
+13. **روش اجرا:** تفکیک متدولوژی در ۱۴ محور استاندارد (۱۳-۱ نوع مطالعه، ۱۳-۲ جامعه، ۱۳-۳ محل، ۱۳-۴ ورود، ۱۳-۵ خروج، ۱۳-۶ ابزارها، ۱۳-۷ روایی، ۱۳-۸ پایایی، ۱۳-۹ حجم نمونه و فرمول، ۱۳-۱۰ تحلیل داده‌ها، ۱۳-۱۱ ملاحظات اخلاقی، ۱۳-۱۲ حفاظت زیستی، ۱۳-۱۳ محدودیت‌ها، و ۱۳-۱۴ شیوه اجرایی گام‌به‌گام).
 14. **فهرست منابع:** نمایه مراجع به فرمت استاندارد ونکوور به همراه شناسه DOI و لینک مستقیم.
 
 ---
@@ -143,14 +151,20 @@ description: >
 ## ۴. اسکریپت‌ها و ماژول‌های اجرایی مهارت (`scripts/`)
 
 - **`research_problem_model.py`:** استخراج و ساخت مدل مسئله پژوهش بر مبنای چارچوب‌های PICO/PECO/Diagnostic/Mechanistic.
-- **`generic_search_planner.py`:** طراحی ماتریس جستجوی چندپایگاهی در ۸ طبقه و اجرای طرح جستجوی دومسیره (حمایتی و معکوس).
+- **`generic_search_planner.py`:** طراحی استراتژی جستجوی ۹ لایه‌ای (A تا I)، زنجیره‌سازی استنادی و سنجش اشباع شواهد.
+- **`generic_study_relationships.py`:** ترسیم روابط چندبُعدی بین‌مطالعه‌ای در ۲۲ نوع ارتباط پویا (Replication, Extension, Supports, Contradicts, ...).
+- **`generic_gap_detector.py`:** شناسایی نظام‌مند شکاف‌های پژوهشی بر پایه شواهد تجربی در ۱۱ شاخه ساختارمند.
 - **`generic_study_family_detector.py`:** شناسایی و خوشه‌بندی مطالعات مشترک، کدهای کارآزمایی و کوهورت‌های اپیدمیولوژیک جهت جلوگیری از شمارش مضاعف شواهد.
-- **`generic_comparability_engine.py`:** ارزیابی همسنجی دوبه‌دوی مطالعات متناسب با طراحی مطالعه (سلولی، حیوانی، بالینی، تشخیصی).
-- **`generic_contradiction_engine.py`:** تحلیل و رده‌بندی شواهد متناقض بر مبنای تاکسونومی ۱۵ گانه و تفکیک تناقض واقعی از اختلاف زمینه‌ای.
-- **`generic_claim_entailment_engine.py`:** ممیزی التزام ادعاها در ۷ سطح، کنترل ادعاهای علیت و ره‌گیری دقیق مقادیر عددی.
+- **`generic_comparability_engine.py`:** ارزیابی همسنجی دوبه‌دوی مطالعات متناسب با طراحی مطالعه (سلولی، حیوانی، بالینی، تشخیصی، اپیدمیولوژیک).
+- **`generic_contradiction_engine.py`:** تحلیل و رده‌بندی شواهد متناقض بر مبنای تاکسونومی ۱۵ گانه، تفکیک تناقض واقعی از اختلاف زمینه‌ای، و قاعده عدم اثبات اثر.
+- **`generic_claim_entailment_engine.py`:** ممیزی التزام ادعاها در ۷ سطح، کنترل مغالطه سینرژی، کنترل ادعاهای علیت و ره‌گیری دقیق مقادیر عددی.
 - **`generic_reference_auditor.py`:** ممیزی اعتبار کتابشناختی، سنجش مرز زمانی و پایش دقیق ممانعت از پرکردن زینتی مراجع.
 - **`generic_evidence_synthesis.py`:** تلفیق چندبعدی شواهد بر پایه ۸ بعد قطعیت و ممانعت از ساده‌سازی اکثریتی.
+- **`dynamic_protocol_designer.py`:** طراحی خودکار و پویای جدول متغیرها، گانت چارت زمان‌بندی و برنامه تحلیل آماری منطبق بر داده‌ها.
+- **`proposal_structure_validator.py`:** دروازه اعتبارسنجی دقیق ساختار ۱۴ گانه با پشتیبانی کامل ارقام فارسی، یونیکد و نیم‌فاصله‌های استاندارد.
+- **`multi_dimensional_qa_gate.py`:** دروازه ممیزی نهایی ۹ بعدی پیش از پرواز (QA Pre-Flight Gate).
 - **`docx_builder.py`:** تولیدکننده سند نهایی Word با تایپوگرافی اختصاصی دبی فارسی و تگ‌های بومی RTL OpenXML.
+- **`generate_compliant_proposal.py`:** اسمبلر جامع تولید پروپوزال منطبق بر شواهد و ممیزی‌شده.
 - **`project_organizer.py`:** ماژول ساماندهی و ایجاد ساختار پوشه‌بندی استاندارد پروپوزال و تفکیک خودکار فایل‌های خروجی در فولدرهای اختصاصی.
 - **`self_audit_suite.py`:** سوئیت آزمون ۶۰ گانه تجربی بنچ‌مارک در سه لایه ساختاری، علمی و کنترل‌های منفی.
 
@@ -163,10 +177,12 @@ description: >
 python tests/run_all_tests.py
 ```
 این سیستم به صورت پویا ۴ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
-1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته.
-2. **آزمون تعمیم‌پذیری چهارگانه (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۴ فیکسچر مستقل (انکولوژی، کاردیولوژی، بیماری‌های عفونی، بیومارکرهای تشخیصی).
-3. **آزمون‌های تنش خصمانه (`test_adversarial_scenarios.py`):** ۱۲ آزمون چالش‌برانگیز شامل رفرنس جعلی، DOI نامنطبق، ادعای علیت غیرمجاز، توهم عددی و مقالات فاقد متن کامل.
-4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی و رعایت کامل فرمت ۱۴ گانه Word.
+1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای ۱۴ گانه هسته.
+2. **آزمون تعمیم‌پذیری پنج‌گانه (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۵ فیکسچر مستقل (انکولوژی، کاردیولوژی، بیماری‌های عفونی، بیومارکرهای تشخیصی، کوهورت اپیدمیولوژیک).
+3. **آزمون‌های تنش خصمانه ۱۶ گانه (`test_adversarial_scenarios.py`):** ۱۶ آزمون چالش‌برانگیز شامل رفرنس جعلی، DOI نامنطبق، ادعای علیت غیرمجاز، توهم عددی، مغالطه سینرژی، مقالات فاقد متن کامل، و واگرایی ساختاری.
+4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی، الزامات متدولوژیک و رعایت کامل فرمت ۱۴ گانه Word.
+
+**مجموع آزمون‌ها:** ۸۲ آزمون مستقل با قبولی ۱۰۰٪ (82 / 82 PASS).
 
 ---
 

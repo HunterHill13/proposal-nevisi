@@ -21,17 +21,25 @@ GENERIC_SCRIPTS = [
     "generic_claim_entailment_engine.py",
     "generic_reference_auditor.py",
     "generic_study_family_detector.py",
-    "generic_evidence_synthesis.py"
+    "generic_evidence_synthesis.py",
+    "generic_study_relationships.py",
+    "generic_gap_detector.py",
+    "proposal_structure_validator.py",
+    "dynamic_protocol_designer.py",
+    "multi_dimensional_qa_gate.py",
+    "project_organizer.py"
 ]
 
 FORBIDDEN_HARDCODED_TERMS = [
     r'\blupeol\b',
     r'\bnewcastle disease virus\b',
+    r'\bndv\b',
     r'\baf2240\b',
     r'\ba549\b',
     r'\bmrc-5\b',
     r'\b4t1\b',
-    r'\bchou-talalay\b'
+    r'\bchou-talalay\b',
+    r'\blung cancer\b'
 ]
 
 def run_leakage_audit() -> bool:

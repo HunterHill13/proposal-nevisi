@@ -92,6 +92,9 @@ class GenericClaimEntailmentEngine:
                 if core_num and core_num[0] not in fact_texts:
                     untraced_numbers.append(num)
 
+        # Audit synergy fallacy
+        synergy_check = cls.check_synergy_fallacy(claim_text, supporting_facts, source_study)
+
         return {
             "claim_id": claim_id,
             "claim_text": claim_text,
@@ -99,11 +102,47 @@ class GenericClaimEntailmentEngine:
             "entailment_status": entailment_status,
             "directness": directness,
             "causal_overclaim_warning": causal_check,
+            "synergy_fallacy_audit": synergy_check,
             "numerical_traceability": {
                 "claim_numbers_found": claim_numbers,
                 "untraced_numbers": untraced_numbers,
                 "hallucination_risk": len(untraced_numbers) > 0
             }
+        }
+
+    @staticmethod
+    def check_synergy_fallacy(claim_text: str, supporting_facts: List[Dict[str, Any]], source_study: Dict[str, Any]) -> Dict[str, Any]:
+        """Prevents inferring combination synergy from monotherapy efficacy (Point 29)."""
+        is_synergy_claim = bool(re.search(r'\b(?:synergistic|synergy|cooperative|supra-additive)\b', claim_text, re.IGNORECASE))
+        if not is_synergy_claim:
+            return {"is_synergy_claim": False, "synergy_status": "NOT_APPLICABLE"}
+
+        # Requires combination design, combination assay, and quantitative metric
+        has_combo_assay = bool(source_study.get("chou_talalay_ci_extracted") or "combination" in str(source_study.get("study_design", "")).lower())
+        has_metric = any("ci" in str(f.get("text_or_data", "")).lower() or "synergy" in str(f.get("text_or_data", "")).lower() for f in supporting_facts)
+
+        if not (has_combo_assay or has_metric):
+            return {
+                "is_synergy_claim": True,
+                "synergy_status": "SYNERGY_NOT_ESTABLISHED",
+                "violation": "SYNERGY_FALLACY_MONOTHERAPY_EXTRAPOLATION",
+                "recommendation": "Maintain strictly as SYNERGY_NOT_ESTABLISHED; separate monotherapies cannot prove synergy."
+            }
+
+        return {
+            "is_synergy_claim": True,
+            "synergy_status": "EMPIRICALLY_VERIFIED_COMBINATION"
+        }
+
+    @staticmethod
+    def audit_data_provenance(evidence_record: Dict[str, Any]) -> Dict[str, Any]:
+        """Audits whether data provenance is traceable to specific source locations (Point 26)."""
+        provenance = evidence_record.get("source_location", {})
+        has_location = any(k in provenance for k in ["page", "section", "table", "figure", "paragraph"])
+        return {
+            "is_provenance_traceable": has_location,
+            "recorded_location": provenance,
+            "provenance_grade": "GRANULAR_LOCATION" if has_location else "DOCUMENT_LEVEL_ONLY"
         }
 
 

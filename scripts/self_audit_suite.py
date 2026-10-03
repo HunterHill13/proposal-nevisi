@@ -32,11 +32,13 @@ def run_v7_audit(base_dir=None):
             ".",
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")),
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")),
-            ".."
+            "..",
+            r"g:\دانشگاه\پژوهش\طرح1",
+            os.environ.get("WORKSPACE_DIR", "")
         ]
         base_dir = "."
         for c in candidates:
-            if has_ref_set(c):
+            if c and os.path.exists(c) and has_ref_set(c):
                 base_dir = c
                 break
     print("=" * 80)
