@@ -725,10 +725,17 @@ def audit_citation_necessity(ref: Dict[str, Any], all_refs: List[Dict[str, Any]]
 
 def run_validity_and_relevance_audit(base_dir: str = ".") -> Dict[str, Any]:
     """Execute complete 4-axis audit and write artifacts."""
-    ref_path = os.path.join(base_dir, "PROPOSAL_REFERENCE_SET.json")
-    prop_path = os.path.join(base_dir, "MEDICAL_PROPOSAL_LUPEOL_NDV.md")
-    cache_path = os.path.join(base_dir, CACHE_FILENAME)
-    ledger_path = os.path.join(base_dir, "EVIDENCE_LEDGER.json")
+    def resolve_file(filename, subdirs=("", "references", "proposal", "evidence", "literature_search", "contradictions", "policies")):
+        for sub in subdirs:
+            p = os.path.join(base_dir, sub, filename) if sub else os.path.join(base_dir, filename)
+            if os.path.exists(p):
+                return p
+        return os.path.join(base_dir, filename)
+
+    ref_path = resolve_file("PROPOSAL_REFERENCE_SET.json", ["references", ""])
+    prop_path = resolve_file("MEDICAL_PROPOSAL_LUPEOL_NDV.md", ["proposal", ""])
+    cache_path = resolve_file(CACHE_FILENAME, ["references", ""])
+    ledger_path = resolve_file("EVIDENCE_LEDGER.json", ["evidence", ""])
     
     if not os.path.exists(ref_path):
         raise FileNotFoundError(f"Missing {ref_path}")

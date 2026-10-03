@@ -24,44 +24,56 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
 def run_v7_audit(base_dir=None):
     if base_dir is None:
-        if os.path.exists("PROPOSAL_REFERENCE_SET.json"):
-            base_dir = "."
-        elif os.path.exists(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "PROPOSAL_REFERENCE_SET.json")):
-            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-        elif os.path.exists(os.path.join(os.path.dirname(__file__), "..", "..", "..", "PROPOSAL_REFERENCE_SET.json")):
-            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-        elif os.path.exists(os.path.join("..", "PROPOSAL_REFERENCE_SET.json")):
-            base_dir = ".."
-        else:
-            base_dir = "."
+        def has_ref_set(cand):
+            return os.path.exists(os.path.join(cand, "PROPOSAL_REFERENCE_SET.json")) or \
+                   os.path.exists(os.path.join(cand, "references", "PROPOSAL_REFERENCE_SET.json"))
+
+        candidates = [
+            ".",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")),
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")),
+            ".."
+        ]
+        base_dir = "."
+        for c in candidates:
+            if has_ref_set(c):
+                base_dir = c
+                break
     print("=" * 80)
     print(">>> RUNNING RIGOROUS 60-TEST BEHAVIORAL & SCIENTIFIC AUDIT SUITE (v7.0) <<<")
     print("=" * 80)
 
-    # Artifact paths
-    qmatrix_path = os.path.join(base_dir, "QUERY_MATRIX.json")
-    qlog_path = os.path.join(base_dir, "SEARCH_QUERY_LOG.json")
-    boundary_path = os.path.join(base_dir, "SEARCH_BOUNDARY.json")
-    registry_path = os.path.join(base_dir, "SOURCE_REGISTRY.json")
-    research_corpus_path = os.path.join(base_dir, "RESEARCH_CORPUS.json")
-    proposal_ref_path = os.path.join(base_dir, "PROPOSAL_REFERENCE_SET.json")
-    claim_inv_path = os.path.join(base_dir, "ATOMIC_CLAIM_INVENTORY.json")
-    study_evidence_path = os.path.join(base_dir, "STUDY_EVIDENCE_RECORD.json")
-    evidence_matrix_csv_path = os.path.join(base_dir, "EVIDENCE_MATRIX.csv")
-    evidence_matrix_json_path = os.path.join(base_dir, "EVIDENCE_MATRIX.json")
-    study_comparability_path = os.path.join(base_dir, "STUDY_COMPARABILITY_MATRIX.json")
-    contradiction_analysis_path = os.path.join(base_dir, "CONTRADICTION_ANALYSIS.json")
-    negative_evidence_report_path = os.path.join(base_dir, "NEGATIVE_EVIDENCE_REPORT.md")
-    negative_ledger_path = os.path.join(base_dir, "NEGATIVE_EVIDENCE_LEDGER.json")
-    claim_dependency_path = os.path.join(base_dir, "CLAIM_DEPENDENCY_GRAPH.json")
-    temporal_map_path = os.path.join(base_dir, "TEMPORAL_EVIDENCE_MAP.json")
-    cross_study_ledger_path = os.path.join(base_dir, "CROSS_STUDY_RELATIONSHIP_LEDGER.json")
-    overreach_path = os.path.join(base_dir, "OVERREACH_AUDIT.json")
-    provenance_path = os.path.join(base_dir, "EVIDENCE_PROVENANCE_GRAPH.json")
-    final_synthesis_path = os.path.join(base_dir, "FINAL_EVIDENCE_SYNTHESIS.md")
-    final_audit_json_path = os.path.join(base_dir, "FINAL_REFERENCE_VALIDITY_AUDIT.json")
-    proposal_md_path = os.path.join(base_dir, "MEDICAL_PROPOSAL_LUPEOL_NDV.md")
-    cache_path = os.path.join(base_dir, "BIBLIOGRAPHIC_VERIFICATION_CACHE.json")
+    def resolve_path(filename, subdirs=("", "proposal", "evidence", "literature_search", "references", "contradictions", "policies")):
+        for sub in subdirs:
+            p = os.path.join(base_dir, sub, filename) if sub else os.path.join(base_dir, filename)
+            if os.path.exists(p):
+                return p
+        return os.path.join(base_dir, filename)
+
+    # Artifact paths (supports both flat root and structured directories)
+    qmatrix_path = resolve_path("QUERY_MATRIX.json", ["literature_search", ""])
+    qlog_path = resolve_path("SEARCH_QUERY_LOG.json", ["literature_search", ""])
+    boundary_path = resolve_path("SEARCH_BOUNDARY.json", ["literature_search", ""])
+    registry_path = resolve_path("SOURCE_REGISTRY.json", ["literature_search", ""])
+    research_corpus_path = resolve_path("RESEARCH_CORPUS.json", ["literature_search", ""])
+    proposal_ref_path = resolve_path("PROPOSAL_REFERENCE_SET.json", ["references", ""])
+    claim_inv_path = resolve_path("ATOMIC_CLAIM_INVENTORY.json", ["evidence", ""])
+    study_evidence_path = resolve_path("STUDY_EVIDENCE_RECORD.json", ["evidence", ""])
+    evidence_matrix_csv_path = resolve_path("EVIDENCE_MATRIX.csv", ["evidence", ""])
+    evidence_matrix_json_path = resolve_path("EVIDENCE_MATRIX.json", ["evidence", ""])
+    study_comparability_path = resolve_path("STUDY_COMPARABILITY_MATRIX.json", ["contradictions", "evidence", ""])
+    contradiction_analysis_path = resolve_path("CONTRADICTION_ANALYSIS.json", ["contradictions", ""])
+    negative_evidence_report_path = resolve_path("NEGATIVE_EVIDENCE_REPORT.md", ["contradictions", ""])
+    negative_ledger_path = resolve_path("NEGATIVE_EVIDENCE_LEDGER.json", ["contradictions", "evidence", ""])
+    claim_dependency_path = resolve_path("CLAIM_DEPENDENCY_GRAPH.json", ["evidence", ""])
+    temporal_map_path = resolve_path("TEMPORAL_EVIDENCE_MAP.json", ["evidence", ""])
+    cross_study_ledger_path = resolve_path("CROSS_STUDY_RELATIONSHIP_LEDGER.json", ["evidence", ""])
+    overreach_path = resolve_path("OVERREACH_AUDIT.json", ["evidence", ""])
+    provenance_path = resolve_path("EVIDENCE_PROVENANCE_GRAPH.json", ["evidence", ""])
+    final_synthesis_path = resolve_path("FINAL_EVIDENCE_SYNTHESIS.md", ["evidence", ""])
+    final_audit_json_path = resolve_path("FINAL_REFERENCE_VALIDITY_AUDIT.json", ["references", ""])
+    proposal_md_path = resolve_path("MEDICAL_PROPOSAL_LUPEOL_NDV.md", ["proposal", ""])
+    cache_path = resolve_path("BIBLIOGRAPHIC_VERIFICATION_CACHE.json", ["references", ""])
 
     def safe_load_json(p):
         if os.path.exists(p):
@@ -198,7 +210,7 @@ def run_v7_audit(base_dir=None):
     record_test(15, "Temporal Evidence Map Chronology", "STRUCTURAL_TEST", t15_pass, "TEMPORAL_EVIDENCE_MAP.json maps 40 studies across 4 chronological phases from 1983 to 2026")
 
     # Test 16: Research Gap Taxonomy Completeness (14 Categories)
-    gap_cats = safe_load_json(os.path.join(base_dir, "RESEARCH_GAP_MAP.json")) or {}
+    gap_cats = safe_load_json(resolve_path("RESEARCH_GAP_MAP.json", ["evidence", ""])) or {}
     t16_pass = gap_cats.get("total_gap_categories") == 14 and len(gap_cats.get("closest_preexisting_studies", [])) >= 4
     record_test(16, "Research Gap Taxonomy Completeness", "STRUCTURAL_TEST", t16_pass, "RESEARCH_GAP_MAP.json covers 14 gap categories with 4 closest pre-existing study boundaries")
 
@@ -344,7 +356,7 @@ def run_v7_audit(base_dir=None):
     record_test(44, "Epistemic Inquiry Completeness (11 Questions)", "SCIENTIFIC_VALIDITY_TEST", t44_pass, "All 11 mandatory epistemic questions fully addressed in FINAL_EVIDENCE_SYNTHESIS.md")
 
     # Test 45: Word DOCX Dubai Typography & Bidi XML Integrity
-    docx_file = os.path.join(base_dir, "MEDICAL_PROPOSAL_LUPEOL_NDV.docx")
+    docx_file = resolve_path("MEDICAL_PROPOSAL_LUPEOL_NDV.docx", ["proposal", ""])
     t45_pass = os.path.exists(docx_file) and os.path.getsize(docx_file) > 30000
     record_test(45, "Word DOCX Typography & Bidi XML Integrity", "SCIENTIFIC_VALIDITY_TEST", t45_pass, "MEDICAL_PROPOSAL_LUPEOL_NDV.docx successfully compiled with Dubai typography and RTL bidi XML")
 
@@ -519,7 +531,8 @@ def run_v7_audit(base_dir=None):
         "\n*Report automatically compiled by Proposal-Nevisi v7.0 Self-Audit Engine.*"
     ])
 
-    report_path = os.path.join(base_dir, "V7_SELF_AUDIT_REPORT.md")
+    policies_dir = os.path.join(base_dir, "policies")
+    report_path = os.path.join(policies_dir, "V7_SELF_AUDIT_REPORT.md") if os.path.isdir(policies_dir) else os.path.join(base_dir, "V7_SELF_AUDIT_REPORT.md")
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("\n".join(report_md))
     print(f"Generated {report_path} successfully.")
