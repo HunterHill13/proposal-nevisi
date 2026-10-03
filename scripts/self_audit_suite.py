@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive 25-Test Behavioral Self-Audit Suite (v4.0)
+Comprehensive 28-Test Behavioral Self-Audit Suite (v4.0)
 Part of Proposal-Nevisi Scientific Skill Suite.
 
 Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
@@ -29,6 +29,9 @@ Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
 23. Document Typography & RTL XML Audit (Dubai font, native RTL bidi XML, and bCs).
 24. Cross-Artifact Data Consistency (consistent identifiers across all artifacts).
 25. Minimum Threshold Must Not Drive Selection (Zero-Padding Gate: natural selection == final set).
+26. Final Proposal Actually Uses At Least 15 Unique References (actually cited in text >= 15).
+27. Every Final Reference Is Actually Cited (100% of selected references cited in text).
+28. Every Major Proposal Claim Has Evidence (claim graph backed by active citations).
 """
 
 import sys
@@ -40,7 +43,7 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
 def run_v4_behavioral_audit(base_dir="."):
     print("=" * 80)
-    print(">>> RUNNING RIGOROUS 25-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
+    print(">>> RUNNING RIGOROUS 28-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
     print("=" * 80)
 
     # Resolve artifact paths
@@ -87,6 +90,7 @@ def run_v4_behavioral_audit(base_dir="."):
     proposal_refs = safe_load_json(proposal_ref_path) or []
     claim_inv = safe_load_json(claim_inv_path) or []
     claim_graph = safe_load_json(claim_graph_path) or []
+    claim_evidence_graph = claim_graph
     gap_map = safe_load_json(gap_map_path) or []
 
     sat_report_text = safe_load_text(sat_report_path)
@@ -405,6 +409,40 @@ def run_v4_behavioral_audit(base_dir="."):
         f"Natural selection ({nat_count}) == Final proposal references ({final_count}); Zero padding code and zero padding added" if selection_undriven else f"Selection driven by threshold: nat={nat_count}, final={final_count}, pad={pad_count}, padding_code={has_padding_code}"
     )
 
+    # Test 26: Final Proposal Actually Uses At Least 15 Unique References
+    proposal_md_path = os.path.join(base_dir, "MEDICAL_PROPOSAL_LUPEOL_NDV.md")
+    cited_refs_in_text = set()
+    if os.path.exists(proposal_md_path):
+        with open(proposal_md_path, 'r', encoding='utf-8') as f:
+            p_text = f.read()
+        p_body = re.split(r'##\s*(?:۱۴|14)\.\s*فهرست\s*منابع', p_text)[0]
+        matches = re.findall(r'\[(\d+(?:\s*,\s*\d+)*)\]', p_body)
+        for m in matches:
+            for n in m.split(','):
+                cited_refs_in_text.add(int(n.strip()))
+    
+    unique_cited_count = len(cited_refs_in_text)
+    uses_at_least_15 = unique_cited_count >= 15
+    test_results["Test 26: Final Proposal Actually Uses At Least 15 Unique References"] = (
+        uses_at_least_15,
+        f"Final proposal body actually cites {unique_cited_count} unique references (Required: >= 15, Max: Unlimited)" if uses_at_least_15 else f"Insufficient citations in body: only {unique_cited_count} cited"
+    )
+
+    # Test 27: Every Final Reference Is Actually Cited
+    unused_refs = len(proposal_refs) - unique_cited_count
+    all_refs_cited = (unused_refs == 0) and (unique_cited_count == len(proposal_refs)) and (len(proposal_refs) >= 15)
+    test_results["Test 27: Every Final Reference Is Actually Cited"] = (
+        all_refs_cited,
+        f"100% of {len(proposal_refs)} selected references are actively cited in proposal text (Unused: {unused_refs})" if all_refs_cited else f"Found {unused_refs} unused references in PROPOSAL_REFERENCE_SET"
+    )
+
+    # Test 28: Every Major Proposal Claim Has Evidence
+    all_major_claims_evidenced = (len(claim_evidence_graph) > 0) and all(g.get("sufficiency_status") == "EVIDENCE_SUFFICIENT" and (len(g.get("supporting_sources", [])) + len(g.get("indirect_sources", [])) > 0) for g in claim_evidence_graph)
+    test_results["Test 28: Every Major Proposal Claim Has Evidence"] = (
+        all_major_claims_evidenced,
+        f"100% of {len(claim_evidence_graph)} core biological claims backed by verified evidence" if all_major_claims_evidenced else "Unbacked claims detected in claim graph"
+    )
+
     # Print Summary Report
     all_passed = True
     print("\n" + "-" * 80)
@@ -417,7 +455,7 @@ def run_v4_behavioral_audit(base_dir="."):
     print("-" * 80)
 
     if all_passed:
-        print("\n>>> ALL 25 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
+        print("\n>>> ALL 28 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
         return 0
     else:
         print("\n>>> BEHAVIORAL SELF-AUDIT FAILED: FIX IDENTIFIED CRITERIA BEFORE PROCEEDING. <<<\n")

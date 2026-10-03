@@ -950,6 +950,8 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
         pmcid_val = (r.get("pmcid") or "").strip()
         
         ref_obj = {
+            "citation_number": len(proposal_refs) + 1,
+            "citation_marker": f"[{len(proposal_refs) + 1}]",
             "reference_id": pmid_val or doi_val or sid,
             "role": primary_role,
             "roles": roles,
@@ -1082,6 +1084,57 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     with open(sufficiency_path, 'w', encoding='utf-8') as f:
         f.writelines(suff_lines)
     print(f"[+] Saved EVIDENCE_SUFFICIENCY_REPORT.md.")
+
+    # 7.5. Run FINAL_REFERENCE_USAGE_AUDIT on the proposal markdown
+    md_proposal_path = os.path.join(output_dir, "MEDICAL_PROPOSAL_LUPEOL_NDV.md")
+    usage_audit_path = os.path.join(output_dir, "FINAL_REFERENCE_USAGE_AUDIT.json")
+    if os.path.exists(md_proposal_path):
+        with open(md_proposal_path, 'r', encoding='utf-8') as f:
+            p_text = f.read()
+        p_body = re.split(r'##\s*(?:۱۴|14)\.\s*فهرست\s*منابع', p_text)[0]
+        matches = re.findall(r'\[(\d+(?:\s*,\s*\d+)*)\]', p_body)
+        cited_numbers = set()
+        for m in matches:
+            for n in m.split(','):
+                cited_numbers.add(int(n.strip()))
+        
+        actually_cited_count = len(cited_numbers)
+        unused_count = len(proposal_refs) - actually_cited_count
+        orphan_cits = [n for n in cited_numbers if n < 1 or n > len(proposal_refs)]
+        
+        all_real = len(orphan_cits) == 0 and all(bool(r.get("pmid") or r.get("doi")) for r in proposal_refs)
+        all_linked = all(len(r.get("supported_claims", [])) >= 1 for r in proposal_refs)
+        major_claims_complete = len(claim_evidence_graph) > 0 and all(g.get("sufficiency_status") == "EVIDENCE_SUFFICIENT" for g in claim_evidence_graph)
+        
+        is_pass = (
+            actually_cited_count >= 15 and
+            padding_added == 0 and
+            unused_count == 0 and
+            all_real and
+            all_linked and
+            major_claims_complete
+        )
+        usage_audit = {
+            "minimum_required_references": 15,
+            "maximum_allowed_references": None,
+            "selected_reference_count": len(proposal_refs),
+            "actually_cited_unique_reference_count": actually_cited_count,
+            "unused_selected_reference_count": unused_count,
+            "padding_added": padding_added,
+            "all_used_references_real": all_real,
+            "all_used_references_claim_linked": all_linked,
+            "major_claims_citation_complete": major_claims_complete,
+            "status": "PASS" if is_pass else "FAIL",
+            "audit_timestamp": datetime.datetime.now().isoformat(),
+            "audit_details": {
+                "cited_citation_numbers": sorted(list(cited_numbers)),
+                "orphan_citations_detected": orphan_cits,
+                "claim_graph_claims_covered": len(claim_evidence_graph)
+            }
+        }
+        with open(usage_audit_path, 'w', encoding='utf-8') as f:
+            json.dump(usage_audit, f, ensure_ascii=False, indent=2)
+        print(f"[+] Saved FINAL_REFERENCE_USAGE_AUDIT.json (Status: {usage_audit['status']}).")
 
     # 8. Build Dynamic Synthesis Dossier (LITERATURE_DEEP_RESEARCH.md)
     now_str = datetime.datetime.now().strftime("%Y-%m-%d")
