@@ -570,10 +570,12 @@ def audit_claim_support(
         return "PARTIALLY_SUPPORTED", ["Proposal text not provided for citation parsing."]
 
     # 1. Parse citing sentences using robust regex
-    body_text = re.split(r'##\s*(?:۱۴|14)\.\s*فهرست\s*منابع', proposal_text)[0]
+    body_parts = re.split(r'##\s*(?:۱۴|14)\.\s*(?:فهرست\s*منابع|منابعی\s*که\s*استفاده\s*شد|منابع)', proposal_text)
+    body_text = body_parts[0] if body_parts else proposal_text
     citing_sentences = []
     
-    raw_sentences = re.split(r'[.\n]\s*', body_text)
+    # Split by newline or sentence-ending periods (do not split on decimal numbers like 0.58)
+    raw_sentences = re.split(r'(?<!\d)\.(?!\d)|\n+', body_text)
     for sent in raw_sentences:
         sent = sent.strip()
         if not sent:
