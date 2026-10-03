@@ -49,7 +49,7 @@ def check_relevance(title, journal, domain_keywords):
 
 def run_checkpoint(md_path, json_path, domain_keywords=None, min_year=2020, max_year=2026):
     if domain_keywords is None:
-        domain_keywords = ["cancer", "breast", "mammary", "4t1", "lupeol", "triterpene", 
+        domain_keywords = ["cancer", "lung", "nsclc", "a549", "adenocarcinoma", "lupeol", "triterpene", 
                            "newcastle", "ndv", "oncolytic", "virus", "virotherapy",
                            "synergy", "synergistic", "combination", "cytotoxicity", "mtt", 
                            "chou-talalay", "median-effect", "mortality", "globocan", "carcinoma", 

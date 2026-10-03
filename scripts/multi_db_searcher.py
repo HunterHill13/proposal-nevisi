@@ -118,8 +118,8 @@ def generate_query_matrix(min_year=2020, max_year=2026):
     """
     Builds a multi-dimensional Concept & Query Matrix categorized into:
     1. Direct Combination (Lupeol + NDV)
-    2. Phytochemical Oncology (Lupeol + Breast / 4T1)
-    3. Oncolytic Virotherapy (NDV + Breast / 4T1)
+    2. Phytochemical Oncology (Lupeol + Lung Cancer / A549)
+    3. Oncolytic Virotherapy (NDV + Lung Cancer / A549)
     4. Mechanistic Bridges (Caspases, Bcl-2, Akt, IFN, Syncytium, ICD)
     5. Methodological Bridges (Chou-Talalay CI, MTT viability, viral titration)
     6. Deep Contradictory & Safety Evidence Branch (Antagonism, toxicity, resistance)
@@ -137,28 +137,28 @@ def generate_query_matrix(min_year=2020, max_year=2026):
             "mesh_status": "MeSH SuppConcept + MeSH Descriptor (D009514)",
             "page_limit": 5
         },
-        # Facet 2: Phytochemical Oncology (Lupeol in Breast / 4T1)
+        # Facet 2: Phytochemical Oncology (Lupeol in Lung Cancer & A549)
         {
             "facet_id": "FACET-02",
             "facet_category": "Phytochemical Oncology",
-            "label": "Lupeol Cytotoxicity in Breast Cancer & 4T1",
-            "term_pubmed": '("Lupeol"[Supplementary Concept] OR "lupeol"[tiab]) AND ("Breast Neoplasms"[Mesh] OR "breast cancer"[tiab] OR "4T1"[tiab] OR "mammary carcinoma"[tiab])',
-            "term_epmc": '(lupeol) AND (breast cancer OR 4T1 OR "mammary carcinoma")',
-            "term_oa": "lupeol breast cancer 4T1 mammary carcinoma",
-            "term_crossref": "lupeol breast cancer 4T1 carcinoma",
-            "mesh_status": "MeSH SuppConcept + MeSH Descriptor (D001943) + Text",
+            "label": "Lupeol Cytotoxicity in Lung Cancer & A549",
+            "term_pubmed": '("Lupeol"[Supplementary Concept] OR "lupeol"[tiab]) AND ("Lung Neoplasms"[Mesh] OR "lung cancer"[tiab] OR "A549"[tiab] OR "non-small cell lung cancer"[tiab] OR "NSCLC"[tiab])',
+            "term_epmc": '(lupeol) AND ("lung cancer" OR A549 OR NSCLC OR "lung adenocarcinoma")',
+            "term_oa": "lupeol lung cancer A549 adenocarcinoma",
+            "term_crossref": "lupeol lung cancer A549 adenocarcinoma",
+            "mesh_status": "MeSH SuppConcept + MeSH Descriptor (D008175) + Text",
             "page_limit": 5
         },
-        # Facet 3: Oncolytic Virotherapy (NDV in Breast / 4T1)
+        # Facet 3: Oncolytic Virotherapy (NDV in Lung Cancer & A549)
         {
             "facet_id": "FACET-03",
             "facet_category": "Oncolytic Virotherapy",
-            "label": "NDV Oncolytic Virotherapy in Breast Cancer & 4T1",
-            "term_pubmed": '("Newcastle Disease Virus"[Mesh] OR "newcastle disease virus"[tiab] OR "NDV"[tiab]) AND ("Breast Neoplasms"[Mesh] OR "breast cancer"[tiab] OR "4T1"[tiab] OR "oncolytic"[tiab])',
-            "term_epmc": '("newcastle disease virus" OR NDV) AND (breast cancer OR 4T1 OR oncolytic)',
-            "term_oa": "newcastle disease virus oncolytic breast cancer 4T1",
-            "term_crossref": "newcastle disease virus oncolytic breast cancer",
-            "mesh_status": "MeSH Descriptor (D009514) + MeSH Descriptor (D001943)",
+            "label": "NDV Oncolytic Virotherapy in Lung Cancer & A549",
+            "term_pubmed": '("Newcastle Disease Virus"[Mesh] OR "newcastle disease virus"[tiab] OR "NDV"[tiab]) AND ("Lung Neoplasms"[Mesh] OR "lung cancer"[tiab] OR "A549"[tiab] OR "oncolytic"[tiab])',
+            "term_epmc": '("newcastle disease virus" OR NDV) AND ("lung cancer" OR A549 OR oncolytic)',
+            "term_oa": "newcastle disease virus oncolytic lung cancer A549",
+            "term_crossref": "newcastle disease virus oncolytic lung cancer",
+            "mesh_status": "MeSH Descriptor (D009514) + MeSH Descriptor (D008175)",
             "page_limit": 5
         },
         # Facet 4: Mechanistic Bridge - Lupeol & Apoptosis/Akt
@@ -946,7 +946,7 @@ def screen_candidate_pool(candidates):
     abstract_excluded = []
 
     inc_kws = ["cancer", "carcinoma", "tumor", "neoplasm", "lupeol", "triterpene", "newcastle", "ndv", 
-               "oncolytic", "virotherapy", "paramyxovirus", "cytotox", "apoptosis", "synerg", "breast", "mammary",
+               "oncolytic", "virotherapy", "paramyxovirus", "cytotox", "apoptosis", "synerg", "lung", "a549", "nsclc",
                "chou-talalay", "isobologram", "combination index", "antagonism", "resistance", "toxicity"]
     
     exc_kws = ["broiler", "chickens", "poultry farm", "avian influenza vaccine", "dairy cattle", "taxonomy of", 
@@ -971,7 +971,7 @@ def screen_candidate_pool(candidates):
                     "newcastle disease virus", "ndv", "oncolytic", "virotherapy", "paramyxovirus",
                     "combination therapy", "synergy", "synergistic", "chou-talalay", "antagonism", "resistance"]
     
-    outcome_terms = ["breast", "mammary", "carcinoma", "tnbc", "mcf-7", "mda-mb-231", "4t1",
+    outcome_terms = ["lung", "nsclc", "adenocarcinoma", "a549", "alveolar", "carcinoma",
                      "apoptosis", "caspase", "cytotoxicity", "viability", "proliferation", "ic50",
                      "bcl-2", "bax", "akt", "pi3k", "nf-kb", "syncytium", "antitumor", "in vitro", "in vivo", 
                      "tumor growth", "resistance", "toxicity", "safety", "neutralization"]
@@ -1140,13 +1140,13 @@ def score_relevance_and_quality(record):
     meta = f"{title} {abstract} {fulltext}"
 
     # A) RELEVANCE SCORE (0 to 10.0)
-    # 1. Disease (Breast / 4T1)
-    d_score = 3.0 if any(k in meta for k in ["breast cancer", "mammary carcinoma", "tnbc", "breast tumor"]) else (1.5 if "cancer" in meta else 0.0)
+    # 1. Disease (Lung Cancer / NSCLC / A549)
+    d_score = 3.0 if any(k in meta for k in ["lung cancer", "nsclc", "a549", "lung adenocarcinoma", "pulmonary"]) else (1.5 if "cancer" in meta else 0.0)
     # 2. Interventions (Lupeol & NDV)
     i1_score = 2.5 if "lupeol" in meta else (1.5 if any(k in meta for k in ["triterpene", "triterpenoid", "lupane"]) else 0.0)
     i2_score = 2.5 if any(k in meta for k in ["newcastle disease virus", "ndv"]) else (1.5 if "oncolytic" in meta else 0.0)
-    # 3. Model (4T1 / BALB/c)
-    m_score = 1.0 if "4t1" in meta else (0.5 if any(k in meta for k in ["balb/c", "murine model", "mouse model"]) else 0.0)
+    # 3. Model (A549 / In Vitro)
+    m_score = 1.0 if "a549" in meta else (0.5 if any(k in meta for k in ["in vitro", "cell line", "cell culture"]) else 0.0)
     # 4. Recency
     try:
         yr = int(str(record.get("year", "0"))[:4])
@@ -1169,9 +1169,9 @@ def score_relevance_and_quality(record):
     # 2. Experimental Directness (3.0 max)
     if "lupeol" in meta and any(k in meta for k in ["newcastle", "ndv"]):
         directness_score = 3.0
-    elif "lupeol" in meta and "4t1" in meta:
+    elif "lupeol" in meta and ("a549" in meta or "lung" in meta):
         directness_score = 2.5
-    elif any(k in meta for k in ["newcastle", "ndv"]) and "4t1" in meta:
+    elif any(k in meta for k in ["newcastle", "ndv"]) and ("a549" in meta or "lung" in meta):
         directness_score = 2.5
     elif "lupeol" in meta or any(k in meta for k in ["newcastle", "ndv"]):
         directness_score = 2.0
@@ -1198,7 +1198,7 @@ def score_relevance_and_quality(record):
         role = "Contradictory_context"
     elif any(k in meta for k in ["chou-talalay", "combination index", "isobologram", "synergy"]):
         role = "Methodology_standard"
-    elif "4t1" in meta or "balb/c" in meta:
+    elif "a549" in meta or "lung" in meta:
         role = "Model_justification"
     elif any(k in meta for k in ["caspase", "bcl-2", "bax", "akt", "pi3k", "signaling", "interferon", "syncytium"]):
         role = "Mechanism"
@@ -1384,7 +1384,7 @@ def run_v4_deep_research_pipeline(output_dir=".", min_year=2020, max_year=2026):
         "fulltext_audit_policy": "100% universal screening of all eligible candidates via PMC OA XML and Europe PMC XML",
         "canonical_novelty_statement": (
             "No directly matching study evaluating the simultaneous combination of Lupeol and "
-            "oncolytic Newcastle Disease Virus in the 4T1 murine mammary carcinoma model was identified "
+            "oncolytic Newcastle Disease Virus on growth inhibition of lung cancer cell line (A549) in vitro was identified "
             "within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."
         )
     }

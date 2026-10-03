@@ -195,7 +195,7 @@ def extract_evidence_provenance_structured(fulltext, abstract=""):
     for sec_name, sec_text in parsed_sections:
         sentences = re.split(r'(?<=[.!?])\s+', sec_text)
         for s in sentences:
-            found = re.findall(r'\b(4T1|MCF-7|MDA-MB-231|T47D|SKBR3|EMT6|B16F10|Vero|mammary carcinoma)\b', s, re.IGNORECASE)
+            found = re.findall(r'\b(A549|BEAS-2B|H1299|H460|lung adenocarcinoma|MCF-7|MDA-MB-231|Vero)\b', s, re.IGNORECASE)
             if found:
                 for f in found: detected_cells.add(f.upper())
                 s_str = s.strip()
@@ -393,7 +393,7 @@ def assign_reference_provenance(rec, claims_for_rec):
     elif any(k in combined_text for k in ["newcastle disease virus", "ndv", "oncolytic", "virotherapy", "syncytium"]):
         primary_role = "NDV_EVIDENCE"
         roles = ["NDV_EVIDENCE", "ONCOLYTIC_VIROTHERAPY"]
-    elif any(k in combined_text for k in ["4t1", "balb/c", "syngeneic", "mouse model", "mammary carcinoma"]):
+    elif any(k in combined_text for k in ["a549", "beas-2b", "lung adenocarcinoma", "nsclc", "lung cancer"]):
         primary_role = "CELL_LINE_RATIONALE"
         roles = ["CELL_LINE_RATIONALE", "DISEASE_BURDEN"]
     elif any(k in combined_text for k in ["caspase-3", "caspase", "bcl-2", "bax", "akt", "pi3k", "mtor", "signaling"]):
@@ -402,7 +402,7 @@ def assign_reference_provenance(rec, claims_for_rec):
     elif any(k in combined_text for k in ["safety", "tolerance", "toxicity", "solvent", "dmso", "off-target"]):
         primary_role = "SAFETY"
         roles = ["SAFETY", "MOLECULAR_BIOLOGY"]
-    elif any(k in combined_text for k in ["breast cancer", "tnbc", "triple-negative", "carcinoma", "metastasis", "epidemiology"]):
+    elif any(k in combined_text for k in ["lung cancer", "nsclc", "pulmonary neoplasm", "carcinoma", "metastasis", "epidemiology", "globocan"]):
         primary_role = "EPIDEMIOLOGY"
         roles = ["EPIDEMIOLOGY", "DISEASE_BURDEN"]
     else:
@@ -418,13 +418,13 @@ def assign_reference_provenance(rec, claims_for_rec):
     if is_foundation:
         necessity_reason = "Foundational mathematical and methodological standard establishing the median-effect combination index equation (CI < 1.0) and MTT viability protocol."
     elif primary_role == "LUPEOL_EVIDENCE":
-        necessity_reason = "Essential for demonstrating the direct cytotoxicity, apoptotic caspase activation, and concentration windows of Lupeol in breast carcinoma targets."
+        necessity_reason = "Essential for demonstrating the direct cytotoxicity, apoptotic caspase activation, and concentration windows of Lupeol in lung carcinoma targets."
     elif primary_role == "NDV_EVIDENCE":
         necessity_reason = "Essential for verifying replication-selective oncolytic potency, syncytium induction, and cancer clearance induced by Newcastle Disease Virus."
     elif primary_role == "COMBINATION_RATIONALE":
         necessity_reason = "Establishes mechanistic necessity for co-targeting intrinsic survival signaling and viral oncolysis to achieve preclinical pharmacological synergy."
     elif primary_role == "CELL_LINE_RATIONALE":
-        necessity_reason = "Provides translational justification for the aggressive, syngeneic, immunocompetent 4T1 murine mammary carcinoma host model in BALB/c mice."
+        necessity_reason = "Provides experimental justification for using the human alveolar lung adenocarcinoma cell line (A549) as the gold standard in vitro model."
     elif primary_role == "MECHANISM":
         necessity_reason = "Validates specific intracellular signaling milestones, including caspase-3/9 cleavage and downregulation of phospho-Akt survival signaling."
     elif primary_role == "CONTRADICTORY_EVIDENCE":
@@ -588,21 +588,21 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     core_claims_definitions = [
         {
             "graph_claim_id": "GC-01",
-            "claim_topic": "Lupeol Direct Cytotoxicity & Apoptosis Induction in Breast Carcinoma",
+            "claim_topic": "Lupeol Direct Cytotoxicity & Apoptosis Induction in Lung Carcinoma (A549)",
             "domain": "Phytochemical Oncology",
-            "match_keywords": ["lupeol", "triterpene", "breast", "mammary"]
+            "match_keywords": ["lupeol", "triterpene", "lung", "a549", "adenocarcinoma"]
         },
         {
             "graph_claim_id": "GC-02",
-            "claim_topic": "NDV Selective Oncolysis & Syncytium Formation in Mammary Tumors",
+            "claim_topic": "NDV Selective Oncolysis & Syncytium Formation in Lung Tumors",
             "domain": "Oncolytic Virotherapy",
             "match_keywords": ["newcastle", "ndv", "oncolytic", "syncytium"]
         },
         {
             "graph_claim_id": "GC-03",
-            "claim_topic": "4T1 Murine Mammary Carcinoma as an Aggressive Syngeneic Host Model",
+            "claim_topic": "A549 Human Lung Adenocarcinoma as a Validated In Vitro Model",
             "domain": "Host & Tumor Models",
-            "match_keywords": ["4t1", "balb/c", "syngeneic"]
+            "match_keywords": ["a549", "lung", "adenocarcinoma", "in vitro", "nsclc"]
         },
         {
             "graph_claim_id": "GC-04",
@@ -702,17 +702,17 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     research_gap_map = [
         {
             "gap_id": "GAP-01",
-            "gap_statement": "فقدان ارزیابی همزمان برهم‌کنش فارماکودینامیک لوپئول و ویروس انکولیتیک NDV در مدل کارسینوم پستان ۴T1 درون‌تن و برون‌تن",
-            "exact_research_question": "آیا تجویز توأم لوپئول و NDV در رده کارسینوم پستان ۴T1 منجر به بروز اثرات هم‌افزایی داروشناختی (CI < 1.0) می‌گردد؟",
+            "gap_statement": "فقدان ارزیابی همزمان برهم‌کنش فارماکودینامیک لوپئول و ویروس انکولیتیک NDV در مدل کارسینوم سلول‌های ریه A549 در شرایط آزمایشگاهی",
+            "exact_research_question": "آیا تجویز توأم لوپئول و NDV در رده سلول سرطانی ریه (A549) منجر به بروز اثرات هم‌افزایی داروشناختی (CI < 1.0) می‌گردد؟",
             "search_queries_used": [
-                '("Lupeol"[Supplementary Concept] OR "lupeol"[tiab]) AND ("Newcastle Disease Virus"[Mesh] OR "NDV"[tiab]) AND ("4T1"[tiab] OR "Breast Neoplasms"[Mesh])'
+                '("Lupeol"[Supplementary Concept] OR "lupeol"[tiab]) AND ("Newcastle Disease Virus"[Mesh] OR "NDV"[tiab]) AND ("A549"[tiab] OR "Lung Neoplasms"[Mesh])'
             ],
             "databases_searched": ["PubMed", "Europe PMC", "OpenAlex", "Crossref"],
             "date_boundary": "2020-2026",
             "relevant_studies_found": 0,
             "closest_studies": [
-                "مطالعات اثر تک‌عاملی لوپئول بر آپوپتوز رده ۴T1 و MCF-7",
-                "مطالعات ویروس‌درمانی انکولیتیک انفرادی NDV در کارسینوم موشی"
+                "مطالعات اثر تک‌عاملی لوپئول بر آپوپتوز رده A549 و H1299",
+                "مطالعات ویروس‌درمانی انکولیتیک انفرادی NDV در کارسینوم سلول‌های ریه"
             ],
             "what_closest_studies_tested": "اثربخشی مستقل هر عامل به عنوان مونوتراپی در مهار رشد یا مرگ سلولی",
             "what_they_did_not_test": "منحنی‌های همزمانی دوز-پاسخ، شاخص ترکیب چو-تالالی (CI)، و فاکتور کاهش دوز (DRI)",
@@ -722,7 +722,7 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
         {
             "gap_id": "GAP-02",
             "gap_statement": "عدم شناسایی تغییرات سینتیک تکثیر ویروسی NDV در حضور پیش‌تیمار با تری‌ترپن‌های لوپانی",
-            "exact_research_question": "آیا تعدیل مسیرهای بقا توسط لوپئول باعث تسهیل چرخه همانندسازی یا افزایش تشکیل سن‌سیشیوم ناشی از NDV در سلول‌های ۴T1 می‌شود؟",
+            "exact_research_question": "آیا تعدیل مسیرهای بقا توسط لوپئول باعث تسهیل چرخه همانندسازی یا افزایش تشکیل سن‌سیشیوم ناشی از NDV در سلول‌های A549 می‌شود؟",
             "search_queries_used": [
                 '("Newcastle Disease Virus"[Mesh]) AND ("triterpenes"[Mesh] OR "lupeol"[tiab]) AND ("viral replication"[tiab] OR "plaque assay"[tiab])'
             ],
@@ -752,13 +752,13 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     
     matrix_domains = [
         ("EQ01", "Direct Combination (Lupeol + NDV)", 0, 8, "فاقد مطالعه همزمانی در مرز ۲۰۲۰-۲۰۲۶", "احتمال تداخل در دوزهای نامتقارن", "طراحی آزمون ایزوبولوگرام کامل و محاسبه CI در این طرح"),
-        ("EQ02", "Phytochemical Cytotoxicity (Lupeol)", 12, 14, "مطالعات سلولی پستان (IC50: 20-50 µM)", "آبگریزی بالا در دوز بالای ۸۰ میکرومولار", "کنترل حلال DMSO زیر ۰.۱ درصد در چاهک‌های کشت"),
-        ("EQ03", "Oncolytic Virotherapy (NDV)", 11, 15, "انکولیز وابسته به تکثیر و القای سن‌سیشیوم", "خنثی‌سازی توسط آنتی‌بادی در فاز تاخیری حیوانی", "ارزیابی تیتر ویروسی درون‌توموری در روزهای اولیه"),
-        ("EQ04", "4T1 Mammary Model Directness", 9, 10, "مدل تهاجمی TNBC موشی با تمایل متاستاز", "مقاومت ذاتی نسبی به برخی شیمی‌درمانی‌ها", "بهره‌گیری از موش‌های هم‌نژاد BALB/c و رده تاییدشده ۴T1"),
+        ("EQ02", "Phytochemical Cytotoxicity (Lupeol)", 12, 14, "مطالعات سلولی ریه A549 (IC50: 20-50 µM)", "آبگریزی بالا در دوز بالای ۸۰ میکرومولار", "کنترل حلال DMSO زیر ۰.۱ درصد در چاهک‌های کشت"),
+        ("EQ03", "Oncolytic Virotherapy (NDV)", 11, 15, "انکولیز وابسته به تکثیر و القای سن‌سیشیوم", "پاسخ ایمنی ذاتی با واسطه اینترفرون در برخی رده‌ها", "ارزیابی حساسیت رده A549 و نقص مسیر IFN"),
+        ("EQ04", "A549 Lung Model Directness", 9, 10, "مدل کارسینوم ریه انسانی A549 برون‌تن", "تفاوت احتمالی پاسخ سلول‌های نامیرای A549 با بافت ریه نرمال", "بهره‌گیری از سلول‌های اپیتلیال نرمال ریه BEAS-2B جهت ارزیابی پنجره ایمنی"),
         ("EQ05", "Caspase & Apoptotic Pathways", 14, 18, "فعال‌سازی کاسپاز-۳/۹ و شکافت PARP", "گزارش نشده", "سنجش همزمان فلوسایتومتری انکسین V/PI و پروتئین‌های میتوکندری"),
         ("EQ06", "PI3K/Akt Survival Signaling", 8, 12, "مهار فسفوریلاسیون سرین ۴۷۳ کیناز Akt", "گزارش نشده", "بررسی نقش لوپئول در شکستن سد بقای سلولی تومور"),
         ("EQ07", "Chou-Talalay Predefined Rule", 2, 6, "چو (۲۰۰۶) متدولوژی پایه و ایزوبولوگرام", "CI > 1 نشان‌دهنده آنتاگونیسم است", "استفاده از CI < 1 به عنوان ضابطه تصمیم‌گیری استاندارد"),
-        ("EQ08", "Safety & Normal Cell Tolerance", 6, 8, "تحمل‌پذیری سلول‌های سالم در برابر لوپئول و NDV", "سمیت در غلظت‌های خارج از محدوده", "پایش شاخص‌های وزن، بیوشیمی کبد و کلیه موش‌ها")
+        ("EQ08", "Safety & Normal Cell Tolerance", 6, 8, "تحمل‌پذیری سلول‌های سالم در برابر لوپئول و NDV", "سمیت در غلظت‌های خارج از محدوده", "پایش شاخص‌های زنده ماندن رده سلول غیرتوموری ریه BEAS-2B")
     ]
 
     for eq_id, dname, dir_cnt, indir_cnt, strong_study, contra_ev, gap_sol in matrix_domains:
@@ -782,11 +782,11 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
 
     # 12 Core Evidence Domains covering every facet of the medical proposal
     core_domains_criteria = [
-        ("EPIDEMIOLOGY", lambda r, text: any(k in text for k in ["breast cancer", "tnbc", "triple-negative", "carcinoma", "epidemiology", "metastasis"])),
+        ("EPIDEMIOLOGY", lambda r, text: any(k in text for k in ["lung cancer", "nsclc", "adenocarcinoma", "carcinoma", "epidemiology", "a549"])),
         ("LUPEOL_EVIDENCE", lambda r, text: any(k in text for k in ["lupeol", "triterpene", "triterpenoid", "lupane"])),
         ("NDV_EVIDENCE", lambda r, text: any(k in text for k in ["newcastle disease virus", "ndv", "oncolytic", "virotherapy", "syncytium"])),
         ("COMBINATION_RATIONALE", lambda r, text: any(k in text for k in ["combination", "synergy", "synergistic", "isobologram", "chou-talalay", "co-treatment"])),
-        ("CELL_LINE_RATIONALE", lambda r, text: any(k in text for k in ["4t1", "balb/c", "syngeneic", "mouse model", "mammary carcinoma"])),
+        ("CELL_LINE_RATIONALE", lambda r, text: any(k in text for k in ["a549", "lung cancer", "adenocarcinoma", "nsclc", "beas-2b"])),
         ("MECHANISM_CASPASE", lambda r, text: any(k in text for k in ["caspase-3", "caspase", "bax", "bcl-2", "cytochrome c", "parp"])),
         ("MECHANISM_PI3K_AKT", lambda r, text: any(k in text for k in ["akt", "pi3k", "mtor", "phospho-akt", "survival signaling"])),
         ("METHODOLOGY_CHOU_TALALAY", lambda r, text: r.get("is_foundation") or any(k in text for k in ["chou-talalay", "combination index", "median-effect", "ci < 1"])),
@@ -812,7 +812,7 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     # A study is a candidate IF AND ONLY IF it satisfies at least one necessity criterion:
     # 1. Supports a major proposal claim in claim_evidence_graph (CLM-01 .. CLM-09)
     # 2. Covers an essential evidence domain with high relevance/quality or Tier A
-    # 3. Direct evidence for main research question (Lupeol in 4T1, NDV oncolytic, combo)
+    # 3. Direct evidence for main research question (Lupeol in A549, NDV oncolytic, combo)
     # 4. Key contradictory or safety evidence essential for balanced synthesis
     # 5. Methodological foundation (Chou-Talalay 2006, Mosmann 1983)
     # =========================================================================
@@ -827,7 +827,7 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
         c1 = any(sid in g.get("supporting_sources", []) or sid in g.get("indirect_sources", []) or sid in g.get("contradicting_sources", []) for g in claim_evidence_graph)
         c2 = len(d_list) >= 1 and (r.get("source_tier") == "Tier A" or r.get("relevance_score", 0) >= 6 or r.get("evidence_quality_score", 0) >= 6)
         text = f"{(r.get('title') or '').lower()} {(r.get('abstract') or '').lower()}"
-        c3 = any(k in text for k in ["lupeol", "newcastle disease virus", "4t1", "breast cancer"]) and (r.get("relevance_score", 0) >= 5)
+        c3 = any(k in text for k in ["lupeol", "newcastle disease virus", "a549", "lung cancer"]) and (r.get("relevance_score", 0) >= 5)
         c4 = r.get("evidentiary_role") == "Contradictory_context" or any(k in text for k in ["antagonis", "resistance", "toxicity", "neutralizing antibody"])
         c5 = is_foundation
 
@@ -1145,7 +1145,7 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
         f"**تعداد کل مراجع پرونده شواهد:** {len(proposal_refs)} مقاله منتخب بر مبنای ضرورت اثباتی (Research Corpus: {len(corpus)} مقاله)\n\n---\n",
         "## ۱. چکیده مدیریتی و سنتز شواهد (Executive Research Synthesis)\n\n",
         "`[Epistemic Status: Synthesis / Methodological Framework]`  \n",
-        "این پرونده بر مبنای فرآیند بازیابی عمیق ادبیات از پایگاه‌های PubMed (MeSH)، Europe PMC، OpenAlex و Crossref و تحلیل دقیق متن کامل تدوین شده است. هدف اصلی این واکاوی، استخراج دقیق پارامترهای کمی آزمایشگاهی، مقادیر دوز و شاخص‌های سمیت جهت تدوین پروتکل ارزیابی برهم‌کنش هم‌افزایی **لوپئول (Lupeol)** و **ویروس انکولیتیک بیماری نیوکاسل (NDV)** در مدل **کارسینوم پستان ۴T1** و موش‌های BALB/c می‌باشد. تمامی ادعاهای این سند به صورت دوطرفه به پرونده‌های `CLAIM_INVENTORY.json` و `CLAIM_EVIDENCE_GRAPH.json` متصل شده‌اند.\n\n",
+        "این پرونده بر مبنای فرآیند بازیابی عمیق ادبیات از پایگاه‌های PubMed (MeSH)، Europe PMC، OpenAlex و Crossref و تحلیل دقیق متن کامل تدوین شده است. هدف اصلی این واکاوی، استخراج دقیق پارامترهای کمی آزمایشگاهی، مقادیر دوز و شاخص‌های سمیت جهت تدوین پروتکل ارزیابی برهم‌کنش هم‌افزایی **لوپئول (Lupeol)** و **ویروس انکولیتیک بیماری نیوکاسل (NDV)** در مدل **کارسینوم ریه انسانی (A549)** در شرایط برون‌تن (In Vitro) می‌باشد. تمامی ادعاهای این سند به صورت دوطرفه به پرونده‌های `CLAIM_INVENTORY.json` و `CLAIM_EVIDENCE_GRAPH.json` متصل شده‌اند.\n\n",
         "## ۲. شناسنامه شیمیایی و نگاشت مسیرهای زیستی (Chemical & Pathway Grounding)\n\n",
         "### ۲.۱. مشخصات فیزیکوشیمیایی لوپئول استعلام‌شده از پایگاه PubChem (Live API):\n",
         f"- **وضعیت استعلام:** `{pubchem_lupeol.get('status')}`\n",

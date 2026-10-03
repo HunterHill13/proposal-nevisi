@@ -43,7 +43,7 @@ flowchart TD
 - **EQ01: انکولوژی مستقیم و سمیت سلولی (Direct Oncology & Cytotoxicity):** مقادیر IC50، درصد مهار رشد، و سینتیک زنده‌مانی.
 - **EQ02: کسکیدهای پیام‌رسانی مولکولی (Molecular Signaling Pathways):** کاسپازها، نسبت Bax/Bcl-2، مهار Akt، و فعال‌سازی NF-kB.
 - **EQ03: متدولوژی هم‌افزایی و درمان ترکیبی (Combination & Synergy):** ضابطه تصمیم‌گیری چو-تالالی و آزمون ایزوبولوگرام.
-- **EQ04: مدل‌های سلولی و حیوانی (Cellular & Animal Models):** سلول ۴T1 و مدل سینژنیک موش BALB/c.
+- **EQ04: مدل‌های سلولی برون‌تن (In Vitro Cellular Models):** رده کارسینوم آلوئولار ریه انسان (A549) و رده اپیتلیال کنترل نرمال (BEAS-2B).
 - **EQ05: شاخص درمانی و ارزیابی ایمنی (Safety & Therapeutic Index):** پنجره دوز ایمن و مهار سمیت بر بافت‌های سالم.
 - **EQ06: دارورسانی و فارماکوکینتیک (Pharmacokinetics & Delivery):** حلالیت، کنترل DMSO زیر ۰.۱٪، و پایداری درونزاد.
 - **EQ07: موانع مقاومت زیستی و آنتاگونیسم (Resistance & Antagonism):** پدیده‌های مقاومت دارویی/ویروسی و راهکارهای غلبه بر آن.
@@ -69,7 +69,7 @@ flowchart TD
 
 ### ۵. سیاست اصالت مقید (Bounded Novelty Statement)
 در تمامی گزارش‌ها و متون پروپوزال، نوآوری طرح منحصراً در چارچوب مرز جست‌وجوی مستندشده بیان می‌گردد:
-> "No directly matching study evaluating the simultaneous combination of Lupeol and oncolytic Newcastle Disease Virus in the 4T1 murine mammary carcinoma model was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."
+> "No directly matching study evaluating the simultaneous combination of Lupeol and oncolytic Newcastle Disease Virus on growth inhibition of lung cancer cell line (A549) in vitro was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."
 
 ---
 

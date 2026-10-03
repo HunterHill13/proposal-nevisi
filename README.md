@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Evidence-Driven Deep Literature Research Engine & Academic Proposal Generator (v3.0)
+### Evidence-Driven Deep Literature Research Engine & Academic Proposal Generator (v4.5)
 ### موتور پژوهش عمیق متون علمی و نگارش پروپوزال‌های پژوهشی علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Audit Suite: 18/18 Passed](https://img.shields.io/badge/Audit%20Suite-18%2F18%20Passed-success.svg)](#18-test-self-audit-suite)
+[![Audit Suite: 34/34 Passed](https://img.shields.io/badge/Audit%20Suite-34%2F34%20Passed-success.svg)](#34-test-behavioral-self-audit-suite)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#15-stage-evidence-funnel)
 
 ---
