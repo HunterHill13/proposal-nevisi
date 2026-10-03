@@ -8,7 +8,7 @@ based on authentic evidence trails, boundary conditions, and study cohort charac
 """
 
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 UNIVERSAL_GAP_TAXONOMY = {
     "POPULATION_GAP": "Lack of evidence in specific clinical, demographic, or disease sub-populations",
@@ -28,13 +28,26 @@ class GenericGapDetector:
     """Detects, categorizes, and validates evidence-based research gaps."""
 
     @classmethod
+    def detect_gaps(
+        cls,
+        studies: List[Dict[str, Any]],
+        target_model: Dict[str, Any],
+        contradictions: Optional[List[Dict[str, Any]]] = None
+    ) -> List[Dict[str, Any]]:
+        """Convenience alias for detecting gaps directly from studies and target model."""
+        res = cls.identify_gaps(target_model=target_model, study_evidence=studies, contradictions=contradictions or [])
+        return res.get("identified_gaps", [])
+
+    @classmethod
     def identify_gaps(
         cls,
         target_model: Dict[str, Any],
         study_evidence: List[Dict[str, Any]],
-        contradictions: List[Dict[str, Any]]
+        contradictions: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """Maps synthesized evidence against target research problem to derive grounded gaps."""
+        if contradictions is None:
+            contradictions = []
         identified_gaps = []
 
         # 1. Model Gap: Check if studies cover primary target system
@@ -44,11 +57,12 @@ class GenericGapDetector:
             if target_system and target_system in str(s.get("model_system", s.get("organism_cell_line", ""))).lower()
         ]
         if len(system_studies) < 3:
+            gap_cat = "POPULATION_GAP" if "clinical" in str(target_model.get("population_or_model", {}).get("model_type", "")).lower() or "human" in str(target_model.get("population_or_model", {}).get("model_type", "")).lower() else "MODEL_GAP"
             identified_gaps.append({
-                "gap_category": "MODEL_GAP",
-                "definition": UNIVERSAL_GAP_TAXONOMY["MODEL_GAP"],
+                "gap_category": gap_cat,
+                "definition": UNIVERSAL_GAP_TAXONOMY.get(gap_cat, UNIVERSAL_GAP_TAXONOMY["MODEL_GAP"]),
                 "evidence_trail": f"Only {len(system_studies)} studies evaluate target system '{target_system}' directly.",
-                "proposed_resolution": "Conduct systematic empirical validation directly within target biological lineage."
+                "proposed_resolution": "Conduct systematic empirical validation directly within target biological lineage or patient population."
             })
 
         # 2. Combination Gap: Check if multi-agent combinations exist

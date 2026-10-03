@@ -1,0 +1,1597 @@
+[
+  {
+    "graph_claim_id": "GC-01",
+    "claim_topic": "Lupeol Direct Cytotoxicity & Apoptosis Induction in Lung Carcinoma (A549)",
+    "domain": "Phytochemical Oncology",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 90,
+    "contradicting_sources_count": 6,
+    "indirect_sources_count": 180,
+    "supporting_sources": [
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The ginsenoside Rh2 stimulates the c-Jun N-terminal kinase (JNK)/mitogen-activated protein kinase (MAPK) signaling pathway, impacting the levels of the cell cycle proteins D1 and cyclin-dependent kina"
+      },
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Overall, under serum starvation conditions, ginsenosides inhibit the expression of Akt and activate FoxO in serum-starved A549 cells.Concurrently, changes in the mRNA expression levels of apoptosis-re"
+      },
+      {
+        "source_id": "38682055",
+        "source_ref": "Gouvarchinghaleh HE et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "observed an increase in NDV replication and syncytia formation in A549 tumor cells, leading to apoptosis in 2011 (24)."
+      },
+      {
+        "source_id": "34575964",
+        "source_ref": "Khusnutdinova E et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "A comparative summary of the single-dose mean growth inhibition (%) for all active compounds, and for those that passed the initial one-dose screening test, the mean (GI50, μM) and the most sensitive "
+      },
+      {
+        "source_id": "36613643",
+        "source_ref": "Pęcak P et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "showed that betulin 1 induces apoptosis in human cancer cells such as HeLa (cervix carcinoma), HepG2 (hepatoma), A549 (lung adenocarcinoma), MCF-7 (breast cancer), SK-HEP-1 (hepatoma), PC-3 (prostate "
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "35327364",
+        "source_ref": "Schirrmacher V et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "A few examples of breaking drug resistance are: induction of apoptosis in cisplatin-resistant human lung adenocarcinoma cells [73], autophagy enhanced NDV oncolysis in drug-resistant lung cancer cells"
+      },
+      {
+        "source_id": "32872257",
+        "source_ref": "Wińska P et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Due to its cytotoxicity [8] and resistance occurrence, 5-FU is one of the most commonly used TS-directed anticancer drugs applied in combination with other chemotherapy compounds for the treatment of "
+      },
+      {
+        "source_id": "40546658",
+        "source_ref": "Wang Z et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "FuZhengKangAiA study has shown that FuZhengKangAi (FZKA) significantly enhances the therapeutic efficacy of gefitinib and delays the emergence of gefitinib resistance in patients with lung adenocarcin"
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "41130364",
+        "source_ref": "Qu Y et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Cell culture plates were pre-coated with poly-HEMA to prevent proper adhesion of non-small cell lung cancer cells (A549 cells)."
+      },
+      {
+        "source_id": "41612592",
+        "source_ref": "Qu Y et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "(B) after transfection of A549 cells with the DsRed-Mito plasmid for 24 h, mitochondrial morphology was observed using laser confocal microscopy."
+      },
+      {
+        "source_id": "41249331",
+        "source_ref": "Tang C et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "All other reagents or chemicals used were analytical grade reagents and used without further purification.The lung cancer cell line A549 was obtained from National Collection of Authenticated Cell Cul"
+      },
+      {
+        "source_id": "40713180",
+        "source_ref": "Liu M et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Methods Cell lines and CAR T cellsNCI-H460 (human large cell lung carcinoma), H460-Luc (luciferase-labeled NCI-H460), H460-GFP (eg,FP-labeled NCI-H460), BEAS-2B (normal human lung epithelial), and BHK"
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-02",
+    "claim_topic": "NDV Selective Oncolysis & Syncytium Formation in Lung Tumors",
+    "domain": "Oncolytic Virotherapy",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 34,
+    "contradicting_sources_count": 3,
+    "indirect_sources_count": 181,
+    "supporting_sources": [
+      {
+        "source_id": "41612592",
+        "source_ref": "Qu Y et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "As expected, NDV infection induces damage to the electron transport chain complexes, which is characterized by the degradation of SDHA (succinate dehydrogenase complex flavoprotein subunit A) and COX4"
+      },
+      {
+        "source_id": "32782438",
+        "source_ref": "Miri SM et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "In order to inactivate NDV, the sample was exposed to the UV radiation [18] and the result was confirmed in Vero cells by plaque-forming assay [19]."
+      },
+      {
+        "source_id": "38682055",
+        "source_ref": "Gouvarchinghaleh HE et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "observed an increase in NDV replication and syncytia formation in A549 tumor cells, leading to apoptosis in 2011 (24)."
+      },
+      {
+        "source_id": "33806229",
+        "source_ref": "Yurchenko KS et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Newcastle Disease Virus Strain and Tumor Cell LineNewcastle disease virus NDV/Altai/pigeon/770/2011 strain [27] with an infectious titer of 7.2 ± 0.49 lgTCID50/mL ± 2σ at a tissue cytopathic dose on a"
+      },
+      {
+        "source_id": "38932177",
+        "source_ref": "Yang H et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Loss of mitochondrial membrane potential, release of cytochrome C, and activation of caspase 9 are the basic elements of the mitochondrial apoptotic pathway."
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "35327364",
+        "source_ref": "Schirrmacher V et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "A few examples of breaking drug resistance are: induction of apoptosis in cisplatin-resistant human lung adenocarcinoma cells [73], autophagy enhanced NDV oncolysis in drug-resistant lung cancer cells"
+      },
+      {
+        "source_id": "36765769",
+        "source_ref": "Yu T et al. (2023)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Tumours provide a favourable environment for NDV replication, spreading due to compromised antiviral defences related to the weaker sensitivity and expressions of type 1 interferon (IFN) as well as de"
+      },
+      {
+        "source_id": "38694569",
+        "source_ref": "Vazaios K et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Resistance-related genes were enriched in terms related to NF-κB signaling and vesicle organization (Figure 4A)."
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "41322194",
+        "source_ref": "Yates JGE et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "DiscussionOncolytic viruses induce a pro-inflammatory tumor environment that supports anti-tumor immune responses, and NDV is no exception.6,19,35,36 This is highlighted by increased presence of cytok"
+      },
+      {
+        "source_id": "41141365",
+        "source_ref": "Huberts M et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Hoeben) were produced and titrated in HER911 cells,44 while those of MeV-Edm were produced and titrated in Vero cells.15,45 Virus stock of lentogenic NDV LaSota strain (NDV) was produced in embryonate"
+      },
+      {
+        "source_id": "39993343",
+        "source_ref": "Zhang S et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The interaction between the homologous HN stalk region and the F protein is essential for cell fusion and syncytium formation (Stone-Hulslander and Morrison, 1997; Li, et al., 1998; Sergel, et al., 20"
+      },
+      {
+        "source_id": "42799649",
+        "source_ref": "Baghani B et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "So, they concluded that NDV induces apoptosis through the extrinsic apoptotic pathway [52].Caspase 9 is involved in the caspase activation cascade responsible for apoptosis execution and cleaves/activ"
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-03",
+    "claim_topic": "A549 Human Lung Adenocarcinoma as a Validated In Vitro Model",
+    "domain": "Host & Tumor Models",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 95,
+    "contradicting_sources_count": 6,
+    "indirect_sources_count": 191,
+    "supporting_sources": [
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The ginsenoside Rh2 stimulates the c-Jun N-terminal kinase (JNK)/mitogen-activated protein kinase (MAPK) signaling pathway, impacting the levels of the cell cycle proteins D1 and cyclin-dependent kina"
+      },
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Overall, under serum starvation conditions, ginsenosides inhibit the expression of Akt and activate FoxO in serum-starved A549 cells.Concurrently, changes in the mRNA expression levels of apoptosis-re"
+      },
+      {
+        "source_id": "39906418",
+        "source_ref": "Al-Shammari AM et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Preclinical data confirmed the safety profile and limited toxicity of VSVΔ51M-hIL-12, with in vitro experiments demonstrating its ability to induce significant cytotoxic effects against various cancer"
+      },
+      {
+        "source_id": "38682055",
+        "source_ref": "Gouvarchinghaleh HE et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "observed an increase in NDV replication and syncytia formation in A549 tumor cells, leading to apoptosis in 2011 (24)."
+      },
+      {
+        "source_id": "34575964",
+        "source_ref": "Khusnutdinova E et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "A comparative summary of the single-dose mean growth inhibition (%) for all active compounds, and for those that passed the initial one-dose screening test, the mean (GI50, μM) and the most sensitive "
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "35327364",
+        "source_ref": "Schirrmacher V et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "A few examples of breaking drug resistance are: induction of apoptosis in cisplatin-resistant human lung adenocarcinoma cells [73], autophagy enhanced NDV oncolysis in drug-resistant lung cancer cells"
+      },
+      {
+        "source_id": "32872257",
+        "source_ref": "Wińska P et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Due to its cytotoxicity [8] and resistance occurrence, 5-FU is one of the most commonly used TS-directed anticancer drugs applied in combination with other chemotherapy compounds for the treatment of "
+      },
+      {
+        "source_id": "40546658",
+        "source_ref": "Wang Z et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "FuZhengKangAiA study has shown that FuZhengKangAi (FZKA) significantly enhances the therapeutic efficacy of gefitinib and delays the emergence of gefitinib resistance in patients with lung adenocarcin"
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "41130364",
+        "source_ref": "Qu Y et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Cell culture plates were pre-coated with poly-HEMA to prevent proper adhesion of non-small cell lung cancer cells (A549 cells)."
+      },
+      {
+        "source_id": "41612592",
+        "source_ref": "Qu Y et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "(B) after transfection of A549 cells with the DsRed-Mito plasmid for 24 h, mitochondrial morphology was observed using laser confocal microscopy."
+      },
+      {
+        "source_id": "41249331",
+        "source_ref": "Tang C et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "All other reagents or chemicals used were analytical grade reagents and used without further purification.The lung cancer cell line A549 was obtained from National Collection of Authenticated Cell Cul"
+      },
+      {
+        "source_id": "40713180",
+        "source_ref": "Liu M et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Methods Cell lines and CAR T cellsNCI-H460 (human large cell lung carcinoma), H460-Luc (luciferase-labeled NCI-H460), H460-GFP (eg,FP-labeled NCI-H460), BEAS-2B (normal human lung epithelial), and BHK"
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-04",
+    "claim_topic": "Caspase-Dependent Apoptotic Cascade & Mitochondrial Bax/Bcl-2 Cleavage",
+    "domain": "Molecular Signaling",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 85,
+    "contradicting_sources_count": 3,
+    "indirect_sources_count": 395,
+    "supporting_sources": [
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Overall, under serum starvation conditions, ginsenosides inhibit the expression of Akt and activate FoxO in serum-starved A549 cells.Concurrently, changes in the mRNA expression levels of apoptosis-re"
+      },
+      {
+        "source_id": "41612592",
+        "source_ref": "Qu Y et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "As expected, NDV infection induces damage to the electron transport chain complexes, which is characterized by the degradation of SDHA (succinate dehydrogenase complex flavoprotein subunit A) and COX4"
+      },
+      {
+        "source_id": "34281176",
+        "source_ref": "Sultani HN et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "reported that natural triterpenoic acids induce caspase-dependent apoptosis and in particular, caspase-3 [34]."
+      },
+      {
+        "source_id": "33790554",
+        "source_ref": "Wang S et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Results and DiscussionCI EvaluationNVB functions by disrupting the microtubule network and inducing G2/M phase arrest and caspase-3 activation,36 while the anticancer activity of CDDP involves binding"
+      },
+      {
+        "source_id": "40726480",
+        "source_ref": "Chen C et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "For this purpose, we exploited our previously reported recombinant bacteria‐based BIL‐CRISPR approach[ 15 ] to simultaneously disrupt the expression of Bak and Bax in KCs in vivo, which are core compo"
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "41595541",
+        "source_ref": "Omer S et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Mechanistically, cannabinoids modulate several pathways implicated in chemoresistance, including activation of intrinsic apoptotic signaling via caspase-3/9, suppression of PI3K/AKT-mediated survival "
+      },
+      {
+        "source_id": "42360010",
+        "source_ref": "Haysom-McDowell A et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "It is also involved in the activation of the proapoptotic proteins such as B‐cell lymphoma 2 (Bcl‐2) associated X protein (Bax), Bcl‐2 antagonist/killer protein (Bak) and P53 upregulated modulator of "
+      },
+      {
+        "source_id": "REF-614",
+        "source_ref": "Ozan E et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "These findings further support the translational value of OVCAR3 cells for investigating mechanisms related to therapeutic response, resistance development, and combination-based treatment strategies "
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "41130364",
+        "source_ref": "Qu Y et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The death receptor pathway depends on the binding of death ligands (Fas or TRAIL) to death receptors and utilizes the formation of a death-inducing signaling complex (DISC) to activate the downstream "
+      },
+      {
+        "source_id": "36555096",
+        "source_ref": "Chen JL et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The blots were then incubated with the primary antibodies against α-actinin (ACTN, H-2, sc-17829, 1:5000) and p62 (D-3, sc-28359, 1:1000 dilution) (Santa Cruz Biotechnology, Santa Cruz, CA, USA); LC3B"
+      },
+      {
+        "source_id": "40572628",
+        "source_ref": "Bednarczyk-Cwynar B et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Caspases are generally classified into two groups: initiator caspases (e.g., caspase-8 and caspase-9), which respond to apoptotic signals and activate downstream pathways, and executioner caspases (e."
+      },
+      {
+        "source_id": "40565062",
+        "source_ref": "Ganguly A et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "We compared the effect of BA and MC on cell cycle arrest and caspase-3/7-mediated apoptosis [27] and only investigated the glucose-sensitive cytotoxic effect of BA by determining the effect of BA on t"
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-05",
+    "claim_topic": "Downregulation of PI3K/Akt Survival Signaling by Triterpenoids",
+    "domain": "Molecular Signaling",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 61,
+    "contradicting_sources_count": 19,
+    "indirect_sources_count": 346,
+    "supporting_sources": [
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Overall, under serum starvation conditions, ginsenosides inhibit the expression of Akt and activate FoxO in serum-starved A549 cells.Concurrently, changes in the mRNA expression levels of apoptosis-re"
+      },
+      {
+        "source_id": "35620326",
+        "source_ref": "Mohammadian M et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "28 Also, a related study confirmed that apatinib displayed potentially inhibitory impacts in pancreatic cancerous cells and Astragalus polysaccharide increased the anti-cancer effects of apatinib by d"
+      },
+      {
+        "source_id": "33448320",
+        "source_ref": "Chen T et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Moreover, it inhibits the phosphorylation of MAPK and mTOR to varying degrees, which is related to the proliferation of cancer cells.Apart from the signaling pathways discussed, AS-IV may also interru"
+      },
+      {
+        "source_id": "38932177",
+        "source_ref": "Yang H et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Loss of mitochondrial membrane potential, release of cytochrome C, and activation of caspase 9 are the basic elements of the mitochondrial apoptotic pathway."
+      },
+      {
+        "source_id": "39062057",
+        "source_ref": "Drif AI et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Both lupeol and quercetin were most frequently correlated with microtubule inhibitors and mTOR inhibitors."
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "34337076",
+        "source_ref": "Wang L et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Various studies have revealed that alteration of ER signaling, crosstalk between the ER and GFR (growth factor receptor) network, downregulation of ER, and activation of the PI3K/Akt/mTOR pathway cont"
+      },
+      {
+        "source_id": "41595541",
+        "source_ref": "Omer S et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Mechanistically, cannabinoids modulate several pathways implicated in chemoresistance, including activation of intrinsic apoptotic signaling via caspase-3/9, suppression of PI3K/AKT-mediated survival "
+      },
+      {
+        "source_id": "36048281",
+        "source_ref": "Plangger A et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "All tested combinations with these compounds showed statistically significant synergistic or antagonistic effects, with the exception of the combinations of WZB117 against MIA PaCa-2 and BxPC3, in rel"
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "36555096",
+        "source_ref": "Chen JL et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The blots were then incubated with the primary antibodies against α-actinin (ACTN, H-2, sc-17829, 1:5000) and p62 (D-3, sc-28359, 1:1000 dilution) (Santa Cruz Biotechnology, Santa Cruz, CA, USA); LC3B"
+      },
+      {
+        "source_id": "32874134",
+        "source_ref": "Al-Ziaydi AG et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Moreover, tamoxifen-resistant breast cancer cells MCF-7 showed upregulation of HK2 and mTOR that was accompanied by an enhanced glycolysis process."
+      },
+      {
+        "source_id": "32874134",
+        "source_ref": "Al-Ziaydi AG et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Moreover, tamoxifen-resistant breast cancer cells MCF-7 showed upregulation of HK2 and mTOR that was accompanied by an enhanced glycolysis process."
+      },
+      {
+        "source_id": "34613571",
+        "source_ref": "Schnoell J et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Reported mechanisms leading to the antiproliferative effects of zerumbone include the modulation of the Nf-κB pathway, the mitochondrial pathway of apoptosis, upregulation of redox potential, inhibiti"
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-06",
+    "claim_topic": "Chou-Talalay Median-Effect Equation and Combination Index (CI < 1.0) Predefined Rule",
+    "domain": "Synergy Methodology",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 7,
+    "contradicting_sources_count": 0,
+    "indirect_sources_count": 18,
+    "supporting_sources": [
+      {
+        "source_id": "36555096",
+        "source_ref": "Chen JL et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The concentration of doxorubicin with ropivacaine decreased from 0.75 µM to 0.55 µM in MDA-MB-231 cells and from 2.03 µM to 0.75 µM in BT-474 cells.In addition to its stronger synergy with doxorubicin"
+      },
+      {
+        "source_id": "34221071",
+        "source_ref": "Bahamin N et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "m extract showed IC50s > 100 µg/ml against A549, MCF7, HepG2, HT-29, and MDBK cell lines [30].Synergy is a process in which the combined effect of the participating elements is greater than the sum of"
+      },
+      {
+        "source_id": "41372579",
+        "source_ref": "Piska K et al. (2026)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "CI values < 0.3 indicate strong synergy; 0.3–0.7, robust; 0.7–0.85, moderate; and 0.85–0.9, slight synergyCAS [µM]ABI [µM]CI0.5100.71250.591.0100.49250.492.0100.52250.31 Apoptosis inductionTo evaluate"
+      },
+      {
+        "source_id": "38449422",
+        "source_ref": "Munef A et al. (2024)",
+        "source_tier": "Tier B",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Results: In vitro cell viability studies demonstrated the inhibitory effect of TQ and Vit C against colorectal (HT29, 5.5 ± 0.9 μM) and lung cancer (A549, 6.25 ± 0.9 μM) cell lines with combination in"
+      },
+      {
+        "source_id": "35803031",
+        "source_ref": "Atallah MA et al. (2022)",
+        "source_tier": "Tier B",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "PMT/HK-loaded Lf-CMC NGs were successfully taken up by MDA-MB-231 breast cancer cells and demonstrated superior in vitro cytotoxicity, as elucidated by a low combination index value (CI=0.17) and a hi"
+      }
+    ],
+    "contradicting_sources": [],
+    "indirect_sources": [
+      {
+        "source_id": "41223123",
+        "source_ref": "Borde P et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The combination index (CombI), fraction affected (Fa) and dose‐reduction index (DRI) were calculated with CompuSyn software (ComboSyn Inc., Paramus, USA).2.5 Sig1R KnockdownMDA‐MB‐231 and HCC1806 cell"
+      },
+      {
+        "source_id": "41463522",
+        "source_ref": "Alkan Akalın S et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Cells were then treated with increasing concentrations of metformin (0, 1, 5, 10, 20, and 50 mM), adriamycin (0, 0.5, 1, 2, 5, and 10 µM), or their combinations for 24 and 48 h.For combination and syn"
+      },
+      {
+        "source_id": "40802352",
+        "source_ref": "Gürsoy GT et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "In particular, the CI values at 50 and 100 µM were 0.57 and 0.42, respectively, corresponding to strong synergy, while the CI at 500 µM was 0.31, classified as very strong synergy."
+      },
+      {
+        "source_id": "33090073",
+        "source_ref": "Ghosh S et al. (2020)",
+        "source_tier": "Tier B",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "Methods: The combinatorial index of the drugs was established using the Chou-Talalay method in MDA-MB-231 and A549 cell lines."
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-07",
+    "claim_topic": "MTT Formazan Reduction Assay Protocol & Viability Standardization",
+    "domain": "Methodological Standards",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 122,
+    "contradicting_sources_count": 7,
+    "indirect_sources_count": 347,
+    "supporting_sources": [
+      {
+        "source_id": "36555096",
+        "source_ref": "Chen JL et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The concentration of doxorubicin with ropivacaine decreased from 0.75 µM to 0.55 µM in MDA-MB-231 cells and from 2.03 µM to 0.75 µM in BT-474 cells.In addition to its stronger synergy with doxorubicin"
+      },
+      {
+        "source_id": "40572628",
+        "source_ref": "Bednarczyk-Cwynar B et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The IC50 value for 3-O-acetyloleanolic acid (1b) varied from 0.09 µM (for the SKOV-3 cell line) to 1.86 µM (for MCF-7 cells); for 3-O-acetylbetulinic acid (4b) the IC50 value varied from 0.93 µM (for "
+      },
+      {
+        "source_id": "40565062",
+        "source_ref": "Ganguly A et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Effect of 10% Glucose Increase from Basal Levels on MC-Evoked Cytotoxicity, Cell Cycle Arrest, and ApoptosisMTT results plotted in Figure 2 display comparable cytotoxicity of MC on normal TRT-HU1 and "
+      },
+      {
+        "source_id": "35633550",
+        "source_ref": "Bashari MH et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Interestingly, the IC50 of the ethyl acetate fraction of Stylissa carteri showed high efficacy in HCC-1954 and MDA MB 231 cells and but not in MCF-7 cells, with an IC50 value of 4.1 µg/ml, 3.9 µg/ml a"
+      },
+      {
+        "source_id": "35740300",
+        "source_ref": "Chughtai AA et al. (2022)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "SCaBER was the most sensitive cell line tested upon ATR inhibition (Ceralasertib: IC50 = 0.46 µM at 8 Gy), while VMCUB-1 was highly sensitive upon DNA-PK inhibitor treatment (AZD7648: IC50 = 1.02 µM a"
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "32028599",
+        "source_ref": "Wang C et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Furthermore, RT-112 cells were used displaying native cisplatin resistance (IC50: 16.8 µM, Figure 1a)."
+      },
+      {
+        "source_id": "33240430",
+        "source_ref": "Lee S et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "AGS/FR cells were cultured in medium containing 100 µM 5-FU (Sigma-Aldrich; Merck KGaA) to maintain resistance.Measurement of cell viabilityAGS and AGS/FR cells were seeded onto 96-well plates at 0.5–"
+      },
+      {
+        "source_id": "34396444",
+        "source_ref": "Yu B et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Thereafter, resistance was maintained by including 1 µg/ml gefitinib in culture media."
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "40572628",
+        "source_ref": "Bednarczyk-Cwynar B et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "MTT ResultsThe cytotoxic activity of 1a–6a and 1b–6b was tested with MTT (3-[4,5-dimethylthiazol-2-yl]-2,5 diphenyl tetrazolium bromide) assay for the following cancer cell lines: HeLa (human cervical"
+      },
+      {
+        "source_id": "41141365",
+        "source_ref": "Huberts M et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Sequencing was carried out by GenomeScan (Leiden, the Netherlands) using the NovaSeq6000, following the manufacturer’s protocols with 0.8 nM of cDNA and utilizing NovaSeq control software NCS v.1.8."
+      },
+      {
+        "source_id": "41011591",
+        "source_ref": "Li J et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "A 20 µL reaction mixture was prepared, comprising 2 µL of template, 0.6 µL of each primer (400 nM final concentration), and 10 µL of 2 × Talent qPCR PreMix (Tiangen, Beijing, China)."
+      },
+      {
+        "source_id": "32874134",
+        "source_ref": "Al-Ziaydi AG et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "After 72 h, each well received 50 μl of MTT dye solution (2 mg/ml), incubated for 3 h, and solubilized with 100 μl of dimethyl sulfoxide (DMSO)."
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-08",
+    "claim_topic": "Absence of Significant Off-Target Toxicity in Normal Tissues & Safe Solvent Window",
+    "domain": "Safety & Toxicology",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 28,
+    "contradicting_sources_count": 2,
+    "indirect_sources_count": 89,
+    "supporting_sources": [
+      {
+        "source_id": "40565062",
+        "source_ref": "Ganguly A et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Effect of 10% Glucose Increase from Basal Levels on MC-Evoked Cytotoxicity, Cell Cycle Arrest, and ApoptosisMTT results plotted in Figure 2 display comparable cytotoxicity of MC on normal TRT-HU1 and "
+      },
+      {
+        "source_id": "39906418",
+        "source_ref": "Al-Shammari AM et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Preclinical data confirmed the safety profile and limited toxicity of VSVΔ51M-hIL-12, with in vitro experiments demonstrating its ability to induce significant cytotoxic effects against various cancer"
+      },
+      {
+        "source_id": "41312935",
+        "source_ref": "Abdull Rahim U et al. (2025)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "It exhibited cytotoxicity against non-small cell lung cancer (NSCLC) and the breast cancer cell lines MCF7 and MDA-MB-231 by inhibiting cell proliferation and promoting apoptosis [19, 20]."
+      },
+      {
+        "source_id": "39639305",
+        "source_ref": "Zhou R et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "In this study, we proposed an advanced and integrated platform based on structure-based drug screening to rapidly identify selective inhibitors of EGFRL858R/T790M and explored the selective cytotoxici"
+      },
+      {
+        "source_id": "38276759",
+        "source_ref": "Teclegeorgish ZW et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "The previous study of 3-Hydroxyfriedel-3en-2-one (3) showed no cytotoxicity (IC50 = 330 mol) for the inhibitory effects on the Epstein–Barr virus [34].Stigmasta-5-22-dien-3-ol (5) showed a low cytotox"
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "32872257",
+        "source_ref": "Wińska P et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Due to its cytotoxicity [8] and resistance occurrence, 5-FU is one of the most commonly used TS-directed anticancer drugs applied in combination with other chemotherapy compounds for the treatment of "
+      },
+      {
+        "source_id": "42312508",
+        "source_ref": "Khafagy SZ et al. (2026)",
+        "source_tier": "Tier B",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "This study investigated whether atorvastatin (ATR) enhances doxorubicin (DOX) activity by coordinating the disruption of multiple resistance pathways in MCF-7 cells.<h4>Methods</h4>Cytotoxicity and dr"
+      }
+    ],
+    "indirect_sources": [
+      {
+        "source_id": "34777686",
+        "source_ref": "Ma X et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "The key active phytochemicals of SHM can prevent APAP-induced acute hepatotoxicity or nephrotoxicity by inhibiting the NF-κB and PI3K/Akt pathways or by activating Nrf2 [89–93]."
+      },
+      {
+        "source_id": "38377149",
+        "source_ref": "Liao T et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "PARTIALLY_SUPPORTED",
+        "verbatim_quote": "CNAS BL0015) at Yangzhou University in strict accordance with the recommendations of the institutional biosafety manual and supervised by the Institutional Biosafety Committee of Yangzhou University.C"
+      },
+      {
+        "source_id": "32354075",
+        "source_ref": "Santana-Gálvez J et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Some General Aspects about Cell Cycle and ApoptosisResults herein demonstrated that the combination SD(1:1) was synergistic against HT-29 colon cancer cells at 90% cytotoxicity level (Figure 1), using"
+      },
+      {
+        "source_id": "39126024",
+        "source_ref": "Pradel LS et al. (2024)",
+        "source_tier": "Tier A",
+        "entailment": "INDIRECT_SUPPORT",
+        "verbatim_quote": "Notably, the combination of exemestane and α-lipoic acid showed synergistic effects in cytotoxicity and caspase activation as shown by Chou–Talalay analysis [27,28], and led to an increase in p21 and "
+      }
+    ],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  },
+  {
+    "graph_claim_id": "GC-09",
+    "claim_topic": "Potential Antagonism or Resistance Barriers Under Asymmetric Concentrations",
+    "domain": "Contradictory / Safety Context",
+    "overall_entailment": "DIRECTLY_SUPPORTED",
+    "sufficiency_status": "EVIDENCE_SUFFICIENT",
+    "supporting_sources_count": 2,
+    "contradicting_sources_count": 37,
+    "indirect_sources_count": 0,
+    "supporting_sources": [
+      {
+        "source_id": "16968947",
+        "source_ref": "Chou TC et al. (2006)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies based on the median-effect equation."
+      },
+      {
+        "source_id": "16968947",
+        "source_ref": "Chou TC et al. (2006)",
+        "source_tier": "Tier A",
+        "entailment": "DIRECTLY_SUPPORTED",
+        "verbatim_quote": "Quantitative calculation of combination index (CI) where CI < 1 indicates synergism, CI = 1 additive, and CI > 1 antagonism."
+      }
+    ],
+    "contradicting_sources": [
+      {
+        "source_id": "32028599",
+        "source_ref": "Wang C et al. (2020)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Furthermore, RT-112 cells were used displaying native cisplatin resistance (IC50: 16.8 µM, Figure 1a)."
+      },
+      {
+        "source_id": "34337076",
+        "source_ref": "Wang L et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "Various studies have revealed that alteration of ER signaling, crosstalk between the ER and GFR (growth factor receptor) network, downregulation of ER, and activation of the PI3K/Akt/mTOR pathway cont"
+      },
+      {
+        "source_id": "33240430",
+        "source_ref": "Lee S et al. (2021)",
+        "source_tier": "Tier A",
+        "entailment": "CONTRADICTORY",
+        "verbatim_quote": "AGS/FR cells were cultured in medium containing 100 µM 5-FU (Sigma-Aldrich; Merck KGaA) to maintain resistance.Measurement of cell viabilityAGS and AGS/FR cells were seeded onto 96-well plates at 0.5–"
+      }
+    ],
+    "indirect_sources": [],
+    "cross_study_edges": [
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-14",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Chou-Talalay median-effect equation provides theoretical basis for combination index CI < 1.0 in Zhu et al."
+      },
+      {
+        "source_study": "STUDY-01",
+        "target_study": "STUDY-27",
+        "relationship_type": "METHODOLOGICAL_DISAGREEMENT",
+        "rationale": "Divergent combination analysis: empirical response surface vs formal Chou-Talalay median-effect model"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-03",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Mosmann MTT optical density protocol used for 50% inhibitory concentration (IC50) determination"
+      },
+      {
+        "source_study": "STUDY-02",
+        "target_study": "STUDY-10",
+        "relationship_type": "CONCEPTUAL_REPLICATION",
+        "rationale": "MTT viability reduction replicated in A549 lung adenocarcinoma cell cultures"
+      },
+      {
+        "source_study": "STUDY-03",
+        "target_study": "STUDY-07",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Deng and Tian extend chemical C-3 modifications of the lupane triterpenoid core to enhance cytotoxic potency"
+      },
+      {
+        "source_study": "STUDY-10",
+        "target_study": "STUDY-11",
+        "relationship_type": "MECHANISTIC_COMPLEMENT",
+        "rationale": "Both confirm intrinsic mitochondrial caspase-3/9 cleavage and Bax/Bcl-2 ratio regulation"
+      },
+      {
+        "source_study": "STUDY-23",
+        "target_study": "STUDY-24",
+        "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+        "rationale": "Inhibition of upstream PI3K phosphorylation leads directly to downstream Akt dephosphorylation and reduced motility"
+      },
+      {
+        "source_study": "STUDY-24",
+        "target_study": "STUDY-25",
+        "relationship_type": "DIRECT_REPLICATION",
+        "rationale": "Replication of scratch wound healing closure suppression by natural triterpenes in alveolar epithelial tumor cells"
+      },
+      {
+        "source_study": "STUDY-04",
+        "target_study": "STUDY-37",
+        "relationship_type": "PARAMETRIC_VARIATION",
+        "rationale": "Parametric comparison of phytochemical purity, solvent extraction fraction, and concentration-dependent IC50 values"
+      },
+      {
+        "source_study": "STUDY-05",
+        "target_study": "STUDY-18",
+        "relationship_type": "EXTENSION_TO_NEW_MODEL",
+        "rationale": "Recombinant oncolytic viral engineering strategies extended across diverse solid adenocarcinoma lines"
+      },
+      {
+        "source_study": "STUDY-13",
+        "target_study": "STUDY-26",
+        "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+        "rationale": "Defective innate antiviral type I interferon signaling allows selective oncolytic replication in malignant lung cells"
+      },
+      {
+        "source_study": "STUDY-14",
+        "target_study": "STUDY-30",
+        "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+        "rationale": "Demonstrates that combining oncolytic NDV with metabolic or pathway modulators achieves synergistic killing (CI < 1.0)"
+      },
+      {
+        "source_study": "STUDY-19",
+        "target_study": "STUDY-31",
+        "relationship_type": "DOSE_REGIME_COMPARISON",
+        "rationale": "Comparison of metabolic deprivation thresholds and MOI infection ratios for sensitizing refractory tumor lines"
+      },
+      {
+        "source_study": "STUDY-12",
+        "target_study": "STUDY-36",
+        "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+        "rationale": "Both studies confirm high selectivity index and absence of cytotoxic necrosis in non-malignant normal epithelial models"
+      }
+    ]
+  }
+]

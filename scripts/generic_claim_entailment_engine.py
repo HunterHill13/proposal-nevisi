@@ -29,6 +29,31 @@ OBSERVATIONAL_DESIGNS = [
 class GenericClaimEntailmentEngine:
     """Audits scientific claim entailment, overclaim risks, and numerical traceability."""
 
+    @classmethod
+    def audit_causal_language(cls, claim_text: str, source_study_design: str) -> Dict[str, Any]:
+        """Audits causal vs correlational language boundaries and flags overclaims."""
+        text_lower = claim_text.lower()
+        is_observational = (
+            source_study_design in OBSERVATIONAL_DESIGNS
+            or "OBSERVATIONAL" in source_study_design
+            or "COHORT" in source_study_design
+        )
+        flagged_words = []
+        if is_observational:
+            for pattern in CAUSAL_VERBS:
+                if re.search(pattern, text_lower):
+                    flagged_words.append(pattern.replace(r'\b', ''))
+        
+        has_overclaim = len(flagged_words) > 0
+        return {
+            "claim_text": claim_text,
+            "source_study_design": source_study_design,
+            "allowed_unconditional_causal_claim": not has_overclaim,
+            "status": "OVERCLAIM_RISK" if has_overclaim else "COMPLIANT",
+            "flagged_causal_words": flagged_words,
+            "recommendation": "Replace causal verbs with correlational phrasing." if has_overclaim else "Language aligns with study design."
+        }
+
     @staticmethod
     def detect_causal_overclaim(claim_text: str, source_study_design: str) -> Optional[Dict[str, str]]:
         """Flags unwarranted causal claims derived from observational designs."""

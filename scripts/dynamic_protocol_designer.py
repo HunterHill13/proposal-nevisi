@@ -107,9 +107,24 @@ class DynamicProtocolDesigner:
         return variables
 
     @classmethod
+    def render_variable_table_markdown(cls, variables: List[Dict[str, str]]) -> str:
+        """Renders the standard 6-column Markdown variable table."""
+        header = "| نام متغیر | نقش متغیر | نوع متغیر | تعریف عملیاتی | نحوه اندازه‌گیری و ابزار | مقیاس / واحد سنجش |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n"
+        rows = []
+        for v in variables:
+            name = v.get("name", "")
+            role = v.get("role", "")
+            vtype = v.get("type", "")
+            op_def = v.get("operational_definition", "")
+            meas = v.get("measurement_method", "")
+            unit = v.get("unit", "")
+            rows.append(f"| **{name}** | {role} | {vtype} | {op_def} | {meas} | {unit} |")
+        return header + "\n".join(rows)
+
+    @classmethod
     def generate_timeline(cls, framework: str) -> List[Dict[str, Any]]:
         """Returns phased Gantt timeline appropriate for the study framework."""
-        raw_phases = STUDY_TIMELINE_TEMPLATES.get(framework, STUDY_TIMELINE_TEMPLATES["EXPERIMENTAL_IN_VITRO"])
+        raw_phases = STUDY_TIMELINE_TEMPLATES.get(framework, STUDY_TIMELINE_TEMPLATES.get("EXPERIMENTAL_IN_VITRO", []))
         timeline = []
         for phase_name, start_m, end_m in raw_phases:
             timeline.append({
@@ -119,6 +134,26 @@ class DynamicProtocolDesigner:
                 "duration_months": end_m - start_m + 1
             })
         return timeline
+
+    @classmethod
+    def render_timeline_markdown(cls, timeline: List[Dict[str, Any]], total_months: int = 12) -> str:
+        """Renders standard Markdown Gantt chart table."""
+        m_headers = " | ".join(str(m) for m in range(1, total_months + 1))
+        sep_cols = " | ".join([":---:"] * total_months)
+        header = f"| فاز اجرایی و شرح فعالیت‌ها | {m_headers} |\n| :--- | {sep_cols} |\n"
+        rows = []
+        for item in timeline:
+            title = item.get("phase_title", "")
+            start_m = item.get("start_month", 1)
+            end_m = item.get("end_month", total_months)
+            cells = []
+            for m in range(1, total_months + 1):
+                if start_m <= m <= end_m:
+                    cells.append("■")
+                else:
+                    cells.append(" ")
+            rows.append(f"| **{title}** | {' | '.join(cells)} |")
+        return header + "\n".join(rows)
 
     @classmethod
     def generate_statistical_plan(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:

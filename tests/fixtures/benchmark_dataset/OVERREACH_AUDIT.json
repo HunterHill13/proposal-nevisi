@@ -1,0 +1,14 @@
+{
+  "audit_timestamp": "2026-10-03T15:28:14.870118",
+  "total_studies_audited": 40,
+  "in_vitro_only_studies": 23,
+  "in_vivo_preclinical_studies": 5,
+  "literature_review_studies": 6,
+  "extrapolation_safeguards": {
+    "monotherapy_to_synergy_extrapolation": "BLOCKED: Monotherapy efficacy is never cited as evidence that combination CI < 1.0 pre-exists.",
+    "in_vitro_to_in_vivo_extrapolation": "BLOCKED: In vitro findings on A549 are strictly flagged with preclinical boundary warnings; no human clinical efficacy is asserted.",
+    "derivative_to_parent_extrapolation": "BLOCKED: Synthetic lupeol derivative data (Deng 2024, Tian 2024) are classified as STRUCTURAL_ANALOGUE_EVIDENCE and not conflated with pure natural Lupeol.",
+    "unrelated_agent_extrapolation": "BLOCKED: Compounds such as arjunolic acid, betulin, or crude plant extracts are quarantined from Lupeol evidence records."
+  },
+  "overreach_status": "PASS_ZERO_UNJUSTIFIED_EXTRAPOLATION"
+}

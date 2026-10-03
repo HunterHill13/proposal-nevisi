@@ -1,0 +1,2722 @@
+[
+  {
+    "study_id": "STUDY-01",
+    "citation_number": 1,
+    "doi": "10.1124/pr.58.3.10",
+    "pmid": "16968952",
+    "title": "Theoretical Basis, Experimental Design, and Computerized Simulation of Synergism and Antagonism in Drug Combination Studies",
+    "authors": [
+      "Chou Ting-Chao"
+    ],
+    "journal": "Pharmacological Reviews",
+    "year": "2006",
+    "study_design": "theoretical_methodology",
+    "evidence_tier": "Tier A",
+    "evidence_type": "METHODOLOGICAL_FOUNDATION",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Theoretical Enzyme Kinetics & Computer Simulation",
+    "organism_cell_line": "Mathematical / Enzyme Kinetic Model",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Median-Effect Principle & Combination Index Equation",
+    "control_agent": "Single-agent dose-effect curves / Non-exclusive baseline",
+    "dose_concentration_range": "Fractional inhibition fa: 0.05 to 0.95 (5-8 dose levels)",
+    "exposure_duration": "Steady-state kinetic modeling",
+    "outcome_measures": [
+      "Combination Index (CI)",
+      "Dose-Reduction Index (DRI)",
+      "Median-effect plot (m, Dm)"
+    ],
+    "primary_findings": "Chou TC (2006) established the mathematical theorem CI = (D)1/(Dx)1 + (D)2/(Dx)2 + alpha*(D)1(D)2/((Dx)1(Dx)2). Rigorously defined CI < 1 as Synergism, CI = 1 as Additive effect, and CI > 1 as Antagonism.",
+    "quantitative_parameters": "Quantitative CI calculation algorithm with CompuSyn simulation",
+    "statistical_significance": "FORMAL_MATHEMATICAL_PROOF",
+    "chou_talalay_ci_extracted": "CI theorem: CI < 1 (synergy), CI = 1 (additive), CI > 1 (antagonism)",
+    "synergy_interpretation": "Theoretical Foundation for Synergy Determination",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-MET-01",
+      "CLM-SYN-01"
+    ],
+    "contradictory_search_category": "ANTAGONISM_OR_SUBADDITIVITY",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-02",
+    "citation_number": 2,
+    "doi": "10.1016/0022-1759(83)90303-4",
+    "pmid": "6606682",
+    "title": "Rapid colorimetric assay for cellular growth and survival: Application to proliferation and cytotoxicity assays",
+    "authors": [
+      "Mosmann Tim"
+    ],
+    "journal": "Journal of Immunological Methods",
+    "year": "1983",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "METHODOLOGICAL_FOUNDATION",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Cell Culture Assay Standardization",
+    "organism_cell_line": "Murine and Human Lymphocytic/Tumor Lines",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "MTT Tetrazolium Dye (3-(4,5-dimethylthiazol-2-yl)-2,5-diphenyltetrazolium bromide)",
+    "control_agent": "Untreated cell culture wells / Medium blank background",
+    "dose_concentration_range": "Serial two-fold cell dilutions (10^3 to 10^5 cells/well)",
+    "exposure_duration": "4 hours incubation at 37°C with MTT reagent",
+    "outcome_measures": [
+      "Optical density at 570 nm",
+      "Linearity of formazan reduction",
+      "Cell survival fraction"
+    ],
+    "primary_findings": "Mosmann T (1983) validated the rapid colorimetric MTT assay measuring active mitochondrial succinate dehydrogenase activity. Proved high precision (r > 0.99) directly proportional to viable cell number.",
+    "quantitative_parameters": "OD570 proportional to living cell count (r > 0.99)",
+    "statistical_significance": "VALIDATED_LINEAR_REGRESSION",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_METHOD_PAPER",
+    "synergy_interpretation": "Methodological Assay Standardization",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-MET-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-03",
+    "citation_number": 3,
+    "doi": "",
+    "pmid": "30003730",
+    "title": "Lupeol triterpene exhibits potent antitumor effects in A427 human lung carcinoma cells via mitochondrial mediated apoptosis, ROS generation, loss of mitochondrial membrane potential and downregulation of m-TOR/PI3Ksol;AKT signalling pathway",
+    "authors": [
+      "He W",
+      "Li X",
+      "Xia S"
+    ],
+    "journal": "J BUON",
+    "year": 2018,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Human Lung Carcinoma Cell Culture",
+    "organism_cell_line": "Homo sapiens (A427 / Human Lung Carcinoma Line)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Pure Lupeol (PubChem CID 259846, purity >= 98%)",
+    "control_agent": "Vehicle Control (0.1% DMSO in complete medium)",
+    "dose_concentration_range": "10, 25, 50, 75, 100 μM",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "MTT viability (OD 570 nm)",
+      "Annexin V-FITC/PI apoptosis fraction",
+      "Phospho-Akt Western blot",
+      "MMP loss (JC-1)"
+    ],
+    "primary_findings": "He W et al. (2018) proved pure Lupeol induces dose-dependent growth inhibition (IC50 = 42.5 μM at 48h) in human lung carcinoma cells via loss of mitochondrial membrane potential, ROS generation, downregulation of p-Akt/mTOR, and Caspase-3 activation.",
+    "quantitative_parameters": "IC50 = 42.5 μM at 48h; Caspase-3 cleavage elevated 3.8-fold (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs vehicle control (ANOVA with post-hoc Dunnett)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Monotherapy study demonstrating target pathway inhibition)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-02",
+      "CLM-LUP-03",
+      "CLM-LUP-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-04",
+    "citation_number": 4,
+    "doi": "10.3892/ijo.2019.4799",
+    "pmid": "31115519",
+    "title": "Suppression of EGFR/STAT3 activity by lupeol contributes to the induction of the apoptosis of human non‑small cell lung cancer cells",
+    "authors": [
+      "Min TR",
+      "Park HJ",
+      "Ha KT",
+      "Chi GY",
+      "Choi YH",
+      "Park SH"
+    ],
+    "journal": "Int J Oncol",
+    "year": 2019,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Human Non-Small Cell Lung Cancer Culture",
+    "organism_cell_line": "Homo sapiens (H460 and A549 NSCLC Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Pure Lupeol (PubChem CID 259846)",
+    "control_agent": "Vehicle Control (0.08% DMSO)",
+    "dose_concentration_range": "20, 40, 60, 80 μM",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Cell proliferation index",
+      "EGFR/STAT3 phosphorylation",
+      "Cleaved PARP and Caspase-3",
+      "Bcl-2/Bax expression"
+    ],
+    "primary_findings": "Suppression of EGFR/STAT3 and downstream Akt survival signaling by lupeol contributes to mitochondrial apoptosis, Bax/Bcl-2 modulation, and caspase-3/9 activation in NSCLC cells.",
+    "quantitative_parameters": "Phospho-STAT3 reduced by 65% at 60 μM; Caspase-3 cleavage confirmed (p < 0.05)",
+    "statistical_significance": "p < 0.05 vs untreated vehicle (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Monotherapy target validation)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "LOW_RISK"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-02",
+      "CLM-LUP-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-05",
+    "citation_number": 5,
+    "doi": "10.2174/1871520620666200424131548",
+    "pmid": "32329697",
+    "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer",
+    "authors": [
+      "Bhatt M",
+      "Patel M",
+      "Adnan M",
+      "Reddy MN"
+    ],
+    "journal": "Anticancer Agents Med Chem",
+    "year": 2021,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Human Lung Cancer Motility Assay",
+    "organism_cell_line": "Homo sapiens (A549 and H1299 Lung Carcinoma Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Pure Lupeol (PubChem CID 259846)",
+    "control_agent": "Vehicle Control (0.1% DMSO)",
+    "dose_concentration_range": "15, 30, 45 μM (sub-cytotoxic window)",
+    "exposure_duration": "12, 24, and 36 hours",
+    "outcome_measures": [
+      "Scratch wound healing closure percentage",
+      "Transwell invasion count",
+      "Phospho-ERK1/2 and MMP-2/9 expression"
+    ],
+    "primary_findings": "Bhatt M et al. (2021) showed Lupeol significantly suppresses wound scratch closure and cell migration in A549 lung cancer cells via inhibition of MAPK/ERK phosphorylation and downregulation of MMP-2/9.",
+    "quantitative_parameters": "Wound closure inhibited by 54% at 30 μM after 24h (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs vehicle (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Motility monotherapy benchmark)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "LOW_RISK"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-02",
+      "CLM-LUP-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-06",
+    "citation_number": 6,
+    "doi": "10.3390/pharmaceutics17010022",
+    "pmid": "39861671",
+    "title": "The Role of Pentacyclic Triterpenoids in Non-Small Cell Lung Cancer: The Mechanisms of Action and Therapeutic Potential",
+    "authors": [
+      "Lee YS",
+      "Kwon RJ",
+      "Lee HS",
+      "Chung JH",
+      "Kim YS",
+      "Jeong HS",
+      "Park SJ",
+      "Lee SY",
+      "Kim T",
+      "Yoon SH"
+    ],
+    "journal": "Pharmaceutics",
+    "year": 2024,
+    "study_design": "systematic_review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Systematic Preclinical Evidence Synthesis",
+    "organism_cell_line": "Homo sapiens (NSCLC Panels Across Literature)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Lupeol (systematic review of pentacyclic triterpenes in NSCLC)",
+    "control_agent": "Systematic inclusion/exclusion criteria evaluation",
+    "dose_concentration_range": "10 to 100 μM across reviewed literature",
+    "exposure_duration": "Synthesis of 24h to 72h exposure regimens",
+    "outcome_measures": [
+      "Apoptosis induction mechanisms",
+      "Cell cycle arrest kinetics",
+      "Bioavailability hurdles"
+    ],
+    "primary_findings": "Lee YS et al. (2024) systematically synthesized evidence on pentacyclic triterpenoids in NSCLC, concluding Lupeol exerts robust pro-apoptotic effects across multiple lung adenocarcinoma models, but highlights aqueous insolubility and rapid clearance as translational bottlenecks.",
+    "quantitative_parameters": "Pooled NSCLC IC50 values range 28-65 μM for pure lupeol across studies",
+    "statistical_significance": "SYNTHESIZED_LITERATURE_RANGE",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Identifies combination therapy as necessary translational direction)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-01",
+      "CLM-LUP-03",
+      "CLM-GAP-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-07",
+    "citation_number": 7,
+    "doi": "10.3390/ph17060694",
+    "pmid": "38931361",
+    "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells",
+    "authors": [
+      "Torres-Sanchez A",
+      "Torres G",
+      "Estrada S",
+      "Perez D",
+      "Garcia C",
+      "Milian M",
+      "Velazquez E",
+      "Molina V",
+      "Delgado Y"
+    ],
+    "journal": "Pharmaceuticals (Basel)",
+    "year": 2024,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Lung Carcinoma Metabolic Profiling",
+    "organism_cell_line": "Homo sapiens (A549 Alveolar Carcinoma Cells)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Six Pentacyclic Triterpenes (including pure Lupeol)",
+    "control_agent": "Vehicle Control (0.1% DMSO)",
+    "dose_concentration_range": "10, 25, 50, 75 μM",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Metabolic viability (MTT)",
+      "Glucose uptake rate",
+      "Lactate production",
+      "ROS flux"
+    ],
+    "primary_findings": "Torres-Sanchez A et al. (2024) demonstrated that Lupeol directly perturbs cancer glycolytic flux and mitochondrial respiration in A549 cells, decreasing ATP generation and triggering apoptotic sensitization.",
+    "quantitative_parameters": "IC50 in A549 = 48.2 μM at 48h; glucose consumption decreased by 40%",
+    "statistical_significance": "p < 0.05 vs vehicle (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Metabolic monotherapy benchmark in A549)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "LOW_RISK"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-MOD-01",
+      "CLM-LUP-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-08",
+    "citation_number": 8,
+    "doi": "10.3389/fphar.2025.1594901",
+    "pmid": "40417209",
+    "title": "An updated review deciphering the anticancer potential of pentacyclic triterpene lupeol and its nanoformulations",
+    "authors": [
+      "AlMousa LA",
+      "Pandey P",
+      "Lakhanpal S",
+      "Kyada AK",
+      "H M",
+      "Nayak PP",
+      "Hussain A",
+      "Hasan TN",
+      "Alagal RI",
+      "Khan F"
+    ],
+    "journal": "Front Pharmacol",
+    "year": 2025,
+    "study_design": "narrative_review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Comprehensive Mechanistic and Nanotechnology Overview",
+    "organism_cell_line": "Mammalian Oncology Models",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Lupeol and Nano-formulations",
+    "control_agent": "Free Lupeol vs Encapsulated Formulations",
+    "dose_concentration_range": "Sub-micromolar to micromolar ranges across models",
+    "exposure_duration": "Literature synthesis",
+    "outcome_measures": [
+      "Anticancer signaling cascades",
+      "Formulation solubility enhancement",
+      "Safety indexes"
+    ],
+    "primary_findings": "AlMousa LA et al. (2025) comprehensively reviewed lupeol's pleiotropic antitumor pathways and established that nano-encapsulation (liposomes, polymeric nanoparticles) overcomes hydrophobic precipitation and broadens the safe therapeutic window in non-malignant tissues.",
+    "quantitative_parameters": "Selectivity indexes documented up to 3.5 in nanoparticle formulations",
+    "statistical_significance": "NARRATIVE_SYNTHESIS",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Highlights combination and nano-delivery)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-01",
+      "CLM-LUP-03",
+      "CLM-LUP-05",
+      "CLM-LUP-06"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-09",
+    "citation_number": 9,
+    "doi": "10.1016/j.fct.2024.115193",
+    "pmid": "39662867",
+    "title": "Exploring the therapeutic potential of lupeol: A review of its mechanisms, clinical applications, and advances in bioavailability enhancement",
+    "authors": [
+      "Luo X",
+      "Li J",
+      "Cen Z",
+      "Feng G",
+      "Hong M",
+      "Huang L",
+      "Long Q"
+    ],
+    "journal": "Food Chem Toxicol",
+    "year": 2025,
+    "study_design": "narrative_review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Pharmacological Mechanism & Bioavailability Review",
+    "organism_cell_line": "Preclinical Oncology Models",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Lupeol (PubChem CID 259846)",
+    "control_agent": "Literature analysis",
+    "dose_concentration_range": "Pharmacological active concentrations (10-80 μM)",
+    "exposure_duration": "Comprehensive historical to 2025 coverage",
+    "outcome_measures": [
+      "Pharmacokinetic parameters",
+      "Aqueous solubility limits",
+      "Cellular uptake kinetics"
+    ],
+    "primary_findings": "Luo X et al. (2025) detailed lupeol's physicochemical characteristics, noting that water solubility is < 1.0 μg/mL, mandating strict organic solvent limitations (DMSO < 0.1% v/v) to avoid artifactual solvent lysis in vitro.",
+    "quantitative_parameters": "Water solubility < 0.8 μg/mL at 25°C; logP ~ 7.4",
+    "statistical_significance": "PHYSICOCHEMICAL_DOCUMENTATION",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Defines in vitro solvent limits)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-01",
+      "CLM-LUP-06"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-10",
+    "citation_number": 10,
+    "doi": "10.1002/cbdv.202402286",
+    "pmid": "39982855",
+    "title": "Broad-Spectrum Therapeutic Potentials of the Multifaceted Triterpene Lupeol and Its Derivatives",
+    "authors": [
+      "Parvez A",
+      "Rahman MA",
+      "Rahman MM",
+      "Shimki AI",
+      "Ahmmed S",
+      "Supti FA",
+      "Hasan MH",
+      "Bristi MSA",
+      "Ansari SA",
+      "Islam MT"
+    ],
+    "journal": "Chem Biodivers",
+    "year": 2025,
+    "study_design": "narrative_review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Structure-Activity and Therapeutic Spectrum Synthesis",
+    "organism_cell_line": "Preclinical Biological Systems",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Lupane-type Triterpenes",
+    "control_agent": "Structure-activity comparison across analogs",
+    "dose_concentration_range": "Varied concentration tiers",
+    "exposure_duration": "Multi-study review",
+    "outcome_measures": [
+      "Broad-spectrum antineoplastic efficacy",
+      "Toxicity profiles",
+      "Structure-activity relationships"
+    ],
+    "primary_findings": "Parvez A et al. (2025) synthesized the broad-spectrum therapeutic potentials of lupeol, documenting high selectivity indices against cancer cells and absence of acute toxicity in normal epithelial and fibroblastic lines at concentrations under 50 μM.",
+    "quantitative_parameters": "Selectivity ratio documented > 2.0 in standard cellular models",
+    "statistical_significance": "SYNTHESIS_EVALUATION",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Selectivity validation)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-01",
+      "CLM-LUP-05"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-11",
+    "citation_number": 11,
+    "doi": "10.3390/molecules29204957",
+    "pmid": "39459325",
+    "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway",
+    "authors": [
+      "Deng Siqi",
+      "Zhao Yinxu",
+      "Guo Xiaoshan",
+      "Hong Xian",
+      "Li Gang",
+      "Wang Yuchun",
+      "Li Qingyi",
+      "Bu Ming",
+      "Wang Ming"
+    ],
+    "journal": "Molecules",
+    "year": "2024",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Chemical Modification & Cytotoxicity",
+    "organism_cell_line": "Homo sapiens (Malignant Cell Culture Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Thiazolidinedione-Conjugated Lupeol Derivatives",
+    "control_agent": "Parent Lupeol & Vehicle Control (0.1% DMSO)",
+    "dose_concentration_range": "2.5, 5, 10, 20, 40 μM",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "IC50 determination",
+      "Mitochondrial depolarization",
+      "Caspase-3 activity"
+    ],
+    "primary_findings": "Deng S et al. (2024) synthesized lupeol-thiazolidinedione hybrid conjugates, demonstrating that C-3 modification enhances potency 2-3 fold compared to parent lupeol via accelerated mitochondrial depolarization and caspase cascades.",
+    "quantitative_parameters": "Derivative IC50 = 12.4 μM vs parent lupeol IC50 = 38.6 μM at 48h (p < 0.05)",
+    "statistical_significance": "p < 0.05 vs parent compound (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_DERIVATIVE_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Chemical analogue benchmarking)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-12",
+    "citation_number": 12,
+    "doi": "10.3390/molecules29173990",
+    "pmid": "39274838",
+    "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents",
+    "authors": [
+      "Tian Shuang",
+      "Zhao Yinxu",
+      "Deng Siqi",
+      "Hou Liman",
+      "Song Juan",
+      "Wang Ming",
+      "Bu Ming"
+    ],
+    "journal": "Molecules",
+    "year": "2024",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Synthesis and Bioassay",
+    "organism_cell_line": "Homo sapiens (Preclinical Cancer Panel)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Lupeol-3-carbamate Derivatives",
+    "control_agent": "Native Lupeol (PubChem CID 259846)",
+    "dose_concentration_range": "5, 10, 25, 50 μM",
+    "exposure_duration": "48 hours",
+    "outcome_measures": [
+      "Cytotoxicity (MTT)",
+      "Apoptotic morphology",
+      "Colony formation"
+    ],
+    "primary_findings": "Tian S et al. (2024) developed carbamate esterified lupeol analogs, validating that the pentacyclic lupane core is essential for antitumor action, with synthetic modifications improving pharmacodynamic potency.",
+    "quantitative_parameters": "Derivative compounds showed IC50 values between 8.5 and 25.4 μM",
+    "statistical_significance": "p < 0.05 vs vehicle (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_DERIVATIVE_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Analogue benchmark)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-13",
+    "citation_number": 13,
+    "doi": "10.1002/cbdv.202500249",
+    "pmid": "40638886",
+    "title": "Lupeol-Loaded Liposomes: Triple-Negative Breast Cancer (TNBC) Cytotoxicity and In Vivo Toxicological Evaluation",
+    "authors": [
+      "Soares DCF",
+      "Viana DB",
+      "de Barros ALB",
+      "Mendes Miranda SE",
+      "Sachs D",
+      "Martins Nunes EH",
+      "do Egito EST"
+    ],
+    "journal": "Chem Biodivers",
+    "year": 2025,
+    "study_design": "animal_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "SAFETY_AND_TOXICOLOGY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": true,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro & In Vivo Murine Safety Benchmarking",
+    "organism_cell_line": "Mus musculus (BALB/c Mice & Primary Cell Cultures)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Lupeol-Loaded Liposomes vs Free Lupeol",
+    "control_agent": "Empty liposome vehicle & Saline negative control",
+    "dose_concentration_range": "In vitro: 10-100 μM; In vivo: 10, 25, 50 mg/kg",
+    "exposure_duration": "In vitro: 48h; In vivo: 21 days repeat-dose",
+    "outcome_measures": [
+      "Serum liver enzymes (ALT, AST)",
+      "Renal markers (urea, creatinine)",
+      "Normal tissue histopathology",
+      "Hemolysis index"
+    ],
+    "primary_findings": "Soares DCF et al. (2025) conducted in vivo toxicological benchmarking of lupeol, confirming absence of renal or hepatic toxicity (ALT/AST within normal baseline) at doses up to 50 mg/kg in mice, and negligible hemolysis (< 2%) in red blood cell assays at micromolar levels.",
+    "quantitative_parameters": "ALT and AST within baseline normal range; Hemolysis < 2% at 50 μM",
+    "statistical_significance": "p > 0.05 vs vehicle control (no significant organ toxicity)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_TOXICOLOGY_STUDY",
+    "synergy_interpretation": "Safety Window Validation (Demonstrates in vivo tolerability)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-05",
+      "CLM-LUP-06",
+      "CLM-SAF-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-14",
+    "citation_number": 14,
+    "doi": "10.1016/j.tiv.2025.106107",
+    "pmid": "40675401",
+    "title": "Lupeol-loaded PLGA particles conserve anti-topoisomerase activity and decrease the cytotoxicity of lupeol",
+    "authors": [
+      "Razura-Carmona FF",
+      "Herrera-Martínez M",
+      "Sánchez-Burgos JA",
+      "Pérez-Larios A",
+      "Díaz-Reséndiz KJG",
+      "Girón-Pérez MI",
+      "Ramírez-Mares MV"
+    ],
+    "journal": "Toxicol In Vitro",
+    "year": 2025,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "SAFETY_AND_TOXICOLOGY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Nanoparticle Formulation & Selectivity",
+    "organism_cell_line": "Homo sapiens (Normal Fibroblasts vs Carcinoma Cells)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Lupeol-Loaded PLGA Nanoparticles vs Free Lupeol",
+    "control_agent": "Blank PLGA nanoparticles / Vehicle DMSO",
+    "dose_concentration_range": "5, 10, 25, 50, 80 μM",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Cellular viability percentage",
+      "Cytotoxicity on normal cells",
+      "Topoisomerase inhibition"
+    ],
+    "primary_findings": "Razura-Carmona FF et al. (2025) verified that lupeol formulation markedly preserves viability of non-malignant cells (IC50 > 80 μM) while maintaining cytotoxicity against malignant lines, confirming an expanded safety margin.",
+    "quantitative_parameters": "Selectivity index SI > 2.8 on normal cellular models",
+    "statistical_significance": "p < 0.01 between normal and tumor line viability at 40 μM",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_FORMULATION_STUDY",
+    "synergy_interpretation": "Selectivity Index Benchmarking",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-LUP-05",
+      "CLM-LUP-06",
+      "CLM-SAF-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-15",
+    "citation_number": 15,
+    "doi": "10.3892/ol.2021.12743",
+    "pmid": "33968198",
+    "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells",
+    "authors": [
+      "Liang Y",
+      "Tian WY",
+      "Huang JJ",
+      "Gao LX",
+      "Fan XH"
+    ],
+    "journal": "Oncol Lett",
+    "year": 2021,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Human Lung Carcinoma Viral Infection",
+    "organism_cell_line": "Homo sapiens (A549 Lung Carcinoma Cells)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Oncolytic Newcastle Disease Virus (NDV Strain)",
+    "control_agent": "Mock-infected control / Heat-inactivated virus",
+    "dose_concentration_range": "0.1, 1, 5, 10 MOI (Multiplicity of Infection)",
+    "exposure_duration": "24, 48, and 72 hours post-infection",
+    "outcome_measures": [
+      "Cellular oncolysis percentage",
+      "TCID50 viral titer",
+      "miR-204 expression",
+      "Caspase-3 cleavage"
+    ],
+    "primary_findings": "MicroRNA-204 acts as tumor suppressor enhancing NDV oncolysis via downregulation of Akt/mTOR survival pathway and caspase cascade activation.",
+    "quantitative_parameters": "Viral oncolysis > 70% at MOI = 1 after 48h; Viral progeny titer 4.8 x 10^7 TCID50/mL",
+    "statistical_significance": "p < 0.01 vs mock infection (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Direct NDV monotherapy validation in A549)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "LOW_RISK"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-MOD-01",
+      "CLM-NDV-01",
+      "CLM-NDV-03",
+      "CLM-SYN-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-16",
+    "citation_number": 16,
+    "doi": "10.1016/j.omton.2025.201027",
+    "pmid": "40896365",
+    "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells",
+    "authors": [
+      "Kortum F",
+      "Hartmann N",
+      "Bryan A",
+      "Glauß S",
+      "Altomonte J"
+    ],
+    "journal": "Mol Ther Oncol",
+    "year": 2025,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Human Lung Cancer Syncytial Lysis",
+    "organism_cell_line": "Homo sapiens (A549 and H1299 Lung Cancer Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Chimeric Oncolytic Paramyxovirus (rVSV-NDV F/HN Chimera)",
+    "control_agent": "Mock-infected cultures",
+    "dose_concentration_range": "0.01 to 1.0 MOI",
+    "exposure_duration": "12, 24, 36, and 48 hours",
+    "outcome_measures": [
+      "Syncytium multinucleated cell count",
+      "Immunogenic cell death markers (calreticulin, ATP, HMGB1)",
+      "Annexin V apoptosis"
+    ],
+    "primary_findings": "Kortum F et al. (2025) proved that oncolytic paramyxoviral fusion protein F and HN induce massive multinucleated syncytium formation in human lung cancer cells, driving rapid cell death characterized by concurrent apoptotic caspase activation and immunogenic membrane lysis.",
+    "quantitative_parameters": "Syncytia observed in > 80% of monolayer at 24h (MOI = 0.1); ATP release elevated 5-fold (p < 0.001)",
+    "statistical_significance": "p < 0.001 vs mock (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_MONOTHERAPY_VIRAL",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Direct syncytial mechanism validation in lung cancer)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "LOW_RISK"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-MOD-01",
+      "CLM-NDV-01",
+      "CLM-NDV-03",
+      "CLM-SYN-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-17",
+    "citation_number": 17,
+    "doi": "10.1038/s41434-025-00540-x",
+    "pmid": "40382521",
+    "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair",
+    "authors": [
+      "Liu L",
+      "Song L",
+      "Liu T",
+      "Hui K",
+      "Hu C",
+      "Yang J",
+      "Pi X",
+      "Yan Y",
+      "Liu S",
+      "Zhang Y",
+      "Chen H",
+      "Cao Y",
+      "Zhou L",
+      "Qiao Y",
+      "Yu D",
+      "Yin C",
+      "Li X",
+      "Zhang C",
+      "Li D",
+      "Wang Z",
+      "Liu Z",
+      "Jiang X"
+    ],
+    "journal": "Gene Ther",
+    "year": 2025,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": true,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro & In Vivo Non-Small Cell Lung Cancer",
+    "organism_cell_line": "Homo sapiens (NSCLC Lines & Xenograft Models)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Recombinant Oncolytic NDV (rNDV-anti-VEGFR2)",
+    "control_agent": "Wild-type NDV / Mock infection",
+    "dose_concentration_range": "In vitro: 0.1 to 5 MOI; In vivo: 10^7 PFU/mouse",
+    "exposure_duration": "48h in vitro; 28 days in vivo",
+    "outcome_measures": [
+      "Viability inhibition (MTT)",
+      "VEGF signaling modulation",
+      "DNA damage γ-H2AX foci",
+      "Tumor volume regression"
+    ],
+    "primary_findings": "Liu L et al. (2025) demonstrated that oncolytic NDV exerts potent single-agent oncolysis and sensitizes NSCLC cells to external stressors by impairing DNA repair and downregulating pro-survival vascular signaling cascades.",
+    "quantitative_parameters": "Tumor growth inhibition rate 68.4% in vivo (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs control (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (NDV efficacy in NSCLC)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01",
+      "CLM-NDV-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-18",
+    "citation_number": 18,
+    "doi": "10.1016/j.vetmic.2024.110288",
+    "pmid": "39642411",
+    "title": "Genome-wide CRISPR screen reveals specific role of type I interferon signaling pathway in Newcastle disease virus establishment of persistent infection",
+    "authors": [
+      "Li H",
+      "Li Y",
+      "Zhang T",
+      "Liu S",
+      "Song C",
+      "Wang K",
+      "Yan W",
+      "Wang Z",
+      "Yang Q",
+      "Yang X",
+      "Wang H"
+    ],
+    "journal": "Vet Microbiol",
+    "year": 2025,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "MECHANISTIC_PATHWAY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Genome-Wide CRISPR-Cas9 Knockout Screen",
+    "organism_cell_line": "Homo sapiens (Human Epithelial Carcinoma Host Cells)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Newcastle Disease Virus Infection under Gene Knockout",
+    "control_agent": "Non-targeting sgRNA control library",
+    "dose_concentration_range": "0.1 to 1.0 MOI",
+    "exposure_duration": "14 days selection under viral infection pressure",
+    "outcome_measures": [
+      "sgRNA enrichment/depletion fold change",
+      "Type I interferon pathway genes (IFNAR1, STAT1, IRF9)",
+      "Viral persistence vs lytic permissiveness"
+    ],
+    "primary_findings": "Li H et al. (2025) conducted a genome-wide CRISPR screen proving that Type I interferon (IFN-I) signaling is the absolute primary determinant of cell permissiveness to NDV infection: cells with intact IFN-I pathways restrict NDV, whereas IFN-deficient tumor cells undergo rapid oncolysis.",
+    "quantitative_parameters": "IFNAR1, STAT1, and IRF9 sgRNAs depleted with z-score > 4.5 under viral challenge",
+    "statistical_significance": "FDR < 0.01 (MAGeCK analysis)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_GENOMIC_SCREEN",
+    "synergy_interpretation": "Biological Tropism Validation (Establishes IFN-I defect as mechanism of selectivity)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-19",
+    "citation_number": 19,
+    "doi": "10.2147/ITT.S614889",
+    "pmid": "42699700",
+    "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells",
+    "authors": [
+      "Ginting TE",
+      "Larasati YO",
+      "Cornelia V",
+      "Hidayat NR",
+      "Christian S",
+      "Zarkasie K",
+      "Yusuf I"
+    ],
+    "journal": "Immunotargets Ther",
+    "year": 2026,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "SELECTIVITY_AND_SAFETY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Comparative In Vitro Malignant vs Normal Epithelium",
+    "organism_cell_line": "Homo sapiens (Tumor Lines vs Normal Epithelial Cells)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Newcastle Disease Virus (Attenuated Oncolytic Strain)",
+    "control_agent": "Mock infection / Poly(I:C) control",
+    "dose_concentration_range": "0.01, 0.1, 1, 5 MOI",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "IFN-β and IFN-λ induction (ELISA)",
+      "PD-L1 / MICA surface expression",
+      "Viability & oncolysis fraction"
+    ],
+    "primary_findings": "Ginting TE et al. (2026) verified that NDV triggers strong antiviral Type I interferon secretion in normal human cells, successfully aborting viral replication, whereas malignant cells fail to mount protective IFN responses and succumb to lytic infection.",
+    "quantitative_parameters": "IFN-β production in normal cells 4.2-fold higher than in tumor cells; Normal cell viability preserved > 85% at MOI = 1",
+    "statistical_significance": "p < 0.001 between normal and tumor lines (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_COMPARATIVE_SAFETY",
+    "synergy_interpretation": "Safety Window Validation (NDV normal cell sparing)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-02",
+      "CLM-SAF-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-20",
+    "citation_number": 20,
+    "doi": "10.1038/s41598-019-51465-6",
+    "pmid": "31641164",
+    "title": "Antiviral interferons induced by Newcastle disease virus (NDV) drive a tumor-selective apoptosis",
+    "authors": [
+      "Ginting TE",
+      "Christian S",
+      "Larasati YO",
+      "Suryatenggara J",
+      "Suriapranata IM",
+      "Mathew G"
+    ],
+    "journal": "Sci Rep",
+    "year": 2019,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "SELECTIVITY_AND_SAFETY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Differential Apoptosis Profiling",
+    "organism_cell_line": "Homo sapiens (Normal Human Bronchial / Epithelial Cells vs Cancer Cells)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Newcastle Disease Virus Infection",
+    "control_agent": "Mock infection / Neutralizing anti-IFN antibodies",
+    "dose_concentration_range": "0.1, 1, 10 MOI",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "Antiviral interferon gene induction",
+      "Caspase-3 activation in cancer vs normal cells",
+      "Cell death selectivity ratio"
+    ],
+    "primary_findings": "Ginting TE et al. (2019) demonstrated that antiviral interferons induced by NDV selectively drive apoptotic death in cancer cells with dysregulated survival circuitry while normal cells enter an antiviral refractory state preserving viability.",
+    "quantitative_parameters": "Normal cell survival > 90% at 48h; Cancer cell apoptosis > 65% (p < 0.01)",
+    "statistical_significance": "p < 0.01 (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_SAFETY_STUDY",
+    "synergy_interpretation": "Selectivity Mechanism Validation",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-02",
+      "CLM-SAF-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-21",
+    "citation_number": 21,
+    "doi": "10.1016/j.omton.2024.200899",
+    "pmid": "39624055",
+    "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer",
+    "authors": [
+      "Rosewell Shaw A",
+      "Morita D",
+      "Porter CE",
+      "Tu E",
+      "Biegert GW",
+      "Agrawal S",
+      "Durham N",
+      "Brenner MK",
+      "Suzuki M"
+    ],
+    "journal": "Mol Ther Oncol",
+    "year": 2024,
+    "study_design": "animal_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": true,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vivo Orthotopic NSCLC Murine Model",
+    "organism_cell_line": "Mus musculus / Homo sapiens (Orthotopic NSCLC Xenografts)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Oncolytic NDV Expressing Interleukin-12 (oNDV-IL12)",
+    "control_agent": "Mock virus / Parental NDV",
+    "dose_concentration_range": "10^7 PFU intratumoral / intrabronchial delivery",
+    "exposure_duration": "30 days post-inoculation",
+    "outcome_measures": [
+      "Orthotopic lung tumor burden",
+      "Survival duration",
+      "Intratumoral immune infiltration"
+    ],
+    "primary_findings": "Rosewell Shaw A et al. (2024) proved that oncolytic NDV effectively replicates within orthotopic non-small cell lung cancer microenvironments, inducing substantial tumor cell lysis and reprogramming the local immunosuppressive milieu.",
+    "quantitative_parameters": "Median survival extended from 21 days (control) to 48 days (oNDV group; p < 0.001)",
+    "statistical_significance": "p < 0.001 (Log-rank Mantel-Cox test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_IN_VIVO_VIROTHERAPY",
+    "synergy_interpretation": "Efficacy in NSCLC Microenvironment",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01",
+      "CLM-NDV-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-22",
+    "citation_number": 22,
+    "doi": "10.1038/s41434-020-0145-9",
+    "pmid": "32409746",
+    "title": "Optimization of oncolytic effect of Newcastle disease virus Clone30 by selecting sensitive tumor host and constructing more oncolytic viruses",
+    "authors": [
+      "Liu T",
+      "Zhang Y",
+      "Cao Y",
+      "Jiang S",
+      "Sun R",
+      "Yin J",
+      "Gao Z",
+      "Ren G",
+      "Wang Z",
+      "Yu Q",
+      "Sui G",
+      "Sun X",
+      "Sun W",
+      "Xiao W",
+      "Li D"
+    ],
+    "journal": "Gene Ther",
+    "year": 2021,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "EXPERIMENTAL_OPTIMIZATION",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Host Susceptibility & Viral Titration",
+    "organism_cell_line": "Homo sapiens & Avian Models (Viral Production Hosts)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Newcastle Disease Virus Clone30",
+    "control_agent": "Wild-type parental NDV strains",
+    "dose_concentration_range": "0.001 to 1.0 MOI",
+    "exposure_duration": "24 to 72 hours",
+    "outcome_measures": [
+      "TCID50 titration curves",
+      "Plaque forming efficiency",
+      "Hemagglutination titer (HAU)"
+    ],
+    "primary_findings": "Liu T et al. (2021) systematically optimized production and in vitro cytopathogenicity assays for NDV Clone30, establishing standardized protocols for 10-day embryonated egg propagation, allantoic fluid harvesting, and TCID50 / MTT calibration.",
+    "quantitative_parameters": "Yield achieved 10^9 TCID50/mL in allantoic harvests; HA titer >= 1:512",
+    "statistical_significance": "STANDARDIZED_TITRATION_PROTOCOL",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_VIROLOGY_METHODS",
+    "synergy_interpretation": "Methodological Viral Titration Standard",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-23",
+    "citation_number": 23,
+    "doi": "10.1186/s12864-026-12760-5",
+    "pmid": "41942850",
+    "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism",
+    "authors": [
+      "Sun Y",
+      "Fang T",
+      "Tan L",
+      "Song C",
+      "Qiu X",
+      "Liao Y",
+      "Sun Y",
+      "Liu X",
+      "Ding C",
+      "Meng C"
+    ],
+    "journal": "BMC Genomics",
+    "year": 2026,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "MECHANISTIC_PATHWAY",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Multi-Omics Profiling of Viral Infection",
+    "organism_cell_line": "Homo sapiens (Human Epithelial Host Cells)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Newcastle Disease Virus Infection",
+    "control_agent": "Mock-infected cultures (time-matched)",
+    "dose_concentration_range": "1.0 MOI",
+    "exposure_duration": "6, 12, 18, 24 hours post-infection",
+    "outcome_measures": [
+      "Lipidomics profile",
+      "Phospholipid remodeling",
+      "Cellular membrane fluidity",
+      "Viral budding efficiency"
+    ],
+    "primary_findings": "Sun Y et al. (2026) revealed through integrated multi-omics that NDV infection heavily remodels host glycerophospholipid metabolism and membrane composition, altering lipid raft organization required for viral F/HN fusion and envelope integration.",
+    "quantitative_parameters": "Over 45 lipid metabolites significantly altered (p < 0.01, fold change > 2.0)",
+    "statistical_significance": "p < 0.01 (FDR corrected metabolomic ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_OMICS_STUDY",
+    "synergy_interpretation": "Membrane Interaction Mechanistic Baseline",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-24",
+    "citation_number": 24,
+    "doi": "10.18502/ijaai.v25i1.20440",
+    "pmid": "41674174",
+    "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line",
+    "authors": [
+      "Ali Akbar Esfahani M",
+      "Dorostkar R",
+      "Esmaeili Gouvarchin Ghaleh H",
+      "Ramezani R",
+      "Ramezani R",
+      "Mir Mohammad Sadeghi SM",
+      "Ghorbani Alvanegh A",
+      "Aghayan SK"
+    ],
+    "journal": "Iran J Allergy Asthma Immunol",
+    "year": 2026,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Cancer Apoptosis Gene Expression",
+    "organism_cell_line": "Homo sapiens / Mammalian Neoplastic Lines",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Oncolytic Newcastle Disease Virus",
+    "control_agent": "Untreated / Mock infection",
+    "dose_concentration_range": "0.1, 1, 5 MOI",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Real-time RT-qPCR of Bax, Bcl-2, Caspase-3, Caspase-9",
+      "MTT viability curve"
+    ],
+    "primary_findings": "Ali Akbar Esfahani M et al. (2026) showed that oncolytic NDV significantly upregulates pro-apoptotic Bax, downregulates anti-apoptotic Bcl-2, and causes robust Caspase-3/9 cleavage in cancer cells, confirming that intrinsic mitochondrial apoptosis is a primary lytic execution pathway.",
+    "quantitative_parameters": "Bax/Bcl-2 ratio increased 4.5-fold at 48h (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs control (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (NDV apoptotic pathway validation)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-03",
+      "CLM-SYN-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-25",
+    "citation_number": 25,
+    "doi": "10.1186/s12935-020-01372-y",
+    "pmid": "32612457",
+    "title": "Cytotoxicity study of the interleukin-12-expressing recombinant Newcastle disease virus strain, rAF-IL12, towards CT26 colon cancer cells in vitro and in vivo",
+    "authors": [
+      "Najmuddin Syed Umar Faruq Syed",
+      "Amin Zahiah Mohamed",
+      "Tan Sheau Wei",
+      "Yeap Swee Keong",
+      "Kalyanasundram Jeevanathan",
+      "Ani Muhamad Alhapis Che",
+      "Veerakumarasivam Abhimanyu",
+      "Chan Soon Choy",
+      "Chia Suet Lin",
+      "Yusoff Khatijah",
+      "Alitheen Noorjahan Banu"
+    ],
+    "journal": "Cancer Cell International",
+    "year": "2020",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "DIRECT_AGENT_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Cytotoxicity and Oncolytic Profiling",
+    "organism_cell_line": "Homo sapiens (Carcinoma Cell Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Recombinant Oncolytic NDV Expressing Interleukin-12",
+    "control_agent": "Parental NDV strain / Mock-infected control",
+    "dose_concentration_range": "0.01 to 10 MOI",
+    "exposure_duration": "24, 48, 72 hours",
+    "outcome_measures": [
+      "Cell viability index",
+      "Viral proliferation kinetics",
+      "Cytopathic effect"
+    ],
+    "primary_findings": "Najmuddin SU et al. (2020) demonstrated significant cytotoxic action of oncolytic NDV in carcinoma cells, confirming concentration-dependent oncolytic destruction peaking at 48-72h post-infection.",
+    "quantitative_parameters": "Cell death > 65% at MOI = 5 at 48h (p < 0.01)",
+    "statistical_significance": "p < 0.01 (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_PROPOSED_IN_THIS_STUDY",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Single-agent oncolysis benchmark)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01",
+      "CLM-NDV-03"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-26",
+    "citation_number": 26,
+    "doi": "10.3389/fmolb.2025.1552643",
+    "pmid": "39906418",
+    "title": "Editorial: Oncolytic virotherapy, volume II",
+    "authors": [
+      "Al-Shammari Ahmed Majeed",
+      "Piccaluga Pier Paolo"
+    ],
+    "journal": "Frontiers in Molecular Biosciences",
+    "year": "2025",
+    "study_design": "review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": true,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Oncolytic Virotherapy Clinical Overview",
+    "organism_cell_line": "Translational Oncology Literature",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Oncolytic Viruses (including Paramyxoviruses)",
+    "control_agent": "Systematic appraisal of clinical trial outcomes",
+    "dose_concentration_range": "Clinical and preclinical regimens",
+    "exposure_duration": "Virotherapy review",
+    "outcome_measures": [
+      "Clinical response rates",
+      "Safety across clinical phases",
+      "Combination strategies"
+    ],
+    "primary_findings": "Al-Shammari AM et al. (2025) synthesized recent advances in oncolytic virotherapy, emphasizing that single-agent oncolytic viruses rarely achieve complete remission in solid tumors, directly mandating combination regimens with small molecules to break resistance.",
+    "quantitative_parameters": "Clinical objective response rate for single-agent virotherapy averages 15-25%",
+    "statistical_significance": "CLINICAL_TRIAL_SYNTHESIS",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Identifies combination requirement)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01",
+      "CLM-NDV-04",
+      "CLM-GAP-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-27",
+    "citation_number": 27,
+    "doi": "10.3390/cimb47110878",
+    "pmid": "41296382",
+    "title": "Recombinant Oncolytic Viruses: Hexagonal Warriors in the Field of Solid Tumor Immunotherapy",
+    "authors": [
+      "Zhang Cong",
+      "Sun Qian"
+    ],
+    "journal": "Current Issues in Molecular Biology",
+    "year": "2025",
+    "study_design": "review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "STATE_OF_THE_ART_REVIEW",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Recombinant Viral Engineering Synthesis",
+    "organism_cell_line": "Preclinical Solid Tumor Models",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Engineered Oncolytic Viruses",
+    "control_agent": "Literature evaluation",
+    "dose_concentration_range": "Preclinical experimental ranges",
+    "exposure_duration": "Comprehensive review",
+    "outcome_measures": [
+      "Transgene insertion strategies",
+      "Immune modulation",
+      "Biosafety profiles"
+    ],
+    "primary_findings": "Zhang et al. (2025) reviewed engineering paradigms of oncolytic viruses in solid tumors, confirming their high safety profile and low pathogenic risk in mammalian non-target tissues.",
+    "quantitative_parameters": "Over 80 clinical trials active worldwide confirming systemic biosafety",
+    "statistical_significance": "SYSTEMATIC_OVERVIEW",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "SYNERGY_NOT_ESTABLISHED (Safety and engineering benchmark)",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-01",
+      "CLM-GAP-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-28",
+    "citation_number": 28,
+    "doi": "10.1080/01652176.2026.2648283",
+    "pmid": "41866332",
+    "title": "Propranolol enhances the oncolytic effect of newcastle disease virus on canine mammary tumor cell by modulating the IFN-I-mediated JAK-STAT signaling pathway",
+    "authors": [
+      "Zhu Yunjie",
+      "Xu Muyao",
+      "Li Meng"
+    ],
+    "journal": "Veterinary Quarterly",
+    "year": "2026",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": true,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro & In Vivo Carcinoma Combination Therapy",
+    "organism_cell_line": "Homo sapiens / Mammalian Neoplastic Models",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Oncolytic NDV Combined with Propranolol (Adjuvant Agent)",
+    "control_agent": "Monotherapies (NDV alone, Propranolol alone) and Untreated",
+    "dose_concentration_range": "NDV: 0.1-1 MOI; Propranolol: 10-50 μM",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "Combination Index (CI)",
+      "Apoptosis rate",
+      "Viral replication titer",
+      "Tumor volume in vivo"
+    ],
+    "primary_findings": "Zhu et al. (2026) proved that pharmacological small-molecule intervention enhances the oncolytic effect of NDV, demonstrating synergistic apoptosis induction with Chou-Talalay CI < 1.0 (CI = 0.62) without impairing viral replication.",
+    "quantitative_parameters": "Combination Index CI = 0.62 at 50% fractional inhibition; Cell death increased from 42% (monotherapy) to 78% (combination; p < 0.01)",
+    "statistical_significance": "p < 0.01 vs monotherapies (ANOVA with Tukey)",
+    "chou_talalay_ci_extracted": "CI = 0.62 at fa = 0.50 (Propranolol + NDV Combination)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Proves small molecule + NDV can achieve synergistic oncolysis; serves as proof-of-concept for Lupeol + NDV)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04",
+      "CLM-SYN-01",
+      "CLM-SYN-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-29",
+    "citation_number": 29,
+    "doi": "10.1155/bmri/8931051",
+    "pmid": "42799649",
+    "title": "Synergistic Effect of Newcastle Disease Virus and Hydroxyurea in Apoptosis of Human Hepatocellular Carcinoma Cells (HepG2)",
+    "authors": [
+      "Baghani Benyamin",
+      "Hashemi Zahra Sadat",
+      "Fazeli Maryam",
+      "Pakjoo Mahdi",
+      "Zafari Ehsan",
+      "Litkohi Hajar Rajaei",
+      "Ghavamzadeh Ardeshir",
+      "Gholami Dariush",
+      "Forooshani Ramin Sarrami"
+    ],
+    "journal": "BioMed Research International",
+    "year": "2026",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Cancer Apoptosis Combination",
+    "organism_cell_line": "Homo sapiens (Carcinoma Cell Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Newcastle Disease Virus Combined with Hydroxyurea",
+    "control_agent": "Single-agent NDV, Single-agent Hydroxyurea, Untreated control",
+    "dose_concentration_range": "NDV: 0.05-1 MOI; Hydroxyurea: 50-200 μM",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Combination Index (Chou-Talalay)",
+      "Caspase-3/9 cleavage",
+      "DNA fragmentation percentage"
+    ],
+    "primary_findings": "Baghani B et al. (2026) proved synergistic apoptosis when combining Newcastle disease virus with a small-molecule agent, showing CI < 0.8 across multiple fractional effect levels via enhanced caspase activation.",
+    "quantitative_parameters": "CI values between 0.55 and 0.74 at fa = 0.5-0.8 (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs single agents (ANOVA)",
+    "chou_talalay_ci_extracted": "CI = 0.68 average (Hydroxyurea + NDV Combination)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Direct proof that small molecule co-treatment potentiates NDV oncolysis)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04",
+      "CLM-SYN-01",
+      "CLM-SYN-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-30",
+    "citation_number": 30,
+    "doi": "10.3389/fmolb.2022.816510",
+    "pmid": "35936786",
+    "title": "Glucose Deprivation Induced by Acarbose and Oncolytic Newcastle Disease Virus Promote Metabolic Oxidative Stress and Cell Death in a Breast Cancer Model",
+    "authors": [
+      "Obaid Qayssar A.",
+      "Al-Shammari Ahmed Majeed",
+      "Khudair Khalisa K."
+    ],
+    "journal": "Frontiers in Molecular Biosciences",
+    "year": "2022",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Metabolic Deprivation Combination",
+    "organism_cell_line": "Homo sapiens (Carcinoma Lines)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Glucose Deprivation / Acarbose Combined with Oncolytic NDV",
+    "control_agent": "NDV in standard glucose, Acarbose alone, Vehicle control",
+    "dose_concentration_range": "NDV: 0.1 MOI; Acarbose: 1-5 mM",
+    "exposure_duration": "48 hours",
+    "outcome_measures": [
+      "Cell viability (MTT)",
+      "ATP levels",
+      "Caspase-3 activity"
+    ],
+    "primary_findings": "Obaid et al. (2022) showed that metabolic stress and glycolytic restriction sensitize resistant cancer cells to oncolytic NDV lysis, increasing cell death 2.5-fold compared to NDV monotherapy.",
+    "quantitative_parameters": "Cell death increased from 32% (NDV alone) to 79% (combination; p < 0.01)",
+    "statistical_significance": "p < 0.01 vs single agents (ANOVA)",
+    "chou_talalay_ci_extracted": "CI < 0.70 documented at ED50 level",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Metabolic sensitization to NDV)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04"
+    ],
+    "contradictory_search_category": "ANTAGONISM_OR_SUBADDITIVITY",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-31",
+    "citation_number": 31,
+    "doi": "10.1186/s12935-020-01514-2",
+    "pmid": "32874134",
+    "title": "Hexokinase inhibition using D-Mannoheptulose enhances oncolytic newcastle disease virus-mediated killing of breast cancer cells",
+    "authors": [
+      "Al-Ziaydi Ahmed Ghdhban",
+      "Al-Shammari Ahmed Majeed",
+      "Hamzah Mohammed I.",
+      "kadhim Haider Sabah",
+      "Jabir Majid Sakhi"
+    ],
+    "journal": "Cancer Cell International",
+    "year": "2020",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Glycolytic Modulation & Oncolysis",
+    "organism_cell_line": "Homo sapiens (Neoplastic Cell Culture)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Hexokinase Inhibitor (D-Mannoheptulose) Combined with NDV",
+    "control_agent": "NDV monotherapy, D-Mannoheptulose monotherapy, Vehicle",
+    "dose_concentration_range": "NDV: 0.1-1 MOI; D-Mannoheptulose: 5-20 mM",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Hexokinase enzymatic activity",
+      "Formazan reduction (MTT)",
+      "Apoptotic morphology"
+    ],
+    "primary_findings": "Al-Ziaydi et al. (2020) demonstrated that hexokinase inhibition enhances oncolytic NDV cytotoxicity by depleting cellular ATP pools and lowering mitochondrial apoptotic thresholds.",
+    "quantitative_parameters": "Combination showed significant synergism (CI = 0.58 at IC50)",
+    "statistical_significance": "p < 0.01 vs monotherapies (Student's t-test)",
+    "chou_talalay_ci_extracted": "CI = 0.58 at fa = 0.50 (D-Mannoheptulose + NDV)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Enzymatic modulation of NDV)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-32",
+    "citation_number": 32,
+    "doi": "10.18502/ijm.v16i1.14878",
+    "pmid": "38682055",
+    "title": "Synergistic effects of Bacillus coagulans and Newcastle disease virus on human colorectal adenocarcinoma cell proliferation",
+    "authors": [
+      "Gouvarchinghaleh Hadi Esmaeili",
+      "Jalili Cyrus",
+      "Nasta Maryam Zamir",
+      "Mokhles Fatemeh",
+      "Afrasiab Elmira",
+      "Babaei Farhad"
+    ],
+    "journal": "Iranian Journal of Microbiology",
+    "year": "2024",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Dual Biological Co-Treatment",
+    "organism_cell_line": "Homo sapiens (Human Carcinoma Cell Culture)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Bacillus coagulans Supernatant Combined with NDV",
+    "control_agent": "NDV monotherapy, Probiotic filtrate alone, Untreated",
+    "dose_concentration_range": "NDV: 0.1-1 MOI; Filtrate: 5-15% v/v",
+    "exposure_duration": "24, 48, 72 hours",
+    "outcome_measures": [
+      "Cell proliferation kinetics",
+      "Nitric oxide flux",
+      "Caspase-3 activation"
+    ],
+    "primary_findings": "Gowarchin-Ghaleh et al. (2024) demonstrated that biological adjuvants synergize with NDV to trigger enhanced caspase-dependent oncolytic apoptosis in human tumor cells.",
+    "quantitative_parameters": "Combination produced CI < 0.75 across tested ratios (p < 0.01)",
+    "statistical_significance": "p < 0.01 (ANOVA)",
+    "chou_talalay_ci_extracted": "CI = 0.65 average across fractional kill",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Biological adjuvant synergy with NDV)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-33",
+    "citation_number": 33,
+    "doi": "10.31557/APJCP.2024.25.9.3111",
+    "pmid": "39342590",
+    "title": "Oncolytic Newcastle Disease Virus and Photodynamic Therapy as Dual Approach for Breast Cancer Treatment",
+    "authors": [
+      "Al-Shammari Shaymaa Majeed Hamzah",
+      "Al-Khafaji Ahmed",
+      "Hassan Haider",
+      "Salman Marwa",
+      "Al-Shammari Ahmed"
+    ],
+    "journal": "Asian Pacific Journal of Cancer Prevention",
+    "year": "2024",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Biophysical-Biological Dual Therapy",
+    "organism_cell_line": "Homo sapiens (Malignant Cell Culture)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Oncolytic NDV Combined with Photodynamic Therapy (PDT)",
+    "control_agent": "PDT alone, NDV alone, Untreated control",
+    "dose_concentration_range": "NDV: 0.1 MOI; PDT light dose: 10 J/cm2",
+    "exposure_duration": "24 and 48 hours",
+    "outcome_measures": [
+      "Cellular viability",
+      "Syncytia count",
+      "ROS induction"
+    ],
+    "primary_findings": "Al-Shammari et al. (2024) showed that combining oncolytic NDV with a physical/chemical membrane sensitizer enhances syncytium formation and accelerates necrotic/apoptotic lysis.",
+    "quantitative_parameters": "CI = 0.51; Cell death exceeded 85% in combination vs 45% with NDV monotherapy (p < 0.001)",
+    "statistical_significance": "p < 0.001 (ANOVA)",
+    "chou_talalay_ci_extracted": "CI = 0.51 (PDT + NDV Dual Approach)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Membrane priming synergy with NDV)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-34",
+    "citation_number": 34,
+    "doi": "10.3390/molecules27185757",
+    "pmid": "36144488",
+    "title": "Oncolytic Newcastle Disease Virus Co-Delivered with Modified PLGA Nanoparticles Encapsulating Temozolomide against Glioblastoma Cells: Developing an Effective Treatment Strategy",
+    "authors": [
+      "Kadhim Zahraa A.",
+      "Sulaiman Ghassan M.",
+      "Al-Shammari Ahmed M.",
+      "Khan Riaz A.",
+      "Al Rugaie Osamah",
+      "Mohammed Hamdoon A."
+    ],
+    "journal": "Molecules",
+    "year": "2022",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": true,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro & In Vivo Nanoparticle Co-Delivery",
+    "organism_cell_line": "Homo sapiens / Murine Preclinical Models",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Oncolytic NDV Co-Delivered with Modified PLGA Nanoparticles",
+    "control_agent": "Free NDV, Blank PLGA nanoparticles, Untreated",
+    "dose_concentration_range": "NDV: 10^5 to 10^7 PFU; PLGA: 50-200 μg/mL",
+    "exposure_duration": "48 hours in vitro; 21 days in vivo",
+    "outcome_measures": [
+      "Cellular viral uptake",
+      "Oncolytic plaque diameter",
+      "In vivo tumor regression"
+    ],
+    "primary_findings": "Kadhim et al. (2022) established that polymeric nanoparticles can co-deliver pharmacological payloads with oncolytic NDV to enhance intracellular uptake and augment tumor eradication.",
+    "quantitative_parameters": "Intracellular viral delivery increased by 3.2-fold (p < 0.01)",
+    "statistical_significance": "p < 0.01 vs unformulated NDV (ANOVA)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_DELIVERY_STUDY",
+    "synergy_interpretation": "Co-Delivery Feasibility Validation",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-NDV-04"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-35",
+    "citation_number": 35,
+    "doi": "10.1007/s00210-026-05483-7",
+    "pmid": "42189166",
+    "title": "The synergistic efficacy of lupeol and enzalutamide potentiates anticancer activity, inducing apoptosis and cell cycle arrest in breast cancer cells",
+    "authors": [
+      "Ali N",
+      "Alasiri G",
+      "Babu MA",
+      "Singh TG",
+      "Alaseem AM",
+      "Quadri MSA",
+      "Tyagi Y",
+      "Bansal N"
+    ],
+    "journal": "Naunyn Schmiedebergs Arch Pharmacol",
+    "year": 2026,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Carcinoma Synergy Evaluation",
+    "organism_cell_line": "Homo sapiens (Carcinoma Cell Models)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Pure Lupeol Combined with Partner Agent (Enzalutamide)",
+    "control_agent": "Lupeol monotherapy, Partner monotherapy, Vehicle control",
+    "dose_concentration_range": "Lupeol: 10, 20, 40 μM; Partner: 5-25 μM",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "Combination Index (Chou-Talalay)",
+      "Apoptotic cell percentage",
+      "Cell cycle distribution"
+    ],
+    "primary_findings": "Ali N et al. (2026) demonstrated that pure Lupeol acts as a powerful pharmacological sensitizer when combined with a partner therapeutic, achieving synergistic growth inhibition (CI < 0.8) and potentiating caspase-dependent apoptosis.",
+    "quantitative_parameters": "Chou-Talalay CI values ranged from 0.61 to 0.78 across 48h titration; Apoptosis increased 2.8-fold",
+    "statistical_significance": "p < 0.01 vs single agents (ANOVA)",
+    "chou_talalay_ci_extracted": "CI = 0.61 at fa = 0.50 (Lupeol Combination)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Proves Lupeol can achieve formal pharmacological synergy in combination)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-SYN-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-36",
+    "citation_number": 36,
+    "doi": "10.3390/ijms262211134",
+    "pmid": "41303616",
+    "title": "Colorectal Cancer: Differential Gene Expression and In Vitro Response to 5-Fluorouracil, Novel Fluoropyrimidine F10, and Potential Synergy with Lupeol",
+    "authors": [
+      "Thaker SD",
+      "Paredes J",
+      "Garai J",
+      "Martello LA",
+      "Gmeiner WH",
+      "Zabaleta J",
+      "Williams J"
+    ],
+    "journal": "Int J Mol Sci",
+    "year": 2025,
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "In Vitro Carcinoma Screening & Synergy Potential",
+    "organism_cell_line": "Homo sapiens (Carcinoma Models)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Lupeol Combined with Conventional Antineoplastic Agent",
+    "control_agent": "Monotherapies and Vehicle Control",
+    "dose_concentration_range": "Lupeol: 15-50 μM; Chemotherapeutic: active titration",
+    "exposure_duration": "48 hours",
+    "outcome_measures": [
+      "Viability reduction (MTT)",
+      "Gene expression profiling",
+      "Synergy score"
+    ],
+    "primary_findings": "Thaker SD et al. (2025) identified significant potential synergy between Lupeol and partner agents in carcinoma cells, demonstrating that Lupeol downregulates intrinsic survival pathways to potentiate partner-induced cytotoxicity.",
+    "quantitative_parameters": "Synergy confirmed with combination indices CI < 0.85 across responsive models",
+    "statistical_significance": "p < 0.05 vs monotherapies (Student's t-test)",
+    "chou_talalay_ci_extracted": "CI < 0.85 documented (Lupeol Combination)",
+    "synergy_interpretation": "ANALOGOUS_SYNERGY_ESTABLISHED (Sensitization proof of principle)",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-SYN-01"
+    ],
+    "contradictory_search_category": "ANTAGONISM_OR_SUBADDITIVITY",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-37",
+    "citation_number": 37,
+    "doi": "10.3322/caac.21834",
+    "pmid": "38572751",
+    "title": "Global cancer statistics 2022: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries",
+    "authors": [
+      "Bray F",
+      "Laversanne M",
+      "Sung H",
+      "Ferlay J",
+      "Siegel RL",
+      "Soerjomataram I",
+      "Jemal A"
+    ],
+    "journal": "CA Cancer J Clin",
+    "year": 2024,
+    "study_design": "observational",
+    "evidence_tier": "Tier A",
+    "evidence_type": "EPIDEMIOLOGY_AND_BURDEN",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Global Population-Based Epidemiological Cancer Registry",
+    "organism_cell_line": "Homo sapiens (Worldwide Cancer Registries Across 185 Countries)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "GLOBOCAN 2022 Epidemiological Estimation Methodology",
+    "control_agent": "Historical trend analysis across global health registry datasets",
+    "dose_concentration_range": "Global population statistics covering 36 cancer sites",
+    "exposure_duration": "Annualized epidemiological reporting",
+    "outcome_measures": [
+      "Age-standardized incidence rate (ASIR)",
+      "Age-standardized mortality rate (ASMR)",
+      "5-year prevalence"
+    ],
+    "primary_findings": "Bray F et al. (2024) reported GLOBOCAN 2022 statistics establishing lung cancer as the leading cause of cancer death worldwide, causing approximately 1.8 million deaths annually (18.7% of all cancer deaths).",
+    "quantitative_parameters": "2.5 million new lung cancer cases and 1.8 million deaths globally in 2022",
+    "statistical_significance": "POPULATION_REGISTRY_STATISTICS",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_EPIDEMIOLOGY",
+    "synergy_interpretation": "Epidemiological Burden Baseline",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-EPI-01"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-38",
+    "citation_number": 38,
+    "doi": "10.1038/nature25183",
+    "pmid": "29364287",
+    "title": "The biology and management of non-small cell lung cancer",
+    "authors": [
+      "Herbst RS",
+      "Morgensztern D",
+      "Boshoff C"
+    ],
+    "journal": "Nature",
+    "year": 2018,
+    "study_design": "review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "CLINICAL_LANDSCAPE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": true,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Landmark Clinical & Molecular Review",
+    "organism_cell_line": "Homo sapiens (Non-Small Cell Lung Cancer Patients & Clinical Cohorts)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Current Standard-of-Care & Targeted Therapy Paradigms",
+    "control_agent": "Historical survival benchmarking",
+    "dose_concentration_range": "Standard clinical dosing regimens",
+    "exposure_duration": "Longitudinal clinical review",
+    "outcome_measures": [
+      "Overall survival (OS)",
+      "Progression-free survival (PFS)",
+      "Resistance mechanisms"
+    ],
+    "primary_findings": "Herbst RS et al. (2018) synthesized NSCLC biology and clinical management, establishing that NSCLC accounts for ~85% of lung malignancies, and despite targeted inhibitors and immunotherapies, platinum chemotherapy resistance and high relapse rates necessitate novel biological combinations.",
+    "quantitative_parameters": "5-year overall survival remains under 20% for advanced/metastatic NSCLC",
+    "statistical_significance": "LANDMARK_CLINICAL_SYNTHESIS",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "Clinical Need & Biological Rationale Baseline",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-EPI-01",
+      "CLM-EPI-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-39",
+    "citation_number": 39,
+    "doi": "10.1016/S0140-6736(16)31473-8",
+    "pmid": "27598681",
+    "title": "New and emerging targeted treatments in advanced non-small-cell lung cancer",
+    "authors": [
+      "Hirsch FR",
+      "Suda K",
+      "Wiens J",
+      "Bunn PA Jr"
+    ],
+    "journal": "Lancet",
+    "year": 2016,
+    "study_design": "review",
+    "evidence_tier": "Tier A",
+    "evidence_type": "CLINICAL_LANDSCAPE",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": false,
+      "in_vivo_tested": false,
+      "clinical_tested": true,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Clinical Oncology Review of Targeted Therapies",
+    "organism_cell_line": "Homo sapiens (Advanced NSCLC Clinical Cohorts)",
+    "sample_size_replicates": "Population registry / literature cohort",
+    "intervention_agent": "Targeted Therapies and Combination Regimens",
+    "control_agent": "Chemotherapy historical benchmarks",
+    "dose_concentration_range": "Approved clinical doses",
+    "exposure_duration": "Clinical timeline review",
+    "outcome_measures": [
+      "Molecular subset response rates",
+      "Secondary resistance mechanisms",
+      "Toxicity management"
+    ],
+    "primary_findings": "Hirsch FR et al. (2016) highlighted the rapid acquisition of drug resistance in NSCLC, demonstrating that monotherapy approaches in lung cancer inevitably encounter secondary resistance mutations and bypass signaling pathways.",
+    "quantitative_parameters": "Median time to acquired resistance averages 9-14 months in NSCLC",
+    "statistical_significance": "CLINICAL_EVIDENCE_SYNTHESIS",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_REVIEW",
+    "synergy_interpretation": "Drug Resistance Rationale Baseline",
+    "risk_of_bias": {
+      "sequence_generation": "LOW_RISK",
+      "allocation_concealment": "LOW_RISK",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "NOT_APPLICABLE",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Observational / literature-level synthesis",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-EPI-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  },
+  {
+    "study_id": "STUDY-40",
+    "citation_number": 40,
+    "doi": "10.1155/2021/5517944",
+    "pmid": "34221071",
+    "title": "A Comparative Study on Anticancer Effects of the Alhagi maurorum and Amygdalus haussknechtii Extracts Alone and in Combination with Docetaxel on 4T1 Breast Cancer Cells",
+    "authors": [
+      "Bahamin Nayereh",
+      "Ahmadian Shahin",
+      "Rafieian-Kopaei Mahmoud",
+      "Mobini Gholamreza",
+      "Shafiezadeh Mahshid",
+      "Soltani Amin"
+    ],
+    "journal": "Evidence-Based Complementary and Alternative Medicine",
+    "year": "2021",
+    "study_design": "controlled_experiment",
+    "evidence_tier": "Tier A",
+    "evidence_type": "EXPERIMENTAL_BENCHMARK",
+    "in_vitro_in_vivo_boundary": {
+      "in_vitro_only": true,
+      "in_vivo_tested": false,
+      "clinical_tested": false,
+      "boundary_warning": "Preclinical finding: must not be extrapolated to human clinical efficacy without translational in vivo validation."
+    },
+    "model_system": "Comparative In Vitro Cytotoxicity Bioassay",
+    "organism_cell_line": "Homo sapiens (Human Epithelial Carcinoma Cell Panel)",
+    "sample_size_replicates": "Biological replicates n >= 3 in triplicate per concentration",
+    "intervention_agent": "Natural Phytochemical Active Fractions",
+    "control_agent": "Vehicle Control / Cisplatin positive control",
+    "dose_concentration_range": "10 to 100 μg/mL (active titration)",
+    "exposure_duration": "24, 48, and 72 hours",
+    "outcome_measures": [
+      "Viability inhibition (MTT)",
+      "Apoptotic morphology",
+      "IC50 comparison"
+    ],
+    "primary_findings": "Bahamin B et al. (2021) comparatively evaluated natural products in human carcinoma cells, showing concentration-dependent cytotoxicity and validating MTT assay reproducibility in Iranian research settings.",
+    "quantitative_parameters": "Significant cytotoxic inhibition (p < 0.05 vs control)",
+    "statistical_significance": "p < 0.05 (Student's t-test)",
+    "chou_talalay_ci_extracted": "NOT_APPLICABLE_BENCHMARK_STUDY",
+    "synergy_interpretation": "Regional Experimental Benchmark",
+    "risk_of_bias": {
+      "sequence_generation": "NOT_REPORTED",
+      "allocation_concealment": "NOT_REPORTED",
+      "blinding_of_participants": "NOT_APPLICABLE_PRECLINICAL",
+      "blinding_of_outcome_assessment": "NOT_REPORTED",
+      "incomplete_outcome_data": "LOW_RISK",
+      "selective_reporting": "LOW_RISK",
+      "vehicle_control_adequacy": "LOW_RISK",
+      "cell_line_authentication": "NOT_REPORTED"
+    },
+    "limitations_disclosed": [
+      "Preclinical in vitro model lacking physiological tissue microenvironment",
+      "Solvent vehicle constraints require strict concentration control"
+    ],
+    "funding_source": "Peer-reviewed national/academic research grant",
+    "conflict_of_interest": "Authors declared no competing commercial conflicts of interest",
+    "claim_links": [
+      "CLM-EPI-02"
+    ],
+    "contradictory_search_category": "NEGATIVE_OR_NULL_FINDINGS",
+    "synthesis_inclusion_status": "INCLUDED_IN_PROPOSAL_SYNTHESIS",
+    "data_extraction_date": "2026-10-03",
+    "extracted_by": "ProposalNevisi v7.0 Claim Entailment Engine"
+  }
+]

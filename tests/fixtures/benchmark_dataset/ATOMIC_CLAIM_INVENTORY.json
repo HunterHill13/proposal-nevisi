@@ -1,0 +1,343 @@
+[
+  {
+    "claim_id": "CLM-EPI-01",
+    "claim_text_fa": "سرطان ریه پیشروترین عامل مرگ‌ومیر ناشی از بدخیمی‌ها در سراسر جهان است و کارسینوم سلول غیرکوچک ریه (NSCLC) بیش از ۸۵ درصد از موارد ابتلا را تشکیل می‌دهد.",
+    "claim_text_en": "Lung cancer is the leading cause of cancer mortality worldwide, with non-small cell lung cancer (NSCLC) accounting for over 85% of cases.",
+    "claim_type": "EPIDEMIOLOGICAL",
+    "target_entity": "Homo sapiens NSCLC",
+    "target_biological_system": "Global Oncology Epidemiology",
+    "target_endpoint": "Incidence and Mortality Rates",
+    "falsifiability_criteria": "Global epidemiology reporting showing non-lung cancer as leading cancer death cause or NSCLC < 80%.",
+    "minimum_evidence_threshold": "Tier A peer-reviewed global epidemiological registries (GLOBOCAN / CA Cancer J Clin).",
+    "proposal_location": "Section 2, Paragraph 1; Section 4, Item 1",
+    "supported_studies": [
+      "STUDY-37",
+      "STUDY-38"
+    ]
+  },
+  {
+    "claim_id": "CLM-EPI-02",
+    "claim_text_fa": "شیمی‌درمانی خط اول پلاتینی در NSCLC با سمیت شدید سیستمیک، سمیت کلیوی و عود کلون‌های مقاوم به آپوپتوز با شکست مواجه می‌شود.",
+    "claim_text_en": "First-line platinum-based chemotherapy in NSCLC is limited by severe systemic toxicities, nephrotoxicity, and emergence of apoptosis-resistant tumor clones.",
+    "claim_type": "CLINICAL_LANDSCAPE",
+    "target_entity": "Platinum chemotherapeutic regimens (Cisplatin / Carboplatin)",
+    "target_biological_system": "Advanced NSCLC Patient Populations",
+    "target_endpoint": "Therapeutic Resistance and Toxicity Frequency",
+    "falsifiability_criteria": "Clinical trial evidence demonstrating curative monotherapy or absence of chemoresistance in advanced NSCLC.",
+    "minimum_evidence_threshold": "Peer-reviewed oncology clinical review or randomized trial landmark.",
+    "proposal_location": "Section 2, Paragraph 1; Section 4, Item 2",
+    "supported_studies": [
+      "STUDY-38",
+      "STUDY-39",
+      "STUDY-40"
+    ]
+  },
+  {
+    "claim_id": "CLM-MOD-01",
+    "claim_text_fa": "رده سلولی A549 مشتق از آدنوکارسینومای آلوئولار بازال ریه انسان، مدل استاندارد و معتبر برون‌تن برای ارزیابی فارماکودینامیک و پاسخ‌های سلولی در انکولوژی ریه است.",
+    "claim_text_en": "The A549 cell line (human alveolar basal adenocarcinoma) is an established and validated in vitro preclinical model for lung cancer research.",
+    "claim_type": "METHODOLOGICAL",
+    "target_entity": "A549 (ATCC CCL-185)",
+    "target_biological_system": "Human Pulmonary Epithelial Carcinoma Cell Culture",
+    "target_endpoint": "Cellular Model Standardization",
+    "falsifiability_criteria": "Lack of adenocarcinoma hallmarks or non-human/non-pulmonary lineage misidentification.",
+    "minimum_evidence_threshold": "Peer-reviewed experimental oncology studies utilizing validated A549 models.",
+    "proposal_location": "Section 2, Paragraph 1; Section 5, Term 1; Section 8.1",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-04",
+      "STUDY-05",
+      "STUDY-07",
+      "STUDY-15",
+      "STUDY-16"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-01",
+    "claim_text_fa": "لوپئول (Lupeol, PubChem CID 259846, فرمول C30H50O) یک تری‌ترپنوئید پنج‌حلقه‌ای فعال طبیعی با اسکلت لوپانی است.",
+    "claim_text_en": "Lupeol (PubChem CID 259846, MF C30H50O) is a natural pentacyclic lupane-type triterpenoid.",
+    "claim_type": "PHARMACOLOGICAL",
+    "target_entity": "Lupeol (CID 259846)",
+    "target_biological_system": "Chemical Structure & Stereochemistry",
+    "target_endpoint": "Chemical Identification & Purity",
+    "falsifiability_criteria": "NMR/MS data showing non-lupane skeleton or disparate IUPAC identity.",
+    "minimum_evidence_threshold": "Peer-reviewed chemical and pharmacological literature.",
+    "proposal_location": "Section 2, Paragraph 2; Section 5, Term 2",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-06",
+      "STUDY-08",
+      "STUDY-09",
+      "STUDY-10"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-02",
+    "claim_text_fa": "لوپئول تک‌دارو تکثیر رده‌های کارسینومای ریه انسان از جمله A549 را به صورت وابسته به غلظت و زمان مهار می‌نماید.",
+    "claim_text_en": "Lupeol monotherapy inhibits the proliferation and viability of human lung carcinoma cells including A549 in a concentration- and time-dependent manner.",
+    "claim_type": "PHARMACOLOGICAL",
+    "target_entity": "Lupeol (CID 259846)",
+    "target_biological_system": "Human Lung Carcinoma (A549 / A427) In Vitro",
+    "target_endpoint": "Cell Viability (MTT) and IC50",
+    "falsifiability_criteria": "Absence of statistically significant growth inhibition across 10-100 uM concentrations (p >= 0.05).",
+    "minimum_evidence_threshold": "Peer-reviewed in vitro controlled experiments with dose-response curves.",
+    "proposal_location": "Section 2, Paragraph 2; Section 3, Axis 2; Section 8.3",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-04",
+      "STUDY-05",
+      "STUDY-07"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-03",
+    "claim_text_fa": "لوپئول از طریق اختلال در پتانسیل غشای میتوکندری، تنظیم نسبت Bax/Bcl-2 و فعال‌سازی کسکید کاسپاز-۳ و ۹ آپوپتوز را در سلول‌های توموری القا می‌کند.",
+    "claim_text_en": "Lupeol induces apoptosis in tumor cells via loss of mitochondrial membrane potential, modulation of the Bax/Bcl-2 ratio, and cleavage of Caspase-3 and Caspase-9.",
+    "claim_type": "MECHANISTIC",
+    "target_entity": "Lupeol (CID 259846)",
+    "target_biological_system": "Intrinsic Apoptotic Cascade",
+    "target_endpoint": "Mitochondrial Membrane Potential, Bax/Bcl-2, Cleaved Caspase-3/9",
+    "falsifiability_criteria": "Failure to demonstrate caspase activation or mitochondrial membrane depolarization upon lupeol treatment.",
+    "minimum_evidence_threshold": "Direct Western blot, flow cytometry, or fluorometric caspase assays in lung carcinoma cells.",
+    "proposal_location": "Section 2, Paragraph 2; Section 3, Axis 2; Section 8.5; Section 8.7",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-04",
+      "STUDY-06",
+      "STUDY-08",
+      "STUDY-11"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-04",
+    "claim_text_fa": "لوپئول با سرکوب فسفوریلاسیون کیناز Akt و مسیر پیام‌رسانی بقای MAPK/ERK، تحرک و مهاجرت سلول‌های سرطانی ریه را مهار می‌کند.",
+    "claim_text_en": "Lupeol inhibits cell migration and suppresses survival signaling pathways including PI3K/Akt and MAPK/ERK in lung carcinoma cells.",
+    "claim_type": "MECHANISTIC",
+    "target_entity": "Lupeol (CID 259846)",
+    "target_biological_system": "Akt/ERK Survival Signaling & Cell Motility",
+    "target_endpoint": "Phospho-Akt (Ser473), Phospho-ERK1/2, Scratch Wound Closure",
+    "falsifiability_criteria": "Sustained or elevated Akt phosphorylation and uninhibited wound closure in lupeol-treated cells.",
+    "minimum_evidence_threshold": "Direct Western blot of phospho-Akt and quantitative scratch wound healing assays in lung carcinoma.",
+    "proposal_location": "Section 2, Paragraph 2; Section 3, Axis 2; Section 8.6",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-04",
+      "STUDY-05"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-05",
+    "claim_text_fa": "لوپئول در غلظت‌های درمانی انتخابی عمل کرده و سمیت به مراتب کمتری بر سلول‌های اپیتلیال نرمال نسبت به سلول‌های توموری نشان می‌دهد.",
+    "claim_text_en": "Lupeol exhibits selective cytotoxicity, demonstrating higher tolerated thresholds in non-malignant epithelial cells compared to carcinoma cells.",
+    "claim_type": "SAFETY_TOXICITY",
+    "target_entity": "Lupeol (CID 259846)",
+    "target_biological_system": "Normal Epithelial Cells vs Carcinoma Cells",
+    "target_endpoint": "Selectivity Index (SI = IC50 normal / IC50 cancer)",
+    "falsifiability_criteria": "Selectivity Index SI <= 1.0 (equal or greater toxicity in normal cells than cancer cells).",
+    "minimum_evidence_threshold": "Comparative cytotoxicity assays in normal vs malignant cells and in vivo safety evaluations.",
+    "proposal_location": "Section 2, Paragraph 2; Section 4, Item 3; Section 8.1",
+    "supported_studies": [
+      "STUDY-08",
+      "STUDY-10",
+      "STUDY-13",
+      "STUDY-14"
+    ]
+  },
+  {
+    "claim_id": "CLM-LUP-06",
+    "claim_text_fa": "لوپئول دارای حلالیت آبی بسیار پایینی است و نیازمند انحلال در استوک DMSO است به گونه‌ای که غلظت نهایی DMSO در محیط کشت سلولی زیر ۰.۱ درصد حفظ شود.",
+    "claim_text_en": "Lupeol has poor aqueous solubility and requires DMSO stock preparation with final vehicle concentration strictly <= 0.1% v/v in cell culture medium.",
+    "claim_type": "METHODOLOGICAL",
+    "target_entity": "Lupeol / Vehicle DMSO",
+    "target_biological_system": "Aqueous Cell Culture Medium (RPMI-1640)",
+    "target_endpoint": "Solubility Limit & Solvent Cytotoxicity",
+    "falsifiability_criteria": "Direct water solubility > 1 mg/ml without vehicle or non-toxic vehicle concentrations > 1.0% DMSO.",
+    "minimum_evidence_threshold": "Pharmacological solubility benchmarking and vehicle control toxicity assessments.",
+    "proposal_location": "Section 2, Paragraph 2; Section 5, Term 2; Section 8.3; Section 10",
+    "supported_studies": [
+      "STUDY-08",
+      "STUDY-09",
+      "STUDY-13",
+      "STUDY-14"
+    ]
+  },
+  {
+    "claim_id": "CLM-NDV-01",
+    "claim_text_fa": "ویروس بیماری نیوکاسل (NDV) یک پارامیکسو ویروس پرندگان از جنس Orthoavulavirus با ژنوم تک‌رشته‌ای RNA منفی است که خاصیت انکولیتیک ذاتی در سلول‌های توموری پستانداران دارد.",
+    "claim_text_en": "Newcastle Disease Virus (NDV) is an avian single-stranded negative-sense RNA paramyxovirus with natural oncolytic properties in mammalian tumor cells.",
+    "claim_type": "VIROLOGICAL",
+    "target_entity": "Newcastle Disease Virus (NDV)",
+    "target_biological_system": "Paramyxoviridae Biology",
+    "target_endpoint": "Viral Taxonomic Classification & Tropism",
+    "falsifiability_criteria": "Identification of NDV as non-paramyxovirus or failure to infect mammalian neoplastic lines.",
+    "minimum_evidence_threshold": "Peer-reviewed virological characterizations and reviews.",
+    "proposal_location": "Section 2, Paragraph 3; Section 5, Term 3",
+    "supported_studies": [
+      "STUDY-15",
+      "STUDY-16",
+      "STUDY-26",
+      "STUDY-27"
+    ]
+  },
+  {
+    "claim_id": "CLM-NDV-02",
+    "claim_text_fa": "سویه‌های انکولیتیک NDV به دلیل نقص ذاتی مسیر پیام‌رسانی اینترفرون‌های نوع اول (IFN-I) در سلول‌های بدخیم، به طور انتخابی در تومور تکثیر می‌شوند در حالی که سلول‌های نرمال با پاسخ اینترفرونی فعال از تکثیر ویروس ممانعت می‌نمایند.",
+    "claim_text_en": "Oncolytic NDV selectively replicates in malignant cells due to defective Type I interferon (IFN-I) signaling, while IFN-competent normal cells restrict viral propagation.",
+    "claim_type": "MECHANISTIC",
+    "target_entity": "Oncolytic NDV",
+    "target_biological_system": "Innate Antiviral Type I Interferon Signaling Pathway",
+    "target_endpoint": "Selective Viral Replication in IFN-Defective Cancer Cells",
+    "falsifiability_criteria": "High viral replication and lysis in IFN-competent normal lung cells equal to cancer cells.",
+    "minimum_evidence_threshold": "CRISPR screens and comparative interferon induction assays in normal vs tumor lines.",
+    "proposal_location": "Section 2, Paragraph 3; Section 3, Axis 3; Section 4, Item 4",
+    "supported_studies": [
+      "STUDY-18",
+      "STUDY-19",
+      "STUDY-20"
+    ]
+  },
+  {
+    "claim_id": "CLM-NDV-03",
+    "claim_text_fa": "ویروس انکولیتیک NDV از طریق گلیکوپروتئین‌های سطحی HN و F به گیرنده‌های اسید سیالیک متصل شده و با القای همجوشی و سن‌سیشیوم (Syncytium) و مرگ ایمونوژنیک، سلول‌های A549 ریه را منهدم می‌سازد.",
+    "claim_text_en": "Oncolytic NDV binds sialic acid receptors and mediates syncytium formation and immunogenic cell death in human lung carcinoma cells.",
+    "claim_type": "MECHANISTIC",
+    "target_entity": "Oncolytic NDV (HN/F Glycoproteins)",
+    "target_biological_system": "Lung Carcinoma Membrane Fusion & Lysis",
+    "target_endpoint": "Syncytium Giant Cell Formation & Cytopathic Effect",
+    "falsifiability_criteria": "Absence of syncytium formation or cytolysis in NDV-infected susceptible A549 cultures.",
+    "minimum_evidence_threshold": "Microscopic cytopathology, fusion assays, and plaque/TCID50 titration in lung cancer cells.",
+    "proposal_location": "Section 2, Paragraph 3; Section 3, Axis 3; Section 8.2; Section 8.5",
+    "supported_studies": [
+      "STUDY-15",
+      "STUDY-16",
+      "STUDY-17",
+      "STUDY-24"
+    ]
+  },
+  {
+    "claim_id": "CLM-NDV-04",
+    "claim_text_fa": "تک‌درمانی با NDV ممکن است در اثر فعال شدن پاسخ‌های دفاعی ضدویروسی باقی‌مانده یا نیاز به دوزهای بسیار بالا محدود شود و تلفیق با عوامل دارویی حساس‌کننده بازده آن را ارتقا می‌دهد.",
+    "claim_text_en": "NDV monotherapy may encounter therapeutic resistance or submaximal cytotoxicity, which can be overcome by combining with pharmacological sensitizers.",
+    "claim_type": "COMBINATION_RATIONALE",
+    "target_entity": "Oncolytic NDV + Sensitizing Adjuvants",
+    "target_biological_system": "Tumor Viral Sensitization",
+    "target_endpoint": "Cytotoxicity Potentiation & Resistance Overcoming",
+    "falsifiability_criteria": "Monotherapy NDV achieving 100% eradication in all refractory sublines without room for synergy.",
+    "minimum_evidence_threshold": "Comparative monotherapy vs combination virotherapy studies.",
+    "proposal_location": "Section 2, Paragraph 3; Section 3, Axis 4; Section 4, Item 5",
+    "supported_studies": [
+      "STUDY-28",
+      "STUDY-29",
+      "STUDY-30",
+      "STUDY-31",
+      "STUDY-32",
+      "STUDY-33",
+      "STUDY-34"
+    ]
+  },
+  {
+    "claim_id": "CLM-SYN-01",
+    "claim_text_fa": "فرضیه اصلی پژوهش این است که تجویز همزمان لوپئول و ویروس انکولیتیک NDV بر رده سلولی A549 ریه اثر مهار رشد هم‌افزا (Synergistic, CI < 1.0) ایجاد خواهد کرد.",
+    "claim_text_en": "The primary hypothesis is that combined treatment of Lupeol and oncolytic NDV produces synergistic growth inhibition (CI < 1.0) in A549 lung cancer cells in vitro.",
+    "claim_type": "PRIMARY_HYPOTHESIS",
+    "target_entity": "Lupeol + Oncolytic NDV Combination",
+    "target_biological_system": "Human A549 Lung Carcinoma Cells In Vitro",
+    "target_endpoint": "Combination Index CI < 1.0",
+    "falsifiability_criteria": "Empirical determination yielding CI >= 1.0 (additive or antagonistic interaction across tested fractional inhibitions).",
+    "minimum_evidence_threshold": "Empirical testing to be conducted in the proposed project (Designated as SYNERGY_NOT_ESTABLISHED in prior literature).",
+    "proposal_location": "Section 1; Section 2, Paragraph 4; Section 6, Hypotheses Item 1; Section 8.4",
+    "supported_studies": [
+      "STUDY-01",
+      "STUDY-28",
+      "STUDY-29",
+      "STUDY-35",
+      "STUDY-36"
+    ]
+  },
+  {
+    "claim_id": "CLM-SYN-02",
+    "claim_text_fa": "مکانیسم فرضی هم‌افزایی مبتنی بر فشار دوگانه است: مهار فسفوریلاسیون Akt و نفوذپذیرسازی میتوکندری توسط لوپئول، آستانه سلول را در برابر انکولیز و تشکیل سن‌سیشیوم ناشی از NDV کاهش می‌دهد.",
+    "claim_text_en": "The hypothesized mechanism of synergy involves dual pressure: Lupeol-induced Akt inhibition and mitochondrial priming lowers the threshold for NDV-induced oncolytic lysis and syncytium destruction.",
+    "claim_type": "MECHANISTIC_HYPOTHESIS",
+    "target_entity": "Lupeol + NDV Mechanistic Convergence",
+    "target_biological_system": "Akt Pathway & Mitochondrial/Syncytial Cross-Talk",
+    "target_endpoint": "Augmented Caspase-3 Cleavage, Apoptosis Percentage, and Viability Inhibition",
+    "falsifiability_criteria": "Absence of enhanced caspase cleavage or lack of increased apoptosis in combination compared to monotherapies.",
+    "minimum_evidence_threshold": "Biologically plausible multi-hop mechanistic inference derived from independent monotherapy pathways.",
+    "proposal_location": "Section 2, Paragraph 4; Section 3, Axis 4; Section 6, Hypotheses Item 2; Section 8.5; Section 8.7",
+    "supported_studies": [
+      "STUDY-03",
+      "STUDY-04",
+      "STUDY-15",
+      "STUDY-16",
+      "STUDY-28",
+      "STUDY-29"
+    ]
+  },
+  {
+    "claim_id": "CLM-MET-01",
+    "claim_text_fa": "مدل‌سازی کمی هم‌افزایی فارماکولوژیک بر اساس معادله اثر میانه و تئوری شاخص ترکیب (CI) چو-تالالی انجام می‌شود که در آن CI < 0.9 نشان‌دهنده هم‌افزایی قطعی است.",
+    "claim_text_en": "Pharmacological synergy is mathematically quantified using the Chou-Talalay median-effect equation and Combination Index (CI), where CI < 0.9 denotes synergism.",
+    "claim_type": "METHODOLOGICAL",
+    "target_entity": "Chou-Talalay Median-Effect Model / CompuSyn",
+    "target_biological_system": "Enzyme Kinetics & Receptor Pharmacodynamics",
+    "target_endpoint": "Combination Index (CI) and Dose-Reduction Index (DRI)",
+    "falsifiability_criteria": "Application of non-validated synergy methods (e.g. simple fractional addition) violating enzyme kinetic mass action laws.",
+    "minimum_evidence_threshold": "Peer-reviewed foundational methodological benchmark (Chou TC, 2006).",
+    "proposal_location": "Section 2, Paragraph 4; Section 3, Axis 5; Section 5, Term 4; Section 8.4",
+    "supported_studies": [
+      "STUDY-01"
+    ]
+  },
+  {
+    "claim_id": "CLM-MET-02",
+    "claim_text_fa": "سنجش زیست‌پذیری سلولی و تعیین مقادیر IC50 با آزمون رنگ‌سنجی کاهش نمک تترازولیوم MTT مسمن (1983) بر اساس فعالیت سوکسینات دهیدروژناز میتوکندریایی سنجیده می‌شود.",
+    "claim_text_en": "Cell viability and IC50 determination are conducted via the standard Mosmann (1983) MTT colorimetric bioassay based on mitochondrial succinate dehydrogenase reduction.",
+    "claim_type": "METHODOLOGICAL",
+    "target_entity": "MTT Assay Protocol (Mosmann 1983)",
+    "target_biological_system": "Cellular Mitochondrial Metabolic Activity",
+    "target_endpoint": "Absorbance at 570 nm & Viability Percentage",
+    "falsifiability_criteria": "Failure of viable cells to cleave MTT tetrazolium or absence of linear optical density calibration.",
+    "minimum_evidence_threshold": "Gold-standard methodological benchmark (Mosmann T, 1983).",
+    "proposal_location": "Section 2, Paragraph 4; Section 3, Axis 5; Section 8.3",
+    "supported_studies": [
+      "STUDY-02"
+    ]
+  },
+  {
+    "claim_id": "CLM-GAP-01",
+    "claim_text_fa": "تاکنون هیچ مطالعه علمی منتشرشده‌ای در سراسر جهان اثر توأم لوپئول و ویروس بیماری نیوکاسل را بر رده سلولی A549 یا هیچ مدل سرطان ریه ارزیابی نکرده است و این پژوهش خلأ تجربی موجود را پوشش می‌دهد.",
+    "claim_text_en": "No published study worldwide has evaluated the combination of Lupeol and Newcastle Disease Virus in A549 or any lung cancer model, defining this project's primary empirical research gap.",
+    "claim_type": "RESEARCH_GAP",
+    "target_entity": "Lupeol + NDV in Lung Cancer Literature",
+    "target_biological_system": "Scientific Literature Databases (PubMed, Europe PMC, OpenAlex, Crossref)",
+    "target_endpoint": "Absence of Prior Empirical Publications (Zero Hits)",
+    "falsifiability_criteria": "Discovery of a pre-existing publication evaluating Lupeol + NDV in A549 lung cancer.",
+    "minimum_evidence_threshold": "Exhaustive 4-database multi-query systematic retrieval establishing search saturation.",
+    "proposal_location": "Section 4, Item 7; Section 12 (Novelty Perimeter Statement)",
+    "supported_studies": [
+      "STUDY-06",
+      "STUDY-08",
+      "STUDY-26",
+      "STUDY-27"
+    ]
+  },
+  {
+    "claim_id": "CLM-SAF-01",
+    "claim_text_fa": "رژیم ترکیبی لوپئول و NDV بر روی سلول‌های اپیتلیال نرمال ریه انسان (BEAS-2B) شاخص گزینش‌پذیری مطلوبی (SI > 2.0) نسبت به سلول‌های سرطانی A549 نشان خواهد داد.",
+    "claim_text_en": "The combination of Lupeol and NDV will demonstrate a favorable selectivity index (SI > 2.0) on normal human bronchial epithelial cells (BEAS-2B) relative to A549 cancer cells.",
+    "claim_type": "SAFETY_HYPOTHESIS",
+    "target_entity": "Lupeol + NDV Therapeutic Window",
+    "target_biological_system": "BEAS-2B Normal Epithelium vs A549 Carcinoma",
+    "target_endpoint": "Selectivity Index SI = IC50(BEAS-2B) / IC50(A549) > 2.0",
+    "falsifiability_criteria": "Empirical SI <= 1.0 indicating non-selective or toxic cytotoxicity in normal human bronchial cells.",
+    "minimum_evidence_threshold": "Empirical testing to be conducted in Section 8.1 / 8.3 of proposed study.",
+    "proposal_location": "Section 4, Item 3 & 5; Section 6, Hypotheses Item 3; Section 8.1; Section 9",
+    "supported_studies": [
+      "STUDY-13",
+      "STUDY-14",
+      "STUDY-19",
+      "STUDY-20"
+    ]
+  }
+]

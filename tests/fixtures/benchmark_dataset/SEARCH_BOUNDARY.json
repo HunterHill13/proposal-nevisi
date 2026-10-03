@@ -1,0 +1,25 @@
+{
+  "search_protocol_version": "4.0",
+  "boundary_date_executed": "2026-10-03T01:02:56.251240",
+  "primary_databases": [
+    "PubMed",
+    "Europe PMC",
+    "OpenAlex",
+    "Crossref"
+  ],
+  "date_window": {
+    "start_year": 2020,
+    "end_year": 2026,
+    "foundational_exceptions": [
+      "Chou TC (2006) Pharmacol Rev",
+      "Mosmann T (1983) J Immunol Methods"
+    ]
+  },
+  "language_filters": [
+    "English"
+  ],
+  "query_matrix_facets": 7,
+  "pagination_policy": "Full API pagination across all matching result pages without fixed caps",
+  "fulltext_audit_policy": "100% universal screening of all eligible candidates via PMC OA XML and Europe PMC XML",
+  "canonical_novelty_statement": "No directly matching study evaluating the simultaneous combination of Lupeol and oncolytic Newcastle Disease Virus on growth inhibition of lung cancer cell line (A549) in vitro was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."
+}

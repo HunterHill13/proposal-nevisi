@@ -1,0 +1,79 @@
+[
+  {
+    "facet_id": "FACET-01",
+    "facet_category": "Direct Combination",
+    "label": "Lupeol & Newcastle Disease Virus Co-Treatment",
+    "term_pubmed": "(\"Lupeol\"[Supplementary Concept] OR \"lupeol\"[tiab]) AND (\"Newcastle Disease Virus\"[Mesh] OR \"newcastle disease virus\"[tiab] OR \"NDV\"[tiab])",
+    "term_epmc": "(lupeol) AND (\"newcastle disease virus\" OR NDV)",
+    "term_oa": "lupeol newcastle disease virus",
+    "term_crossref": "lupeol newcastle disease virus oncolytic",
+    "mesh_status": "MeSH SuppConcept + MeSH Descriptor (D009514)",
+    "page_limit": 5
+  },
+  {
+    "facet_id": "FACET-02",
+    "facet_category": "Phytochemical Oncology",
+    "label": "Lupeol Cytotoxicity in Breast Cancer & 4T1",
+    "term_pubmed": "(\"Lupeol\"[Supplementary Concept] OR \"lupeol\"[tiab]) AND (\"Breast Neoplasms\"[Mesh] OR \"breast cancer\"[tiab] OR \"4T1\"[tiab] OR \"mammary carcinoma\"[tiab])",
+    "term_epmc": "(lupeol) AND (breast cancer OR 4T1 OR \"mammary carcinoma\")",
+    "term_oa": "lupeol breast cancer 4T1 mammary carcinoma",
+    "term_crossref": "lupeol breast cancer 4T1 carcinoma",
+    "mesh_status": "MeSH SuppConcept + MeSH Descriptor (D001943) + Text",
+    "page_limit": 5
+  },
+  {
+    "facet_id": "FACET-03",
+    "facet_category": "Oncolytic Virotherapy",
+    "label": "NDV Oncolytic Virotherapy in Breast Cancer & 4T1",
+    "term_pubmed": "(\"Newcastle Disease Virus\"[Mesh] OR \"newcastle disease virus\"[tiab] OR \"NDV\"[tiab]) AND (\"Breast Neoplasms\"[Mesh] OR \"breast cancer\"[tiab] OR \"4T1\"[tiab] OR \"oncolytic\"[tiab])",
+    "term_epmc": "(\"newcastle disease virus\" OR NDV) AND (breast cancer OR 4T1 OR oncolytic)",
+    "term_oa": "newcastle disease virus oncolytic breast cancer 4T1",
+    "term_crossref": "newcastle disease virus oncolytic breast cancer",
+    "mesh_status": "MeSH Descriptor (D009514) + MeSH Descriptor (D001943)",
+    "page_limit": 5
+  },
+  {
+    "facet_id": "FACET-04",
+    "facet_category": "Mechanistic Bridge",
+    "label": "Lupeol Apoptosis, Caspase & PI3K/Akt Signaling",
+    "term_pubmed": "(\"Lupeol\"[Supplementary Concept] OR \"lupeol\"[tiab] OR \"triterpenes\"[Mesh]) AND (\"Apoptosis\"[Mesh] OR \"caspase\"[tiab] OR \"Akt\"[tiab] OR \"PI3K\"[tiab]) AND (\"cancer\"[tiab] OR \"carcinoma\"[tiab])",
+    "term_epmc": "(lupeol OR triterpenes) AND (apoptosis OR caspase OR Akt OR PI3K) AND cancer",
+    "term_oa": "lupeol triterpene apoptosis caspase Akt PI3K cancer",
+    "term_crossref": "lupeol apoptosis caspase Akt signaling carcinoma",
+    "mesh_status": "MeSH Descriptor (D014315) + MeSH Descriptor (D017209)",
+    "page_limit": 5
+  },
+  {
+    "facet_id": "FACET-05",
+    "facet_category": "Mechanistic Bridge",
+    "label": "NDV Interferon Defect, Syncytium & Immunogenic Cell Death",
+    "term_pubmed": "(\"Newcastle Disease Virus\"[Mesh] OR \"oncolytic virus\"[tiab]) AND (\"interferon\"[tiab] OR \"syncytium\"[tiab] OR \"immunogenic cell death\"[tiab] OR \"calreticulin\"[tiab])",
+    "term_epmc": "(\"newcastle disease virus\" OR oncolytic) AND (interferon OR syncytium OR \"immunogenic cell death\")",
+    "term_oa": "newcastle disease virus oncolytic interferon syncytium immunogenic cell death",
+    "term_crossref": "oncolytic newcastle disease virus interferon syncytium cell death",
+    "mesh_status": "MeSH Descriptor (D009514) + Text Words",
+    "page_limit": 5
+  },
+  {
+    "facet_id": "FACET-06",
+    "facet_category": "Methodological Bridge",
+    "label": "Chou-Talalay Median-Effect & MTT Cytotoxicity Standards",
+    "term_pubmed": "(\"Chou-Talalay\"[tiab] OR \"combination index\"[tiab] OR \"median-effect\"[tiab] OR \"isobologram\"[tiab]) AND (\"cancer\"[tiab] OR \"cytotoxicity\"[tiab])",
+    "term_epmc": "(\"Chou-Talalay\" OR \"combination index\" OR isobologram) AND (cancer OR cytotoxicity)",
+    "term_oa": "Chou-Talalay combination index isobologram synergy cancer",
+    "term_crossref": "Chou-Talalay combination index synergy cancer",
+    "mesh_status": "Methodology Text Standards",
+    "page_limit": 4
+  },
+  {
+    "facet_id": "FACET-07",
+    "facet_category": "Contradictory / Safety Context",
+    "label": "Antagonism, Resistance, Neurovirulence & Normal Cell Toxicity",
+    "term_pubmed": "(\"lupeol\"[tiab] OR \"Newcastle Disease Virus\"[Mesh]) AND (\"antagonism\"[tiab] OR \"resistance\"[tiab] OR \"toxicity\"[tiab] OR \"neurovirulence\"[tiab] OR \"adverse effect\"[tiab] OR \"neutralizing antibody\"[tiab] OR \"null effect\"[tiab])",
+    "term_epmc": "(lupeol OR \"newcastle disease virus\") AND (antagonism OR resistance OR toxicity OR neurovirulence OR \"adverse effect\" OR \"off-target\")",
+    "term_oa": "lupeol newcastle disease virus antagonism toxicity resistance neurovirulence safety",
+    "term_crossref": "lupeol newcastle disease virus toxicity safety resistance",
+    "mesh_status": "Safety & Contradictory MeSH + Text",
+    "page_limit": 5
+  }
+]

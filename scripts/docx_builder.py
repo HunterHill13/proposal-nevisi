@@ -369,6 +369,24 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
 
     print(f"Master Word DOCX successfully generated at: {output_docx_path}", file=sys.stderr)
 
+class DocxBuilder:
+    """Wrapper class providing programmatic interface for document generation."""
+
+    @classmethod
+    def build_docx(cls, md_content_or_path: str, output_docx_path: str, font_name: str = "Dubai"):
+        if os.path.isfile(md_content_or_path):
+            build_proposal_docx(md_content_or_path, output_docx_path, font_name=font_name)
+        else:
+            temp_dir = tempfile.gettempdir()
+            temp_md = os.path.join(temp_dir, "temp_proposal_input.md")
+            with open(temp_md, "w", encoding="utf-8") as tf:
+                tf.write(md_content_or_path)
+            try:
+                build_proposal_docx(temp_md, output_docx_path, font_name=font_name)
+            finally:
+                if os.path.exists(temp_md):
+                    os.remove(temp_md)
+
 def main():
     parser = argparse.ArgumentParser(description="Master Persian Research Proposal Word Docx Generator")
     parser.add_argument("input_md", help="Path to input Markdown proposal file")

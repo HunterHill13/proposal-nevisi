@@ -208,7 +208,7 @@ if __name__ == "__main__":
             {"name": "Vehicle Control (0.1% DMSO)", "type": "VEHICLE_CONTROL"}
         ],
         "primary_outcomes": [
-            {"name": "Cell Viability Inhibition", "type": "VIABILITY", "measurement_unit": "IC50 (µM)", "preferred_assays": ["MTT", "CellTiter-Glo"]}
+            {"name": "Cell Viability Inhibition", "type": "VIABILITY", "measurement_unit": "IC50 (µM)", "preferred_assays": ["Standard Viability Assay", "Spectrophotometric Assay"]}
         ],
         "hypothesized_mechanisms": [
             {"pathway_name": "Apoptotic Signaling", "target_molecules": ["Caspase-3", "Bax"], "expected_modulation": "CLEAVAGE"}

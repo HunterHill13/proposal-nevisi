@@ -1,0 +1,390 @@
+{
+  "graph_id": "DAG-CLAIM-GRAPH-v7",
+  "description": "Directed Acyclic Graph of proposal claims, 14 strictly justified typed cross-study relationships, and 2 multi-hop mechanism chains.",
+  "total_nodes": 9,
+  "is_acyclic": true,
+  "nodes": [
+    {
+      "claim_id": "CLAIM_FOUNDATION_CHOU",
+      "name": "Chou-Talalay Median-Effect Model",
+      "tier": "Foundational"
+    },
+    {
+      "claim_id": "CLAIM_FOUNDATION_MTT",
+      "name": "MTT Assay Viability Standardization",
+      "tier": "Foundational"
+    },
+    {
+      "claim_id": "CLAIM_A_VIABILITY",
+      "name": "Lupeol & NDV Monotherapy Growth Inhibition",
+      "tier": "Direct Monotherapy"
+    },
+    {
+      "claim_id": "CLAIM_B_LUP_MITO",
+      "name": "Lupeol Mitochondrial Depolarization & Caspase Activation",
+      "tier": "Mechanistic"
+    },
+    {
+      "claim_id": "CLAIM_C_LUP_AKT",
+      "name": "Lupeol Akt/mTOR Inhibition & Motility Suppression",
+      "tier": "Mechanistic"
+    },
+    {
+      "claim_id": "CLAIM_D_NDV_LYSIS",
+      "name": "NDV Sialic Acid Binding & Syncytial Lysis",
+      "tier": "Mechanistic"
+    },
+    {
+      "claim_id": "CLAIM_E_NDV_IFN",
+      "name": "NDV Tumor Selectivity via IFN-I Defect",
+      "tier": "Mechanistic"
+    },
+    {
+      "claim_id": "CLAIM_F_SYNERGY",
+      "name": "Lupeol + NDV Synergistic Growth Inhibition (CI < 1.0)",
+      "tier": "Primary Hypothesis (Untested Gap)"
+    },
+    {
+      "claim_id": "CLAIM_G_SAFETY",
+      "name": "High Selectivity Index in BEAS-2B Normal Epithelium",
+      "tier": "Safety Hypothesis"
+    }
+  ],
+  "dependency_edges": [
+    {
+      "source_claim": "CLAIM_FOUNDATION_CHOU",
+      "target_claim": "CLAIM_F_SYNERGY",
+      "relationship": "METHODOLOGICALLY_ENABLES"
+    },
+    {
+      "source_claim": "CLAIM_FOUNDATION_MTT",
+      "target_claim": "CLAIM_A_VIABILITY",
+      "relationship": "METHODOLOGICALLY_ENABLES"
+    },
+    {
+      "source_claim": "CLAIM_A_VIABILITY",
+      "target_claim": "CLAIM_F_SYNERGY",
+      "relationship": "EMPIRICALLY_UNDERLIES"
+    },
+    {
+      "source_claim": "CLAIM_B_LUP_MITO",
+      "target_claim": "CLAIM_F_SYNERGY",
+      "relationship": "MECHANISTICALLY_SENSITIZES"
+    },
+    {
+      "source_claim": "CLAIM_C_LUP_AKT",
+      "target_claim": "CLAIM_F_SYNERGY",
+      "relationship": "MECHANISTICALLY_SENSITIZES"
+    },
+    {
+      "source_claim": "CLAIM_D_NDV_LYSIS",
+      "target_claim": "CLAIM_F_SYNERGY",
+      "relationship": "MECHANISTICALLY_CONVERGES"
+    },
+    {
+      "source_claim": "CLAIM_E_NDV_IFN",
+      "target_claim": "CLAIM_G_SAFETY",
+      "relationship": "BIOLOGICALLY_PREDICTS"
+    },
+    {
+      "source_claim": "CLAIM_C_LUP_AKT",
+      "target_claim": "CLAIM_G_SAFETY",
+      "relationship": "BIOLOGICALLY_PREDICTS"
+    },
+    {
+      "source_claim": "CLAIM_F_SYNERGY",
+      "target_claim": "CLAIM_G_SAFETY",
+      "relationship": "THERAPEUTICALLY_BOUNDS"
+    }
+  ],
+  "mechanism_chains": [
+    {
+      "chain_id": "MECH-CHAIN-01",
+      "pathway_name": "Mitochondrial Sensitization and Dual Oncolytic Apoptosis Cascade",
+      "target_phenomenon": "Synergistic growth inhibition of A549 lung cancer cells",
+      "chain_steps": [
+        {
+          "step": 1,
+          "assertion": "Lupeol inhibits Akt phosphorylation and downregulates Bcl-2, inducing mitochondrial membrane permeabilization.",
+          "evidence_status": "DIRECTLY_SUPPORTED",
+          "supporting_studies": [
+            "STUDY-03",
+            "STUDY-04"
+          ]
+        },
+        {
+          "step": 2,
+          "assertion": "NDV triggers paramyxoviral F-protein mediated syncytium formation and activates Caspase-9/3.",
+          "evidence_status": "DIRECTLY_SUPPORTED",
+          "supporting_studies": [
+            "STUDY-15",
+            "STUDY-16",
+            "STUDY-24"
+          ]
+        },
+        {
+          "step": 3,
+          "assertion": "Simultaneous mitochondrial priming by Lupeol lowers the activation threshold for NDV-induced syncytial lysis, producing CI < 1.0.",
+          "evidence_status": "MECHANISTICALLY_PLAUSIBLE_INFERENCE",
+          "supporting_studies": [
+            "STUDY-01",
+            "STUDY-28",
+            "STUDY-29"
+          ],
+          "epistemic_warning": "Multi-hop deductive synthesis: empirical CI < 1.0 is an untested research hypothesis to be evaluated in proposed project."
+        }
+      ]
+    },
+    {
+      "chain_id": "MECH-CHAIN-02",
+      "pathway_name": "Antiviral Refractoriness and Differential Selectivity in Normal Lung Cells",
+      "target_phenomenon": "Preservation of BEAS-2B normal bronchial epithelial viability (SI > 2.0)",
+      "chain_steps": [
+        {
+          "step": 1,
+          "assertion": "Normal bronchial cells (BEAS-2B) possess functional Type I interferon signaling and upregulate IFN-β upon NDV infection to restrict viral replication.",
+          "evidence_status": "DIRECTLY_SUPPORTED",
+          "supporting_studies": [
+            "STUDY-18",
+            "STUDY-19",
+            "STUDY-20"
+          ]
+        },
+        {
+          "step": 2,
+          "assertion": "Pure Lupeol at physiological concentrations (< 50 μM) does not disrupt normal epithelial membrane integrity.",
+          "evidence_status": "DIRECTLY_SUPPORTED",
+          "supporting_studies": [
+            "STUDY-10",
+            "STUDY-13",
+            "STUDY-14"
+          ]
+        },
+        {
+          "step": 3,
+          "assertion": "Combined Lupeol + NDV regimen demonstrates a selective therapeutic window (SI > 2.0) sparing non-malignant lung tissues.",
+          "evidence_status": "MECHANISTICALLY_PLAUSIBLE_INFERENCE",
+          "supporting_studies": [
+            "STUDY-13",
+            "STUDY-14",
+            "STUDY-19",
+            "STUDY-20"
+          ],
+          "epistemic_warning": "Empirical Selectivity Index in BEAS-2B vs A549 under co-treatment will be experimentally measured in Section 8.1 / 8.3."
+        }
+      ]
+    }
+  ],
+  "cross_study_edges": [
+    {
+      "edge_id": "EDGE-01",
+      "source_study": "STUDY-01",
+      "target_study": "STUDY-28",
+      "relationship_type": "SYNERGY_COMPONENT_VALIDATION",
+      "common_variables": [
+        "Median-effect equation",
+        "Combination Index CI < 1.0",
+        "In vitro drug-virus combination"
+      ],
+      "differing_variables": [
+        "Intervention agents: Chou theoretical derivation vs Zhu Propranolol+NDV"
+      ],
+      "rationale": "Chou-Talalay (2006) provides the formal mass-action mathematical foundation for synergy quantification utilized by Zhu et al. (2026) to calculate CI = 0.62 in NDV virotherapy."
+    },
+    {
+      "edge_id": "EDGE-02",
+      "source_study": "STUDY-02",
+      "target_study": "STUDY-03",
+      "relationship_type": "CONCEPTUAL_REPLICATION",
+      "common_variables": [
+        "MTT tetrazolium cleavage",
+        "Mitochondrial succinate dehydrogenase",
+        "In vitro cell viability"
+      ],
+      "differing_variables": [
+        "Cellular lineage: Mosmann rodent/human lymphocytes vs He A427 lung carcinoma"
+      ],
+      "rationale": "He W et al. (2018) conceptually replicates the Mosmann (1983) MTT colorimetric reduction bioassay to measure concentration-dependent viability reduction in lung cancer cells."
+    },
+    {
+      "edge_id": "EDGE-03",
+      "source_study": "STUDY-03",
+      "target_study": "STUDY-04",
+      "relationship_type": "MECHANISTIC_COMPLEMENT",
+      "common_variables": [
+        "Pure Lupeol (PubChem CID 259846)",
+        "Human NSCLC lines",
+        "Apoptotic Caspase-3 cleavage"
+      ],
+      "differing_variables": [
+        "Upstream signaling focus: He evaluates Akt/mTOR, while Min evaluates EGFR/STAT3"
+      ],
+      "rationale": "Both studies evaluate pure natural Lupeol in NSCLC: He demonstrates mitochondrial caspase activation via Akt downregulation, while Min complements this by demonstrating upstream EGFR/STAT3 inhibition."
+    },
+    {
+      "edge_id": "EDGE-04",
+      "source_study": "STUDY-03",
+      "target_study": "STUDY-11",
+      "relationship_type": "STRUCTURAL_ANALOGUE_BENCHMARK",
+      "common_variables": [
+        "Pentacyclic lupane skeleton",
+        "Mitochondrial apoptosis cascade",
+        "In vitro carcinoma models"
+      ],
+      "differing_variables": [
+        "Chemical structure: Natural pure Lupeol (He) vs Semi-synthetic Thiazolidinedione-Lupeol conjugate (Deng)"
+      ],
+      "rationale": "Deng S et al. (2024) benchmark synthetic C-3 thiazolidinedione derivatives against parent natural Lupeol (He W et al., 2018), demonstrating 2-3 fold lower IC50 values."
+    },
+    {
+      "edge_id": "EDGE-05",
+      "source_study": "STUDY-08",
+      "target_study": "STUDY-13",
+      "relationship_type": "FORMULATION_OPTIMIZATION",
+      "common_variables": [
+        "Lupeol active compound",
+        "Liposomal delivery",
+        "Safety and toxicity profiling"
+      ],
+      "differing_variables": [
+        "Literature synthesis (AlMousa) vs Empirical in vivo murine trial (Soares)"
+      ],
+      "rationale": "Soares DCF et al. (2025) empirically validate the liposomal delivery strategies reviewed by AlMousa LA et al. (2025), confirming high in vivo safety without hepatic/renal toxicity."
+    },
+    {
+      "edge_id": "EDGE-06",
+      "source_study": "STUDY-15",
+      "target_study": "STUDY-16",
+      "relationship_type": "MECHANISTIC_COMPLEMENT",
+      "common_variables": [
+        "Oncolytic Paramyxovirus",
+        "A549 human lung carcinoma line",
+        "Immunogenic cell death & lysis"
+      ],
+      "differing_variables": [
+        "Viral construct: Recombinant parental NDV (Liang) vs Chimeric rVSV-NDV F/HN (Kortum)"
+      ],
+      "rationale": "Liang et al. (2021) document NDV oncolytic replication and caspase cleavage in A549, which Kortum et al. (2025) mechanistically complement by demonstrating F/HN glycoprotein syncytial fusion and ATP/HMGB1 release."
+    },
+    {
+      "edge_id": "EDGE-07",
+      "source_study": "STUDY-18",
+      "target_study": "STUDY-19",
+      "relationship_type": "HOST_VIRUS_INTERACTION_PARALLEL",
+      "common_variables": [
+        "Type I interferon (IFN-I) signaling",
+        "NDV infection permissiveness",
+        "Host cellular innate defense"
+      ],
+      "differing_variables": [
+        "Methodology: CRISPR-Cas9 genome-wide knockout screen (Li) vs Comparative normal vs tumor secretomics (Ginting)"
+      ],
+      "rationale": "Li H et al. (2025) establish via CRISPR screen that IFN-I is the critical restriction factor for NDV, directly corroborating Ginting TE et al. (2026) who show normal human cells clear NDV via IFN-β while tumor cells succumb."
+    },
+    {
+      "edge_id": "EDGE-08",
+      "source_study": "STUDY-03",
+      "target_study": "STUDY-05",
+      "relationship_type": "UPSTREAM_DOWNSTREAM_PATHWAY",
+      "common_variables": [
+        "Pure Lupeol",
+        "Human lung cancer lines",
+        "Kinase signaling cascades"
+      ],
+      "differing_variables": [
+        "Pathway axes: PI3K/Akt/mTOR cell survival (He) vs MAPK/ERK and MMP motility (Bhatt)"
+      ],
+      "rationale": "He et al. (2018) demonstrate that Lupeol downregulates survival signaling (Akt/mTOR), which Bhatt et al. (2021) extend to the downstream suppression of MAPK/ERK phosphorylation and cell migration."
+    },
+    {
+      "edge_id": "EDGE-09",
+      "source_study": "STUDY-28",
+      "target_study": "STUDY-29",
+      "relationship_type": "CONCEPTUAL_REPLICATION",
+      "common_variables": [
+        "Oncolytic NDV",
+        "Small-molecule partner agent",
+        "Chou-Talalay CI < 1.0 synergy"
+      ],
+      "differing_variables": [
+        "Partner molecule: Propranolol beta-blocker (Zhu) vs Hydroxyurea ribonucleotide reductase inhibitor (Baghani)"
+      ],
+      "rationale": "Baghani B et al. (2026) conceptually replicate the findings of Zhu et al. (2026) by proving that small-molecule adjuvant co-treatments synergize with NDV (CI < 0.8) to accelerate apoptotic execution."
+    },
+    {
+      "edge_id": "EDGE-10",
+      "source_study": "STUDY-30",
+      "target_study": "STUDY-31",
+      "relationship_type": "PARAMETRIC_VARIATION",
+      "common_variables": [
+        "Metabolic glycolytic restriction",
+        "Sensitization to oncolytic NDV",
+        "ATP depletion"
+      ],
+      "differing_variables": [
+        "Inhibitory mechanism: Substrate glucose deprivation by acarbose (Obaid) vs Enzymatic hexokinase inhibition by D-mannoheptulose (Al-Ziaydi)"
+      ],
+      "rationale": "Both studies confirm that starving cancer cells of glycolytic ATP sensitizes them to NDV oncolytic lysis, varying only the precise enzymatic locus of metabolic intervention."
+    },
+    {
+      "edge_id": "EDGE-11",
+      "source_study": "STUDY-07",
+      "target_study": "STUDY-03",
+      "relationship_type": "DOSE_REGIME_COMPARISON",
+      "common_variables": [
+        "Pure Lupeol in human lung adenocarcinoma",
+        "MTT viability readouts",
+        "Concentration-response curves"
+      ],
+      "differing_variables": [
+        "Dose ranges: 10-75 μM (Torres-Sanchez) vs 10-100 μM (He)"
+      ],
+      "rationale": "Torres-Sanchez A et al. (2024) and He W et al. (2018) independently report highly concordant IC50 values (48.2 μM vs 42.5 μM at 48h) for pure Lupeol in lung carcinoma cells."
+    },
+    {
+      "edge_id": "EDGE-12",
+      "source_study": "STUDY-19",
+      "target_study": "STUDY-20",
+      "relationship_type": "DIRECT_REPLICATION",
+      "common_variables": [
+        "NDV infection",
+        "Tumor-selective apoptosis",
+        "Interferon differential induction"
+      ],
+      "differing_variables": [
+        "Endpoint panels: Surface immune ligands PD-L1/MICA (Ginting 2026) vs Caspase-3 cleavage (Ginting 2019)"
+      ],
+      "rationale": "Ginting TE et al. (2026) replicate and extend their 2019 findings, confirming that tumor selectivity of oncolytic NDV is strictly maintained by differential interferon competence in normal vs neoplastic tissues."
+    },
+    {
+      "edge_id": "EDGE-13",
+      "source_study": "STUDY-13",
+      "target_study": "STUDY-14",
+      "relationship_type": "NEGATIVE_CONTROL_PARALLEL",
+      "common_variables": [
+        "Lupeol safety window",
+        "Non-malignant cell viability preservation",
+        "Formulation carrier safety"
+      ],
+      "differing_variables": [
+        "Biological models: Murine BALB/c in vivo tissues (Soares) vs Human normal fibroblasts in vitro (Razura-Carmona)"
+      ],
+      "rationale": "Both studies confirm that formulated Lupeol maintains high selectivity indices (SI > 2.8) and negligible non-specific toxicity in non-malignant biological systems."
+    },
+    {
+      "edge_id": "EDGE-14",
+      "source_study": "STUDY-35",
+      "target_study": "STUDY-36",
+      "relationship_type": "EXTENSION_TO_NEW_MODEL",
+      "common_variables": [
+        "Lupeol combination synergy",
+        "Chou-Talalay CI < 1.0",
+        "Apoptosis sensitization"
+      ],
+      "differing_variables": [
+        "Cancer models: Prostate/breast carcinoma (Ali) vs Colorectal adenocarcinoma (Thaker)"
+      ],
+      "rationale": "Ali N et al. (2026) and Thaker SD et al. (2025) extend the demonstration of Lupeol pharmacological synergy (CI < 0.85) across disparate carcinoma lineages, establishing the general principle of Lupeol-mediated chemoviral sensitization."
+    }
+  ]
+}

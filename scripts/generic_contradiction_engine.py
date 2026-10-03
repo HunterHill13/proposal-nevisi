@@ -32,6 +32,28 @@ class GenericContradictionEngine:
     """Detects, categorizes, and contextualizes scientific disagreements."""
 
     @classmethod
+    def detect_contradictions(cls, studies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Convenience method to audit and detect contradictions across a set of studies."""
+        negative_findings = []
+        for s in studies:
+            findings_text = str(s.get("primary_findings", "")) + " " + str(s.get("title", ""))
+            category = None
+            if "rebound" in findings_text.lower():
+                category = "TIME_LIMITATION"
+            elif "resistance" in findings_text.lower() or "mutation" in findings_text.lower():
+                category = "RESISTANCE"
+            elif "no effect" in findings_text.lower() or "null" in findings_text.lower():
+                category = "NULL_RESULT"
+            
+            if category:
+                negative_findings.append({
+                    "study_id": s.get("study_id"),
+                    "category": category,
+                    "target_context": s.get("design_specific_attributes", {})
+                })
+        return cls.build_contradiction_report(negative_findings, {"studies_analyzed": len(studies)})
+
+    @classmethod
     def analyze_discrepancy(cls, positive_finding: Dict[str, Any], negative_finding: Dict[str, Any]) -> Dict[str, Any]:
         """Resolves whether a discrepancy is a TRUE_CONTRADICTION or CONTEXTUAL_DISAGREEMENT."""
         pos_ctx = positive_finding.get("context_parameters", {})

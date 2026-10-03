@@ -1,0 +1,657 @@
+{
+  "temporal_span": "1983 - 2026 (43 Years of Published Literature)",
+  "total_studies_mapped": 40,
+  "chronological_phases": {
+    "1983-2006: Methodological & Theoretical Foundation": [
+      {
+        "study_id": "STUDY-02",
+        "year": 1983,
+        "first_author": "Mosmann Tim",
+        "title": "Rapid colorimetric assay for cellular growth and survival: Application",
+        "evidence_type": "METHODOLOGICAL_FOUNDATION",
+        "key_contribution": "OD570 proportional to living cell count (r > 0.99)"
+      },
+      {
+        "study_id": "STUDY-01",
+        "year": 2006,
+        "first_author": "Chou Ting-Chao",
+        "title": "Theoretical Basis, Experimental Design, and Computerized Simulation of",
+        "evidence_type": "METHODOLOGICAL_FOUNDATION",
+        "key_contribution": "Quantitative CI calculation algorithm with CompuSyn simulation"
+      }
+    ],
+    "2016-2020: Target Validation & Single-Agent Proof of Concept": [
+      {
+        "study_id": "STUDY-39",
+        "year": 2016,
+        "first_author": "Hirsch FR",
+        "title": "New and emerging targeted treatments in advanced non-small-cell lung c",
+        "evidence_type": "CLINICAL_LANDSCAPE",
+        "key_contribution": "Median time to acquired resistance averages 9-14 months in NSCLC"
+      },
+      {
+        "study_id": "STUDY-03",
+        "year": 2018,
+        "first_author": "He W",
+        "title": "Lupeol triterpene exhibits potent antitumor effects in A427 human lung",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "IC50 = 42.5 μM at 48h; Caspase-3 cleavage elevated 3.8-fold (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-38",
+        "year": 2018,
+        "first_author": "Herbst RS",
+        "title": "The biology and management of non-small cell lung cancer",
+        "evidence_type": "CLINICAL_LANDSCAPE",
+        "key_contribution": "5-year overall survival remains under 20% for advanced/metastatic NSCLC"
+      },
+      {
+        "study_id": "STUDY-04",
+        "year": 2019,
+        "first_author": "Min TR",
+        "title": "Suppression of EGFR/STAT3 activity by lupeol contributes to the induct",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Phospho-STAT3 reduced by 65% at 60 μM; Caspase-3 cleavage confirmed (p < 0.05)"
+      },
+      {
+        "study_id": "STUDY-20",
+        "year": 2019,
+        "first_author": "Ginting TE",
+        "title": "Antiviral interferons induced by Newcastle disease virus (NDV) drive a",
+        "evidence_type": "SELECTIVITY_AND_SAFETY",
+        "key_contribution": "Normal cell survival > 90% at 48h; Cancer cell apoptosis > 65% (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-25",
+        "year": 2020,
+        "first_author": "Najmuddin Syed Umar Faruq Syed",
+        "title": "Cytotoxicity study of the interleukin-12-expressing recombinant Newcas",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Cell death > 65% at MOI = 5 at 48h (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-31",
+        "year": 2020,
+        "first_author": "Al-Ziaydi Ahmed Ghdhban",
+        "title": "Hexokinase inhibition using D-Mannoheptulose enhances oncolytic newcas",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Combination showed significant synergism (CI = 0.58 at IC50)"
+      }
+    ],
+    "2021-2023: Cellular Mechanisms, Tropism & MicroRNA Regulation": [
+      {
+        "study_id": "STUDY-05",
+        "year": 2021,
+        "first_author": "Bhatt M",
+        "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathw",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Wound closure inhibited by 54% at 30 μM after 24h (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-15",
+        "year": 2021,
+        "first_author": "Liang Y",
+        "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease v",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Viral oncolysis > 70% at MOI = 1 after 48h; Viral progeny titer 4.8 x 10^7 TCID50/mL"
+      },
+      {
+        "study_id": "STUDY-22",
+        "year": 2021,
+        "first_author": "Liu T",
+        "title": "Optimization of oncolytic effect of Newcastle disease virus Clone30 by",
+        "evidence_type": "EXPERIMENTAL_OPTIMIZATION",
+        "key_contribution": "Yield achieved 10^9 TCID50/mL in allantoic harvests; HA titer >= 1:512"
+      },
+      {
+        "study_id": "STUDY-40",
+        "year": 2021,
+        "first_author": "Bahamin Nayereh",
+        "title": "A Comparative Study on Anticancer Effects of the Alhagi maurorum and A",
+        "evidence_type": "EXPERIMENTAL_BENCHMARK",
+        "key_contribution": "Significant cytotoxic inhibition (p < 0.05 vs control)"
+      },
+      {
+        "study_id": "STUDY-30",
+        "year": 2022,
+        "first_author": "Obaid Qayssar A.",
+        "title": "Glucose Deprivation Induced by Acarbose and Oncolytic Newcastle Diseas",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Cell death increased from 32% (NDV alone) to 79% (combination; p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-34",
+        "year": 2022,
+        "first_author": "Kadhim Zahraa A.",
+        "title": "Oncolytic Newcastle Disease Virus Co-Delivered with Modified PLGA Nano",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Intracellular viral delivery increased by 3.2-fold (p < 0.01)"
+      }
+    ],
+    "2024-2026: Multi-Omics, Combination Virotherapy & Translational Synthesis": [
+      {
+        "study_id": "STUDY-06",
+        "year": 2024,
+        "first_author": "Lee YS",
+        "title": "The Role of Pentacyclic Triterpenoids in Non-Small Cell Lung Cancer: T",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Pooled NSCLC IC50 values range 28-65 μM for pure lupeol across studies"
+      },
+      {
+        "study_id": "STUDY-07",
+        "year": 2024,
+        "first_author": "Torres-Sanchez A",
+        "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabo",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "IC50 in A549 = 48.2 μM at 48h; glucose consumption decreased by 40%"
+      },
+      {
+        "study_id": "STUDY-11",
+        "year": 2024,
+        "first_author": "Deng Siqi",
+        "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer A",
+        "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+        "key_contribution": "Derivative IC50 = 12.4 μM vs parent lupeol IC50 = 38.6 μM at 48h (p < 0.05)"
+      },
+      {
+        "study_id": "STUDY-12",
+        "year": 2024,
+        "first_author": "Tian Shuang",
+        "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as",
+        "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+        "key_contribution": "Derivative compounds showed IC50 values between 8.5 and 25.4 μM"
+      },
+      {
+        "study_id": "STUDY-21",
+        "year": 2024,
+        "first_author": "Rosewell Shaw A",
+        "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models o",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Median survival extended from 21 days (control) to 48 days (oNDV group; p < 0.001)"
+      },
+      {
+        "study_id": "STUDY-32",
+        "year": 2024,
+        "first_author": "Gouvarchinghaleh Hadi Esmaeili",
+        "title": "Synergistic effects of Bacillus coagulans and Newcastle disease virus ",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Combination produced CI < 0.75 across tested ratios (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-33",
+        "year": 2024,
+        "first_author": "Al-Shammari Shaymaa Majeed Hamzah",
+        "title": "Oncolytic Newcastle Disease Virus and Photodynamic Therapy as Dual App",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Cell death exceeded 85% in combination vs 45% with NDV monotherapy (p < 0.001)"
+      },
+      {
+        "study_id": "STUDY-37",
+        "year": 2024,
+        "first_author": "Bray F",
+        "title": "Global cancer statistics 2022: GLOBOCAN estimates of incidence and mor",
+        "evidence_type": "EPIDEMIOLOGY_AND_BURDEN",
+        "key_contribution": "2.5 million new lung cancer cases and 1.8 million deaths globally in 2022"
+      },
+      {
+        "study_id": "STUDY-08",
+        "year": 2025,
+        "first_author": "AlMousa LA",
+        "title": "An updated review deciphering the anticancer potential of pentacyclic ",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Selectivity indexes documented up to 3.5 in nanoparticle formulations"
+      },
+      {
+        "study_id": "STUDY-09",
+        "year": 2025,
+        "first_author": "Luo X",
+        "title": "Exploring the therapeutic potential of lupeol: A review of its mechani",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Water solubility < 0.8 μg/mL at 25°C; logP ~ 7.4"
+      },
+      {
+        "study_id": "STUDY-10",
+        "year": 2025,
+        "first_author": "Parvez A",
+        "title": "Broad-Spectrum Therapeutic Potentials of the Multifaceted Triterpene L",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Selectivity ratio documented > 2.0 in standard cellular models"
+      },
+      {
+        "study_id": "STUDY-13",
+        "year": 2025,
+        "first_author": "Soares DCF",
+        "title": "Lupeol-Loaded Liposomes: Triple-Negative Breast Cancer (TNBC) Cytotoxi",
+        "evidence_type": "SAFETY_AND_TOXICOLOGY",
+        "key_contribution": "ALT and AST within baseline normal range; Hemolysis < 2% at 50 μM"
+      },
+      {
+        "study_id": "STUDY-14",
+        "year": 2025,
+        "first_author": "Razura-Carmona FF",
+        "title": "Lupeol-loaded PLGA particles conserve anti-topoisomerase activity and ",
+        "evidence_type": "SAFETY_AND_TOXICOLOGY",
+        "key_contribution": "Selectivity index SI > 2.8 on normal cellular models"
+      },
+      {
+        "study_id": "STUDY-16",
+        "year": 2025,
+        "first_author": "Kortum F",
+        "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates i",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Syncytia observed in > 80% of monolayer at 24h (MOI = 0.1); ATP release elevated 5-fold (p < 0.001)"
+      },
+      {
+        "study_id": "STUDY-17",
+        "year": 2025,
+        "first_author": "Liu L",
+        "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sens",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Tumor growth inhibition rate 68.4% in vivo (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-18",
+        "year": 2025,
+        "first_author": "Li H",
+        "title": "Genome-wide CRISPR screen reveals specific role of type I interferon s",
+        "evidence_type": "MECHANISTIC_PATHWAY",
+        "key_contribution": "IFNAR1, STAT1, and IRF9 sgRNAs depleted with z-score > 4.5 under viral challenge"
+      },
+      {
+        "study_id": "STUDY-26",
+        "year": 2025,
+        "first_author": "Al-Shammari Ahmed Majeed",
+        "title": "Editorial: Oncolytic virotherapy, volume II",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Clinical objective response rate for single-agent virotherapy averages 15-25%"
+      },
+      {
+        "study_id": "STUDY-27",
+        "year": 2025,
+        "first_author": "Zhang Cong",
+        "title": "Recombinant Oncolytic Viruses: Hexagonal Warriors in the Field of Soli",
+        "evidence_type": "STATE_OF_THE_ART_REVIEW",
+        "key_contribution": "Over 80 clinical trials active worldwide confirming systemic biosafety"
+      },
+      {
+        "study_id": "STUDY-36",
+        "year": 2025,
+        "first_author": "Thaker SD",
+        "title": "Colorectal Cancer: Differential Gene Expression and In Vitro Response ",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Synergy confirmed with combination indices CI < 0.85 across responsive models"
+      },
+      {
+        "study_id": "STUDY-19",
+        "year": 2026,
+        "first_author": "Ginting TE",
+        "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA ",
+        "evidence_type": "SELECTIVITY_AND_SAFETY",
+        "key_contribution": "IFN-β production in normal cells 4.2-fold higher than in tumor cells; Normal cell viability preserved > 85% at MOI = 1"
+      },
+      {
+        "study_id": "STUDY-23",
+        "year": 2026,
+        "first_author": "Sun Y",
+        "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reve",
+        "evidence_type": "MECHANISTIC_PATHWAY",
+        "key_contribution": "Over 45 lipid metabolites significantly altered (p < 0.01, fold change > 2.0)"
+      },
+      {
+        "study_id": "STUDY-24",
+        "year": 2026,
+        "first_author": "Ali Akbar Esfahani M",
+        "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic V",
+        "evidence_type": "DIRECT_AGENT_EVIDENCE",
+        "key_contribution": "Bax/Bcl-2 ratio increased 4.5-fold at 48h (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-28",
+        "year": 2026,
+        "first_author": "Zhu Yunjie",
+        "title": "Propranolol enhances the oncolytic effect of newcastle disease virus o",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Combination Index CI = 0.62 at 50% fractional inhibition; Cell death increased from 42% (monotherapy) to 78% (combination; p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-29",
+        "year": 2026,
+        "first_author": "Baghani Benyamin",
+        "title": "Synergistic Effect of Newcastle Disease Virus and Hydroxyurea in Apopt",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "CI values between 0.55 and 0.74 at fa = 0.5-0.8 (p < 0.01)"
+      },
+      {
+        "study_id": "STUDY-35",
+        "year": 2026,
+        "first_author": "Ali N",
+        "title": "The synergistic efficacy of lupeol and enzalutamide potentiates antica",
+        "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+        "key_contribution": "Chou-Talalay CI values ranged from 0.61 to 0.78 across 48h titration; Apoptosis increased 2.8-fold"
+      }
+    ]
+  },
+  "complete_timeline": [
+    {
+      "study_id": "STUDY-02",
+      "year": 1983,
+      "first_author": "Mosmann Tim",
+      "title": "Rapid colorimetric assay for cellular growth and survival: Application",
+      "evidence_type": "METHODOLOGICAL_FOUNDATION",
+      "key_contribution": "OD570 proportional to living cell count (r > 0.99)"
+    },
+    {
+      "study_id": "STUDY-01",
+      "year": 2006,
+      "first_author": "Chou Ting-Chao",
+      "title": "Theoretical Basis, Experimental Design, and Computerized Simulation of",
+      "evidence_type": "METHODOLOGICAL_FOUNDATION",
+      "key_contribution": "Quantitative CI calculation algorithm with CompuSyn simulation"
+    },
+    {
+      "study_id": "STUDY-39",
+      "year": 2016,
+      "first_author": "Hirsch FR",
+      "title": "New and emerging targeted treatments in advanced non-small-cell lung c",
+      "evidence_type": "CLINICAL_LANDSCAPE",
+      "key_contribution": "Median time to acquired resistance averages 9-14 months in NSCLC"
+    },
+    {
+      "study_id": "STUDY-03",
+      "year": 2018,
+      "first_author": "He W",
+      "title": "Lupeol triterpene exhibits potent antitumor effects in A427 human lung",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "IC50 = 42.5 μM at 48h; Caspase-3 cleavage elevated 3.8-fold (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-38",
+      "year": 2018,
+      "first_author": "Herbst RS",
+      "title": "The biology and management of non-small cell lung cancer",
+      "evidence_type": "CLINICAL_LANDSCAPE",
+      "key_contribution": "5-year overall survival remains under 20% for advanced/metastatic NSCLC"
+    },
+    {
+      "study_id": "STUDY-04",
+      "year": 2019,
+      "first_author": "Min TR",
+      "title": "Suppression of EGFR/STAT3 activity by lupeol contributes to the induct",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Phospho-STAT3 reduced by 65% at 60 μM; Caspase-3 cleavage confirmed (p < 0.05)"
+    },
+    {
+      "study_id": "STUDY-20",
+      "year": 2019,
+      "first_author": "Ginting TE",
+      "title": "Antiviral interferons induced by Newcastle disease virus (NDV) drive a",
+      "evidence_type": "SELECTIVITY_AND_SAFETY",
+      "key_contribution": "Normal cell survival > 90% at 48h; Cancer cell apoptosis > 65% (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-25",
+      "year": 2020,
+      "first_author": "Najmuddin Syed Umar Faruq Syed",
+      "title": "Cytotoxicity study of the interleukin-12-expressing recombinant Newcas",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Cell death > 65% at MOI = 5 at 48h (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-31",
+      "year": 2020,
+      "first_author": "Al-Ziaydi Ahmed Ghdhban",
+      "title": "Hexokinase inhibition using D-Mannoheptulose enhances oncolytic newcas",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Combination showed significant synergism (CI = 0.58 at IC50)"
+    },
+    {
+      "study_id": "STUDY-05",
+      "year": 2021,
+      "first_author": "Bhatt M",
+      "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathw",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Wound closure inhibited by 54% at 30 μM after 24h (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-15",
+      "year": 2021,
+      "first_author": "Liang Y",
+      "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease v",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Viral oncolysis > 70% at MOI = 1 after 48h; Viral progeny titer 4.8 x 10^7 TCID50/mL"
+    },
+    {
+      "study_id": "STUDY-22",
+      "year": 2021,
+      "first_author": "Liu T",
+      "title": "Optimization of oncolytic effect of Newcastle disease virus Clone30 by",
+      "evidence_type": "EXPERIMENTAL_OPTIMIZATION",
+      "key_contribution": "Yield achieved 10^9 TCID50/mL in allantoic harvests; HA titer >= 1:512"
+    },
+    {
+      "study_id": "STUDY-40",
+      "year": 2021,
+      "first_author": "Bahamin Nayereh",
+      "title": "A Comparative Study on Anticancer Effects of the Alhagi maurorum and A",
+      "evidence_type": "EXPERIMENTAL_BENCHMARK",
+      "key_contribution": "Significant cytotoxic inhibition (p < 0.05 vs control)"
+    },
+    {
+      "study_id": "STUDY-30",
+      "year": 2022,
+      "first_author": "Obaid Qayssar A.",
+      "title": "Glucose Deprivation Induced by Acarbose and Oncolytic Newcastle Diseas",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Cell death increased from 32% (NDV alone) to 79% (combination; p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-34",
+      "year": 2022,
+      "first_author": "Kadhim Zahraa A.",
+      "title": "Oncolytic Newcastle Disease Virus Co-Delivered with Modified PLGA Nano",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Intracellular viral delivery increased by 3.2-fold (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-06",
+      "year": 2024,
+      "first_author": "Lee YS",
+      "title": "The Role of Pentacyclic Triterpenoids in Non-Small Cell Lung Cancer: T",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Pooled NSCLC IC50 values range 28-65 μM for pure lupeol across studies"
+    },
+    {
+      "study_id": "STUDY-07",
+      "year": 2024,
+      "first_author": "Torres-Sanchez A",
+      "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabo",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "IC50 in A549 = 48.2 μM at 48h; glucose consumption decreased by 40%"
+    },
+    {
+      "study_id": "STUDY-11",
+      "year": 2024,
+      "first_author": "Deng Siqi",
+      "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer A",
+      "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+      "key_contribution": "Derivative IC50 = 12.4 μM vs parent lupeol IC50 = 38.6 μM at 48h (p < 0.05)"
+    },
+    {
+      "study_id": "STUDY-12",
+      "year": 2024,
+      "first_author": "Tian Shuang",
+      "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as",
+      "evidence_type": "STRUCTURAL_ANALOGUE_EVIDENCE",
+      "key_contribution": "Derivative compounds showed IC50 values between 8.5 and 25.4 μM"
+    },
+    {
+      "study_id": "STUDY-21",
+      "year": 2024,
+      "first_author": "Rosewell Shaw A",
+      "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models o",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Median survival extended from 21 days (control) to 48 days (oNDV group; p < 0.001)"
+    },
+    {
+      "study_id": "STUDY-32",
+      "year": 2024,
+      "first_author": "Gouvarchinghaleh Hadi Esmaeili",
+      "title": "Synergistic effects of Bacillus coagulans and Newcastle disease virus ",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Combination produced CI < 0.75 across tested ratios (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-33",
+      "year": 2024,
+      "first_author": "Al-Shammari Shaymaa Majeed Hamzah",
+      "title": "Oncolytic Newcastle Disease Virus and Photodynamic Therapy as Dual App",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Cell death exceeded 85% in combination vs 45% with NDV monotherapy (p < 0.001)"
+    },
+    {
+      "study_id": "STUDY-37",
+      "year": 2024,
+      "first_author": "Bray F",
+      "title": "Global cancer statistics 2022: GLOBOCAN estimates of incidence and mor",
+      "evidence_type": "EPIDEMIOLOGY_AND_BURDEN",
+      "key_contribution": "2.5 million new lung cancer cases and 1.8 million deaths globally in 2022"
+    },
+    {
+      "study_id": "STUDY-08",
+      "year": 2025,
+      "first_author": "AlMousa LA",
+      "title": "An updated review deciphering the anticancer potential of pentacyclic ",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Selectivity indexes documented up to 3.5 in nanoparticle formulations"
+    },
+    {
+      "study_id": "STUDY-09",
+      "year": 2025,
+      "first_author": "Luo X",
+      "title": "Exploring the therapeutic potential of lupeol: A review of its mechani",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Water solubility < 0.8 μg/mL at 25°C; logP ~ 7.4"
+    },
+    {
+      "study_id": "STUDY-10",
+      "year": 2025,
+      "first_author": "Parvez A",
+      "title": "Broad-Spectrum Therapeutic Potentials of the Multifaceted Triterpene L",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Selectivity ratio documented > 2.0 in standard cellular models"
+    },
+    {
+      "study_id": "STUDY-13",
+      "year": 2025,
+      "first_author": "Soares DCF",
+      "title": "Lupeol-Loaded Liposomes: Triple-Negative Breast Cancer (TNBC) Cytotoxi",
+      "evidence_type": "SAFETY_AND_TOXICOLOGY",
+      "key_contribution": "ALT and AST within baseline normal range; Hemolysis < 2% at 50 μM"
+    },
+    {
+      "study_id": "STUDY-14",
+      "year": 2025,
+      "first_author": "Razura-Carmona FF",
+      "title": "Lupeol-loaded PLGA particles conserve anti-topoisomerase activity and ",
+      "evidence_type": "SAFETY_AND_TOXICOLOGY",
+      "key_contribution": "Selectivity index SI > 2.8 on normal cellular models"
+    },
+    {
+      "study_id": "STUDY-16",
+      "year": 2025,
+      "first_author": "Kortum F",
+      "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates i",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Syncytia observed in > 80% of monolayer at 24h (MOI = 0.1); ATP release elevated 5-fold (p < 0.001)"
+    },
+    {
+      "study_id": "STUDY-17",
+      "year": 2025,
+      "first_author": "Liu L",
+      "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sens",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Tumor growth inhibition rate 68.4% in vivo (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-18",
+      "year": 2025,
+      "first_author": "Li H",
+      "title": "Genome-wide CRISPR screen reveals specific role of type I interferon s",
+      "evidence_type": "MECHANISTIC_PATHWAY",
+      "key_contribution": "IFNAR1, STAT1, and IRF9 sgRNAs depleted with z-score > 4.5 under viral challenge"
+    },
+    {
+      "study_id": "STUDY-26",
+      "year": 2025,
+      "first_author": "Al-Shammari Ahmed Majeed",
+      "title": "Editorial: Oncolytic virotherapy, volume II",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Clinical objective response rate for single-agent virotherapy averages 15-25%"
+    },
+    {
+      "study_id": "STUDY-27",
+      "year": 2025,
+      "first_author": "Zhang Cong",
+      "title": "Recombinant Oncolytic Viruses: Hexagonal Warriors in the Field of Soli",
+      "evidence_type": "STATE_OF_THE_ART_REVIEW",
+      "key_contribution": "Over 80 clinical trials active worldwide confirming systemic biosafety"
+    },
+    {
+      "study_id": "STUDY-36",
+      "year": 2025,
+      "first_author": "Thaker SD",
+      "title": "Colorectal Cancer: Differential Gene Expression and In Vitro Response ",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Synergy confirmed with combination indices CI < 0.85 across responsive models"
+    },
+    {
+      "study_id": "STUDY-19",
+      "year": 2026,
+      "first_author": "Ginting TE",
+      "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA ",
+      "evidence_type": "SELECTIVITY_AND_SAFETY",
+      "key_contribution": "IFN-β production in normal cells 4.2-fold higher than in tumor cells; Normal cell viability preserved > 85% at MOI = 1"
+    },
+    {
+      "study_id": "STUDY-23",
+      "year": 2026,
+      "first_author": "Sun Y",
+      "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reve",
+      "evidence_type": "MECHANISTIC_PATHWAY",
+      "key_contribution": "Over 45 lipid metabolites significantly altered (p < 0.01, fold change > 2.0)"
+    },
+    {
+      "study_id": "STUDY-24",
+      "year": 2026,
+      "first_author": "Ali Akbar Esfahani M",
+      "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic V",
+      "evidence_type": "DIRECT_AGENT_EVIDENCE",
+      "key_contribution": "Bax/Bcl-2 ratio increased 4.5-fold at 48h (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-28",
+      "year": 2026,
+      "first_author": "Zhu Yunjie",
+      "title": "Propranolol enhances the oncolytic effect of newcastle disease virus o",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Combination Index CI = 0.62 at 50% fractional inhibition; Cell death increased from 42% (monotherapy) to 78% (combination; p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-29",
+      "year": 2026,
+      "first_author": "Baghani Benyamin",
+      "title": "Synergistic Effect of Newcastle Disease Virus and Hydroxyurea in Apopt",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "CI values between 0.55 and 0.74 at fa = 0.5-0.8 (p < 0.01)"
+    },
+    {
+      "study_id": "STUDY-35",
+      "year": 2026,
+      "first_author": "Ali N",
+      "title": "The synergistic efficacy of lupeol and enzalutamide potentiates antica",
+      "evidence_type": "ANALOGOUS_COMBINATION_EVIDENCE",
+      "key_contribution": "Chou-Talalay CI values ranged from 0.61 to 0.78 across 48h titration; Apoptosis increased 2.8-fold"
+    }
+  ],
+  "evidence_trajectory_summary": "Evidence has evolved from foundational mathematical modeling (Chou 2006) and colorimetric viability assays (Mosmann 1983) to validated single-agent oncolysis and apoptosis (2018-2021), culminating in 2024-2026 in multi-targeted combination virotherapy and precision nanotechnology."
+}

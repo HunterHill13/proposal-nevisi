@@ -1,0 +1,88 @@
+{
+  "primary_untested_gap": "Zero prior publications evaluate the pharmacological combination of Lupeol (PubChem CID 259846) with oncolytic Newcastle Disease Virus in A549 lung cancer cells.",
+  "total_gap_categories": 14,
+  "gap_categories": {
+    "1. EMPIRICAL_COMBINATION_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "2. CELL_LINE_SPECIFIC_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "3. DOSE_SCHEDULE_OPTIMIZATION_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "4. MECHANISTIC_CONVERGENCE_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "5. VIRAL_STRAIN_TROPISM_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "6. HOST_INTERFERON_INTERFERENCE_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "7. NORMAL_CELL_SELECTIVITY_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "8. MEMBRANE_LIPIDOMICS_CROSS_TALK_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "9. CELL_CYCLE_CHECKPOINT_CONCURRENCE_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "10. SOLUBILITY_DELIVERY_FORMULATION_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "11. DRUG_RESISTANCE_REVERSAL_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "12. CHOU_TALALAY_CI_PARAMETERIZATION_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "13. TRANSLATIONAL_IN_VITRO_TO_IN_VIVO_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    },
+    "14. BIOETHICAL_AND_BIOSAFETY_STANDARDIZATION_GAP": {
+      "status": "ACTIVE_RESEARCH_GAP",
+      "addressed_in_proposal": true
+    }
+  },
+  "closest_preexisting_studies": [
+    {
+      "pmid": "41866332",
+      "first_author": "Zhu et al. (2026)",
+      "topic": "Propranolol + NDV combination in cancer",
+      "distance_to_gap": "Evaluates small molecule + NDV, but uses beta-blocker instead of lupane triterpenoid."
+    },
+    {
+      "pmid": "42189166",
+      "first_author": "Ali N et al. (2026)",
+      "topic": "Lupeol + Enzalutamide combination",
+      "distance_to_gap": "Evaluates Lupeol in combination, but combines with androgen receptor antagonist instead of oncolytic virus."
+    },
+    {
+      "pmid": "33968198",
+      "first_author": "Liang Y et al. (2021)",
+      "topic": "NDV oncolysis in lung cancer A549 cells",
+      "distance_to_gap": "Evaluates NDV in A549, but solely as single-agent monotherapy without Lupeol."
+    },
+    {
+      "pmid": "30003730",
+      "first_author": "He W et al. (2018)",
+      "topic": "Lupeol in human lung carcinoma cells",
+      "distance_to_gap": "Evaluates pure Lupeol in lung carcinoma, but solely as single-agent monotherapy without NDV."
+    }
+  ]
+}
