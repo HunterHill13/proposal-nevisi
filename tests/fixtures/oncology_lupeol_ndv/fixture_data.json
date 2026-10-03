@@ -1,0 +1,105 @@
+{
+  "project_id": "FIXTURE_ONCOLOGY_LUPEOL_NDV",
+  "domain": "oncology",
+  "framework": "EXPERIMENTAL_IN_VITRO",
+  "research_problem_model": {
+    "model_id": "RPM_ONC_001",
+    "research_title_fa": "بررسی اثرات همزمان لوپئول و ویروس نیوکاسل بر سلول‌های A549",
+    "research_title_en": "Evaluation of Synergistic Effects of Lupeol and Newcastle Disease Virus on A549 Lung Cancer",
+    "domain": "oncology",
+    "framework": "EXPERIMENTAL_IN_VITRO",
+    "target_condition": {
+      "name_en": "Non-Small Cell Lung Carcinoma",
+      "name_fa": "کارسینومای سلول غیرکوچک ریه",
+      "mesh_term": "Carcinoma, Non-Small-Cell Lung",
+      "synonyms": ["NSCLC", "lung adenocarcinoma"]
+    },
+    "population_or_model": {
+      "model_type": "CELL_CULTURE_IN_VITRO",
+      "primary_system": "A549 human lung carcinoma cell line",
+      "secondary_systems": ["H1299"],
+      "normal_control_system": "MRC-5 normal lung fibroblasts"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Lupeol",
+        "chemical_or_biological_class": "Triterpenoid phytochemical",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Triterpenes"],
+        "synonyms": ["lup-20(29)-en-3beta-ol"]
+      },
+      {
+        "name": "Newcastle Disease Virus",
+        "chemical_or_biological_class": "Paramyxovirus oncolytic virus",
+        "role": "ADJUVANT_AGENT",
+        "mesh_terms": ["Newcastle disease virus"],
+        "synonyms": ["NDV", "AF2240", "LaSota"]
+      }
+    ],
+    "comparators": [
+      {"name": "Vehicle Control (0.1% DMSO)", "type": "VEHICLE_CONTROL"},
+      {"name": "Mock infected control", "type": "NEGATIVE_CONTROL"}
+    ],
+    "primary_outcomes": [
+      {"name": "Cell Viability Inhibition", "type": "VIABILITY", "measurement_unit": "IC50 (µM / HAU)", "preferred_assays": ["MTT", "WST-1"]},
+      {"name": "Combination Index", "type": "SYNERGY", "measurement_unit": "CI value (< 1 indicates synergy)", "preferred_assays": ["Chou-Talalay Median Effect"]}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "PI3K/Akt Signaling", "target_molecules": ["Akt", "p-Akt"], "expected_modulation": "INHIBITION"},
+      {"pathway_name": "Mitochondrial Apoptosis", "target_molecules": ["Bax", "Bcl-2", "Caspase-3"], "expected_modulation": "CLEAVAGE"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Carcinoma, Non-Small-Cell Lung", "Triterpenes", "Newcastle disease virus"],
+      "all_synonyms": ["A549", "synergy", "oncolysis"],
+      "exclusion_terms": ["breast cancer 4T1", "mammary carcinoma", "veterinary poultry outbreak only"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_LUPEOL_01",
+      "study_family_id": "FAM_LUP_01",
+      "doi": "10.1016/j.canlet.2021.05.012",
+      "title": "Lupeol induces intrinsic apoptosis in human lung carcinoma cells via Akt suppression",
+      "authors": ["Saleem M", "Murtaza I", "Mukhtar H"],
+      "year": 2021,
+      "journal": "Cancer Letters",
+      "study_design": "IN_VITRO_EXPERIMENTAL",
+      "design_specific_attributes": {
+        "model_system_identity": "A549",
+        "culture_conditions": "RPMI-1640 10% FBS",
+        "vehicle_and_formulation": "DMSO 0.1%",
+        "concentration_gradient": "10 to 60 uM",
+        "exposure_duration": "48h",
+        "endpoint_assay_mechanism": "MTT and Western Blot"
+      },
+      "risk_of_bias": {"tool_used": "IN_VITRO_CRITERIA", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_LUP_A549_VIABILITY"]
+    },
+    {
+      "study_id": "ST_NDV_01",
+      "study_family_id": "FAM_NDV_01",
+      "doi": "10.1186/s12985-022-01824-3",
+      "title": "Newcastle disease virus AF2240 strain triggers immunogenic cell death in A549",
+      "authors": ["Omar AR", "Ideris A", "Yusoff K"],
+      "year": 2022,
+      "journal": "Virology Journal",
+      "study_design": "IN_VITRO_EXPERIMENTAL",
+      "design_specific_attributes": {
+        "model_system_identity": "A549",
+        "culture_conditions": "DMEM 2% FBS",
+        "vehicle_and_formulation": "PBS control",
+        "concentration_gradient": "MOI 0.1 to 5.0",
+        "exposure_duration": "48h",
+        "endpoint_assay_mechanism": "Annexin V/PI and Plaque Assay"
+      },
+      "risk_of_bias": {"tool_used": "IN_VITRO_CRITERIA", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_NDV_ONCOLYSIS"]
+    }
+  ]
+}

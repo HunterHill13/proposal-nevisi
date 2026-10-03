@@ -1,0 +1,93 @@
+{
+  "project_id": "FIXTURE_CARDIO_SGLT2",
+  "domain": "cardiovascular",
+  "framework": "PICO",
+  "research_problem_model": {
+    "model_id": "RPM_CARDIO_001",
+    "research_title_fa": "بررسی اثرات مهارکننده‌های SGLT2 بر بستری و مرگ قلبی در بیماران HFpEF",
+    "research_title_en": "Evaluation of SGLT2 Inhibitors on Cardiovascular Mortality and Hospitalization in Heart Failure with Preserved Ejection Fraction",
+    "domain": "cardiovascular",
+    "framework": "PICO",
+    "target_condition": {
+      "name_en": "Heart Failure with Preserved Ejection Fraction",
+      "name_fa": "نارسایی قلبی با کسر تخلیه‌ای حفظ‌شده",
+      "mesh_term": "Heart Failure",
+      "synonyms": ["HFpEF", "diastolic dysfunction"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Adult Patients with symptomatic HFpEF (LVEF >= 50%)",
+      "secondary_systems": ["Outpatient cardiology clinics"],
+      "normal_control_system": "Placebo treated HFpEF controls"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Empagliflozin",
+        "chemical_or_biological_class": "Sodium-Glucose Transporter 2 Inhibitor",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Sodium-Glucose Transporter 2 Inhibitors"],
+        "synonyms": ["Jardiance"]
+      }
+    ],
+    "comparators": [
+      {"name": "Matching Placebo", "type": "PLACEBO"}
+    ],
+    "primary_outcomes": [
+      {"name": "Composite of CV Death or Heart Failure Hospitalization", "type": "HAZARD_RATIO", "measurement_unit": "Hazard Ratio (95% CI)"}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "Myocardial Energetics and Sodium Hydrogen Exchange", "target_molecules": ["NHE1", "SGLT1"], "expected_modulation": "INHIBITION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Heart Failure", "Sodium-Glucose Transporter 2 Inhibitors"],
+      "all_synonyms": ["EMPEROR-Preserved", "DELIVER", "gliflozins"],
+      "exclusion_terms": ["HFrEF only", "dialysis dependent"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_EMPEROR_PRESERVED_2021",
+      "study_family_id": "FAM_EMPEROR_PRESERVED",
+      "doi": "10.1056/NEJMoa2107038",
+      "title": "Empagliflozin in Heart Failure with a Preserved Ejection Fraction",
+      "authors": ["Anker SD", "Butler J", "Filippatos G", "Packer M"],
+      "year": 2021,
+      "journal": "New England Journal of Medicine",
+      "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+      "design_specific_attributes": {
+        "target_population_criteria": "5988 patients with class II-IV heart failure and LVEF > 40%",
+        "disease_severity_or_stage": "NYHA II-IV",
+        "intervention_regimen": "Empagliflozin 10 mg once daily",
+        "comparator_type": "Placebo",
+        "primary_endpoint_definition": "Composite of cardiovascular death or hospitalization for heart failure",
+        "randomization_allocation": "1:1 double-blind randomized",
+        "follow_up_completeness": "Median 26.2 months"
+      },
+      "risk_of_bias": {"tool_used": "COCHRANE_ROB2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_SGLT2_HF_PRIMARY_COMPOSITE"]
+    },
+    {
+      "study_id": "ST_EMPEROR_SUBGROUP_RENAL",
+      "study_family_id": "FAM_EMPEROR_PRESERVED",
+      "doi": "10.1161/CIRCULATIONAHA.121.056824",
+      "title": "Renal outcomes in the EMPEROR-Preserved trial",
+      "authors": ["Packer M", "Butler J", "Zannad F"],
+      "year": 2022,
+      "journal": "Circulation",
+      "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+      "design_specific_attributes": {
+        "target_population_criteria": "Trial cohort subset (NCT03057977)",
+        "intervention_regimen": "Empagliflozin 10 mg",
+        "comparator_type": "Placebo"
+      },
+      "risk_of_bias": {"tool_used": "COCHRANE_ROB2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_SGLT2_RENAL_ENDPOINT"]
+    }
+  ]
+}

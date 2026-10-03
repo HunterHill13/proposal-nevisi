@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StudyEvidenceRecord",
+  "description": "Study-design-aware evidence record capturing granular bibliographic, methodological, quantitative, and bias data.",
+  "type": "object",
+  "required": [
+    "study_id",
+    "doi",
+    "title",
+    "authors",
+    "year",
+    "journal",
+    "study_design",
+    "risk_of_bias",
+    "fulltext_status",
+    "temporal_tier",
+    "claims_supported"
+  ],
+  "properties": {
+    "study_id": { "type": "string" },
+    "doi": { "type": "string" },
+    "pmid": { "type": "string" },
+    "title": { "type": "string" },
+    "authors": { "type": "array", "items": { "type": "string" } },
+    "year": { "type": "integer" },
+    "journal": { "type": "string" },
+    "study_family_id": { "type": "string" },
+    "study_design": {
+      "type": "string",
+      "enum": [
+        "IN_VITRO_EXPERIMENTAL",
+        "IN_VIVO_ANIMAL",
+        "RANDOMIZED_CONTROLLED_TRIAL",
+        "CONTROLLED_CLINICAL_STUDY",
+        "OBSERVATIONAL_COHORT_CASE_CONTROL",
+        "DIAGNOSTIC_ACCURACY_STUDY",
+        "SYSTEMATIC_REVIEW_META_ANALYSIS",
+        "METHODOLOGICAL_LANDMARK"
+      ]
+    },
+    "design_specific_attributes": {
+      "type": "object",
+      "properties": {
+        "model_system": { "type": "string" },
+        "organism_or_species": { "type": "string" },
+        "sample_size_or_replicates": { "type": "string" },
+        "intervention_details": { "type": "object" },
+        "comparator_details": { "type": "object" },
+        "endpoint_assays": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "risk_of_bias": {
+      "type": "object",
+      "required": ["tool_used", "overall_rob"],
+      "properties": {
+        "tool_used": { "type": "string" },
+        "overall_rob": { "type": "string", "enum": ["LOW_RISK", "SOME_CONCERNS", "HIGH_RISK", "CRITICAL_RISK", "NOT_REPORTED"] },
+        "domain_judgments": { "type": "object" }
+      }
+    },
+    "quantitative_facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["parameter", "value", "unit"],
+        "properties": {
+          "parameter": { "type": "string" },
+          "value": { "type": ["number", "string"] },
+          "unit": { "type": "string" },
+          "confidence_interval": { "type": "string" },
+          "p_value": { "type": "string" },
+          "source_passage": { "type": "string" }
+        }
+      }
+    },
+    "negative_or_null_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "description"],
+        "properties": {
+          "category": { "type": "string" },
+          "description": { "type": "string" },
+          "context_parameters": { "type": "object" }
+        }
+      }
+    },
+    "fulltext_status": {
+      "type": "string",
+      "enum": ["FULL_TEXT_AVAILABLE", "ABSTRACT_ONLY"]
+    },
+    "temporal_tier": {
+      "type": "string",
+      "enum": ["RECENT_PRIMARY_EVIDENCE", "FOUNDATIONAL/HISTORICAL_EVIDENCE"]
+    },
+    "foundational_justification": {
+      "type": "object",
+      "properties": {
+        "is_justified": { "type": "boolean" },
+        "category": { "type": "string" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "claims_supported": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

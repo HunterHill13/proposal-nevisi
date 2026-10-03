@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EvidenceLedgerSchema",
+  "description": "Atomic evidence ledger preventing numerical hallucination and linking scientific statements to exact source passages.",
+  "type": "object",
+  "required": ["project_id", "facts", "audit_metadata"],
+  "properties": {
+    "project_id": { "type": "string" },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "fact_id",
+          "study_id",
+          "claim_id",
+          "source_location",
+          "text_or_data",
+          "directness",
+          "confidence"
+        ],
+        "properties": {
+          "fact_id": { "type": "string" },
+          "study_id": { "type": "string" },
+          "claim_id": { "type": "string" },
+          "source_location": { "type": "string" },
+          "text_or_data": { "type": "string" },
+          "parameter_type": {
+            "type": "string",
+            "enum": [
+              "CONCENTRATION_OR_DOSE",
+              "EFFECT_SIZE_OR_IC50",
+              "SAMPLE_SIZE_OR_REPLICATES",
+              "STATISTICAL_P_OR_CI",
+              "PATHWAY_OR_MECHANISM",
+              "ADVERSE_EVENT_OR_LIMITATION",
+              "PHENOTYPIC_ENDPOINT"
+            ]
+          },
+          "directness": {
+            "type": "string",
+            "enum": ["DIRECT_EVIDENCE", "INDIRECT_EVIDENCE", "INFERENCE", "HYPOTHESIS"]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["HIGH", "MODERATE", "LOW"]
+          },
+          "extraction_method": {
+            "type": "string",
+            "enum": ["FULLTEXT_EXCERPT", "TABLE_DATA", "FIGURE_LEGEND", "ABSTRACT_ONLY"]
+          }
+        }
+      }
+    },
+    "audit_metadata": {
+      "type": "object",
+      "required": ["total_facts", "untraceable_claims_count", "numerical_hallucination_detected"],
+      "properties": {
+        "total_facts": { "type": "integer" },
+        "untraceable_claims_count": { "type": "integer" },
+        "numerical_hallucination_detected": { "type": "boolean" }
+      }
+    }
+  }
+}

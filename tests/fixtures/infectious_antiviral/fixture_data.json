@@ -1,0 +1,90 @@
+{
+  "project_id": "FIXTURE_INFECTIOUS_ANTIVIRAL",
+  "domain": "infectious_disease",
+  "framework": "PICO",
+  "research_problem_model": {
+    "model_id": "RPM_INFECT_001",
+    "research_title_fa": "بررسی مقاومت ویروسی و بازگشت بالینی پس از درمان با پاکسلووید در کووید-۱۹",
+    "research_title_en": "Evaluation of Antiviral Resistance Mutations and Clinical Rebound Following Nirmatrelvir/Ritonavir Treatment in SARS-CoV-2",
+    "domain": "infectious_disease",
+    "framework": "PICO",
+    "target_condition": {
+      "name_en": "SARS-CoV-2 Infection",
+      "name_fa": "عفونت کووید-۱۹",
+      "mesh_term": "COVID-19",
+      "synonyms": ["SARS-CoV-2", "Coronavirus Disease 2019"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Outpatient adults with mild-to-moderate COVID-19 at high risk of progression",
+      "secondary_systems": ["Vero E6 viral cultures"],
+      "normal_control_system": "Standard supportive care cohort"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Nirmatrelvir/Ritonavir",
+        "chemical_or_biological_class": "SARS-CoV-2 3CL Protease Inhibitor",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Ritonavir"],
+        "synonyms": ["Paxlovid"]
+      }
+    ],
+    "comparators": [
+      {"name": "Placebo or untreated controls", "type": "PLACEBO"}
+    ],
+    "primary_outcomes": [
+      {"name": "Viral Rebound Frequency", "type": "EFFICACY", "measurement_unit": "Percentage of patients with rebound PCR positivity"},
+      {"name": "Emergence of 3CLpro Mutations", "type": "TOXICITY", "measurement_unit": "Mutational frequency (e.g. E166V, L50F)"}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "Main Protease Inhibition", "target_molecules": ["Mpro", "3CLpro"], "expected_modulation": "INHIBITION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["COVID-19", "Ritonavir", "Protease Inhibitors"],
+      "all_synonyms": ["Paxlovid", "nirmatrelvir", "viral rebound"],
+      "exclusion_terms": ["HIV monotherapy", "hepatitis C"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_EPIC_HR_2022",
+      "study_family_id": "FAM_EPIC_HR",
+      "doi": "10.1056/NEJMoa2118542",
+      "title": "Oral Nirmatrelvir for High-Risk, Nonhospitalized Adults with Covid-19",
+      "authors": ["Hammond J", "Leister-Tebbe H", "Gardner A"],
+      "year": 2022,
+      "journal": "New England Journal of Medicine",
+      "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+      "design_specific_attributes": {
+        "target_population_criteria": "2246 symptomatic non-hospitalized high-risk patients",
+        "intervention_regimen": "300 mg nirmatrelvir plus 100 mg ritonavir twice daily for 5 days",
+        "comparator_type": "Placebo",
+        "primary_endpoint_definition": "Covid-19 related hospitalization or death through day 28"
+      },
+      "risk_of_bias": {"tool_used": "COCHRANE_ROB2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_PAXLOVID_EFFICACY_HOSPITALIZATION"]
+    },
+    {
+      "study_id": "ST_REBOUND_CDC_2023",
+      "study_family_id": "FAM_REBOUND_CDC",
+      "doi": "10.15585/mmwr.mm7246a3",
+      "title": "COVID-19 Rebound After Paxlovid Treatment",
+      "authors": ["Smith-Jeffcoat SE", "Biddle JE"],
+      "year": 2023,
+      "journal": "MMWR",
+      "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL",
+      "design_specific_attributes": {
+        "target_population_criteria": "Community cohort receiving 5-day Paxlovid",
+        "primary_endpoint_definition": "Rebound of symptoms or viral shedding at days 2-8 post-treatment"
+      },
+      "risk_of_bias": {"tool_used": "NEWCASTLE_OTTAWA_SCALE", "overall_rob": "SOME_CONCERNS"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_PAXLOVID_REBOUND_FREQUENCY"]
+    }
+  ]
+}

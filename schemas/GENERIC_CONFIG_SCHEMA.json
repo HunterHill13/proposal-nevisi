@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProposalNevisiProjectConfig",
+  "description": "Topic-agnostic configuration schema for medical research proposal generation and literature synthesis.",
+  "type": "object",
+  "required": ["project_id", "research_question", "domain", "study_framework"],
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "research_question": {
+      "type": "string",
+      "minLength": 15
+    },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "oncology",
+        "cardiovascular",
+        "infectious_disease",
+        "immunology",
+        "endocrinology",
+        "neurology",
+        "pulmonology",
+        "gastroenterology",
+        "diagnostics",
+        "basic_biomedical"
+      ]
+    },
+    "study_framework": {
+      "type": "string",
+      "enum": [
+        "PICO",
+        "PECO",
+        "DIAGNOSTIC",
+        "PROGNOSTIC",
+        "MECHANISTIC",
+        "EXPERIMENTAL_IN_VITRO",
+        "EXPERIMENTAL_ANIMAL"
+      ]
+    },
+    "time_policy": {
+      "type": "object",
+      "properties": {
+        "current_operating_year": {
+          "type": "integer",
+          "default": 2026
+        },
+        "max_primary_evidence_age_years": {
+          "type": "integer",
+          "default": 6
+        },
+        "allow_foundational_exceptions": {
+          "type": "boolean",
+          "default": true
+        },
+        "minimum_recent_proportion": {
+          "type": "number",
+          "default": 0.75
+        }
+      }
+    },
+    "evidence_policy": {
+      "type": "object",
+      "properties": {
+        "minimum_required_references": {
+          "type": "integer",
+          "default": 15
+        },
+        "enforce_zero_padding": {
+          "type": "boolean",
+          "default": true
+        },
+        "require_opposing_evidence_search": {
+          "type": "boolean",
+          "default": true
+        },
+        "require_passage_level_entailment": {
+          "type": "boolean",
+          "default": true
+        },
+        "max_overclaim_tolerance": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "output_specification": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "default": "fa-IR"
+        },
+        "template_sections_count": {
+          "type": "integer",
+          "default": 14
+        },
+        "require_individual_reference_paragraphs": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

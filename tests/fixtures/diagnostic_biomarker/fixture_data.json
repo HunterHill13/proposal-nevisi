@@ -1,0 +1,72 @@
+{
+  "project_id": "FIXTURE_DIAGNOSTIC_BIOMARKER",
+  "domain": "diagnostics",
+  "framework": "DIAGNOSTIC",
+  "research_problem_model": {
+    "model_id": "RPM_DIAG_001",
+    "research_title_fa": "ارزیابی دقت تشخیصی DNA توموری در گردش (ctDNA) در تشخیص زودهنگام عود سرطان کولورکتال",
+    "research_title_en": "Diagnostic Accuracy of Postoperative Circulating Tumor DNA (ctDNA) for Minimal Residual Disease and Recurrence in Colorectal Cancer",
+    "domain": "diagnostics",
+    "framework": "DIAGNOSTIC",
+    "target_condition": {
+      "name_en": "Colorectal Carcinoma Recurrence / Minimal Residual Disease",
+      "name_fa": "عود سرطان کولورکتال و بیماری باقی‌مانده مینیمال",
+      "mesh_term": "Colorectal Neoplasms",
+      "synonyms": ["CRC", "minimal residual disease", "MRD"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Stage II and III Colorectal Cancer Patients Post-Curative Resection",
+      "secondary_systems": ["Plasma cell-free DNA specimens"],
+      "normal_control_system": "Disease-free healthy plasma controls"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Tumor-Informed ctDNA Assay (Signatera)",
+        "chemical_or_biological_class": "Next-Generation Sequencing Liquid Biopsy",
+        "role": "INDEX_TEST",
+        "mesh_terms": ["Circulating Tumor DNA"],
+        "synonyms": ["liquid biopsy", "ctDNA MRD"]
+      }
+    ],
+    "comparators": [
+      {"name": "Standard Radiologic Surveillance (CT Chest/Abdomen/Pelvis) & Serum CEA", "type": "GOLD_STANDARD"}
+    ],
+    "primary_outcomes": [
+      {"name": "Diagnostic Sensitivity for Recurrence", "type": "SENSITIVITY", "measurement_unit": "Percentage sensitivity (95% CI)"},
+      {"name": "Diagnostic Specificity", "type": "SPECIFICITY", "measurement_unit": "Percentage specificity (95% CI)"}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "Somatic Genomic Mutation Tracking", "target_molecules": ["KRAS", "BRAF", "TP53", "APC"], "expected_modulation": "SECRETION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Colorectal Neoplasms", "Circulating Tumor DNA", "Liquid Biopsy"],
+      "all_synonyms": ["ctDNA", "MRD", "recurrence surveillance"],
+      "exclusion_terms": ["metastatic stage IV at baseline", "benign adenoma"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_DYNAMIC_2022",
+      "study_family_id": "FAM_DYNAMIC_TRIAL",
+      "doi": "10.1056/NEJMoa2204735",
+      "title": "Circulating Tumor DNA Analysis Guiding Adjuvant Therapy in Stage II Colon Cancer",
+      "authors": ["Tie J", "Cohen JD", "Lahouel K", "Tomasetti C"],
+      "year": 2022,
+      "journal": "New England Journal of Medicine",
+      "study_design": "DIAGNOSTIC_ACCURACY_STUDY",
+      "design_specific_attributes": {
+        "clinical_presentation_spectrum": "455 stage II colon cancer patients after surgery",
+        "index_test_platform": "Tumor-informed personalized 16-plex NGS ctDNA assay",
+        "reference_standard_validity": "2-year recurrence-free survival assessed by clinical and radiological criteria",
+        "threshold_pre_specification": "Pre-specified qualitative detection threshold (>= 2 variants)",
+        "blinding_between_tests": "Clinicians blinded to ctDNA in standard management arm"
+      },
+      "risk_of_bias": {"tool_used": "QUADAS_2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_CTDNA_STAGE_II_MRD_SENSITIVITY"]
+    }
+  ]
+}

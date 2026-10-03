@@ -1,150 +1,168 @@
 ---
 name: proposal-nevisi
 description: >
-  Comprehensive end-to-end Iranian medical and biomedical research proposal drafting, deep literature research,
-  humanization, and Word (.docx) publication workflow. Interactively clarifies scope and methodological ambiguities,
-  executes a 15-stage Evidence-Driven Deep Research Engine across 4 databases (PubMed/MeSH, Europe PMC, OpenAlex, Crossref),
-  applies dedicated Contradictory/Negative evidence discovery, executes saturation-based citation chaining, classifies
-  sources into 3 tiers (Tier A: Full-Text verified, Tier B: Abstract landscape, Tier C: Leads), extracts granular
-  experimental parameters with exact sentence provenance, grounds compounds in PubChem and pathways in Reactome
-  (strictly zero synthetic runtime fallbacks), maps claim-evidence entailment, builds an Evidence Gap Matrix (EQ01-EQ12),
-  produces an emergent reference set with zero arbitrary caps, enforces strict novelty phrasing boundaries, applies the 6-layer
-  anti-AI detection academic protocol, produces beautifully formatted Word documents featuring Dubai Persian typography,
-  native RTL bidi XML (<w:bidi/>, <w:rtlGutter/>), Complex Script bolding (<w:bCs/>), zero divider dashes (---),
-  formula callout boxes, styled tables, embedded Word Citation Manager sources via COM, and executes an automated 34-test self-audit suite.
+  Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
+  evidence synthesis, humanization, and Word (.docx) publication engine (v8.0). Operates across diverse biomedical domains
+  (oncology, cardiology, infectious diseases, diagnostics, immunology, basic experimental science). Generates dynamic
+  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes dual-path 8-facet literature searches
+  (SUPPORTING_SEARCH & CONTRADICTING_SEARCH across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence
+  Records (STUDY_EVIDENCE_RECORD_SCHEMA), performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
+  clusters study families and trial registries to prevent evidence double-counting, resolves contradictions across an extensible
+  15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT), enforces 7-level claim entailment and causal
+  language boundaries (blocking causal leaps from observational data), guarantees numerical traceability in EVIDENCE_LEDGER,
+  enforces the 6-year temporal boundary with explicit foundational justifications, renders publication-grade 14-section Word proposals
+  with individual reference paragraphs, Dubai Persian typography, native RTL bidi XML, and passes a unified 77-assertion test harness
+  (Static analysis zero leakage, 4-domain generalization fixtures, 12 adversarial stress tests, and 60-test benchmark).
 ---
 
-# Proposal-Nevisi (مهارت جامع نگارش پروپوزال‌های پژوهشی علوم پزشکی و موتور Deep Research v4.5)
+# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.0)
 
-این مهارت یک راهکار خودکار، تعاملی، پیشرفته و با استاندارد سخت‌گیرانه برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی است که مجهز به موتور اختصاصی **Deep Research v4.5** مبتنی بر شواهد پدیدارشده (Evidence-Driven)، بازیابی ۴ پایگاهی، اعتبارسنجی شیمیایی/مسیری زنده، ممیزی استلزام ادعا-شواهد (Claim-Evidence Entailment)، و نگارش انسان‌محور ضد هوش مصنوعی می‌باشد.
+این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.0 با بازطراحی بنیادین معماری، از وابستگی به یک موضوع خاص رها شده و به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
 
 ---
 
-## اصول کلیدی و استانداردهای الزامی (Core Standards v4.5)
+## ۱. چرخه فرآیندی موتور عمومی شواهد (Universal Pipeline)
 
-1. **معماری ۱۵ مرحله‌ای بازیابی و استخراج شواهد (The 15-Stage Evidence Funnel):**
-   ```text
-   Research Question
-           ↓
-   Evidence Questions (12 Categories: EQ01 - EQ12)
-           ↓
-   Concept / Synonym Expansion (MeSH & Controlled Vocabularies)
-           ↓
-   Search Facets (Disease, Interventions, Combination, Mechanisms, Models)
-           ↓
-   Multi-Database Retrieval (PubMed, Europe PMC, OpenAlex, Crossref)
-           ↓
-   Contradictory / Negative Evidence Search Branch
-           ↓
-   Deduplication (DOI, PMID, Normalized Title)
-           ↓
-   Title & Abstract Screening (Explicit Audit Trail)
-           ↓
-   Full-Text Retrieval & Strict 3-Tier Classification
-           ↓
-   Saturation-Based Citation Chaining (Backward, Forward, Related Works)
-           ↓
-   Claim-Level Evidence Extraction (Verbatim Quotes, Strict NR Policy)
-           ↓
-   Evidence Gap Matrix (EQ01 - EQ12 Systematic Audit)
-           ↓
-   Claim-Evidence Entailment Mapping (Formal Semantic Audit)
-           ↓
-   Emergent Citation Selection (No Arbitrary Cap + Designated Evidentiary Roles)
-           ↓
-   Academic Proposal Writing & Master Word Document Compilation
-   ```
+```text
+موضوع و عنوان ورودی پژوهشگر
+           │
+           ▼
+[ ۱. مدل‌سازی پویای مسئله پژوهش (Research Problem Model) ]
+├── انتخاب چارچوب متناسب: PICO / PECO / Diagnostic / Prognostic / Mechanistic
+├── شناسایی جمعیت/مدل (Human, Animal, Cell Culture, Diagnostic)
+├── اصطلاحات کنترل‌شده MeSH و واژگان تخصصی
+           │
+           ▼
+[ ۲. طراحی جستجوی دومسیره و ماتریس ۸ طبقه‌ای (Dual-Path Search Plan) ]
+├── مسیر حمایتی (SUPPORTING_SEARCH): اثربخشی، سینرژی، فرضیه مثبت
+├── مسیر معکوس (CONTRADICTING_SEARCH): فقدان اثر (Null)، مقاومت، سمیت، آنتاگونیسم
+├── ماتریس کوئری ۸ طبقه‌ای: مستقیم، اجزاء، ترکیبی، مکانیسمی، ترنسلیشنال، منفی، ایمنی، روش‌شناختی
+           │
+           ▼
+[ ۳. بازیابی چندپایگاهی و حسابداری PRISMA 2020 ]
+├── بازیابی همزمان از PubMed/MEDLINE, Europe PMC, OpenAlex, Crossref
+├── ثبت دقیق لاگ جستجو، حذف موارد تکراری و جریان غربالگری واقعی
+           │
+           ▼
+[ ۴. اعتبارسنجی فیلد-محور کتابشناختی و مرز زمانی ]
+├── تطبیق دقیق DOI, PMID, Title, First Author, Journal, Year
+├── اعمال قانون زمانی ۶ ساله (Main Evidence >= 2020)
+├── تایید استثناهای بنیادین با توجیه معتبر (FOUNDATIONAL_JUSTIFICATION)
+           │
+           ▼
+[ ۵. طبقه‌بندی طراحی مطالعه و ارزیابی سوگیری متناسب با متدولوژی ]
+├── سنجش RoB متناسب: Cochrane RoB2 برای کارآزمایی‌ها، SYRCLE برای حیوانات، QUADAS-2 برای تشخیصی
+├── قانون اکید: وضعیت NOT_REPORTED هرگز به LOW_RISK تبدیل نمی‌شود
+           │
+           ▼
+[ ۶. ماتریس همسنجی متناسب با طراحی مطالعه (Study-Design-Aware Comparability) ]
+├── ارزیابی ابعاد بر اساس ماهیت مطالعه (سلولی، حیوانی، کارآزمایی بالینی، تشخیصی)
+├── تمایز فواصل ترجمانی و بیولوژیک بین مطالعات
+           │
+           ▼
+[ ۷. ردیابی خوشه‌های مطالعاتی و ممانعت از دوباره‌شماری (Study Family Clustering) ]
+├── شناسایی کارآزمایی‌های مشترک (NCT)، کوهورت‌های اپیدمیولوژیک مشترک و زیرگروه‌ها
+├── تفکیک مقالات مروری سیستماتیک از مطالعات اولیه برای جلوگیری از شمارش مضاعف شواهد
+           │
+           ▼
+[ ۸. موتور تحلیل شواهد منفی و تناقضات بر مبنای تاکسونومی ۱۵ گانه ]
+├── تفکیک هوشمندانه «تناقض واقعی» (TRUE_CONTRADICTION) از «اختلاف زمینه‌ای» (CONTEXTUAL_DISAGREEMENT)
+├── تحلیل علل اختلاف: دوز، مدت مواجهه، زمینه ژنتیکی، مرحله بیماری، روش سنجش
+├── قاعده معرفت‌شناختی: ثبت NO_RELEVANT_CONTRADICTING_EVIDENCE_IDENTIFIED به جای نفی مطلق
+           │
+           ▼
+[ ۹. موتور التزام گزاره-شواهد و دروازه زبان علّی (Claim Entailment & Causal Gate) ]
+├── تفکیک ادعاهای اتمیک و درجه‌بندی التزام در مقیاس ۷ سطحی
+├── مسدودسازی ادعای علیت (Causes/Induces) در مطالعات مشاهده‌ای و همبستگی
+├── ره‌گیری کامل مقادیر عددی در دفتر شواهد (EVIDENCE_LEDGER) و مقابله با توهم اعداد
+           │
+           ▼
+[ ۱۰. سنتز چندبعدی شواهد بدون رای‌گیری اکثریتی ]
+├── سنتز وزن‌دهی‌شده بر پایه ۸ بعد قطعیت شواهد (مستقیم بودن، همسویی، دقت، کیفیت، سوگیری، کاربردپذیری، حجم، بار تناقض)
+├── ممنوعیت قاطع ساده‌سازی به رای‌گیری اکثریتی (Vote Counting)
+           │
+           ▼
+[ ۱۱. نگارش و تدوین پروپوزال ساختارمند ۱۴ گانه دانشگاهی ]
+├── نگارش کامل ۱۴ بخش استاندارد مصوب معاونت پژوهشی
+├── اختصاص یک پاراگراف تحلیلی مستقل و تفصیلی برای تک‌تک مراجع در بخش مرور منابع
+├── جدول متغیرها، جدول زمان‌بندی گانت و متدولوژی تفصیلی ۱۴ محوره
+├── فرمت‌بندی رسمی با فونت Dubai، تگ‌های native RTL bidi XML و خروجی Word (.docx)
+           │
+           ▼
+[ ۱۲. ممیزی خودکار یکپارچه و آزمون‌های رفتاری ]
+├── اجرای سوئیت تست یکپارچه (۷۷ نقطه آزمون واقعی و بدون ادعای ساختگی)
+```
 
-2. **قاعده کفایت شواهد و ممیزی کاربرد مراجع (Reference Usage & Zero Padding Policy):**
-   - **تفکیک چهار شاخص کلیدی مراجع:**
-     1. `Natural Selected References`: تعداد منابعی که بر پایه ضرورت شواهد و پوشش ادعاها به طور طبیعی انتخاب شده‌اند (بدون سقف و بدون اعمال هدف عددی).
-     2. `Actually Cited Unique References`: تعداد منابع یکتا که واقعاً در بدنه متن پروپوزال با شناسه استنادی معتبر (مانند `[1]` تا `[N]`) استناد شده‌اند (الزام: حداقل ۱۵ منبع، سقف نامحدود).
-     3. `Unused Selected References`: تعداد منابعی که در فهرست مراجع وجود دارند ولی در متن پروپوزال استفاده نشده‌اند (خط قرمز: باید دقیقاً صفر باشد: `Unused Selected References == 0`).
-     4. `Padding Added`: تعداد مقالاتی که صرفاً برای رسیدن به کف عددی افزوده شده‌اند (خط قرمز: باید دقیقاً صفر باشد: `Padding Added == 0`).
-   - **کف مراجع یک دروازه سنجش کفایت است، نه هدف گزینش (The minimum reference count is a sufficiency gate, not a selection target):** الگوریتم گزینش ابتدا تمام منابعی را که واقعاً برای پوشش ادعاهای ضروری و حوزه‌های شواهد پروپوزال نیاز است به صورت طبیعی (Natural Evidence Selection) استخراج می‌کند؛ سپس در مرحله پایانی کفایت آن را با حداقل ۱۵ ارزیابی می‌نماید.
-   - **ممنوعیت مطلق افزودن منبع برای رساندن به عدد (No reference may be added solely to satisfy the minimum count):** افزودن هرگونه مقاله ضعیف یا اضافی صرفاً برای رساندن عدد به ۱۵ اکیداً غیرمجاز است. اگر تعداد مراجع واجد شرایط کمتر از ۱۵ باشد (مثلاً ۱۲)، سیستم باید وضعیت را صریحاً `FAILED_MINIMUM_REFERENCE_REQUIREMENT` اعلام کند، نه اینکه با ۳ مقاله ضعیف‌تر عدد را به ۱۵ برساند!
-   - **تعیین پدیدارشده منابع بدون سقف حداکثری (The final reference set is determined by evidence necessity, min 15, no max cap):** هیچ سقفی (مانند ۱۵، ۲۰، ۳۰، ۵۰ یا ۸۰) برای تعداد مراجع نهایی وجود ندارد و اگر ۳۸ یا ۷۴ مقاله واقعاً ضروری باشند، همگی بدون برش وارد پروپوزال می‌شوند.
-   - **ممیزی زایدات و همپوشانی (Reference Redundancy Audit):** هر منبع منتخب بررسی می‌شود؛ چنانچه منبع دیگری با وزن و رتبه کیفی بالاتر دقیقاً همان ادعاها و دامنه‌ها را پوشش دهد، منبع مازاد به عنوان `REDUNDANT` حذف می‌گردد تا از تراکم بی‌مورد جلوگیری شود.
+---
 
-3. **سطح‌بندی سه‌گانه منابع (Strict 3-Tier Source Classification):**
-   - **Tier A (تمام‌متن تأییدشده PMC OA XML / Europe PMC XML > 1000 کاراکتر):** منحصراً برای استخراج پارامترهای کمی (دوز، IC50، زمان انکوباسیون) و شواهد مکانیسمی مستقیم. چکیده هرگز به عنوان متن کامل پذیرفته نمی‌شود!
-   - **Tier B (چکیده و متادیتای تأییدشده):** برای ترسیم بستر پژوهش، اپیدمیولوژی، و شواهد زمینه‌ای.
-   - **Tier C (سرنخ‌های اولیه بدون متن کامل):** در رجیستری منابع ثبت شده اما وارد استخراج کمی نمی‌شوند.
+## ۲. اصول و خطوط قرمز علمی مهارت (Non-Negotiable Scientific Principles)
 
-4. **شاخه اختصاصی کشف شواهد متناقض و ارزیابی ریسک (Contradictory Evidence Branch):**
-   - کوئری‌های اختصاصی جهت کشف پدیده‌های آنتاگونیسم (Antagonism)، مقاومت‌های دارویی/ویروسی، سمیت‌های فراتر از پنجره درمانی، و عدم اثربخشی.
-   - تولید سند رسمی `CONTRADICTORY_EVIDENCE.md` جهت پیش‌بینی موانع و تدوین راهکارهای کنترلی در متدولوژی طرح.
+1. **ممنوعیت کامل Hard-Code شدن موجودیت‌های یک طرح در کدهای هسته:**
+   تمام نام‌های ترکیبات، سویه‌ها، رده‌های سلولی، دوزها و بیماری‌ها به عنوان ورودی و در مدل `ResearchProblemModel` تعریف می‌شوند. کدهای اصلی در `scripts/` فاقد هرگونه پیش‌فرض محدودکننده به یک موضوع خاص هستند.
 
-5. **زنجیره استنادی اشباع‌محور (Saturation Citation Chaining):**
-   - پیمایش مراجع گذشته‌نگر (Backward)، استنادهای آینده‌نگر (Forward) و گراف مقالات مرتبط (OpenAlex Related Works).
-   - توقف فرآیند بر اساس قانون بازده نهایی حاشیه‌ای (Marginal Yield < Threshold) به جای تعداد گام‌های صلب.
+2. **قاعده جستجوی دومسیره و الزامی شواهد منفی (Dual-Path Search):**
+   هیچ جستجویی نباید صرفاً تأییدطلبانه (Confirmation-Seeking) باشد. در کنار جستجوی شواهد مثبت، جستجوی شواهد منفی (Null, Toxicity, Antagonism, Failure, Resistance) به صورت سیستمی اجرا می‌شود.
 
-6. **سیاست قطعی عدم داده‌های ساختگی و حذف کامل Fallbackهای هاردکد (Zero Hardcoded Fallbacks):**
-   - در صورت اختلال شبکه یا عدم پاسخ‌دهی سرورهای PubChem یا Reactome، وضعیت رکورد صریحاً به عنوان `UNVERIFIED` ثبت می‌گردد و هیچ مقدار حدسی یا هاردکد جایگزین نمی‌شود.
-   - مراجع متدولوژیک کلاسیک (چو-تالالی ۲۰۰۶ و مسمن ۱۹۸۳) با فلگ `is_foundation: True` کاملاً از شواهد تجربی جدید تفکیک می‌شوند.
+3. **اصل تفکیک ارتباط از التزام (Relevance vs. Entailment):**
+   مرتبط بودن موضوعی یک مقاله به هیچ عنوان به معنای اثبات ادعای متن پروپوزال توسط آن مقاله نیست. هر استناد باید بر پایه التزام دقیق محتوایی در مقیاس ۷ سطحی (`DIRECTLY_SUPPORTED` تا `CONTRADICTED`) تایید شود.
 
-7. **بیان اصالت و نوآوری در چارچوب مرز مستند (Strict Novelty Policy):**
-   - ادعای مطلق و غیرعلمی «برای اولین بار» یا «اثبات می‌کند» ممنوع است.
-   - بیان نوآوری صرفاً در قالب کران‌دار و مقید به مرز جست‌وجو مجاز است:
-     *"No directly matching study was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."*
+4. **ممنوعیت مطلق پرکردن زینتی مراجع (Zero Citation Padding):**
+   هیچ منبعی نباید صرفاً برای زیاد نشان دادن تعداد مراجع به فهرست افزوده شود. هر منبع موجود در رفرنس‌ها باید دارای استناد معتبر در متن، لینک به ادعای علمی و گزاره تاییدشده در دفتر شواهد باشد (`Unused References == 0`).
 
-8. **تایپوگرافی مستر ورد (Master Word Typography):**
-   - فونت استاندارد `Dubai` با راست‌به‌چپ سراسری (`<w:bidi/>` و `<w:rtlGutter/>`).
-   - بومی‌سازی تیترهای فارسی با پررنگ‌سازی Complex Script (`<w:bCs/>`).
-   - حذف ۱۰۰٪ خط‌تیره‌های جداکننده مخرّب (`---`).
-   - ثبت مستقیم منابع در **Word Citation Manager** از طریق اتوماسیون COM.
+5. **دروازه زبان علّی (Anti-Overclaim Causal Gate):**
+   تبدیل عبارات همبستگی در مطالعات مشاهده‌ای به ادعاهای علیت اکیداً ممنوع بوده و به صورت خودکار با پرچم `OVERCLAIM_RISK` متوقف و اصلاح می‌گردد.
 
-9. **سوئیت جامع اسناد و خروجی‌های Deep Research v4.5:**
-   - **`SOURCE_REGISTRY.json`:** پایگاه داده کامل تمام منابع کشف‌شده به همراه Tier و وضعیت غربالگری.
-   - **`EXCLUDED_STUDIES.json`:** مستندسازی شفاف علل حذف تک‌تک مقالات غربال‌شده.
-   - **`SEARCH_QUERY_LOG.json`:** لاگ کامل تک‌تک کوئری‌های ارسالی به ۴ پایگاه داده با کد وضعیت HTTP و تعداد نتایج.
-   - **`SEARCH_BOUNDARY.json`:** تعریف رسمی مرز جست‌وجو و بیانیه اصالت طرح.
-   - **`LITERATURE_SEARCH_REPORT.md`:** گزارش رسمی ممیزی فرآیند جست‌وجو بر مبنای استاندارد PRISMA 2020.
-   - **`CONTRADICTORY_EVIDENCE.md`:** تحلیل تحلیلی شواهد متناقض، سمیت و موانع ایمنی.
-   - **`EVIDENCE_GAP_MATRIX.md`:** ماتریس تحلیل خلأهای شواهد در ۱۲ حوزه کلیدی (EQ01-EQ12).
-   - **`CLAIM_EVIDENCE_MAP.json`:** ممیزی معنایی استلزام ادعا-شواهد با برچسب‌های استاندارد.
-   - **`EVIDENCE_LEDGER.json`:** دفتر کل شواهد آزمایشگاهی با نقل‌قول مستقیم درون‌متنی و فاقد عبارات ساختگی.
-   - **`PROPOSAL_REFERENCE_SET.json`:** مراجع برگزیده نهایی با نقش دقیق، لینک ادعاها، شماره ارجاع و فاقد زایدات (حداقل ۱۵ منبع بدون سقف).
-   - **`FINAL_REFERENCE_USAGE_AUDIT.json`:** سند رسمی ممیزی تطابق ارجاعات در متن پروپوزال، شمارش دقیق استنادات یکتا، و تأیید عدم وجود منبع بدون استفاده.
-   - **`FINAL_REFERENCE_VALIDITY_AUDIT.json`:** سند ساختاریافته ممیزی ۴ محوره اعتبار کتابشناختی، ارتباط علمی، پشتیبانی ادعا، و ضرورت استناد تک‌تک منابع.
-   - **`FINAL_REFERENCE_VALIDITY_AUDIT.md`:** گزارش تفصیلی انسانی و واکاوی ۷‌گانه تک‌تک مراجع نهایی.
-   - **`EVIDENCE_SUFFICIENCY_REPORT.md`:** گیت ممیزی ۱۰ ضابطه کیفیت با تفکیک انتخاب طبیعی و پدینگ صفر.
-   - **`LITERATURE_DEEP_RESEARCH.md`:** پرونده تحلیلی شواهد تجربی به صورت کاملاً پویا و متصل به مراجع.
-   - **`references_with_fulltext.json`**, **`EndNote_Citations.enw`**, **`references_library.ris`**
+6. **قاعده ره‌گیری عددی و ممانعت از توهم ارقام:**
+   تمام اعداد علمی اعم از دوز، $IC_{50}$، نسبت خطر، مقادیر $p$ و حجم نمونه باید مستقیماً از متن مقاله مرجع استخراج و در `EVIDENCE_LEDGER` ثبت شده باشند. در صورت عدم ذکر، وضعیت `NOT_REPORTED` ثبت شده و حدس زدن عدد اکیداً ممنوع است.
 
-10. **آزمونگر سخت‌گیرانه ۳۴ گانه خود-ممیزی (34-Test Behavioral Self-Audit Suite v4.5):**
-    - ارزیابی رفتاری روی داده‌های واقعی:
-      1. پیاده‌سازی صفحه‌بندی واقعی (Real Pagination)
-      2. فقدان سقف ساختگی در بازیابی و گزینش (Zero Hardcoded Caps)
-      3. ممیزی سراسری دسترسی به متن کامل (Universal Full-Text Audit)
-      4. تفکیک شواهد کمی به Tier A
-      5. مشارکت فعال هر ۴ پایگاه علمی (PubMed, Europe PMC, OpenAlex, Crossref)
-      6. ساختار چندوجهی ماتریس کوئری (QUERY_MATRIX.json)
-      7. شواهد متناقض عمیق (CONTRADICTORY_EVIDENCE.md)
-      8. پالایش کانونیکال و بدون تکرار (Canonical Deduplication)
-      9. اشباع انطباقی زنجیره استنادی (Adaptive Saturation)
-      10. نقل‌قول‌های پارامتری مستقیم (Claim-Quote Verbatim Integrity)
-      11. گراف ادعا-شواهد (CLAIM_EVIDENCE_GRAPH.json)
-      12. گیت ۱۰ گانه کفایت شواهد (Evidence Sufficiency Gate)
-      13. نقشه‌برداری شکاف‌های پژوهشی بر مرز جست‌وجو (RESEARCH_GAP_MAP.json)
-      14. استقلال رتبه کیفیت و ارتباط (Decoupled Quality vs Relevance)
-      15. اعتبارسنجی زنده پاب‌کم (PubChem Live Grounding)
-      16. اعتبارسنجی زنده ری‌اکتوم (Reactome Live Grounding)
-      17. کفایت حداقل ۱۵ منبع پروپوزال (Count >= 15, Max Unlimited)
-      18. عدم وجود سقف حداکثری بر مراجع (No Arbitrary Maximum Cap)
-      19. عدم پرسازی جعلی منابع و ممیزی زایدات (Zero Reference Padding)
-      20. اتصال ۱۰۰٪ مراجع به ادعاها (Claim Linkage)
-      21. یکپارچگی نقش‌های استنادی (Reference Roles Integrity)
-      22. ممیزی سیاست نوآوری کران‌دار (Strict Novelty Policy)
-      23. استانداردهای تایپوگرافی دبی و XML دوزبانه
-      24. انطباق سرتاسری اسناد خروجی (Cross-Artifact Consistency)
-      25. ضابطه عدم تأثیر حداقل آستانه بر گزینش شواهد (Zero-Padding Gate)
-      26. استفاده واقعی پروپوزال از حداقل ۱۵ منبع یکتا در بدنه متن (Actually Cited >= 15)
-      27. استناد قطعی به ۱۰۰٪ مراجع نهایی در متن پروپوزال (Unused Selected References == 0)
-      28. پشتیبانی مستند شواهدی برای تمامی ادعاهای اساسی پروپوزال (Every Major Claim Has Evidence)
-      29. ممیزی اعتبار کتابشناختی (Bibliographic Validity Audit: 100% verified, 0 invalid, 0 fabricated)
-      30. یکپارچگی شناسه‌های DOI و PMID و فقدان متادیتای تخمینی (DOI/PMID Integrity Audit)
-      31. انطباق ارتباط علمی با دامنه‌های ۱۱ گانه تخصصی طرح (Scientific Relevance Audit)
-      32. ممیزی استلزام ادعا-مرجع و منع مغالطات تعمیم مدل یا داروی تک به ترکیب (Claim-to-Reference Entailment Audit)
-      33. ممیزی ضرورت و عدم زایدات مراجع نهایی (Reference Necessity / Redundancy Audit)
-      34. گیت جامع تأیید اعتبار و ارتباط مراجع نهایی (Overall Reference Validity Gate Audit)
+7. **قانون زمانی مراجع و توجیه منابع بنیادین:**
+   شواهد اصلی اولیه باید در پنجره ۶ سال اخیر ($\text{Year} \ge \text{CURRENT\_YEAR} - 6$) باشند. ارجاع به مقالات قدیمی‌تر تنها در صورت داشتن برچسب توجیه بنیادین (`FOUNDATIONAL_JUSTIFICATION` نظیر مدل‌های ریاضی، روش‌های سنجش استاندارد، یا کشف‌های تاریخی مرجع) مجاز است.
+
+---
+
+## ۳. ساختار الزامی ۱۴ گانه بدنه پروپوزال (Institutional 14-Section Proposal Structure)
+
+خروجی نهایی پروپوزال در فایل Word (`.docx`) باید واجد دقیقاً ۱۴ بخش استاندارد به شرح زیر باشد:
+1. **موضوع:** عنوان کامل فارسی و انگلیسی.
+2. **بیان مسئله:** نگارش تفصیلی پیرامون بار بیماری، اپیدمیولوژی، مبانی سلولی-مولکولی، چالش‌های درمانی و توجیه علمی طرح.
+3. **مرور بر منابع:** اختصاص **یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع مورد استفاده** (با تحلیل جامعه/مدل، دوز، روش، یافته‌ها و ارتباط آن با طرح حاضر).
+4. **اهمیت و ضرورت تحقیق:** تبیین ضرورت اجرای پژوهش در بندهای علمی و کاربردی.
+5. **تعریف واژه‌ها:** تعاریف مفهومی و عملیاتی واژگان کلیدی طرح.
+6. **اهداف جزیی:** اهداف مرحله‌ای متناسب با آزمون متغیرها.
+7. **اهداف کلی:** بیان یکپارچه هدف اصلی با عبارت «تعیین...».
+8. **اهداف کاربردی:** تبیین کاربردهای تشخیصی، درمانی و پیش‌بالینی طرح.
+9. **فرضیات و سوالات پژوهش:** تفکیک روشن فرضیه‌های آماری/تجربی از سوالات پژوهشی.
+10. **دستاوردها:** برشمردن دستاوردهای ملموس علمی، تولید شواهد و چاپ مقالات.
+11. **جدول متغیرها:** جدول ساختارمند شامل نام متغیر، نقش، نوع، مقیاس و ابزار اندازه‌گیری.
+12. **جدول زمان‌بندی و مراحل اجرا:** گانت چارت زمان‌بندی ماهانه.
+13. **روش اجرا:** تفکیک متدولوژی در ۱۴ محور استاندارد (نوع مطالعه، جامعه، محل، ورود، خروج، ابزارها، روایی، پایایی، حجم نمونه و فرمول، تحلیل داده‌ها، ملاحظات اخلاقی، حفاظت زیستی، محدودیت‌ها، و شیوه اجرایی گام‌به‌گام).
+14. **فهرست منابع:** نمایه مراجع به فرمت استاندارد ونکوور به همراه شناسه DOI و لینک مستقیم.
+
+---
+
+## ۴. اسکریپت‌ها و ماژول‌های اجرایی مهارت (`scripts/`)
+
+- **`research_problem_model.py`:** استخراج و ساخت مدل مسئله پژوهش بر مبنای چارچوب‌های PICO/PECO/Diagnostic/Mechanistic.
+- **`generic_search_planner.py`:** طراحی ماتریس جستجوی چندپایگاهی در ۸ طبقه و اجرای طرح جستجوی دومسیره (حمایتی و معکوس).
+- **`generic_study_family_detector.py`:** شناسایی و خوشه‌بندی مطالعات مشترک، کدهای کارآزمایی و کوهورت‌های اپیدمیولوژیک جهت جلوگیری از شمارش مضاعف شواهد.
+- **`generic_comparability_engine.py`:** ارزیابی همسنجی دوبه‌دوی مطالعات متناسب با طراحی مطالعه (سلولی، حیوانی، بالینی، تشخیصی).
+- **`generic_contradiction_engine.py`:** تحلیل و رده‌بندی شواهد متناقض بر مبنای تاکسونومی ۱۵ گانه و تفکیک تناقض واقعی از اختلاف زمینه‌ای.
+- **`generic_claim_entailment_engine.py`:** ممیزی التزام ادعاها در ۷ سطح، کنترل ادعاهای علیت و ره‌گیری دقیق مقادیر عددی.
+- **`generic_reference_auditor.py`:** ممیزی اعتبار کتابشناختی، سنجش مرز زمانی و پایش دقیق ممانعت از پرکردن زینتی مراجع.
+- **`generic_evidence_synthesis.py`:** تلفیق چندبعدی شواهد بر پایه ۸ بعد قطعیت و ممانعت از ساده‌سازی اکثریتی.
+- **`docx_builder.py`:** تولیدکننده سند نهایی Word با تایپوگرافی اختصاصی دبی فارسی و تگ‌های بومی RTL OpenXML.
+- **`self_audit_suite.py`:** سوئیت آزمون ۶۰ گانه تجربی بنچ‌مارک در سه لایه ساختاری، علمی و کنترل‌های منفی.
+
+---
+
+## ۵. سوئیت جامع آزمون و اعتبارسنجی (`tests/`)
+
+موتور با اجرای دستور زیر ممیزی می‌شود:
+```bash
+python tests/run_all_tests.py
+```
+این سیستم به صورت پویا ۴ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
+1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته.
+2. **آزمون تعمیم‌پذیری چهارگانه (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۴ فیکسچر مستقل (انکولوژی، کاردیولوژی، بیماری‌های عفونی، بیومارکرهای تشخیصی).
+3. **آزمون‌های تنش خصمانه (`test_adversarial_scenarios.py`):** ۱۲ آزمون چالش‌برانگیز شامل رفرنس جعلی، DOI نامنطبق، ادعای علیت غیرمجاز، توهم عددی و مقالات فاقد متن کامل.
+4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی و رعایت کامل فرمت ۱۴ گانه Word.
