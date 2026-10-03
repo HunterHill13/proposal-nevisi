@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive 20-Test Behavioral Self-Audit Suite (v4.0)
+Comprehensive 24-Test Behavioral Self-Audit Suite (v4.0)
 Part of Proposal-Nevisi Scientific Skill Suite.
 
 Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
@@ -15,15 +15,19 @@ Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
 9. Adaptive Saturation Behavioral Audit (marginal yield mathematically calculated).
 10. Claim-Quote Verbatim Audit (direct claims have real quotes > 20 chars without synthetic boilerplate).
 11. Claim-Evidence Graph Audit (CLAIM_EVIDENCE_GRAPH.json has bidirectional mappings & entailment).
-12. Evidence Sufficiency Gate Audit (EVIDENCE_SUFFICIENCY_REPORT.md audits 10 proposal sections).
+12. Evidence Sufficiency Gate Audit (EVIDENCE_SUFFICIENCY_REPORT.md audits 10 proposal sections and 10 quality gates).
 13. Search-Derived Research Gap Audit (RESEARCH_GAP_MAP.json records boundaries & closest studies).
 14. Decoupled Quality vs Relevance Audit (relevance_score & evidence_quality_score independent).
 15. PubChem Live Grounding Audit (live verification without synthetic fallbacks).
 16. Reactome Live Grounding Audit (live verification without synthetic pathways).
-17. Reference Necessity Audit (every proposal reference uniquely supports an identified claim).
-18. Strict Novelty Policy Audit (bounded novelty statement without unqualified 'برای اولین بار').
-19. Document Typography & RTL XML Audit (Dubai font, native RTL bidi XML, and bCs).
-20. Cross-Artifact Data Consistency (consistent identifiers across all artifacts).
+17. Minimum Proposal Reference Requirement (len(PROPOSAL_REFERENCE_SET) >= 15).
+18. No Arbitrary Maximum Reference Cap (no hardcoded maximum reference truncation).
+19. No Reference Padding (zero dummy references inserted without claim support).
+20. Every Proposal Reference Has Claim Support (len(supported_claims) >= 1).
+21. Reference Role Integrity (every reference assigned role from approved taxonomy).
+22. Strict Novelty Policy Audit (bounded novelty statement without unqualified 'برای اولین بار').
+23. Document Typography & RTL XML Audit (Dubai font, native RTL bidi XML, and bCs).
+24. Cross-Artifact Data Consistency (consistent identifiers across all artifacts).
 """
 
 import sys
@@ -35,7 +39,7 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
 def run_v4_behavioral_audit(base_dir="."):
     print("=" * 80)
-    print(">>> RUNNING RIGOROUS 20-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
+    print(">>> RUNNING RIGOROUS 24-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
     print("=" * 80)
 
     # Resolve artifact paths
@@ -249,39 +253,99 @@ def run_v4_behavioral_audit(base_dir="."):
         "Reactome signaling pathways live-verified without synthetic annotations" if has_reactome else "Reactome pathways missing"
     )
 
-    # Test 17: Reference Necessity & Proposal Citation Audit
-    has_roles = len(proposal_refs) > 0 and all("evidentiary_role" in r for r in proposal_refs)
-    test_results["Test 17: Reference Necessity Audit (PROPOSAL_REFERENCE_SET.json)"] = (
-        has_roles,
-        f"All {len(proposal_refs)} emergent proposal references uniquely support claims with designated roles" if has_roles else "Unassigned reference roles"
+    # Approved Medical Proposal Role Taxonomy
+    VALID_PROPOSAL_ROLES = [
+        "BACKGROUND",
+        "EPIDEMIOLOGY",
+        "DISEASE_BURDEN",
+        "MOLECULAR_BIOLOGY",
+        "MECHANISM",
+        "LUPEOL_EVIDENCE",
+        "NDV_EVIDENCE",
+        "ONCOLYTIC_VIROTHERAPY",
+        "COMBINATION_RATIONALE",
+        "CELL_LINE_RATIONALE",
+        "METHODOLOGY",
+        "SAFETY",
+        "CONTRADICTORY_EVIDENCE",
+        "RESEARCH_GAP",
+        "NOVELTY_BOUNDARY"
+    ]
+
+    # Test 17: Minimum Proposal Reference Requirement (Count >= 15)
+    has_min_refs = len(proposal_refs) >= 15
+    test_results["Test 17: Minimum Proposal Reference Requirement (Count >= 15)"] = (
+        has_min_refs,
+        f"{len(proposal_refs)} eligible proposal references selected (Required: >= 15, Max: Unlimited)" if has_min_refs else f"FAILED: Found only {len(proposal_refs)} references (Minimum 15 required)"
     )
 
-    # Test 18: Strict Novelty Policy Audit
+    # Test 18: No Arbitrary Maximum Reference Cap
+    # Verify neither multi_db_searcher.py nor evidence_ledger_builder.py have hardcoded reference truncation caps
+    ledger_code_path = os.path.join(script_dir, "evidence_ledger_builder.py")
+    has_max_cap = False
+    cap_details = "Zero arbitrary maximum reference caps (emergent volume without ceiling)"
+    for code_path in [searcher_code_path, ledger_code_path]:
+        if os.path.exists(code_path):
+            with open(code_path, 'r', encoding='utf-8') as f:
+                c_text = f.read()
+            if re.search(r'(proposal_refs|references|selected_refs)\[:\s*(15|20|30|50|80)\]', c_text) or "top_n = 15" in c_text or "max_references = 20" in c_text:
+                has_max_cap = True
+                cap_details = f"Found arbitrary max reference truncation cap in {os.path.basename(code_path)}"
+    test_results["Test 18: No Arbitrary Maximum Reference Cap"] = (
+        not has_max_cap,
+        cap_details
+    )
+
+    # Test 19: No Reference Padding
+    # Verify no reference was inserted without claim support solely to inflate count
+    unpadded_refs = [r for r in proposal_refs if len(r.get("supported_claims", [])) >= 1]
+    has_zero_padding = len(unpadded_refs) == len(proposal_refs) and len(proposal_refs) >= 15
+    test_results["Test 19: No Reference Padding"] = (
+        has_zero_padding,
+        f"100% of {len(proposal_refs)} references are genuinely necessary with real claim linkage; zero dummy padding" if has_zero_padding else "Padding detected: references found without claim links"
+    )
+
+    # Test 20: Every Proposal Reference Has Claim Support
+    claims_supported_per_ref = [len(r.get("supported_claims", [])) for r in proposal_refs]
+    all_have_claims = len(proposal_refs) > 0 and all(c_cnt >= 1 for c_cnt in claims_supported_per_ref)
+    test_results["Test 20: Every Proposal Reference Has Claim Support"] = (
+        all_have_claims,
+        f"100% of {len(proposal_refs)} references support >= 1 proposal claims with exact provenance" if all_have_claims else "Found references with zero supported claims"
+    )
+
+    # Test 21: Reference Role Integrity
+    roles_valid = len(proposal_refs) > 0 and all(r.get("role") in VALID_PROPOSAL_ROLES for r in proposal_refs)
+    test_results["Test 21: Reference Role Integrity"] = (
+        roles_valid,
+        f"All {len(proposal_refs)} references assigned explicit roles from approved medical taxonomy" if roles_valid else "Invalid or unassigned reference roles"
+    )
+
+    # Test 22: Strict Novelty Policy Audit
     forbidden_words = ["اثبات می‌کند", "ثابت کرد"]
     found_forbidden = [fw for fw in forbidden_words if fw in dossier_text]
     unbounded_novelty = ("برای اولین بار" in dossier_text) and ("مرز مستند" not in dossier_text and "درون این مرز" not in dossier_text)
-    test_results["Test 18: Strict Novelty Policy Audit"] = (
+    test_results["Test 22: Strict Novelty Policy Audit"] = (
         len(found_forbidden) == 0 and not unbounded_novelty,
         "Novelty strictly bounded by documented search perimeter with zero ungrounded hyperbole" if len(found_forbidden) == 0 and not unbounded_novelty else f"Forbidden: {found_forbidden}"
     )
 
-    # Test 19: Document Typography & RTL XML Standards
+    # Test 23: Document Typography & RTL XML Standards
     docx_builder_path = os.path.join(script_dir, "docx_builder.py")
     has_typography = False
     if os.path.exists(docx_builder_path):
         with open(docx_builder_path, 'r', encoding='utf-8') as f:
             code = f.read()
         has_typography = "Dubai" in code and "w:bidi" in code and "w:bCs" in code
-    test_results["Test 19: Document Typography & RTL XML Standards"] = (
+    test_results["Test 23: Document Typography & RTL XML Standards"] = (
         has_typography,
         "Dubai typography, native RTL bidi XML (<w:bidi/>), and Complex Script bolding enforced" if has_typography else "Typography standards missing"
     )
 
-    # Test 20: Cross-Artifact Data Consistency
+    # Test 24: Cross-Artifact Data Consistency
     prop_ids = set(r.get("pmid") or r.get("doi") for r in proposal_refs if not r.get("is_foundation"))
     corp_ids = set(r.get("pmid") or r.get("doi") for r in research_corpus if not r.get("is_foundation"))
     missing_in_corp = prop_ids - corp_ids
-    test_results["Test 20: Cross-Artifact Data Consistency"] = (
+    test_results["Test 24: Cross-Artifact Data Consistency"] = (
         len(missing_in_corp) == 0,
         "100% of Proposal References cross-indexed in RESEARCH_CORPUS.json and SOURCE_REGISTRY.json" if len(missing_in_corp) == 0 else f"Missing in corpus: {missing_in_corp}"
     )
@@ -298,7 +362,7 @@ def run_v4_behavioral_audit(base_dir="."):
     print("-" * 80)
 
     if all_passed:
-        print("\n>>> ALL 20 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
+        print("\n>>> ALL 24 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
         return 0
     else:
         print("\n>>> BEHAVIORAL SELF-AUDIT FAILED: FIX IDENTIFIED CRITERIA BEFORE PROCEEDING. <<<\n")

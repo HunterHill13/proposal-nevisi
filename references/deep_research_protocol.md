@@ -70,3 +70,19 @@ flowchart TD
 ### ۵. سیاست اصالت مقید (Bounded Novelty Statement)
 در تمامی گزارش‌ها و متون پروپوزال، نوآوری طرح منحصراً در چارچوب مرز جست‌وجوی مستندشده بیان می‌گردد:
 > "No directly matching study evaluating the simultaneous combination of Lupeol and oncolytic Newcastle Disease Virus in the 4T1 murine mammary carcinoma model was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026)."
+
+---
+
+### ۶. سیاست کفایت مراجع و آزمون‌های رفتاری ۲۴ گانه (Reference Sufficiency & 24-Test Audit)
+
+1. **کف الزامی ۱۵ منبع و عدم سقف حداکثری (`MIN_PROPOSAL_REFERENCES = 15`, `MAX = UNLIMITED`):**
+   - برای تضمین غنای شواهد در تمام فصول پروپوزال، حداقل ۱۵ منبع پدیدارشده ضروری است.
+   - هیچ سقف ساختگی (مانند ۱۵ یا ۲۰ یا ۵۰) روی منابع نهایی اعمال نمی‌شود.
+2. **سیاست قطعی عدم پرسازی جعلی (Zero Padding Policy):**
+   - افزودن مقالات غیرمرتبط صرفاً جهت پر کردن حد نصاب اکیداً ممنوع است.
+   - در صورت عدم کفایت، سامانه وضعیت `FAILED_MINIMUM_REFERENCE_REQUIREMENT` را اعلام و کسری را گزارش می‌دهد.
+3. **انتخاب پوشش‌محور با نقش مشخص (Coverage-Based Reference Selection):**
+   - هر منبع در `PROPOSAL_REFERENCE_SET.json` دارای فیلدهای الزامی: `reference_id`، `role`، `roles`، `supported_claims` (حداقل یک ادعای متصل)، `evidence_tier`، `relevance_score`، `evidence_quality_score`، `necessity_reason`، و `direct_or_indirect` است.
+4. **سوئیت آزمون ۲۴ گانه خود-ممیزی رفتاری (24-Test Self-Audit Suite):**
+   - ارزیابی رفتاری ۱۰۰٪ داده‌های واقعی دیسک در ۲۴ آزمون بدون ماک یا شبیه‌سازی جهت تضمین جامعیت و اعتبار استنادی.
+

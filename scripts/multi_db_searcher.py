@@ -1406,7 +1406,7 @@ def run_v4_deep_research_pipeline(output_dir=".", min_year=2020, max_year=2026):
         "| ردیف | نویسنده و سال | شناسه مقاله | رده شواهد | حوزه یافته | امتیاز ارتباط | امتیاز کیفیت |\n",
         "| :---: | :--- | :--- | :---: | :--- | :---: | :---: |\n"
     ]
-    for idx, r in enumerate(contra_candidates[:15], 1):
+    for idx, r in enumerate(contra_candidates, 1):
         lead = r.get("authors", ["Anon"])[0] if r.get("authors") else "Anon"
         pid = f"PMID:{r['pmid']}" if r.get("pmid") else (f"DOI:{r['doi'][:20]}" if r.get("doi") else "Record")
         c_lines.append(f"| {idx} | {lead} ({r.get('year', 'NR')}) | {pid} | {r.get('source_tier')} | {r.get('title', '')[:50]}... | {r.get('relevance_score')} | {r.get('evidence_quality_score')} |\n")

@@ -11,7 +11,7 @@ description: >
   produces an emergent reference set with zero arbitrary caps, enforces strict novelty phrasing boundaries, applies the 6-layer
   anti-AI detection academic protocol, produces beautifully formatted Word documents featuring Dubai Persian typography,
   native RTL bidi XML (<w:bidi/>, <w:rtlGutter/>), Complex Script bolding (<w:bCs/>), zero divider dashes (---),
-  formula callout boxes, styled tables, embedded Word Citation Manager sources via COM, and executes an automated 20-test self-audit suite.
+  formula callout boxes, styled tables, embedded Word Citation Manager sources via COM, and executes an automated 24-test self-audit suite.
 ---
 
 # Proposal-Nevisi (مهارت جامع نگارش پروپوزال‌های پژوهشی علوم پزشکی و موتور Deep Research 4.0)
@@ -55,10 +55,11 @@ description: >
    Academic Proposal Writing & Master Word Document Compilation
    ```
 
-2. **قاعده قطعی عدم محدودیت ساختگی در تعداد منابع (No Arbitrary Final-Paper Cap):**
-   - هیچ سقف ثابت و قراردادی (مانند ۱۵ یا ۲۰ مقاله) برای تعداد مراجع نهایی وجود ندارد.
-   - تعداد منابع نهایی به صورت **پدیدارشده (Emergent)** و متناسب با نیاز ادعاهای متن تعیین می‌گردد.
-   - هر منبعی که وارد پروپوزال می‌شود باید دارای یک نقش استنادی مشخص (`Primary_efficacy`, `Mechanism`, `Model_justification`, `Methodology_standard`, `Safety_toxicity`, `Background_landscape`, `Contradictory_context`, `Gap_identification`) باشد تا از اسپم استنادی جلوگیری شود.
+2. **قاعده کفایت و عدم محدودیت حداکثری در تعداد منابع (Min 15 References & No Max Cap):**
+   - **کف الزامی ۱۵ منبع (`MIN_PROPOSAL_REFERENCES = 15`):** پروپوزال باید برای تضمین جامعیت و پوشش کامل بخش‌های دهگانه خود، حداقل ۱۵ منبع پدیدارشده و معتبر داشته باشد.
+   - **عدم وجود سقف حداکثری (`MAX_PROPOSAL_REFERENCES = None`):** هیچ سقف مصنوعی و بسته‌ای برای تعداد منابع نهایی وجود ندارد و تعداد بر اساس نیاز ادعاهای متن (Emergent) تعیین می‌شود.
+   - **سیاست قطعی عدم پرسازی جعلی (Zero Padding Policy):** افزودن هرگونه مقاله ضعیف، نامرتبط یا ساختگی صرفاً برای رسیدن به عدد ۱۵ اکیداً ممنوع است. در صورتی که تعداد شواهد واجد شرایط کمتر از ۱۵ باشد، سیستم باید وضعیت را صریحاً `FAILED_MINIMUM_REFERENCE_REQUIREMENT` اعلام کند و کسری شواهد را گزارش نماید.
+   - **انتخاب پوشش‌محور با نقش مشخص (Coverage-Based Reference Selection):** هر منبع نهایی در `PROPOSAL_REFERENCE_SET.json` باید دارای نقش معتبر (`role`, `roles`)، ادعاهای متصل (`supported_claims` حداقل ۱ مورد)، رتبه کیفیت، و دلیل ضرورت (`necessity_reason`) باشد.
 
 3. **سطح‌بندی سه‌گانه منابع (Strict 3-Tier Source Classification):**
    - **Tier A (تمام‌متن تأییدشده PMC OA XML / Europe PMC XML > 1000 کاراکتر):** منحصراً برای استخراج پارامترهای کمی (دوز، IC50، زمان انکوباسیون) و شواهد مکانیسمی مستقیم. چکیده هرگز به عنوان متن کامل پذیرفته نمی‌شود!
@@ -88,7 +89,7 @@ description: >
    - حذف ۱۰۰٪ خط‌تیره‌های جداکننده مخرّب (`---`).
    - ثبت مستقیم منابع در **Word Citation Manager** از طریق اتوماسیون COM.
 
-9. **سوئیت جامع اسناد و خروجی‌های Deep Research v3.0:**
+9. **سوئیت جامع اسناد و خروجی‌های Deep Research v4.0:**
    - **`SOURCE_REGISTRY.json`:** پایگاه داده کامل تمام منابع کشف‌شده به همراه Tier و وضعیت غربالگری.
    - **`EXCLUDED_STUDIES.json`:** مستندسازی شفاف علل حذف تک‌تک مقالات غربال‌شده.
    - **`SEARCH_QUERY_LOG.json`:** لاگ کامل تک‌تک کوئری‌های ارسالی به ۴ پایگاه داده با کد وضعیت HTTP و تعداد نتایج.
@@ -98,8 +99,10 @@ description: >
    - **`EVIDENCE_GAP_MATRIX.md`:** ماتریس تحلیل خلأهای شواهد در ۱۲ حوزه کلیدی (EQ01-EQ12).
    - **`CLAIM_EVIDENCE_MAP.json`:** ممیزی معنایی استلزام ادعا-شواهد با برچسب‌های استاندارد.
    - **`EVIDENCE_LEDGER.json`:** دفتر کل شواهد آزمایشگاهی با نقل‌قول مستقیم درون‌متنی و فاقد عبارات ساختگی.
+   - **`PROPOSAL_REFERENCE_SET.json`:** مراجع برگزیده نهایی با نقش دقیق و لینک ادعاها (حداقل ۱۵ منبع بدون سقف).
+   - **`EVIDENCE_SUFFICIENCY_REPORT.md`:** گیت ممیزی کفایت شواهد در ۱۰ بخش ساختاری پروپوزال.
    - **`LITERATURE_DEEP_RESEARCH.md`:** پرونده تحلیلی شواهد تجربی به صورت کاملاً پویا و متصل به مراجع.
    - **`references_with_fulltext.json`**, **`EndNote_Citations.enw`**, **`references_library.ris`**
 
-10. **آزمونگر سخت‌گیرانه ۱۸ گانه خود-ممیزی (18-Test Self-Audit Suite):**
-    - پوشش ۴ پایگاه، شفافیت کوئری‌ها، ثبت مرز، اصالت رجیستری، شفافیت حذفیات، عدم سقف ساختگی، اشباع زنجیره استنادی، شاخه متناقض، ماتریس ۱۲ گانه خلأها، استلزام معنایی، حذف فال‌بک‌های هاردکد، سیاست اصالت مقید، نقل‌قول‌های پارامتری، استعلام زنده پاب‌کم، استعلام زنده ری‌اکتوم، تخصیص نقش استنادی، استانداردهای تایپوگرافی دبی، و انطباق سرتاسری اسناد.
+10. **آزمونگر سخت‌گیرانه ۲۴ گانه خود-ممیزی (24-Test Behavioral Self-Audit Suite):**
+    - ارزیابی رفتاری روی داده‌های واقعی: پیاده‌سازی صفحه‌بندی واقعی، فقدان سقف ساختگی در بازیابی و گزینش، ممیزی سراسری دسترسی به متن کامل، تفکیک شواهد کمی به Tier A، مشارکت فعال هر ۴ پایگاه، ساختار چندوجهی ماتریس کوئری، شواهد متناقض عمیق، پالایش کانونیکال و بدون تکرار، اشباع انطباقی زنجیره استنادی، نقل‌قول‌های پارامتری مستقیم، گراف ادعا-شواهد، گیت ۱۰ گانه کفایت شواهد، نقشه‌برداری شکاف‌های پژوهشی بر مرز جست‌وجو، استقلال رتبه کیفیت و ارتباط، اعتبارسنجی زنده پاب‌کم، اعتبارسنجی زنده ری‌اکتوم، کفایت حداقل ۱۵ منبع پروپوزال، عدم وجود سقف حداکثری بر مراجع، عدم پرسازی جعلی منابع، اتصال ۱۰۰٪ مراجع به ادعاها، یکپارچگی نقش‌های استنادی، ممیزی سیاست نوآوری کران‌دار، استانداردهای تایپوگرافی دبی و XML دوزبانه، و انطباق سرتاسری اسناد خروجی.
