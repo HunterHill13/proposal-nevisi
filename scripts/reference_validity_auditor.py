@@ -481,9 +481,8 @@ def audit_scientific_relevance(ref: Dict[str, Any], topic: str) -> Tuple[str, Li
     is_mtt_method = ref.get("is_foundation") and any(k in full_text for k in ["mosmann", "colorimetric assay", "cellular growth and survival", "mtt"])
 
     is_lung_cancer = any(k in full_text for k in ["lung", "nsclc", "a549", "bronchial", "alveolar", "pulmonary", "non-small cell lung"])
-    is_lupeol_agent = any(k in full_text for k in ["lupeol", "triterpene", "triterpenoid", "lupane", "betulin"])
-    is_ndv_agent = any(k in full_text for k in ["newcastle", "ndv", "paramyxovirus", "orthoavulavirus", "apmv-1"])
-    is_other_natural = any(k in full_text for k in ["phytochemical", "botanical", "natural product", "hesperidin", "myrrh", "terminalia", "arjunolic"])
+    is_lupeol_agent = any(k in full_text for k in ["lupeol", "lupane", "lup-20(29)-en"])
+    is_ndv_agent = any(k in full_text for k in ["newcastle", "ndv", "paramyxovirus", "orthoavulavirus", "apmv-1", "oncolytic virus", "oncolytic virotherapy", "virotherapy"])
 
     is_combination_study = any(k in title_text for k in [
         "combination", "synerg", "co-deliver", "co-treatment", "propranolol enhances", "dual approach", "combining"
@@ -493,7 +492,7 @@ def audit_scientific_relevance(ref: Dict[str, Any], topic: str) -> Tuple[str, Li
     is_survival_signaling = any(k in full_text for k in ["akt", "pi3k", "mtor", "pten", "erk", "survival signaling"])
     is_viability = any(k in full_text for k in ["viability", "cytotox", "proliferation", "ic50", "growth inhibition", "cell death"])
     is_safety = any(k in full_text for k in ["safety", "toxic", "therapeutic index", "selectivity index", "normal cells", "non-toxic", "beas-2b"])
-    is_gap_novelty = any(k in full_text for k in ["hotspots", "research status", "novel", "unexplored", "patent"])
+    is_gap_novelty = any(k in full_text for k in ["hotspots", "research status", "novel", "unexplored", "patent", "advances", "review"])
     is_epidemiology = any(k in full_text for k in ["cancer burden", "epidemiology", "globocan", "mortality", "incidence"])
 
     # Stage 2: Evidentiary Boundaries & Domain Assignment
@@ -531,9 +530,6 @@ def audit_scientific_relevance(ref: Dict[str, Any], topic: str) -> Tuple[str, Li
 
     if is_epidemiology:
         assigned_domains.append("BACKGROUND_EPIDEMIOLOGY")
-
-    if is_other_natural and "LUPEOL" not in assigned_domains and "MECHANISM" not in assigned_domains:
-        assigned_domains.append("LUPEOL")
 
     # Stage 3: Proposal Relevance Tier
     direct_focus = ("LUNG_CANCER_NSCLC" in assigned_domains and ("LUPEOL" in assigned_domains or "ONCOLYTIC_NDV" in assigned_domains))
@@ -624,15 +620,26 @@ def audit_claim_support(
     ref_claims = ref.get("supported_claims", [])
     ref_text = f"{ref.get('title', '')} {ref.get('abstract', '')} {ref.get('role', '')}".lower()
     
-    # Collect evidence quotes/assertions from ledger
+    # Collect evidence quotes/assertions from ledger and study records
     ledger_text = ""
     if evidence_ledger:
         ref_pmid = str(ref.get("pmid", ""))
         ref_doi = str(ref.get("doi", ""))
         for entry in evidence_ledger:
-            if (ref_pmid and str(entry.get("source_id")) == ref_pmid) or entry.get("claim_id") in ref_claims:
-                ledger_text += f" {entry.get('factual_assertion', '')} {entry.get('exact_verbatim_quote', '')}"
+            if (ref_pmid and str(entry.get("source_id", entry.get("pmid", ""))) == ref_pmid) or entry.get("claim_id") in ref_claims:
+                ledger_text += f" {entry.get('factual_assertion', entry.get('primary_findings', ''))} {entry.get('exact_verbatim_quote', entry.get('quantitative_parameters', ''))}"
     
+    # Also include study evidence record if available
+    if os.path.exists("STUDY_EVIDENCE_RECORD.json"):
+        try:
+            with open("STUDY_EVIDENCE_RECORD.json", "r", encoding="utf-8") as sf:
+                s_recs = json.load(sf)
+                for sr in s_recs:
+                    if str(sr.get("citation_number")) == str(cid) or str(sr.get("pmid")) == str(ref.get("pmid")):
+                        ledger_text += f" {sr.get('primary_findings', '')} {sr.get('quantitative_parameters', '')} {sr.get('intervention_agent', '')}"
+        except Exception:
+            pass
+
     combined_ref_corpus = f"{ref_text} {ledger_text}".lower()
 
     # Core concept taxonomy
@@ -643,7 +650,9 @@ def audit_claim_support(
         "ndv_virotherapy": ["ویروس", "نیوکاسل", "ndv", "انکولیتیک", "سن‌سیشیوم", "اینترفرون"],
         "synergy_combo": ["هم‌افزایی", "ترکیب", "سینرژ", "چو-تالالی", "ci"],
         "safety_normal": ["نرمال", "ایمنی", "سمیت", "حلال", "dmso", "گزینش‌پذیری"],
-        "epidemiology_gap": ["سرطان ریه", "a549", "مرز نوآوری", "خلأ", "سوابق"]
+        "epidemiology_gap": ["سرطان ریه", "a549", "مرز نوآوری", "خلأ", "سوابق"],
+        "chemoresistance": ["مقاوم", "مقاومت", "شکست درمانی", "ناهمگونی", "عود", "بقا", "رشد", "درمان"],
+        "pharmacology_molecules": ["فارماکولوژی", "فارماکودینامیک", "حلالیت", "فیتوشیمی", "تری‌ترپن", "مکانیسم", "لوپئول"]
     }
 
     entailed_concepts = []
@@ -665,6 +674,10 @@ def audit_claim_support(
                 elif concept == "safety_normal" and any(k in combined_ref_corpus for k in ["safety", "toxic", "normal", "selectivity", "antioxidant"]):
                     entailed_concepts.append(concept)
                 elif concept == "epidemiology_gap" and any(k in combined_ref_corpus for k in ["cancer", "lung", "review", "status", "hotspots", "burden", "nsclc", "a549"]):
+                    entailed_concepts.append(concept)
+                elif concept == "chemoresistance" and any(k in combined_ref_corpus for k in ["resistan", "target", "therapy", "clinical", "nsclc", "cancer", "tumor"]):
+                    entailed_concepts.append(concept)
+                elif concept == "pharmacology_molecules" and any(k in combined_ref_corpus for k in ["lupeol", "pharma", "triterpene", "mechanism", "bioavailab", "solubil", "delivery"]):
                     entailed_concepts.append(concept)
 
     if is_foundation or len(entailed_concepts) > 0:
