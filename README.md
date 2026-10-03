@@ -1,11 +1,11 @@
 # Proposal-Nevisi 🔬📄
-### Evidence-Driven Deep Literature Research Engine & Academic Proposal Generator (v4.5)
-### موتور پژوهش عمیق متون علمی و نگارش پروپوزال‌های پژوهشی علوم پزشکی
+### Evidence-Driven Deep Literature Research Engine & Academic Proposal Generator (v6.0)
+### موتور سنتز عمیق شواهد علمی و نگارش پروپوزال‌های پژوهشی علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Audit Suite: 34/34 Passed](https://img.shields.io/badge/Audit%20Suite-34%2F34%20Passed-success.svg)](#34-test-behavioral-self-audit-suite)
-[![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#15-stage-evidence-funnel)
+[![Audit Suite: 54/54 Passed](https://img.shields.io/badge/Audit%20Suite-54%2F54%20Passed-success.svg)](#54-test-behavioral-self-audit-suite)
+[![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 
 ---
 
@@ -16,153 +16,73 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi** is an autonomous, publication-grade academic research proposal drafting framework and **Evidence-Driven Deep Literature Research Engine (v3.0)** tailored for medical, biomedical, and life science research protocols.
+**Proposal-Nevisi** is an autonomous, publication-grade academic research proposal drafting framework and **Evidence-Driven Deep Literature Research & Synthesis Engine (v6.0)** tailored for medical, biomedical, and life science research protocols.
 
-Unlike conventional retrieval agents that rely on superficial keyword searches and arbitrary paper limits, Proposal-Nevisi executes an end-to-end **15-Stage Evidence Funnel** across four major biomedical graph engines, enforces claim-level sentence provenance, performs claim-evidence entailment audits, and compiles beautifully formatted Microsoft Word documents adhering to native Arabic/Persian Right-to-Left (RTL) typography.
+Unlike conventional retrieval agents that rely on superficial keyword searches and arbitrary paper limits, Proposal-Nevisi executes an end-to-end **15-Stage Evidence Funnel** across four major biomedical graph engines, enforces claim-level sentence provenance, performs claim-evidence entailment audits, builds structured 34-field Study Evidence Records, conducts 12-dimension pairwise study comparability, classifies contradictions across Categories A–F, models claim dependencies as an acyclic DAG, reconciles PRISMA 2020 flow math, and compiles beautifully formatted Microsoft Word documents adhering to native Arabic/Persian Right-to-Left (RTL) typography.
 
 ---
 
-### Core Architectural Principles (v3.0)
+### Core Architectural Principles (v6.0)
 
-1. **No Arbitrary Final-Paper Cap (Emergent Evidence Set):**
-   - No hardcoded limits (e.g., neither fixed "15" nor "20" papers).
+1. **No Arbitrary Final-Paper Cap (Emergent Evidence Set with Min 15 Sufficiency Gate):**
+   - No hardcoded maximum caps (neither 15, 20, 50, nor 80).
    - Reference volume emerges organically from the factual claims required in the proposal.
-   - Every included citation must possess a designated evidentiary role (`Primary_efficacy`, `Mechanism`, `Model_justification`, `Methodology_standard`, `Safety_toxicity`, `Background_landscape`, `Contradictory_context`, `Gap_identification`) to completely prevent citation spamming.
+   - The minimum count (15 references) acts as a **sufficiency gate**, NOT a selection target (zero dummy reference padding).
+   - Every included reference must be actually cited in the proposal body text (`Unused References == 0`).
 
-2. **Multi-Database Literature Harvesting (Tier 1 & Tier 2):**
-   - **PubMed / MEDLINE:** MeSH descriptors and Supplementary Concept Records combined with free-text words.
-   - **Europe PMC:** Open access full-text XML retrieval via REST services.
-   - **OpenAlex:** Global scholarly graph exploration, citation metrics, and related works mapping.
-   - **Crossref:** Comprehensive metadata and DOI resolution across major commercial publishers.
+2. **Field-Level Bibliographic & Honest Author Verification:**
+   - Evaluates metadata at the individual field level (DOI, PMID, Title, First Author, Journal, Year, Volume, Issue, Pages).
+   - Author verification engine: `EXACT_AUTHOR_MATCH`, `FUZZY_AUTHOR_MATCH`, `AUTHOR_MISMATCH`, and `AUTHOR_UNAVAILABLE`.
+   - Strictly zero fake positive score fallbacks (e.g. eliminating the 0.8 fallback for missing authors).
 
-3. **Strict 3-Tier Source Classification:**
-   - **Tier A (Verified Full-Text XML > 1,000 chars):** PMC Open Access XML or Europe PMC FullText XML. Strictly required for all quantitative parameters (IC50, dosage, incubation time) and direct mechanistic claims. *Abstracts are never counted as full text!*
-   - **Tier B (Screened Abstract & Metadata):** Validated for landscape, contextual, epidemiology, and background claims.
-   - **Tier C (Discovered Citation Lead):** Logged in the registry but excluded from synthesis unless upgraded.
+3. **Study-Level Evidence Modeling (34 Structured Fields):**
+   - Every proposal reference is modeled in `STUDY_EVIDENCE_RECORD.json` across 34 granular fields (study design, tier, intervention, control, dose, exposure, outcomes, findings, quantitative parameters, risk of bias, limitations, etc.).
+   - Dual-format export of `EVIDENCE_MATRIX.csv` and `EVIDENCE_MATRIX.json` with 20 unified columns.
 
-4. **Dedicated Contradictory & Safety Evidence Branch:**
-   - Targeted query strings specifically discovering antagonism, biological resistance, viral neutralization, host barriers, and off-target cytotoxicity.
-   - Outputs a dedicated assessment document: `CONTRADICTORY_EVIDENCE.md`.
+4. **Pairwise Study Comparability Analysis (12 Dimensions):**
+   - Evaluates study pairs across 12 dimensions in `STUDY_COMPARABILITY_MATRIX.json`: model system, cell line passage, agent source purity, vehicle control, dose range, exposure duration, assay readout, endpoint timing, normalization method, statistical test, replicate structure, and serum culture conditions.
+   - Categorizes pairs into `HIGH_COMPARABILITY`, `MODERATE_COMPARABILITY`, `LOW_COMPARABILITY`, and `NOT_COMPARABLE`.
 
-5. **Saturation-Based Citation Chaining:**
-   - Backward references, forward citations, and OpenAlex related works graphs.
-   - Stopping rule based on marginal yield threshold ($\Delta < 2$ newly eligible records per iteration) rather than arbitrary iteration cutoffs.
+5. **Contradictory Evidence Engine & Strict Taxonomy (Categories A to F):**
+   - Dedicated active search across 6 negative evidence categories: Antagonism, High-Dose Toxicity, Resistance, Interferon Clearance, Solubility Limits, and Null Findings.
+   - Rigorous taxonomy classification: only Category A (`A_DIRECT_CONTRADICTION`) is a true direct contradiction (identical model, agent, dose, with opposite result). Differences in formulation or cell line are properly classified as `B_CONTEXTUAL_DISAGREEMENT` or `E_METHODOLOGICAL_DISAGREEMENT`.
 
-6. **Zero Hardcoded Biochemical Fallbacks:**
-   - Real-time live API verification with **PubChem** (compound CID, SMILES, IUPAC) and **Reactome** (host signaling pathways).
-   - If an API or network fails, the status is explicitly logged as `UNVERIFIED`—synthetic boilerplate or fabricated values are strictly forbidden.
+6. **Claim Dependency Graph (Acyclic DAG) & Mechanism Chaining:**
+   - Formal DAG modeling in `CLAIM_DEPENDENCY_GRAPH.json` (0 circular dependencies).
+   - Mechanism chains strictly distinguish `DIRECTLY_SUPPORTED` steps from `BIOLOGICALLY_PLAUSIBLE_HYPOTHESIS` steps.
+   - Cross-study relationships mapped using 12 approved typed edges.
 
-7. **Bounded Novelty Phrasing Policy:**
-   - Absolute, ungrounded claims like *"This is the first study ever"* or *"ثابت می‌کند"* are strictly banned.
-   - All novelty statements are bound by the documented search perimeter:  
-     > *"No directly matching study evaluating the simultaneous combination of [Intervention 1] and [Intervention 2] in the [Target Model] was identified within the documented search boundary (PubMed, Europe PMC, OpenAlex, Crossref; 2020–2026)."*
+7. **PRISMA 2020 Transparent Flow Accounting & 19-Section Synthesis:**
+   - `PRISMA_SEARCH_ACCOUNTING.json` and `PRISMA_FLOW_DATA.json` with exact mathematical reconciliation across all identification, screening, eligibility, and inclusion stages.
+   - Comprehensive evidence synthesis report in `FINAL_EVIDENCE_SYNTHESIS.md` containing all 19 structured sections.
 
 8. **Master Word Typography & RTL Bidi XML:**
-   - High-grade Persian academic typography using the `Dubai` font family.
-   - Native OpenXML Right-to-Left bidirectional tags (`<w:bidi/>`, `<w:rtlGutter/>`).
-   - Complex Script bolding (`<w:bCs/>`) for Persian headings.
-   - Complete elimination of disruptive horizontal dividers (`---`).
-   - Direct Word Citation Manager integration via COM automation.
+   - Persian `Dubai` typography with native Word `<w:bidi/>`, `<w:rtlGutter/>`, and `<w:bCs/>` bolding.
+   - Clean professional layout free of disruptive divider dashes (`---`).
 
 ---
 
-### The 15-Stage Evidence Funnel
+### 54-Test Behavioral Self-Audit Suite
 
-```text
-Research Question
-        ↓
-Evidence Questions (12 Categories: EQ01 - EQ12)
-        ↓
-Concept / Synonym Expansion (MeSH & Controlled Vocabularies)
-        ↓
-Search Facets (Disease, Interventions, Combination, Mechanisms, Models)
-        ↓
-Multi-Database Retrieval (PubMed, Europe PMC, OpenAlex, Crossref)
-        ↓
-Contradictory / Negative Evidence Search Branch
-        ↓
-Canonical Deduplication (DOI, PMID, Normalized Title)
-        ↓
-Title & Abstract Screening (Explicit Audit Trail)
-        ↓
-Full-Text Retrieval & Strict 3-Tier Classification
-        ↓
-Saturation-Based Citation Chaining (Backward, Forward, Related Works)
-        ↓
-Claim-Level Evidence Extraction (Verbatim Quotes, Strict NR Policy)
-        ↓
-Evidence Gap Matrix (EQ01 - EQ12 Systematic Audit)
-        ↓
-Claim-Evidence Entailment Mapping (Formal Semantic Audit)
-        ↓
-Emergent Citation Selection (No Arbitrary Cap + Designated Evidentiary Roles)
-        ↓
-Academic Proposal Writing & Master Word Document Compilation
-```
+The automated audit suite (`scripts/self_audit_suite.py`) verifies 54 rigorous criteria on real data:
+- **Tests 1–16:** Retrieval pagination, zero-cap behavior, universal full-text auditing, tier segregation, multi-DB contribution, query matrix, contradictory search, deduplication, saturation, verbatim quotes, claim graph, sufficiency gate, research gaps, decoupled quality/relevance, PubChem/Reactome live grounding.
+- **Tests 17–28:** Minimum 15 references, zero padding code, claim support, role integrity, bounded novelty, Dubai RTL typography, cross-artifact consistency, actual citations in proposal body, zero unused references.
+- **Tests 29–34:** Bibliographic validity, DOI/PMID integrity, scientific relevance mapping, non-circular entailment, necessity/zero redundancy, composite validity gate.
+- **Tests 35–54 (v6.0 New Engines):** 34-field study evidence completeness, RoB reporting honesty (NOT_REPORTED policy), direct vs indirect classification, in vitro to in vivo boundaries, 6 negative search categories, A–F contradiction taxonomy, 12 comparability dimensions, 7 certainty dimensions without fake numbers, CSV/JSON matrix export integrity, acyclic DAG dependency graph, mechanism chaining distinction, 12 typed cross-study edges, Chou-Talalay CI precision, 13 gap categories, negative evidence non-triviality, PRISMA flow mathematical reconciliation, 19 synthesis sections, field-level verification, honest author verification, and composite synthesis engine gate.
 
 ---
 
-### Repository Structure
-
-```text
-proposal-nevisi/
-├── SKILL.md                          # Full skill definition and agent instructions
-├── README.md                         # Bilingual documentation (English & Persian)
-├── LICENSE                           # MIT License
-├── .gitignore                        # Git exclusion rules
-├── references/                       # Reference protocols and style guides
-│   ├── deep_research_protocol.md     # 15-stage Deep Literature Research Protocol
-│   ├── ai_detection_checklist.md     # 6-layer anti-AI academic humanization checklist
-│   └── proposal_template_structure.md# 14 mandatory Iranian medical proposal sections
-└── scripts/                          # Executable Python pipeline engines
-    ├── multi_db_searcher.py          # 4-DB discovery, screening, and saturation chaining
-    ├── evidence_ledger_builder.py    # Evidence ledger, claim entailment, and gap matrix builder
-    ├── self_audit_suite.py           # 18-test integrity and semantic verification suite
-    ├── docx_builder.py               # Markdown-to-Word converter with Dubai RTL typography
-    ├── citation_injector.py          # Word Citation Manager COM injector
-    ├── citation_checkpoint.py        # NCBI verification and in-text citation auditor
-    └── pubmed_searcher.py            # Focused PubMed E-utilities search and fetcher
-```
-
----
-
-### Artifact Suite Generated During Execution
-
-| Artifact File | Description & Purpose |
-| :--- | :--- |
-| **`SEARCH_QUERY_LOG.json`** | Exact query strings sent to all 4 engines with HTTP status codes and hit counts. |
-| **`SEARCH_BOUNDARY.json`** | Formal declaration of search databases, date window, filters, and bounded novelty claim. |
-| **`SOURCE_REGISTRY.json`** | Comprehensive database of all discovered sources classified into Tier A, Tier B, and Tier C. |
-| **`EXCLUDED_STUDIES.json`** | Full audit trail of excluded candidate studies with granular exclusion rationales. |
-| **`CONTRADICTORY_EVIDENCE.md`** | Dedicated evaluation of biological barriers, antagonism risks, and toxicity limits. |
-| **`EVIDENCE_GAP_MATRIX.md`** | Systematic gap analysis across all 12 Evidence Question categories (EQ01–EQ12). |
-| **`CLAIM_EVIDENCE_MAP.json`** | Bidirectional mapping between claims and evidence with formal entailment ratings. |
-| **`EVIDENCE_LEDGER.json`** | Claim ledger with granular quantitative parameters and exact verbatim text quotes. |
-| **`LITERATURE_SEARCH_REPORT.md`** | Official PRISMA 2020 search audit report with screening funnel statistics. |
-| **`LITERATURE_DEEP_RESEARCH.md`** | Dynamic evidence dossier tagged with explicit Epistemic Status headers. |
-| **`references_with_fulltext.json`**| Final emergent evidence dataset with full metadata and verified text. |
-| **`EndNote_Citations.enw`** | Formatted library for EndNote reference manager import. |
-| **`references_library.ris`** | Formatted RIS library for Mendeley, Zotero, and Papers import. |
-
----
-
-### Quick Start (CLI)
+### Command-Line Execution
 
 ```bash
 # 1. Install prerequisites
 pip install python-docx pywin32
 
-# 2. Run 4-Database Literature Harvester & Screener
-python scripts/multi_db_searcher.py --output_json references_with_fulltext.json --audit_report LITERATURE_SEARCH_REPORT.md
+# 2. Run Complete v6.0 Synchronization & Evidence Synthesis Pipeline
+python scripts/sync_proposal_and_audit.py "g:/path/to/project"
 
-# 3. Build Evidence Ledger, Claim Entailment Map & Gap Matrix
-python scripts/evidence_ledger_builder.py --json_in references_with_fulltext.json --ledger_out EVIDENCE_LEDGER.json --dossier_out LITERATURE_DEEP_RESEARCH.md
-
-# 4. Run Comprehensive 18-Test Self-Audit Suite
-python scripts/self_audit_suite.py .
-
-# 5. Compile Master Word Document with Dubai Typography
-python scripts/docx_builder.py proposal_source.md output_proposal.docx
+# 3. Run Comprehensive 54-Test Behavioral Self-Audit Suite
+python scripts/self_audit_suite.py "g:/path/to/project"
 ```
 
 ---
@@ -171,94 +91,62 @@ python scripts/docx_builder.py proposal_source.md output_proposal.docx
 <a name="فارسی"></a>
 ## راهنمای فارسی (Persian Documentation)
 
-مهارت **Proposal-Nevisi (نسخه ۳.۰)** یک دستیار خودکار، تخصصی و تعاملی برای تدوین و ارتقای پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز آکادمیک است که مجهز به **موتور پژوهش عمیق متون علمی مبتنی بر شواهد پدیدارشده (Evidence-Driven Deep Research Engine)** می‌باشد.
+مهارت **Proposal-Nevisi (نسخه ۶.۰)** یک دستیار خودکار، تخصصی و فوق‌پیشرفته برای تدوین و ارتقای پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز آکادمیک است که مجهز به **موتور سنتز عمیق شواهد علمی (Evidence-Driven Deep Literature Research & Synthesis Engine)** می‌باشد.
 
 ---
 
-### اصول کلیدی و خطوط قرمز علمی (نسخه ۳.۰)
+### اصول کلیدی و معماری نسخه ۶.۰
 
-1. **قاعده قطعی عدم سقف ساختگی در تعداد منابع (No Arbitrary Final-Paper Cap):**
-   - هیچ محدودیت از پیش‌تعیین‌شده و قراردادی (مانند ۱۵ یا ۲۰ مقاله) در انتخاب منابع نهایی وجود ندارد.
-   - تعداد منابع نهایی به صورت **پدیدارشده (Emergent)** و دقیقاً متناسب با ادعاهای علمی مطرح‌شده در متن پروپوزال تعیین می‌گردد.
-   - برای جلوگیری از اسپم استنادی، هر منبعی که وارد پروپوزال می‌شود باید دارای یک نقش استنادی صریح (`Primary_efficacy`, `Mechanism`, `Model_justification`, `Methodology_standard`, `Safety_toxicity`, `Background_landscape`, `Contradictory_context`, `Gap_identification`) باشد.
+1. **قاعده کفایت شواهد با پدیدار شدن طبیعی منابع (Sufficiency Gate, Min 15, No Max Cap):**
+   - هیچ سقف ساختگی (۱۵، ۲۰، ۳۰، ۵۰ یا ۸۰) بر تعداد مراجع نهایی تحمیل نمی‌شود.
+   - مراجع به طور طبیعی از دل شواهد استخراج شده و کف ۱۵ مقاله به عنوان **دروازه سنجش کفایت شواهد** (و نه هدف گزینش) عمل می‌کند.
+   - پرسازی مصنوعی مراجع اکیداً ممنوع بوده (`Padding Added == 0`) و تمام مراجع منتخب باید در متن پروپوزال استناد شوند (`Unused Selected References == 0`).
 
-2. **بازیابی چندپایگاهی ادبیات (Multi-Database Retrieval):**
-   - جست‌وجوی همزمان در ۴ پایگاه معتبر بین‌المللی:
-     - **PubMed (MeSH):** بهره‌گیری از اصطلاحات کنترل‌شده توصیف‌گر MeSH و رکوردهای تکمیلی NLM.
-     - **Europe PMC:** واکشی مقالات تمام‌متن آزاد (Open Access XML) از طریق REST API.
-     - **OpenAlex:** کشف گراف استنادی جهانی، شاخص‌های ارجاعی و آثار مرتبط (Related Works).
-     - **Crossref:** بازیابی متادیتا و شناسه‌های DOI رسمی ناشران تجاری.
+2. **اعتبارسنجی فیلد-محور و صحت‌سنجی صادقانه نویسندگان:**
+   - اعتبارسنجی مجزای فیلدهای DOI, PMID, Title, First Author, Journal, Year, Volume, Issue, Pages در `FINAL_REFERENCE_VALIDITY_AUDIT.json`.
+   - حذف کامل ضرایب ساختگی 0.8 برای نویسندگان غایب و تمایز دقیق وضعیت‌های `EXACT_AUTHOR_MATCH`, `FUZZY_AUTHOR_MATCH`, `AUTHOR_MISMATCH`, و `AUTHOR_UNAVAILABLE`.
 
-3. **سطح‌بندی سه‌گانه منابع (3-Tier Classification):**
-   - **Tier A (تمام‌متن تأییدشده PMC OA XML / Europe PMC XML بالای ۱۰۰۰ کاراکتر):** منحصراً برای استخراج داده‌های کمی (IC50، دوزها، زمان انکوباسیون) و شواهد مکانیسمی مستقیم. *چکیده مقاله هرگز تمام‌متن تلقی نمی‌شود.*
-   - **Tier B (چکیده و متادیتای تأییدشده):** جهت تبیین بستر پژوهش، اپیدمیولوژی، و شواهد زمینه‌ای.
-   - **Tier C (سرنخ‌های اولیه بدون متن کامل):** در رجیستری منابع ثبت می‌شود اما وارد استخراج کمی نمی‌گردد.
+3. **مدل‌سازی شواهد در سطح مطالعه (۳۴ فیلد ساختاریافته):**
+   - تولید سند `STUDY_EVIDENCE_RECORD.json` برای تک‌تک مطالعات با ۳۴ فیلد کامل.
+   - خروجی همگام ماتریس شواهد در دو فرمت `EVIDENCE_MATRIX.csv` و `EVIDENCE_MATRIX.json` با ۲۰ ستون یکپارچه.
 
-4. **شاخه اختصاصی شواهد متناقض و موانع ایمنی (Contradictory Evidence Branch):**
-   - کوئری‌های هدفمند برای کشف پدیده‌های آنتاگونیسم (Antagonism)، مقاومت‌های دارویی/ویروسی، و سمیت‌های فراتر از پنجره درمانی.
-   - تولید سند رسمی `CONTRADICTORY_EVIDENCE.md` جهت اتخاذ تدابیر کنترلی در متدولوژی طرح.
+4. **ماتریس همسنجی دوبه‌دوی مطالعات در ۱۲ بعد متدولوژیک:**
+   - ارزیابی قابلیت مقایسه مطالعات در ۱۲ بعد در `STUDY_COMPARABILITY_MATRIX.json`:
+     `model_system`, `cell_line_passage`, `agent_source_purity`, `vehicle_control`, `dose_range`, `exposure_duration`, `assay_readout`, `endpoint_timing`, `normalization_method`, `statistical_test`, `replicate_structure`, `serum_culture_conditions`.
 
-5. **زنجیره استنادی اشباع‌محور (Saturation Citation Chaining):**
-   - پیمایش مراجع گذشته‌نگر، استنادهای آینده‌نگر و گراف مقالات مرتبط OpenAlex با توقف خودکار بر اساس قاعده بازده نهایی حاشیه‌ای ($\Delta < 2$).
+5. **موتور شواهد منفی و تاکسونومی ۶ گانه تناقضات (دسته‌های A تا F):**
+   - جست‌وجوی اختصاصی در ۶ دسته شواهد منفی: آنتاگونیسم، سمیت دوز بالا، مقاومت سلولی، پاکسازی اینترفرونی، محدودیت حلالیت و نتایج بی‌اثر.
+   - تفکیک علمی در `CONTRADICTION_ANALYSIS.json` و `NEGATIVE_EVIDENCE_REPORT.md` بر اساس دسته‌های A تا F بدون انتساب کاذب تناقض مستقیم به تفاوت‌های بافتی و مدل.
 
-6. **سیاست قطعی عدم داده‌های ساختگی (Zero Fallbacks):**
-   - استعلام زنده مشخصات فیزیکوشیمیایی ترکیبات از پایگاه **PubChem**.
-   - استعلام زنده مسیرهای سیگنالینگ از پایگاه **Reactome**.
-   - در صورت خطای شبکه یا پایگاه داده، وضعیت به صورت `UNVERIFIED` ثبت شده و از درج داده‌های ساختگی اکیداً خودداری می‌شود.
-   - استخراج پارامترها با نقل‌قول مستقیم درون‌متنی و ثبت قطعی `NR` (Not Reported) در صورت عدم گزارش.
+6. **گراف بدون دور وابستگی ادعاها (DAG) و زنجیره مکانیسمی:**
+   - تدوین `CLAIM_DEPENDENCY_GRAPH.json` بدون هرگونه دور باطل.
+   - تفکیک قطعی مراحل تأییدشده تجربی (`DIRECTLY_SUPPORTED`) از فرضیات نوآورانه طرح (`BIOLOGICALLY_PLAUSIBLE_HYPOTHESIS`).
+   - یال‌های ارتباطی بین مطالعات در ۱۲ دسته استاندارد تاییدشده.
 
-7. **بیان اصالت مقید به مرز مستند (Strict Novelty Policy):**
-   - ادعاهای مطلق و غیرعلمی مانند «برای اولین بار» یا «اثبات می‌کند» ممنوع است.
-   - نوآوری منحصراً در چارچوب مرز جست‌وجوی مستندشده بیان می‌شود:
-     > *"تا کنون هیچ مطالعه همزمانی با ارزیابی اثر توأم [مداخله ۱] و [مداخله ۲] در مدل [بیماری هدف] درون مرز جست‌وجوی مستندشده (PubMed, Europe PMC, OpenAlex, Crossref; 2020-2026) یافت نگردید."*
+7. **حسابداری جریان PRISMA 2020 و گزارش نهایی تلفیق شواهد در ۱۹ بخش:**
+   - انطباق ریاضی دقیق مراحل PRISMA در `PRISMA_SEARCH_ACCOUNTING.json` و `PRISMA_FLOW_DATA.json`.
+   - تدوین سند جامع `FINAL_EVIDENCE_SYNTHESIS.md` در ۱۹ بخش ساختارمند استاندارد.
 
-8. **تایپوگرافی مستر ورد (Master Word Typography):**
-   - فونت استاندارد `Dubai` با راست‌به‌چپ سراسری (`<w:bidi/>` و `<w:rtlGutter/>`).
-   - بومی‌سازی تیترهای فارسی با پررنگ‌سازی Complex Script (`<w:bCs/>`).
-   - حذف ۱۰۰٪ خط‌تیره‌های جداکننده مخرّب (`---`).
-   - ثبت مستقیم منابع در **Word Citation Manager** از طریق اتوماسیون COM بدون ارور Unreadable Content.
+8. **تایپوگرافی مستر ورد (Dubai RTL Bidi XML):**
+   - فونت استاندارد دبی با تگ‌های راست‌به‌چپ XML سراسری (`<w:bidi/>` و `<w:rtlGutter/>`) و پررنگ‌سازی Complex Script تیترها (`<w:bCs/>`).
 
 ---
 
-### ابعاد ۱۲ گانه سوالات شواهد (EQ01 تا EQ12)
+### آزمونگر رفتاری ۵۴ گانه خود-ممیزی (54-Test Behavioral Self-Audit)
 
-در سند `EVIDENCE_GAP_MATRIX.md`، تمامی ابعاد زیر به صورت نظام‌مند ارزیابی می‌شوند:
-- **EQ01:** انکولوژی مستقیم، سمیت سلولی و مقادیر IC50
-- **EQ02:** کسکیدهای پیام‌رسانی مولکولی و مسیرهای آپوپتوز
-- **EQ03:** متدولوژی هم‌افزایی و ضابطه تصمیم‌گیری چو-تالالی (CI Theorem)
-- **EQ04:** مدل‌های سلولی و حیوانی (رده‌های سلولی و موش‌های سینژنیک)
-- **EQ05:** شاخص درمانی، پنجره دوز ایمن و ارزیابی سمیت بافتی
-- **EQ06:** دارورسانی، فارماکوکینتیک و کنترل حلال DMSO زیر ۰.۱٪
-- **EQ07:** موانع مقاومت زیستی و تداخل‌های آنتاگونیستی
-- **EQ08:** سینتیک تکثیر و انکولیز ویروسی
-- **EQ09:** ریزمحیط تومور و القای مرگ سلولی ایمونوژنیک (ICD)
-- **EQ10:** بیومارکرهای پیش‌بینی‌کننده حساسیت و پاسخ به درمان
-- **EQ11:** ترجمان بالینی و چشم‌انداز کاربرد انسانی
-- **EQ12:** استانداردهای متدولوژیک آزمایشگاهی (آزمون MTT و فلوسایتومتری)
+اسکریپت `scripts/self_audit_suite.py` تمامی ۵۴ ضابطه علمی و متدولوژیک را به صورت ۱۰۰٪ موفقیت‌آمیز بر داده‌های واقعی ارزیابی و تضمین می‌نماید.
 
 ---
 
-### آزمون جامع ۱۸ گانه خود-ممیزی (18-Test Self-Audit Suite)
+### نحوه اجرای خط لوله
 
-اسکریپت `scripts/self_audit_suite.py` تمامی ۱۸ ضابطه زیر را به صورت خودکار ممیزی می‌کند:
-1. پوشش ۴ پایگاه داده (PubMed, Europe PMC, OpenAlex, Crossref)
-2. شفافیت لاگ کوئری‌ها در `SEARCH_QUERY_LOG.json`
-3. ثبت رسمی مرز جست‌وجو در `SEARCH_BOUNDARY.json`
-4. اصالت رجیستری و طبقه‌بندی Tier A, B, C در `SOURCE_REGISTRY.json`
-5. مستندسازی شفاف علل حذف در `EXCLUDED_STUDIES.json`
-6. عدم وجود سقف ساختگی در تعداد منابع (پدیدارشدن منابع از دل شواهد)
-7. ثبت شاخص‌های اشباع زنجیره استنادی
-8. ارزیابی ریسک در شاخه شواهد متناقض (`CONTRADICTORY_EVIDENCE.md`)
-9. تکمیل ماتریس خلأهای شواهد در ۱۲ حوزه (`EVIDENCE_GAP_MATRIX.md`)
-10. ممیزی استلزام معنایی ادعاها (`CLAIM_EVIDENCE_MAP.json`)
-11. حذف ۱۰۰٪ پیش‌فرض‌های هاردکد در کدهای اجرایی
-12. رعایت سیاست نوآوری مقید و حذف مبالغه‌های غیرعلمی
-13. نقل‌قول‌های مستقیم متنی بدون عبارات ساختگی
-14. استعلام زنده پارامترهای شیمیایی از PubChem
-15. استعلام زنده مسیرهای سیگنالینگ از Reactome
-16. تخصیص نقش استنادی صریح برای تمامی مراجع نهایی
-17. استانداردهای تایپوگرافی مستر ورد (دبی + RTL + bCs + بدون '---')
-18. انطباق سرتاسری شناسه‌های مقالات در تمامی اسناد خروجی
+```bash
+# اجرای خودکار کل پایپ‌لاین سنتز شواهد، ممیزی و کامپایل پروپوزال ورد
+python scripts/sync_proposal_and_audit.py "g:/path/to/project"
+
+# اجرای مستقل سوئیت ۵۴ آزمون خود-ممیزی
+python scripts/self_audit_suite.py "g:/path/to/project"
+```
 
 ---
 

@@ -254,12 +254,33 @@ Evaluation of the Combined and Synergistic Effects of Lupeol and Newcastle Disea
 
     print(f"[*] Updated {md_path} with 100% In-Vitro A549 Lung Cancer proposal content.")
 
-    # 3. Execute Reference Validity Auditor
+    # 3. Execute v6.0 Evidence Modeling & Synthesis Engines
+    from study_evidence_engine import generate_evidence_matrix_and_records
+    print("[*] Running Study Evidence Engine (34 fields + 20-col matrix)...")
+    generate_evidence_matrix_and_records(base_dir)
+
+    from study_comparability import run_study_comparability_analysis
+    print("[*] Running Study Comparability Engine (12 dimensions)...")
+    run_study_comparability_analysis(base_dir)
+
+    from contradiction_engine import analyze_claim_contradictions
+    print("[*] Running Contradiction & Negative Evidence Engine (6 categories, A-F taxonomy)...")
+    analyze_claim_contradictions(base_dir)
+
+    from evidence_graph_engine import build_evidence_and_dependency_graphs
+    print("[*] Running Evidence Graph & DAG Dependency Engine...")
+    build_evidence_and_dependency_graphs(base_dir)
+
+    from evidence_synthesis_engine import run_evidence_synthesis
+    print("[*] Running Final Evidence Synthesis & PRISMA Accounting Engine...")
+    run_evidence_synthesis(base_dir)
+
+    # 4. Execute Reference Validity Auditor v6.0
     from reference_validity_auditor import run_validity_and_relevance_audit
-    print("[*] Running Reference Validity & Relevance Audit...")
+    print("[*] Running Reference Validity & Relevance Audit v6.0...")
     val_metrics = run_validity_and_relevance_audit(base_dir)
 
-    # 4. Execute Final Reference Usage Audit
+    # 5. Execute Final Reference Usage Audit
     all_cited_numbers = set()
     body_text = updated_md.split("## ۱۴. فهرست منابع و مراجع")[0]
     matches = re.findall(r'\[(\d+(?:\s*,\s*\d+)*)\]', body_text)
@@ -294,7 +315,7 @@ Evaluation of the Combined and Synergistic Effects of Lupeol and Newcastle Disea
 
     print(f"[*] Saved FINAL_REFERENCE_USAGE_AUDIT.json with status: {usage_audit_data['status']}.")
 
-    # 5. Recompile Master Word Document
+    # 6. Recompile Master Word Document
     docx_builder_script = os.path.join(os.path.dirname(__file__), "docx_builder.py")
     if os.path.exists(docx_builder_script):
         print("[*] Compiling Master Word Document...")
@@ -305,11 +326,17 @@ Evaluation of the Combined and Synergistic Effects of Lupeol and Newcastle Disea
             shutil.copy2(docx_out_path, final_docx_path)
             print(f"[*] Copied to: {final_docx_path}")
 
+    # 7. Run 54-Test Behavioral Self-Audit Suite
+    from self_audit_suite import run_v6_behavioral_audit
+    print("\n[*] Executing Comprehensive 54-Test Behavioral Self-Audit Suite...")
+    audit_exit_code = run_v6_behavioral_audit(base_dir)
+
     return {
         "selected": len(refs),
         "cited": cited_count,
         "unused": unused_count,
-        "validity_status": val_metrics.get("Overall Status")
+        "validity_status": val_metrics.get("Overall Status"),
+        "self_audit_passed": audit_exit_code == 0
     }
 
 if __name__ == "__main__":
