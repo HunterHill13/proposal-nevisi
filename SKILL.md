@@ -94,7 +94,7 @@ description: >
    - حذف ۱۰۰٪ خط‌تیره‌های جداکننده مخرّب (`---`).
    - ثبت مستقیم منابع در **Word Citation Manager** از طریق اتوماسیون COM.
 
-9. **سوئیت جامع اسناد و خروجی‌های Deep Research v4.0:**
+9. **سوئیت جامع اسناد و خروجی‌های Deep Research v4.5:**
    - **`SOURCE_REGISTRY.json`:** پایگاه داده کامل تمام منابع کشف‌شده به همراه Tier و وضعیت غربالگری.
    - **`EXCLUDED_STUDIES.json`:** مستندسازی شفاف علل حذف تک‌تک مقالات غربال‌شده.
    - **`SEARCH_QUERY_LOG.json`:** لاگ کامل تک‌تک کوئری‌های ارسالی به ۴ پایگاه داده با کد وضعیت HTTP و تعداد نتایج.
@@ -106,11 +106,13 @@ description: >
    - **`EVIDENCE_LEDGER.json`:** دفتر کل شواهد آزمایشگاهی با نقل‌قول مستقیم درون‌متنی و فاقد عبارات ساختگی.
    - **`PROPOSAL_REFERENCE_SET.json`:** مراجع برگزیده نهایی با نقش دقیق، لینک ادعاها، شماره ارجاع و فاقد زایدات (حداقل ۱۵ منبع بدون سقف).
    - **`FINAL_REFERENCE_USAGE_AUDIT.json`:** سند رسمی ممیزی تطابق ارجاعات در متن پروپوزال، شمارش دقیق استنادات یکتا، و تأیید عدم وجود منبع بدون استفاده.
+   - **`FINAL_REFERENCE_VALIDITY_AUDIT.json`:** سند ساختاریافته ممیزی ۴ محوره اعتبار کتابشناختی، ارتباط علمی، پشتیبانی ادعا، و ضرورت استناد تک‌تک منابع.
+   - **`FINAL_REFERENCE_VALIDITY_AUDIT.md`:** گزارش تفصیلی انسانی و واکاوی ۷‌گانه تک‌تک مراجع نهایی.
    - **`EVIDENCE_SUFFICIENCY_REPORT.md`:** گیت ممیزی ۱۰ ضابطه کیفیت با تفکیک انتخاب طبیعی و پدینگ صفر.
    - **`LITERATURE_DEEP_RESEARCH.md`:** پرونده تحلیلی شواهد تجربی به صورت کاملاً پویا و متصل به مراجع.
    - **`references_with_fulltext.json`**, **`EndNote_Citations.enw`**, **`references_library.ris`**
 
-10. **آزمونگر سخت‌گیرانه ۲۸ گانه خود-ممیزی (28-Test Behavioral Self-Audit Suite):**
+10. **آزمونگر سخت‌گیرانه ۳۴ گانه خود-ممیزی (34-Test Behavioral Self-Audit Suite v4.5):**
     - ارزیابی رفتاری روی داده‌های واقعی:
       1. پیاده‌سازی صفحه‌بندی واقعی (Real Pagination)
       2. فقدان سقف ساختگی در بازیابی و گزینش (Zero Hardcoded Caps)
@@ -140,3 +142,9 @@ description: >
       26. استفاده واقعی پروپوزال از حداقل ۱۵ منبع یکتا در بدنه متن (Actually Cited >= 15)
       27. استناد قطعی به ۱۰۰٪ مراجع نهایی در متن پروپوزال (Unused Selected References == 0)
       28. پشتیبانی مستند شواهدی برای تمامی ادعاهای اساسی پروپوزال (Every Major Claim Has Evidence)
+      29. ممیزی اعتبار کتابشناختی (Bibliographic Validity Audit: 100% verified, 0 invalid, 0 fabricated)
+      30. یکپارچگی شناسه‌های DOI و PMID و فقدان متادیتای تخمینی (DOI/PMID Integrity Audit)
+      31. انطباق ارتباط علمی با دامنه‌های ۱۱ گانه تخصصی طرح (Scientific Relevance Audit)
+      32. ممیزی استلزام ادعا-مرجع و منع مغالطات تعمیم مدل یا داروی تک به ترکیب (Claim-to-Reference Entailment Audit)
+      33. ممیزی ضرورت و عدم زایدات مراجع نهایی (Reference Necessity / Redundancy Audit)
+      34. گیت جامع تأیید اعتبار و ارتباط مراجع نهایی (Overall Reference Validity Gate Audit)

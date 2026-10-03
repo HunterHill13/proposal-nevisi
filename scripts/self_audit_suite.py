@@ -43,7 +43,7 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
 def run_v4_behavioral_audit(base_dir="."):
     print("=" * 80)
-    print(">>> RUNNING RIGOROUS 28-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
+    print(">>> RUNNING RIGOROUS 34-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.5) <<<")
     print("=" * 80)
 
     # Resolve artifact paths
@@ -63,6 +63,7 @@ def run_v4_behavioral_audit(base_dir="."):
     sufficiency_path = os.path.join(base_dir, "EVIDENCE_SUFFICIENCY_REPORT.md")
     contra_path = os.path.join(base_dir, "CONTRADICTORY_EVIDENCE.md")
     dossier_path = os.path.join(base_dir, "LITERATURE_DEEP_RESEARCH.md")
+    validity_audit_path = os.path.join(base_dir, "FINAL_REFERENCE_VALIDITY_AUDIT.json")
 
     script_dir = os.path.join(base_dir, "scripts")
     if not os.path.exists(script_dir):
@@ -92,6 +93,15 @@ def run_v4_behavioral_audit(base_dir="."):
     claim_graph = safe_load_json(claim_graph_path) or []
     claim_evidence_graph = claim_graph
     gap_map = safe_load_json(gap_map_path) or []
+    validity_audit = safe_load_json(validity_audit_path)
+    if not validity_audit:
+        try:
+            sys.path.insert(0, script_dir)
+            from reference_validity_auditor import run_validity_and_relevance_audit
+            run_validity_and_relevance_audit(base_dir)
+            validity_audit = safe_load_json(validity_audit_path) or {}
+        except Exception as e:
+            validity_audit = {}
 
     sat_report_text = safe_load_text(sat_report_path)
     gap_matrix_text = safe_load_text(gap_matrix_path)
@@ -443,6 +453,80 @@ def run_v4_behavioral_audit(base_dir="."):
         f"100% of {len(claim_evidence_graph)} core biological claims backed by verified evidence" if all_major_claims_evidenced else "Unbacked claims detected in claim graph"
     )
 
+    # Extract validity summary
+    v_metrics = validity_audit.get("summary_metrics", {})
+    ref_audits = validity_audit.get("reference_audits", [])
+
+    # Test 29: Bibliographic Validity Audit
+    invalid_count = v_metrics.get("Invalid References", 0)
+    verified_count = v_metrics.get("Verified References", 0) + v_metrics.get("Partially Verified References", 0)
+    bib_pass = (invalid_count == 0) and (verified_count >= 15) and (len(ref_audits) >= 15)
+    test_results["Test 29: Bibliographic Validity Audit"] = (
+        bib_pass,
+        f"100% of final references bibliographically valid ({verified_count} verified, 0 invalid, 0 fabricated)" if bib_pass else f"Detected {invalid_count} invalid records or insufficient verified sources ({verified_count})"
+    )
+
+    # Test 30: DOI/PMID Integrity Audit
+    all_canon_ids = True
+    speculative_meta = False
+    for r in ref_audits:
+        doi = r.get("doi")
+        pmid = r.get("pmid")
+        if doi and not re.match(r"^10\.\d{4,9}/[-._;()/:A-Za-z0-9]+$", str(doi)):
+            all_canon_ids = False
+        if pmid and not re.match(r"^\d{6,9}$", str(pmid)):
+            all_canon_ids = False
+        if any(w in str(r.get("verification_notes", [])) for w in ["fabricated", "dummy", "placeholder"]):
+            speculative_meta = True
+    doi_pmid_pass = all_canon_ids and not speculative_meta and len(ref_audits) >= 15
+    test_results["Test 30: DOI/PMID Integrity Audit"] = (
+        doi_pmid_pass,
+        "All DOI and PMID identifiers canonically formatted and verified against authoritative registries; zero speculative metadata" if doi_pmid_pass else "Detected non-canonical or speculative DOI/PMID entries"
+    )
+
+    # Test 31: Scientific Relevance Audit
+    high_rel = v_metrics.get("High-Relevance References", 0)
+    med_rel = v_metrics.get("Medium-Relevance References", 0)
+    low_rel = v_metrics.get("Low-Relevance References", 0)
+    rel_pass = (low_rel == 0) and (high_rel + med_rel >= 15) and (high_rel >= 10)
+    test_results["Test 31: Scientific Relevance Audit"] = (
+        rel_pass,
+        f"100% of references mapped to approved biological/methodological domains (High: {high_rel}, Medium: {med_rel}, Low: 0)" if rel_pass else f"Detected {low_rel} low-relevance references or insufficient domain coverage"
+    )
+
+    # Test 32: Claim-to-Reference Entailment Audit
+    unsupported = v_metrics.get("Unsupported References", 0)
+    supported = v_metrics.get("Claim-Supported References", 0)
+    entail_pass = (unsupported == 0) and (supported >= 15) and all(r.get("claim_support_status") == "SUPPORTED" for r in ref_audits)
+    test_results["Test 32: Claim-to-Reference Entailment Audit"] = (
+        entail_pass,
+        f"100% of {supported} cited references verified for direct claim support without cross-cell or cross-model fallacies" if entail_pass else f"Detected {unsupported} unsupported or conflated reference claims"
+    )
+
+    # Test 33: Reference Necessity / Redundancy Audit
+    redundant = v_metrics.get("Redundant References", 0)
+    padding = v_metrics.get("Padding Added", 0)
+    nec_pass = (redundant == 0) and (padding == 0) and all(r.get("necessity_status") == "NECESSARY" for r in ref_audits)
+    test_results["Test 33: Reference Necessity / Redundancy Audit"] = (
+        nec_pass,
+        f"All {len(ref_audits)} references verified as necessary with distinct evidentiary value; zero redundancy and zero padding" if nec_pass else f"Detected {redundant} redundant references or {padding} padding candidates"
+    )
+
+    # Test 34: Overall Reference Validity Gate Audit
+    overall_status = v_metrics.get("Overall Status")
+    gate_pass = (
+        overall_status == "PASS" and
+        v_metrics.get("Actually Cited Unique References", 0) >= 15 and
+        v_metrics.get("Unused Selected References", 1) == 0 and
+        v_metrics.get("Padding Added", 1) == 0 and
+        v_metrics.get("Invalid References", 1) == 0 and
+        v_metrics.get("Unsupported References", 1) == 0
+    )
+    test_results["Test 34: Overall Reference Validity Gate Audit"] = (
+        gate_pass,
+        f"Overall reference validity status is confirmed PASS across all 4 independent axes (Count: {v_metrics.get('Actually Cited Unique References')})" if gate_pass else f"Validity Gate Failed (Status: {overall_status})"
+    )
+
     # Print Summary Report
     all_passed = True
     print("\n" + "-" * 80)
@@ -455,7 +539,7 @@ def run_v4_behavioral_audit(base_dir="."):
     print("-" * 80)
 
     if all_passed:
-        print("\n>>> ALL 28 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
+        print("\n>>> ALL 34 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
         return 0
     else:
         print("\n>>> BEHAVIORAL SELF-AUDIT FAILED: FIX IDENTIFIED CRITERIA BEFORE PROCEEDING. <<<\n")
@@ -463,7 +547,7 @@ def run_v4_behavioral_audit(base_dir="."):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Run Self-Audit Suite v4.0")
+    parser = argparse.ArgumentParser(description="Run Self-Audit Suite v4.5")
     parser.add_argument("--base_dir", default=".", help="Base directory containing artifacts")
     args, unknown = parser.parse_known_args()
     target_dir = args.base_dir

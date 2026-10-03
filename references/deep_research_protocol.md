@@ -73,7 +73,7 @@ flowchart TD
 
 ---
 
-### ۶. ممیزی نهایی استفاده از منابع و آزمون‌های رفتاری ۲۸ گانه (Final Reference Usage Audit & 28-Test Suite)
+### ۶. ممیزی نهایی اعتبار، ارتباط و آزمون‌های رفتاری ۳۴ گانه (Reference Validity, Relevance & 34-Test Suite)
 
 1. **تفکیک چهار شاخص کلیدی مراجع (The 4 Distinct Reference Metrics):**
    - **`Natural Selected References`:** تعداد منابعی که بر پایه ضرورت شواهد و پوشش ادعاها به طور طبیعی انتخاب شده‌اند (بدون سقف و بدون اعمال هدف عددی).
@@ -81,18 +81,32 @@ flowchart TD
    - **`Unused Selected References`:** تعداد منابعی که در فهرست مراجع وجود دارند ولی در متن پروپوزال استفاده نشده‌اند (خط قرمز: این مقدار باید دقیقاً صفر باشد: `Unused Selected References == 0`).
    - **`Padding Added`:** تعداد مقالاتی که صرفاً برای رسیدن به کف عددی افزوده شده‌اند (خط قرمز: باید دقیقاً صفر باشد: `Padding Added == 0`).
 
-2. **دروازه کفایت به جای هدف گزینش (Sufficiency Gate, Not a Selection Target):**
+2. **تفکیک چهار مفهوم مستقل در ممیزی مراجع (The 4 Independent Reference Audit Concepts):**
+   - **`Bibliographic Validity ≠ Scientific Relevance ≠ Claim Support ≠ Citation Necessity`**
+   - یک مقاله ممکن است واقعی باشد اما به موضوع نامرتبط باشد.
+   - یک مقاله ممکن است مرتبط باشد اما ادعای انتسابی در متن را پشتیبانی نکند.
+   - یک مقاله ممکن است ادعا را پشتیبانی کند اما مازاد (Redundant) باشد.
+   - هر ۴ محور باید جداگانه ممیزی و در دو سند `FINAL_REFERENCE_VALIDITY_AUDIT.json` و `FINAL_REFERENCE_VALIDITY_AUDIT.md` ثبت شوند.
+
+3. **دروازه کفایت به جای هدف گزینش (Sufficiency Gate, Not a Selection Target):**
    - حداقل ۱۵ منبع یک شرط کفایت در انتهای پایپ‌لاین است. اگر گزینش طبیعی شواهد کمتر از ۱۵ باشد (مثلاً ۱۲)، سیستم اجازه پرسازی ندارد و باید وضعیت `FAILED_MINIMUM_REFERENCE_REQUIREMENT` اعلام کند.
    - زیرمجموعه بودن قطعی مراجع در استنادات واقعی: `Final Proposal References ⊆ Actually Cited References` (۱۰۰٪ مراجع نهایی باید در متن استناد شده باشند).
 
-3. **سند رسمی ممیزی کاربرد مراجع (`FINAL_REFERENCE_USAGE_AUDIT.json`):**
-   - بررسی تطابق متن پروپوزال، شمارش مارکرهای استنادی، تحلیل خلأها و پوشش ۱۰۰ درصدی ادعاها.
+4. **اسناد رسمی ممیزی کاربرد و اعتبار مراجع:**
+   - **`FINAL_REFERENCE_USAGE_AUDIT.json`:** شمارش دقیق ارجاعات یکتا، عدم وجود ارجاع بدون استفاده و رد پدینگ.
+   - **`FINAL_REFERENCE_VALIDITY_AUDIT.json` & `.md`:** ممیزی اعتبار کتابشناختی با مراجع معتبر (Crossref/PubMed)، ارتباط با دامنه‌های ۱۱ گانه انکولوژی/روش‌شناختی، منع مغالطات تعمیم مدل یا داروی تک به ترکیب، و ضرورت ارجاع.
 
-4. **سوئیت آزمون ۲۸ گانه خود-ممیزی رفتاری (28-Test Behavioral Self-Audit Suite):**
+5. **سوئیت آزمون ۳۴ گانه خود-ممیزی رفتاری (34-Test Behavioral Self-Audit Suite v4.5):**
    - تست‌های ۱ تا ۲۴: آزمون‌های ساختاری، بازیابی، کوئری ماتریکس، شواهد متناقض، عدم سقف ساختگی، متن کامل، و وب‌سرویس‌های زنده.
    - تست ۲۵: عدم تأثیر کف آستانه بر گزینش شواهد (Zero-Padding Gate).
-   - تست ۲۶: استفاده واقعی پروپوزال از حداقل ۱۵ منبع یکتا در بدنه متن.
+   - تست ۲۶: استفاده واقعی پروپوزال از حداقل ۱۵ منبع یکتا در بدنه متن (Actually Cited >= 15).
    - تست ۲۷: استناد قطعی به ۱۰۰٪ مراجع نهایی در متن پروپوزال (`Unused Selected References == 0`).
    - تست ۲۸: پشتیبانی مستند شواهدی برای تمامی ادعاهای اساسی پروپوزال.
+   - تست ۲۹: ممیزی اعتبار کتابشناختی (Bibliographic Validity Audit: 0 invalid, 0 fabricated).
+   - تست ۳۰: یکپارچگی شناسه‌های DOI/PMID و فقدان متادیتای تخمینی (DOI/PMID Integrity Audit).
+   - تست ۳۱: انطباق ارتباط علمی با دامنه‌های ۱۱ گانه تخصصی طرح (Scientific Relevance Audit).
+   - تست ۳۲: ممیزی استلزام ادعا-مرجع و منع مغالطات تعمیم مدل یا داروی تک به ترکیب (Claim-to-Reference Entailment Audit).
+   - تست ۳۳: ممیزی ضرورت و عدم زایدات مراجع نهایی (Reference Necessity / Redundancy Audit).
+   - تست ۳۴: گیت جامع تأیید اعتبار و ارتباط مراجع نهایی (Overall Reference Validity Gate Audit).
 
 
