@@ -70,7 +70,6 @@ def run_v4_behavioral_audit(base_dir="."):
     sufficiency_path = os.path.join(base_dir, "EVIDENCE_SUFFICIENCY_REPORT.md")
     contra_path = os.path.join(base_dir, "CONTRADICTORY_EVIDENCE.md")
     dossier_path = os.path.join(base_dir, "LITERATURE_DEEP_RESEARCH.md")
-    validity_audit_path = os.path.join(base_dir, "FINAL_REFERENCE_VALIDITY_AUDIT.json")
 
     script_dir = os.path.join(base_dir, "scripts")
     if not os.path.exists(script_dir):
@@ -100,15 +99,6 @@ def run_v4_behavioral_audit(base_dir="."):
     claim_graph = safe_load_json(claim_graph_path) or []
     claim_evidence_graph = claim_graph
     gap_map = safe_load_json(gap_map_path) or []
-    validity_audit = safe_load_json(validity_audit_path)
-    if not validity_audit:
-        try:
-            sys.path.insert(0, script_dir)
-            from reference_validity_auditor import run_validity_and_relevance_audit
-            run_validity_and_relevance_audit(base_dir)
-            validity_audit = safe_load_json(validity_audit_path) or {}
-        except Exception as e:
-            validity_audit = {}
 
     sat_report_text = safe_load_text(sat_report_path)
     gap_matrix_text = safe_load_text(gap_matrix_path)
