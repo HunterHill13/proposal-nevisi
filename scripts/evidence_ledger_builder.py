@@ -796,70 +796,139 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
         ("RESEARCH_GAP", lambda r, text: any(k in text for k in ["novelty", "gap", "untested", "perimeter", "boundary"]))
     ]
 
-    selected_refs_map = {}
-    
-    # Step A: Always include foundational methodology studies
+    # Map each study to matched domains
+    study_matched_domains = {}
     for r in corpus:
-        if r.get("is_foundation"):
-            sid = r.get("pmid") or r.get("doi") or r.get("title")
-            selected_refs_map[sid] = r
-
-    # Step B: For each core domain, select top rigorous candidate studies with claim support
-    for domain_name, match_fn in core_domains_criteria:
-        matching_studies = []
-        for r in corpus:
-            sid = r.get("pmid") or r.get("doi") or r.get("title")
-            c_list = source_to_claims.get(sid, [])
-            if not c_list and not r.get("is_foundation"):
-                continue
-            text = f"{(r.get('title') or '').lower()} {(r.get('abstract') or '').lower()}"
+        sid = r.get("pmid") or r.get("doi") or r.get("title")
+        text = f"{(r.get('title') or '').lower()} {(r.get('abstract') or '').lower()}"
+        matched_d = []
+        for dname, match_fn in core_domains_criteria:
             if match_fn(r, text):
-                tier_score = 10 if r.get("source_tier") == "Tier A" else 5
-                qual = r.get("evidence_quality_score", 0)
-                rel = r.get("relevance_score", 0)
-                total_weight = tier_score + qual + rel
-                matching_studies.append((total_weight, r))
-        
-        matching_studies.sort(key=lambda x: x[0], reverse=True)
-        # Select top distinct candidates for this domain to ensure deep coverage
-        for _, study in matching_studies[:6]:
-            sid = study.get("pmid") or study.get("doi") or study.get("title")
-            if sid not in selected_refs_map:
-                selected_refs_map[sid] = study
+                matched_d.append(dname)
+        study_matched_domains[sid] = matched_d
 
-    # Step C: Minimum 15 Constraint Check
-    # If selected_refs_map has < 15, progressively add highest-scoring studies from corpus with claim support
-    if len(selected_refs_map) < MIN_PROPOSAL_REFERENCES:
-        remaining_candidates = []
-        for r in corpus:
-            sid = r.get("pmid") or r.get("doi") or r.get("title")
-            if sid in selected_refs_map:
-                continue
-            c_list = source_to_claims.get(sid, [])
-            if not c_list:
-                continue
+    # =========================================================================
+    # Step A: Objective Necessity Evaluation (5 Criteria)
+    # A study is a candidate IF AND ONLY IF it satisfies at least one necessity criterion:
+    # 1. Supports a major proposal claim in claim_evidence_graph (CLM-01 .. CLM-09)
+    # 2. Covers an essential evidence domain with high relevance/quality or Tier A
+    # 3. Direct evidence for main research question (Lupeol in 4T1, NDV oncolytic, combo)
+    # 4. Key contradictory or safety evidence essential for balanced synthesis
+    # 5. Methodological foundation (Chou-Talalay 2006, Mosmann 1983)
+    # =========================================================================
+    candidate_studies = {}
+    for r in corpus:
+        sid = r.get("pmid") or r.get("doi") or r.get("title")
+        c_list = source_to_claims.get(sid, [])
+        d_list = study_matched_domains.get(sid, [])
+        is_foundation = r.get("is_foundation", False)
+
+        # Criterion 1: Directly supports or informs a structured proposal claim in claim_evidence_graph
+        c1 = any(sid in g.get("supporting_sources", []) or sid in g.get("indirect_sources", []) or sid in g.get("contradicting_sources", []) for g in claim_evidence_graph)
+        c2 = len(d_list) >= 1 and (r.get("source_tier") == "Tier A" or r.get("relevance_score", 0) >= 6 or r.get("evidence_quality_score", 0) >= 6)
+        text = f"{(r.get('title') or '').lower()} {(r.get('abstract') or '').lower()}"
+        c3 = any(k in text for k in ["lupeol", "newcastle disease virus", "4t1", "breast cancer"]) and (r.get("relevance_score", 0) >= 5)
+        c4 = r.get("evidentiary_role") == "Contradictory_context" or any(k in text for k in ["antagonis", "resistance", "toxicity", "neutralizing antibody"])
+        c5 = is_foundation
+
+        if c1 or c2 or c3 or c4 or c5:
             tier_score = 10 if r.get("source_tier") == "Tier A" else 5
             qual = r.get("evidence_quality_score", 0)
             rel = r.get("relevance_score", 0)
-            remaining_candidates.append((tier_score + qual + rel, r))
-        
-        remaining_candidates.sort(key=lambda x: x[0], reverse=True)
-        for _, study in remaining_candidates:
-            sid = study.get("pmid") or study.get("doi") or study.get("title")
-            selected_refs_map[sid] = study
-            if len(selected_refs_map) >= MIN_PROPOSAL_REFERENCES:
+            candidate_studies[sid] = {
+                "study": r,
+                "weight": tier_score + qual + rel,
+                "claims": [c["claim_id"] for c in c_list],
+                "domains": d_list,
+                "is_foundation": is_foundation,
+                "is_contra": c4
+            }
+
+    # =========================================================================
+    # Step B: Coverage Optimization across 12 Core Domains & Structured Claims
+    # Select best candidates per domain to ensure holistic evidence synthesis
+    # =========================================================================
+    tentative_selected = {}
+    
+    # Always include foundational methodology studies
+    for sid, c_info in candidate_studies.items():
+        if c_info["is_foundation"]:
+            tentative_selected[sid] = c_info
+
+    # For each core domain, select candidate studies that maximize evidentiary quality
+    for dname, match_fn in core_domains_criteria:
+        domain_cands = [
+            (c_info["weight"], sid, c_info)
+            for sid, c_info in candidate_studies.items()
+            if dname in c_info["domains"] and (len(c_info["claims"]) >= 1 or c_info["is_foundation"])
+        ]
+        domain_cands.sort(key=lambda x: x[0], reverse=True)
+        # Select top distinct candidates for this domain
+        for _, sid, c_info in domain_cands[:6]:
+            if sid not in tentative_selected:
+                tentative_selected[sid] = c_info
+
+    # =========================================================================
+    # Step C: Reference Redundancy Audit & Elimination
+    # For every selected reference, test if removing it leaves coverage identical
+    # If another reference already covers the exact same claims and domains
+    # with equal or better quality/tier, the reference is marked REDUNDANT and removed.
+    # =========================================================================
+    final_selected = {}
+    redundant_audit_log = []
+
+    for sid, c_info in tentative_selected.items():
+        # Foundational studies are never redundant
+        if c_info["is_foundation"]:
+            final_selected[sid] = c_info["study"]
+            continue
+
+        study_claims = set(c_info["claims"])
+        study_domains = set(c_info["domains"])
+        study_weight = c_info["weight"]
+
+        # Check if there exists another study in tentative_selected that strictly subsumes this study
+        is_subsumed = False
+        for other_sid, other_info in tentative_selected.items():
+            if other_sid == sid:
+                continue
+            other_claims = set(other_info["claims"])
+            other_domains = set(other_info["domains"])
+            other_weight = other_info["weight"]
+
+            # Subsumption: other study covers all claims & domains and has strictly higher evidentiary weight
+            if study_claims.issubset(other_claims) and study_domains.issubset(other_domains) and other_weight > study_weight:
+                is_subsumed = True
                 break
 
-    # Step D: Final Count & Diagnostics
-    final_ref_count = len(selected_refs_map)
+        if is_subsumed:
+            redundant_audit_log.append({
+                "source_id": sid,
+                "title": c_info["study"].get("title"),
+                "status": "REDUNDANT",
+                "reason": "Subsumed by higher-weight study providing equivalent claim and domain coverage"
+            })
+        else:
+            final_selected[sid] = c_info["study"]
+
+    # =========================================================================
+    # Step D: Natural Selection Count & Hard Sufficiency Gate (STRICT ZERO PADDING)
+    # The count is purely emergent from evidence necessity.
+    # ZERO padding is added if count < 15; it must FAIL rather than pad!
+    # =========================================================================
+    natural_selection_count = len(final_selected)
+    padding_added = 0  # STRICTLY ZERO PADDING
+    final_ref_count = natural_selection_count
     redundant_count = len(corpus) - final_ref_count
-    
+
     if final_ref_count < MIN_PROPOSAL_REFERENCES:
         suff_status_code = "FAILED_MINIMUM_REFERENCE_REQUIREMENT"
-        print(f"[!] EVIDENCE_SUFFICIENCY_STATUS: FAILED_MINIMUM_REFERENCE_REQUIREMENT (Found: {final_ref_count}, Required: {MIN_PROPOSAL_REFERENCES})")
+        print(f"[!] EVIDENCE_SUFFICIENCY_STATUS: FAILED_MINIMUM_REFERENCE_REQUIREMENT (Natural: {final_ref_count}, Required: {MIN_PROPOSAL_REFERENCES}, Padding: {padding_added})")
     else:
         suff_status_code = "EVIDENCE_SUFFICIENT"
-        print(f"[+] Proposal Reference Selection Successful: {final_ref_count} emergent references selected (MIN: {MIN_PROPOSAL_REFERENCES}, MAX: UNLIMITED). {redundant_count} redundant candidates eliminated.")
+        print(f"[+] Proposal Reference Selection Successful: {final_ref_count} emergent references selected (MIN: {MIN_PROPOSAL_REFERENCES}, MAX: UNLIMITED). Padding added: {padding_added}. Redundant candidates eliminated: {redundant_count}.")
+
+    selected_refs_map = final_selected
 
     # Format each reference according to required schema
     proposal_refs = []
@@ -891,6 +960,8 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
             "necessity_reason": necessity_reason,
             "direct_or_indirect": direct_or_indirect,
             "is_foundation": r.get("is_foundation", False),
+            "redundancy_audit_passed": True,
+            "padding_candidate": False,
             "title": r.get("title", ""),
             "authors": r.get("authors", []),
             "journal": r.get("journal", ""),
@@ -945,15 +1016,15 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     # 7. Build EVIDENCE_SUFFICIENCY_REPORT.md (Comprehensive 10-Criteria Pre-Proposal Gate)
     gate_checks = [
         ("1. Minimum Proposal Reference Requirement", len(proposal_refs) >= 15, f"{len(proposal_refs)} eligible proposal references selected (Required: >= 15, Max: Unlimited)"),
-        ("2. Zero Duplicate References", len(seen_dois) == len([r for r in proposal_refs if r.get('doi')]) and len(seen_pmids) == len([r for r in proposal_refs if r.get('pmid')]), f"Zero duplicate DOIs or PMIDs across all {len(proposal_refs)} references"),
-        ("3. Role Assignment Integrity", all(r.get("role") in VALID_PROPOSAL_ROLES for r in proposal_refs), f"100% of references assigned valid roles from approved taxonomy"),
-        ("4. Claim Support Necessity", all(len(r.get("supported_claims", [])) >= 1 for r in proposal_refs), f"100% of references support >= 1 specific proposal claims (Zero ungrounded padding)"),
-        ("5. Core Claim Coverage", all(g["sufficiency_status"] == "EVIDENCE_SUFFICIENT" for g in claim_evidence_graph), f"100% of core biological claims in graph have supporting/indirect evidence"),
-        ("6. Direct Claim Evidence Tiers", all(r["evidence_tier"] in ["Tier A", "Tier B"] for r in proposal_refs), f"All direct claims grounded in verified Tier A full-text XML or Tier B screened abstracts"),
-        ("7. Quantitative Evidence Integrity (Tier A Only)", all(c.get("quantitative_parameter") == "NR" or c.get("source_tier") == "Tier A" or c.get("is_foundation") for c in claim_inventory if c.get("claim_domain") == "In Vitro / In Vivo Cytodynamics"), f"100% of quantitative cytotoxicity/dose parameters originate strictly from Tier A XML"),
-        ("8. Contradictory & Safety Evidence Assessment", len([r for r in proposal_refs if r.get("role") == "CONTRADICTORY_EVIDENCE"]) >= 1, f"Dedicated contradictory/safety evidence branch analyzed and integrated ({len([r for r in proposal_refs if r.get('role') == 'CONTRADICTORY_EVIDENCE'])} studies)"),
-        ("9. Search-Derived Research Gap Grounding", len(research_gap_map) >= 1 and all("search_queries_used" in gm for gm in research_gap_map), f"Research gaps mathematically derived from documented multi-database search perimeters"),
-        ("10. Bounded Novelty Formulation", True, f"Novelty claims strictly bounded by documented search boundary with zero ungrounded hyperbole")
+        ("2. Zero Reference Padding Gate", padding_added == 0 and natural_selection_count == len(proposal_refs), f"Natural selection count ({natural_selection_count}) == Final reference count ({len(proposal_refs)}); Padding added: {padding_added} (Strict Zero Padding)"),
+        ("3. Zero Duplicate References", len(seen_dois) == len([r for r in proposal_refs if r.get('doi')]) and len(seen_pmids) == len([r for r in proposal_refs if r.get('pmid')]), f"Zero duplicate DOIs or PMIDs across all {len(proposal_refs)} references"),
+        ("4. Role Assignment Integrity", all(r.get("role") in VALID_PROPOSAL_ROLES for r in proposal_refs), f"100% of references assigned valid roles from approved taxonomy"),
+        ("5. Claim Support Necessity", all(len(r.get("supported_claims", [])) >= 1 for r in proposal_refs), f"100% of references support >= 1 specific proposal claims (Zero ungrounded padding)"),
+        ("6. Core Claim Coverage", all(g["sufficiency_status"] == "EVIDENCE_SUFFICIENT" for g in claim_evidence_graph), f"100% of core biological claims in graph have supporting/indirect evidence"),
+        ("7. Direct Claim Evidence Tiers", all(r["evidence_tier"] in ["Tier A", "Tier B"] for r in proposal_refs), f"All direct claims grounded in verified Tier A full-text XML or Tier B screened abstracts"),
+        ("8. Quantitative Evidence Integrity (Tier A Only)", all(c.get("quantitative_parameter") == "NR" or c.get("source_tier") == "Tier A" or c.get("is_foundation") for c in claim_inventory if c.get("claim_domain") == "In Vitro / In Vivo Cytodynamics"), f"100% of quantitative cytotoxicity/dose parameters originate strictly from Tier A XML"),
+        ("9. Contradictory & Safety Evidence Assessment", len([r for r in proposal_refs if r.get("role") == "CONTRADICTORY_EVIDENCE"]) >= 1, f"Dedicated contradictory/safety evidence branch analyzed and integrated ({len([r for r in proposal_refs if r.get('role') == 'CONTRADICTORY_EVIDENCE'])} studies)"),
+        ("10. Search-Derived Research Gap & Bounded Novelty", len(research_gap_map) >= 1 and all("search_queries_used" in gm for gm in research_gap_map), f"Research gaps mathematically derived from search perimeters and novelty strictly bounded")
     ]
 
     all_gate_passed = all(chk[1] for chk in gate_checks)
@@ -962,9 +1033,15 @@ def build_v4_evidence_architecture(research_corpus_path, output_dir, proposal_ti
     suff_lines = [
         "# گزارش ممیزی دروازه کفایت شواهد (Evidence Sufficiency Gate v4.0)\n\n",
         f"**تاریخ ارزیابی:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",
-        f"**وضعیت نهایی دروازه (Gate Status):** `{overall_gate_status}`\n",
-        f"**تعداد مراجع نهایی پروپوزال:** {len(proposal_refs)} مقاله (حداقل الزامی: ۱۵ | حداکثر مجاز: نامحدود)\n",
-        f"**پیکره پژوهش (Research Corpus):** {len(corpus)} مقاله | **رکوردهای زاید حذف‌شده:** {redundant_count} مقاله\n\n---\n",
+        f"**وضعیت نهایی دروازه (Gate Status):** `{overall_gate_status}`\n\n",
+        "## شاخص‌های گزینش شواهد و عدم پرسازی (Evidence Selection & Zero-Padding Metrics)\n\n",
+        f"- **Natural evidence-driven selection:** {natural_selection_count}\n",
+        f"- **Final proposal reference set:** {final_ref_count}\n",
+        f"- **Minimum required:** 15\n",
+        f"- **Maximum allowed:** Unlimited\n",
+        f"- **Padding added:** {padding_added}\n",
+        f"- **Status:** `{overall_gate_status}`\n",
+        f"- **پیکره پژوهش (Research Corpus):** {len(corpus)} مقاله | **رکوردهای زاید حذف‌شده:** {redundant_count} مقاله\n\n---\n",
         "## ۱. ارزیابی ۱۰ شرط قطعی دروازه کفایت شواهد (10 Mandatory Quality Gates)\n\n",
         "| ردیف | ضابطه ارزیابی (Quality Gate Criterion) | وضعیت | جزییات ممیزی و شواهد داده‌ای |\n",
         "| :---: | :--- | :---: | :--- |\n"

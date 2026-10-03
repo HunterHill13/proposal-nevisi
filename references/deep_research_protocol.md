@@ -73,16 +73,19 @@ flowchart TD
 
 ---
 
-### ۶. سیاست کفایت مراجع و آزمون‌های رفتاری ۲۴ گانه (Reference Sufficiency & 24-Test Audit)
+### ۶. سیاست کفایت مراجع و آزمون‌های رفتاری ۲۵ گانه (Reference Sufficiency & 25-Test Audit)
 
-1. **کف الزامی ۱۵ منبع و عدم سقف حداکثری (`MIN_PROPOSAL_REFERENCES = 15`, `MAX = UNLIMITED`):**
-   - برای تضمین غنای شواهد در تمام فصول پروپوزال، حداقل ۱۵ منبع پدیدارشده ضروری است.
-   - هیچ سقف ساختگی (مانند ۱۵ یا ۲۰ یا ۵۰) روی منابع نهایی اعمال نمی‌شود.
-2. **سیاست قطعی عدم پرسازی جعلی (Zero Padding Policy):**
-   - افزودن مقالات غیرمرتبط صرفاً جهت پر کردن حد نصاب اکیداً ممنوع است.
-   - در صورت عدم کفایت، سامانه وضعیت `FAILED_MINIMUM_REFERENCE_REQUIREMENT` را اعلام و کسری را گزارش می‌دهد.
-3. **انتخاب پوشش‌محور با نقش مشخص (Coverage-Based Reference Selection):**
-   - هر منبع در `PROPOSAL_REFERENCE_SET.json` دارای فیلدهای الزامی: `reference_id`، `role`، `roles`، `supported_claims` (حداقل یک ادعای متصل)، `evidence_tier`، `relevance_score`، `evidence_quality_score`، `necessity_reason`، و `direct_or_indirect` است.
-4. **سوئیت آزمون ۲۴ گانه خود-ممیزی رفتاری (24-Test Self-Audit Suite):**
-   - ارزیابی رفتاری ۱۰۰٪ داده‌های واقعی دیسک در ۲۴ آزمون بدون ماک یا شبیه‌سازی جهت تضمین جامعیت و اعتبار استنادی.
+1. **دروازه کفایت به جای هدف گزینش (The minimum reference count is a sufficiency gate, not a selection target):**
+   - گزینش مراجع منحصراً بر پایه ضرورت اثباتی و پوشش ادعاها انجام می‌شود.
+   - حداقل ۱۵ منبع صرفاً یک گیت ارزیابی کیفیت در مرحله پایانی است، نه هدفی برای پر کردن.
+2. **ممنوعیت مطلق پرسازی جعلی (No reference may be added solely to satisfy the minimum count):**
+   - هیچ مقاله‌ای نباید صرفاً جهت برآورده‌سازی حداقل ۱۵ منبع افزوده شود.
+   - در صورت عدم کفایت طبیعی، وضعیت به عنوان `FAILED_MINIMUM_REFERENCE_REQUIREMENT` ثبت می‌شود.
+3. **تعیین پدیدارشده منابع بدون سقف حداکثری (The final reference set is determined by evidence necessity, min 15, no max cap):**
+   - هیچ سقف ساختگی (مانند ۱۵، ۲۰، ۳۰، ۵۰ یا ۸۰) بر مراجع نهایی اعمال نمی‌شود.
+4. **ممیزی زایدات و همپوشانی (Reference Redundancy Audit):**
+   - ارزیابی هر منبع با آزمون حذف موقت: چنانچه منبع دیگری با رتبه بالاتر دقیقاً همان ادعاها و دامنه‌ها را پوشش دهد، رکورد مازاد حذف می‌شود.
+5. **سوئیت آزمون ۲۵ گانه خود-ممیزی رفتاری (25-Test Behavioral Self-Audit Suite):**
+   - ارزیابی ۲۵ ضابطه رفتاری داده‌محور بر روی دیسک با تفکیک انتخاب طبیعی و تضمین پدینگ صفر (`padding_added: 0`).
+
 

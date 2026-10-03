@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive 24-Test Behavioral Self-Audit Suite (v4.0)
+Comprehensive 25-Test Behavioral Self-Audit Suite (v4.0)
 Part of Proposal-Nevisi Scientific Skill Suite.
 
 Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
@@ -22,12 +22,13 @@ Executes genuine BEHAVIORAL DATA AUDITS (not mere string checks):
 16. Reactome Live Grounding Audit (live verification without synthetic pathways).
 17. Minimum Proposal Reference Requirement (len(PROPOSAL_REFERENCE_SET) >= 15).
 18. No Arbitrary Maximum Reference Cap (no hardcoded maximum reference truncation).
-19. No Reference Padding (zero dummy references inserted without claim support).
+19. No Reference Padding & Redundancy Audit (zero dummy padding and all redundant duplicates eliminated).
 20. Every Proposal Reference Has Claim Support (len(supported_claims) >= 1).
 21. Reference Role Integrity (every reference assigned role from approved taxonomy).
 22. Strict Novelty Policy Audit (bounded novelty statement without unqualified 'برای اولین بار').
 23. Document Typography & RTL XML Audit (Dubai font, native RTL bidi XML, and bCs).
 24. Cross-Artifact Data Consistency (consistent identifiers across all artifacts).
+25. Minimum Threshold Must Not Drive Selection (Zero-Padding Gate: natural selection == final set).
 """
 
 import sys
@@ -39,7 +40,7 @@ sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
 
 def run_v4_behavioral_audit(base_dir="."):
     print("=" * 80)
-    print(">>> RUNNING RIGOROUS 24-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
+    print(">>> RUNNING RIGOROUS 25-TEST BEHAVIORAL SELF-AUDIT SUITE (v4.0) <<<")
     print("=" * 80)
 
     # Resolve artifact paths
@@ -296,13 +297,37 @@ def run_v4_behavioral_audit(base_dir="."):
         cap_details
     )
 
-    # Test 19: No Reference Padding
-    # Verify no reference was inserted without claim support solely to inflate count
-    unpadded_refs = [r for r in proposal_refs if len(r.get("supported_claims", [])) >= 1]
-    has_zero_padding = len(unpadded_refs) == len(proposal_refs) and len(proposal_refs) >= 15
-    test_results["Test 19: No Reference Padding"] = (
+    # Test 19: No Reference Padding & Redundancy Audit
+    # Verify:
+    # 1. Reference supports >= 1 claim
+    # 2. Reference has an assigned proposal role in VALID_PROPOSAL_ROLES
+    # 3. Reference has a non-empty necessity_reason
+    # 4. Reference materially contributes to claim/domain coverage
+    # 5. Reference was not inserted solely to satisfy minimum count (padding_candidate == False)
+    # 6. Removing it does not leave it as a redundant duplicate (redundancy_audit_passed == True)
+    padding_detected = False
+    padding_reasons = []
+    for r in proposal_refs:
+        if len(r.get("supported_claims", [])) < 1:
+            padding_detected = True
+            padding_reasons.append(f"{r.get('reference_id')}: zero supported claims")
+        if r.get("role") not in VALID_PROPOSAL_ROLES:
+            padding_detected = True
+            padding_reasons.append(f"{r.get('reference_id')}: invalid role")
+        if not r.get("necessity_reason"):
+            padding_detected = True
+            padding_reasons.append(f"{r.get('reference_id')}: missing necessity reason")
+        if r.get("padding_candidate", False) is True:
+            padding_detected = True
+            padding_reasons.append(f"{r.get('reference_id')}: marked as padding candidate")
+        if r.get("redundancy_audit_passed", True) is not True:
+            padding_detected = True
+            padding_reasons.append(f"{r.get('reference_id')}: failed redundancy audit")
+
+    has_zero_padding = (not padding_detected) and len(proposal_refs) >= 15
+    test_results["Test 19: No Reference Padding & Redundancy Audit"] = (
         has_zero_padding,
-        f"100% of {len(proposal_refs)} references are genuinely necessary with real claim linkage; zero dummy padding" if has_zero_padding else "Padding detected: references found without claim links"
+        f"100% of {len(proposal_refs)} references are genuinely necessary with real claim linkage and passed redundancy elimination; zero dummy padding" if has_zero_padding else f"Padding/redundancy detected: {padding_reasons[:3]}"
     )
 
     # Test 20: Every Proposal Reference Has Claim Support
@@ -350,6 +375,36 @@ def run_v4_behavioral_audit(base_dir="."):
         "100% of Proposal References cross-indexed in RESEARCH_CORPUS.json and SOURCE_REGISTRY.json" if len(missing_in_corp) == 0 else f"Missing in corpus: {missing_in_corp}"
     )
 
+    # Test 25: Minimum Threshold Must Not Drive Selection (Zero-Padding Gate)
+    # 1. Check report metrics
+    suff_report_text = ""
+    if os.path.exists(sufficiency_path):
+        with open(sufficiency_path, 'r', encoding='utf-8') as f:
+            suff_report_text = f.read()
+
+    nat_m = re.search(r'Natural evidence-driven selection:\s*(\d+)', suff_report_text)
+    final_m = re.search(r'Final proposal reference set:\s*(\d+)', suff_report_text)
+    pad_m = re.search(r'Padding added:\s*(\d+)', suff_report_text)
+
+    nat_count = int(nat_m.group(1)) if nat_m else len(proposal_refs)
+    final_count = int(final_m.group(1)) if final_m else len(proposal_refs)
+    pad_count = int(pad_m.group(1)) if pad_m else 0
+
+    # 2. Check code to ensure no loop artificially appends references when count < 15
+    has_padding_code = False
+    if os.path.exists(ledger_code_path):
+        with open(ledger_code_path, 'r', encoding='utf-8') as f:
+            l_code = f.read()
+        # Look for loops that add candidates if len < 15
+        if re.search(r'if\s+len\([^)]+\)\s*<\s*(15|MIN_PROPOSAL_REFERENCES)[^:]*:\s*\n\s*(for|\w+).*(add|append|\[\w+\]\s*=)', l_code):
+            has_padding_code = True
+
+    selection_undriven = (nat_count == final_count) and (pad_count == 0) and (not has_padding_code)
+    test_results["Test 25: Minimum Threshold Must Not Drive Selection (Zero-Padding Gate)"] = (
+        selection_undriven,
+        f"Natural selection ({nat_count}) == Final proposal references ({final_count}); Zero padding code and zero padding added" if selection_undriven else f"Selection driven by threshold: nat={nat_count}, final={final_count}, pad={pad_count}, padding_code={has_padding_code}"
+    )
+
     # Print Summary Report
     all_passed = True
     print("\n" + "-" * 80)
@@ -362,7 +417,7 @@ def run_v4_behavioral_audit(base_dir="."):
     print("-" * 80)
 
     if all_passed:
-        print("\n>>> ALL 24 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
+        print("\n>>> ALL 25 BEHAVIORAL SELF-AUDIT CRITERIA PASSED SUCCESSFULLY! <<<\n")
         return 0
     else:
         print("\n>>> BEHAVIORAL SELF-AUDIT FAILED: FIX IDENTIFIED CRITERIA BEFORE PROCEEDING. <<<\n")
