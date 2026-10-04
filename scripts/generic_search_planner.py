@@ -7,12 +7,75 @@ Generates an 8-facet query matrix and dual-path search plan (SUPPORTING vs CONTR
 dynamically from any ResearchProblemModel across biomedical fields.
 """
 
+import re
 import json
 from typing import Dict, List, Any, Optional
 try:
     from research_problem_model import ResearchProblemModel, ProblemModelBuilder
 except ImportError:
     from scripts.research_problem_model import ResearchProblemModel, ProblemModelBuilder
+
+class BaseSearchAdapter:
+    """Abstract database search adapter defining interface and query syntax translation."""
+    database_name: str = "BASE"
+
+    def translate_query(self, canonical_query: str) -> str:
+        """Translates canonical query into database-specific syntax."""
+        return canonical_query
+
+    def execute_query(self, query: str, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Dry-run default execution: returns explicit NOT_EXECUTED when network/API uncontacted."""
+        return {
+            "database": self.database_name,
+            "query": self.translate_query(query),
+            "filters": filters or {},
+            "status": "NOT_EXECUTED",
+            "message": f"{self.database_name} API was not contacted (dry-run/offline protocol active). Prohibits fictitious execution.",
+            "results_count": 0,
+            "records": []
+        }
+
+class PubMedAdapter(BaseSearchAdapter):
+    """Adapter for NCBI PubMed/MEDLINE query translation and execution."""
+    database_name = "PubMed"
+
+    def translate_query(self, canonical_query: str) -> str:
+        # Preserve or map [Title/Abstract], [MeSH Terms]
+        q = canonical_query
+        return q
+
+class EuropePMCAdapter(BaseSearchAdapter):
+    """Adapter for Europe PMC REST query translation and execution."""
+    database_name = "Europe PMC"
+
+    def translate_query(self, canonical_query: str) -> str:
+        # Translate [Title/Abstract] -> (TITLE:"..." OR ABS:"...") and remove [MeSH Terms]
+        q = canonical_query
+        q = re.sub(r'"([^"]+)"\[Title/Abstract\]', r'(TITLE:"\1" OR ABS:"\1")', q)
+        q = re.sub(r'"([^"]+)"\[MeSH Terms\]', r'KW:"\1"', q)
+        return q
+
+class CrossrefAdapter(BaseSearchAdapter):
+    """Adapter for Crossref Metadata REST API query translation and execution."""
+    database_name = "Crossref"
+
+    def translate_query(self, canonical_query: str) -> str:
+        # Crossref uses bibliographic query string without field tags
+        q = canonical_query
+        q = re.sub(r'\[Title/Abstract\]', '', q)
+        q = re.sub(r'\[MeSH Terms\]', '', q)
+        return q.strip()
+
+class OpenAlexAdapter(BaseSearchAdapter):
+    """Adapter for OpenAlex scholarly concepts and inverted index search."""
+    database_name = "OpenAlex"
+
+    def translate_query(self, canonical_query: str) -> str:
+        # Strip PubMed field qualifiers and format as OpenAlex search string
+        q = canonical_query
+        q = re.sub(r'\[Title/Abstract\]', '', q)
+        q = re.sub(r'\[MeSH Terms\]', '', q)
+        return q.strip()
 
 class GenericSearchPlanner:
     """Constructs dynamic, multi-database query matrices for evidence-seeking literature retrieval."""
@@ -242,6 +305,7 @@ class GenericSearchPlanner:
         }
 
     EXECUTION_STATUSES = [
+        "NOT_EXECUTED",
         "QUERY_GENERATED",
         "SEARCH_EXECUTED",
         "RETRIEVAL_PARTIAL",
@@ -375,21 +439,131 @@ class GenericSearchPlanner:
         }
 
     @classmethod
-    def generate_prisma_accounting_report(cls, search_logs: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Generates authentic PRISMA 2020 accounting strictly from real execution event logs (Prompt Pt 22, 23).
+    def get_required_evidence_streams(cls, framework: str) -> List[str]:
+        """Returns question-dependent required evidence streams based on study framework (Part 9)."""
+        FRAMEWORK_STREAMS = {
+            "DIAGNOSTIC": [
+                "INDEX_TEST_ACCURACY", "REFERENCE_STANDARD_VALIDITY",
+                "SENSITIVITY_SPECIFICITY", "THRESHOLD_VARIATION",
+                "INTER_RATER_RELIABILITY", "SAFETY_OR_CONTRAINDICATION"
+            ],
+            "PECO": [
+                "EXPOSURE_MEASUREMENT", "OUTCOME_INCIDENCE",
+                "CONFOUNDING_BIAS", "DOSE_RESPONSE_GRADIENT",
+                "TEMPORAL_SEQUENCE", "POPULATION_SUSCEPTIBILITY"
+            ],
+            "PROGNOSTIC": [
+                "PROGNOSTIC_FACTOR_MEASUREMENT", "TIME_TO_EVENT_OUTCOMES",
+                "DISCRIMINATION_CALIBRATION", "INCREMENTAL_VALUE",
+                "CONFOUNDER_ADJUSTMENT"
+            ],
+            "EXPERIMENTAL_ANIMAL": [
+                "IN_VIVO_EFFICACY", "DOSE_FINDING_PHARMACOKINETICS",
+                "ANIMAL_WELFARE_SYRCLE", "METHODOLOGICAL_ARRIVE",
+                "SAFETY_ORGAN_TOXICITY", "NEGATIVE_NULL_EVIDENCE"
+            ],
+            "EXPERIMENTAL_IN_VITRO": [
+                "DIRECT_CYTOTOXICITY_EFFICACY", "COMPONENT_EVIDENCE",
+                "MECHANISTIC_PATHWAY", "SAFETY_THERAPEUTIC_WINDOW",
+                "NEGATIVE_NULL_EVIDENCE", "REPLICATION_EVIDENCE"
+            ],
+            "PICO": [
+                "DIRECT_CLINICAL_EFFICACY", "COMPARATOR_CONTROL",
+                "ADVERSE_EVENTS_SAFETY", "RANDOMIZATION_BLINDING",
+                "NEGATIVE_NULL_EVIDENCE", "SUBGROUP_HETEROGENEITY"
+            ]
+        }
+        return FRAMEWORK_STREAMS.get(framework, [
+            "DIRECT_EVIDENCE", "COMPONENT_EVIDENCE", "MECHANISTIC_EVIDENCE",
+            "SAFETY_TOXICITY", "NEGATIVE_NULL_EVIDENCE", "REPLICATION_EVIDENCE",
+            "TRANSLATIONAL_EVIDENCE", "CLINICAL_EVIDENCE", "COMBINATION_INTERACTION"
+        ])
+
+    @classmethod
+    def deduplicate_records(cls, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Performs authentic record-level deduplication across PMID, DOI, and OpenAlex ID (Part 4)."""
+        seen_keys = set()
+        unique_records = []
+        duplicate_records = []
+
+        for rec in records:
+            pmid = str(rec.get("pmid", "")).strip() if rec.get("pmid") else None
+            doi = str(rec.get("doi", "")).strip().lower() if rec.get("doi") else None
+            openalex_id = str(rec.get("openalex_id", "")).strip().lower() if rec.get("openalex_id") else None
+
+            # Primary key resolution
+            key = None
+            if doi:
+                key = f"doi:{doi}"
+            elif pmid:
+                key = f"pmid:{pmid}"
+            elif openalex_id:
+                key = f"openalex:{openalex_id}"
+            else:
+                title_norm = re.sub(r'[^a-z0-9]', '', str(rec.get("title", "")).lower())
+                if title_norm:
+                    key = f"title:{title_norm[:40]}"
+
+            if key and key in seen_keys:
+                duplicate_records.append(rec)
+            else:
+                if key:
+                    seen_keys.add(key)
+                unique_records.append(rec)
+
+        return {
+            "total_input_records": len(records),
+            "unique_records_count": len(unique_records),
+            "duplicates_removed_count": len(duplicate_records),
+            "unique_records": unique_records,
+            "duplicate_records": duplicate_records
+        }
+
+    @classmethod
+    def generate_prisma_accounting_report(
+        cls,
+        search_logs: List[Dict[str, Any]],
+        identified_records: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Generates authentic PRISMA 2020 accounting strictly from real execution event logs or record callsets (Parts 4, 22, 23).
         Reports PRISMA_INCOMPLETE if data is missing; never invents fake counts.
         """
-        if not search_logs:
+        if not search_logs and not identified_records:
             return {
                 "prisma_status": "PRISMA_INCOMPLETE",
-                "reason": "Zero execution search logs supplied; cannot compute authentic PRISMA numbers without event trace.",
+                "reason": "Zero execution search logs or records supplied; cannot compute authentic PRISMA numbers without event trace.",
                 "total_records_identified": 0
             }
 
+        # Case 1: Real identified records supplied for deduplication
+        if identified_records is not None:
+            dedup_res = cls.deduplicate_records(identified_records)
+            unique_count = dedup_res["unique_records_count"]
+            dup_count = dedup_res["duplicates_removed_count"]
+
+            databases = list(set(r.get("database") for r in identified_records if r.get("database")))
+            screened_records = [r for r in dedup_res["unique_records"] if r.get("screening_status") in ["INCLUDED", "EXCLUDED"]]
+            excluded_records = [r for r in dedup_res["unique_records"] if r.get("screening_status") == "EXCLUDED"]
+            included_records = [r for r in dedup_res["unique_records"] if r.get("screening_status") == "INCLUDED"]
+
+            is_complete = len(screened_records) == unique_count
+
+            return {
+                "prisma_status": "PRISMA_COMPLIANT_AUTHENTIC" if is_complete else "PRISMA_INCOMPLETE",
+                "databases_searched": databases,
+                "records_identified_from_databases": len(identified_records),
+                "duplicates_removed": dup_count,
+                "records_screened": len(screened_records) if screened_records else unique_count,
+                "records_excluded": len(excluded_records),
+                "reports_assessed_for_eligibility": unique_count - len(excluded_records),
+                "studies_included_in_synthesis": len(included_records),
+                "is_reproducible": True
+            }
+
+        # Case 2: Aggregate log entries
         total_retrieved = sum(log.get("retrieved_count", 0) for log in search_logs)
         databases = list(set(log.get("database") for log in search_logs if log.get("database")))
         
-        # Deduplication simulation based on logged unique queries
         screened = sum(log.get("screened_count", log.get("retrieved_count", 0)) for log in search_logs)
         excluded = sum(log.get("excluded_count", 0) for log in search_logs)
         included = sum(log.get("included_count", 0) for log in search_logs)

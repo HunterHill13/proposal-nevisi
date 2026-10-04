@@ -232,8 +232,169 @@ class TestMultiDomainGeneralization(unittest.TestCase):
         matrix_str = json.dumps(matrix).lower()
         self.assertNotIn("lupeol", matrix_str)
         self.assertNotIn("ndv", matrix_str)
+    def test_10_biomaterials_regenerative_scaffold_invariants(self):
+        """Unseen Topic Benchmark 1: Regenerative Biomaterials / Tissue Engineering Scaffold."""
+        spec = {
+            "model_id": "RPM_REGEN_BIO_01",
+            "research_title_fa": "بررسی بازسازی بافت استخوانی توسط داربست نانوالیاف ابریشم بارگذاری‌شده با BMP-2",
+            "research_title_en": "Evaluation of Silk Fibroin Nanofibrous Scaffolds Loaded with BMP-2 for Critical-Sized Bone Defect Regeneration",
+            "domain": "biomaterials_regenerative",
+            "framework": "EXPERIMENTAL_ANIMAL",
+            "target_condition": {
+                "name_en": "Critical-Sized Cranial Bone Defect",
+                "name_fa": "نقص استخوانی اندازه بحرانی کاسه سر",
+                "mesh_term": "Bone Regeneration",
+                "synonyms": ["calvarial defect", "bone defect repair"]
+            },
+            "population_or_model": {
+                "model_type": "ANIMAL_IN_VIVO",
+                "primary_system": "Sprague-Dawley Rats (Calvarial defect model)",
+                "secondary_systems": [],
+                "normal_control_system": "Sham-operated negative control"
+            },
+            "interventions_or_exposures": [
+                {
+                    "name": "Silk Fibroin BMP-2 Scaffold",
+                    "chemical_or_biological_class": "Tissue Engineering Scaffold",
+                    "role": "PRIMARY_AGENT",
+                    "mesh_terms": ["Tissue Scaffolds", "Bone Morphogenetic Protein 2"],
+                    "synonyms": ["SF-BMP2"]
+                }
+            ],
+            "comparators": [{"name": "Unseeded Silk Scaffold", "type": "VEHICLE_SCAFFOLD"}],
+            "primary_outcomes": [
+                {"name": "Bone Mineral Density by Micro-CT", "type": "CONTINUOUS", "measurement_unit": "mg HA/ccm"}
+            ],
+            "hypothesized_mechanisms": [
+                {"pathway_name": "Osteogenic Differentiation and Runx2 Activation", "target_molecules": ["Runx2", "Osteocalcin"], "expected_modulation": "UPREGULATION"}
+            ]
+        }
+        model = ProblemModelBuilder.create_from_specification(spec)
+        self.assertEqual(model.framework, "EXPERIMENTAL_ANIMAL")
+        self.assertEqual(model.domain, "biomaterials_regenerative")
+
+        planner = GenericSearchPlanner(model)
+        matrix = planner.build_query_matrix()
+        self.assertEqual(matrix["dual_path_execution"]["supporting_search_count"], 7)
+        self.assertEqual(matrix["dual_path_execution"]["contradicting_search_count"], 9)
+        # Verify complete domain independence
+        matrix_str = json.dumps(matrix).lower()
         self.assertNotIn("cancer", matrix_str)
-        self.assertIn("membranous nephropathy", matrix_str)
+        self.assertNotIn("lupeol", matrix_str)
+        self.assertIn("bone regeneration", matrix_str)
+
+        # Check required streams for animal models
+        streams = GenericSearchPlanner.get_required_evidence_streams(model.framework)
+        self.assertIn("ANIMAL_WELFARE_SYRCLE", streams)
+        self.assertIn("METHODOLOGICAL_ARRIVE", streams)
+
+    def test_11_toxicology_occupational_cohort_peco_invariants(self):
+        """Unseen Topic Benchmark 2: Occupational Toxicology / Silica Exposure Cohort (PECO)."""
+        spec = {
+            "model_id": "RPM_TOXICOLOGY_02",
+            "research_title_fa": "بررسی خطر فیبروز ریوی ناشی از مواجهه شغلی با گرد و غبار سیلیس در کارگران معدن",
+            "research_title_en": "Occupational Respirable Crystalline Silica Exposure and Risk of Pulmonary Fibrosis: A Prospective Cohort Study",
+            "domain": "occupational_epidemiology",
+            "framework": "PECO",
+            "target_condition": {
+                "name_en": "Silicosis and Pulmonary Fibrosis",
+                "name_fa": "سیلیکوزیس و فیبروز بینابینی ریه",
+                "mesh_term": "Silicosis",
+                "synonyms": ["silica-induced fibrosis", "pneumoconiosis"]
+            },
+            "population_or_model": {
+                "model_type": "HUMAN_COHORT",
+                "primary_system": "Surface and Underground Mining Workers",
+                "secondary_systems": [],
+                "normal_control_system": "Unexposed administrative workers"
+            },
+            "interventions_or_exposures": [
+                {
+                    "name": "Respirable Crystalline Silica Dust",
+                    "chemical_or_biological_class": "Occupational Inhalational Toxicant",
+                    "role": "PRIMARY_EXPOSURE",
+                    "mesh_terms": ["Silicon Dioxide", "Air Pollutants, Occupational"],
+                    "synonyms": ["quartz dust"]
+                }
+            ],
+            "comparators": [{"name": "Unexposed Baseline Cohort", "type": "INTERNAL_CONTROL"}],
+            "primary_outcomes": [
+                {"name": "Incidence of Radiographic Silicosis (ILO Classification)", "type": "HAZARD_RATIO", "measurement_unit": "Adjusted Hazard Ratio"}
+            ],
+            "hypothesized_mechanisms": [
+                {"pathway_name": "Alveolar Macrophage Pyroptosis and NLRP3 Inflammasome", "target_molecules": ["NLRP3", "IL-1beta", "TGF-beta1"], "expected_modulation": "ACTIVATION"}
+            ]
+        }
+        model = ProblemModelBuilder.create_from_specification(spec)
+        self.assertEqual(model.framework, "PECO")
+
+        # Causal overclaim gate test for observational PECO design
+        claim = "Occupational silica dust causes progressive pulmonary fibrosis in all exposed miners."
+        res_causal = GenericClaimEntailmentEngine.audit_causal_language(claim, "OBSERVATIONAL_COHORT_CASE_CONTROL")
+        self.assertEqual(res_causal["status"], "OVERCLAIM_RISK")
+        self.assertFalse(res_causal["allowed_unconditional_causal_claim"])
+
+        # Check required streams for PECO
+        peco_streams = GenericSearchPlanner.get_required_evidence_streams(model.framework)
+        self.assertIn("CONFOUNDING_BIAS", peco_streams)
+        self.assertIn("DOSE_RESPONSE_GRADIENT", peco_streams)
+
+    def test_12_pediatric_asthma_prognostic_multivariable_invariants(self):
+        """Unseen Topic Benchmark 3: Pediatric Asthma Remission Prognosis (Multivariable Cox / C-index)."""
+        spec = {
+            "model_id": "RPM_PEDIATRIC_ASTHMA_03",
+            "research_title_fa": "مدل پیش‌آگهی تداوم آسم دوران کودکی بر اساس فنوتیپ‌های التهابی و بیومارکرهای ائوزینوفیلی",
+            "research_title_en": "Development and Internal Validation of a Multivariable Prognostic Model for Childhood Asthma Persistence into Adulthood",
+            "domain": "pediatric_pulmonology",
+            "framework": "PROGNOSTIC",
+            "target_condition": {
+                "name_en": "Asthma Persistence into Adulthood",
+                "name_fa": "تداوم بیماری آسم در بزرگسالی",
+                "mesh_term": "Asthma",
+                "synonyms": ["pediatric asthma persistence", "wheezing remission failure"]
+            },
+            "population_or_model": {
+                "model_type": "HUMAN_COHORT",
+                "primary_system": "Pediatric Asthma Birth Cohort (Ages 6-18)",
+                "secondary_systems": [],
+                "normal_control_system": "Children with transient early wheeze"
+            },
+            "interventions_or_exposures": [
+                {
+                    "name": "Blood Eosinophil Count and FeNO Profile",
+                    "chemical_or_biological_class": "Prognostic Biomarker Panel",
+                    "role": "PROGNOSTIC_FACTOR",
+                    "mesh_terms": ["Eosinophils", "Fractional Exhaled Nitric Oxide"],
+                    "synonyms": ["FeNO", "blood eosinophils"]
+                }
+            ],
+            "comparators": [{"name": "Standard Clinical Risk Scoring", "type": "EXISTING_PREDICTOR"}],
+            "primary_outcomes": [
+                {"name": "Asthma Persistence at Age 18", "type": "BINARY_AND_TIME_TO_EVENT", "measurement_unit": "Harrell's C-index"}
+            ],
+            "hypothesized_mechanisms": [
+                {"pathway_name": "Type 2 Airway Remodeling and Basal Membrane Thickening", "target_molecules": ["IL-4", "IL-13", "Periostin"], "expected_modulation": "PERSISTENT_ELEVATION"}
+            ]
+        }
+        model = ProblemModelBuilder.create_from_specification(spec)
+        self.assertEqual(model.framework, "PROGNOSTIC")
+
+        # Test statistical strategy contains C-index and Cox regression
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(model.to_dict())
+        stat_text = " ".join(stat_plan["complete_testing_strategy"])
+        self.assertIn("هارل", stat_text)
+        self.assertIn("کاکس", stat_text)
+
+        # Gap detection check for prognostic cohort
+        gap_res = GenericGapDetector.identify_gaps(
+            target_model=model.to_dict(),
+            study_evidence=[
+                {"study_id": "S_P1", "model_system": "Pediatric Asthma Birth Cohort", "variables_measured": ["blood_eosinophils"], "multivariate_adjusted": True}
+            ]
+        )
+        self.assertIn("identified_gaps", gap_res)
+        self.assertGreater(len(gap_res["identified_gaps"]), 0)
+
 
 def run_generalization_suite() -> bool:
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMultiDomainGeneralization)

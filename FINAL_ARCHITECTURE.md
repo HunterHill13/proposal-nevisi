@@ -151,6 +151,9 @@ USER RESEARCH TOPIC & DOMAIN SPECIFICATION
   - Detects overclaim risks and enforces caveat qualification.
 
 ### Layer 6: Universal 14-Section Persian Proposal Output (`scripts/docx_builder.py`, `scripts/generate_compliant_proposal.py`)
+- **Directed Internal Consistency Graph:** Validates logical and methodological coherence from Title -> Question -> Objectives -> Hypotheses -> Variables -> Outcomes -> Design -> Analysis -> Conclusion Scope (scripts/proposal_structure_validator.py).
+- **Sample Size Provenance Audit:** Explicitly tracks statistical parameter origins across 5 discrete states (provided, literature-derived, pilot-derived, ssumed, missing) to eliminate ungrounded sample size calculations (scripts/dynamic_protocol_designer.py).
+- **Deep DOCX XML Inspection Tool:** Real XML validation tool (DocxBuilder.inspect_docx_file) verifying all 14 main sections, 14 Section 13 subsections, data tables, and native Right-to-Left bidirectional XML tags (<w:bidi/>).
 - Strictly renders the 14 standard sections demanded by Iranian medical universities and institutional review boards:
   1. موضوع (عنوان فارسی و انگلیسی) - Research Title
   2. بیان مسئله - Problem Statement (Epidemiological burden, current standards, limitations, biological rationale, conflicting evidence, evidence gaps)

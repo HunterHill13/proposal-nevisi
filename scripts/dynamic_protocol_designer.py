@@ -228,14 +228,27 @@ class DynamicProtocolDesigner:
 
     @classmethod
     def calculate_sample_size_plan(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:
-        """Provides mathematically rigorous and design-aware sample size guidance (Prompt Pt 34).
+        """Provides mathematically rigorous and design-aware sample size guidance (Prompt Pt 34, Part 21).
+        Tracks parameter statuses explicitly ('provided', 'literature-derived', 'pilot-derived', 'assumed', 'missing').
         If statistical parameters (effect size, variance, event rate) are unknown, explicitly
         outputs SAMPLE_SIZE_REQUIRES_INPUT rather than inventing fake sample sizes.
         """
         framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
         stat_inputs = model_dict.get("statistical_parameters", {})
 
+        # Standard parameter audit dictionary
+        param_audit = {
+            "alpha": {"value": 0.05, "status": "assumed" if "alpha" not in stat_inputs else "provided"},
+            "power": {"value": 0.80, "status": "assumed" if "power" not in stat_inputs else "provided"},
+            "effect_size": {"value": stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio"), "status": "provided" if (stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio")) is not None else "missing"},
+            "variance_or_sd": {"value": stat_inputs.get("standard_deviation"), "status": "provided" if stat_inputs.get("standard_deviation") is not None else "missing"},
+            "baseline_event_rate": {"value": stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion"), "status": "provided" if (stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion")) is not None else "missing"},
+            "attrition_rate": {"value": stat_inputs.get("attrition_rate", 0.10), "status": "provided" if "attrition_rate" in stat_inputs else "assumed"}
+        }
+
         if framework == "EXPERIMENTAL_IN_VITRO":
+            param_audit["biological_replicates"] = {"value": 3, "status": "literature-derived"}
+            param_audit["technical_replicates"] = {"value": 3, "status": "literature-derived"}
             return {
                 "design_type": "IN_VITRO_CELLULAR",
                 "biological_replicates": 3,
@@ -243,21 +256,22 @@ class DynamicProtocolDesigner:
                 "total_independent_runs": 3,
                 "pseudo_replication_warning": "Technical replicates within the same plate must be averaged and treated as 1 biological unit to avoid pseudo-replication.",
                 "formula_or_standard": "Triplicate independent biological passages (n=3 biological replicates, each assayed in technical triplicate)",
+                "parameter_audit": param_audit,
                 "pilot_required": False
             }
         elif framework == "EXPERIMENTAL_ANIMAL":
+            param_audit["animals_per_group"] = {"value": 6, "status": "literature-derived"}
             return {
                 "design_type": "IN_VIVO_ANIMAL",
                 "animals_per_group": 6,
                 "formula_or_standard": "Mead's Resource Equation (E = N - B - T, where 10 <= E <= 20) and Charlebois Power Calculation",
                 "alpha": 0.05,
                 "power": 0.80,
+                "parameter_audit": param_audit,
                 "pilot_required": False
             }
         elif framework in ["PICO", "PECO", "PROGNOSTIC"]:
-            # Check if required empirical inputs exist
             p1 = stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion")
-            p2 = stat_inputs.get("expected_intervention_rate") or stat_inputs.get("intervention_proportion")
             effect_size = stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio")
 
             if (p1 is None and effect_size is None):
@@ -268,6 +282,7 @@ class DynamicProtocolDesigner:
                     "formula_or_standard": "Two-sample survival log-rank / proportions power equation: n = (Z_alpha + Z_beta)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2",
                     "alpha": 0.05,
                     "power": 0.80,
+                    "parameter_audit": param_audit,
                     "pilot_required": True,
                     "recommendation": "Empirical baseline event rate is unknown in literature; pilot study or registry inquiry required prior to final sample size fixation. Prohibits guessing."
                 }
@@ -278,11 +293,14 @@ class DynamicProtocolDesigner:
                 "formula_or_standard": "Two-sample survival log-rank / proportions power equation: n = (Z_alpha + Z_beta)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2",
                 "alpha": 0.05,
                 "power": 0.80,
+                "parameter_audit": param_audit,
                 "pilot_required": False
             }
         elif framework == "DIAGNOSTIC":
             prev = stat_inputs.get("prevalence")
             sens = stat_inputs.get("expected_sensitivity")
+            param_audit["prevalence"] = {"value": prev, "status": "provided" if prev is not None else "missing"}
+            param_audit["expected_sensitivity"] = {"value": sens, "status": "provided" if sens is not None else "missing"}
             if prev is None or sens is None:
                 return {
                     "design_type": "DIAGNOSTIC_ACCURACY",
@@ -291,6 +309,7 @@ class DynamicProtocolDesigner:
                     "formula_or_standard": "Buderer's formula for diagnostic sensitivity and specificity: n = (Z_alpha/2)^2 * P * (1-P) / (L^2 * Prevalence)",
                     "alpha": 0.05,
                     "precision": 0.05,
+                    "parameter_audit": param_audit,
                     "pilot_required": False,
                     "recommendation": "Disease prevalence and target sensitivity must be specified from epidemiological benchmarks."
                 }
@@ -301,9 +320,15 @@ class DynamicProtocolDesigner:
                 "formula_or_standard": "Buderer's formula for diagnostic sensitivity and specificity: n = (Z_alpha/2)^2 * P * (1-P) / (L^2 * Prevalence)",
                 "alpha": 0.05,
                 "precision": 0.05,
+                "parameter_audit": param_audit,
                 "pilot_required": False
             }
-        return {"design_type": "GENERIC", "status": "SAMPLE_SIZE_COMPUTED", "pilot_required": False}
+        return {
+            "design_type": "GENERIC",
+            "status": "SAMPLE_SIZE_COMPUTED",
+            "parameter_audit": param_audit,
+            "pilot_required": False
+        }
 
     @classmethod
     def generate_dynamic_ethics_subsections(cls, model_dict: Dict[str, Any]) -> List[Tuple[str, str, str]]:

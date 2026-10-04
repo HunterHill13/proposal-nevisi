@@ -12,6 +12,7 @@ import re
 import shutil
 import tempfile
 import argparse
+from typing import Dict, List, Any, Optional
 import docx
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
@@ -390,6 +391,68 @@ class DocxBuilder:
             finally:
                 if os.path.exists(temp_md):
                     os.remove(temp_md)
+
+    @classmethod
+    def inspect_docx_file(cls, docx_path: str) -> Dict[str, Any]:
+        """Performs authentic structural and typographic inspection of a generated Word .docx file (Part 30).
+        Verifies presence of 14 sections, Section 13 subsections, tables, bidi RTL, and Dubai font.
+        """
+        if not os.path.exists(docx_path):
+            return {
+                "inspection_status": "FILE_NOT_FOUND",
+                "file_exists": False,
+                "verified": False
+            }
+
+        doc = Document(docx_path)
+        paragraphs_text = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+        
+        # Check headings
+        h1_headings = []
+        h2_headings = []
+        has_bidi = False
+        has_dubai = False
+
+        for p in doc.paragraphs:
+            p_xml = p._p.xml
+            if "<w:bidi" in p_xml:
+                has_bidi = True
+            if 'w:cs="Dubai"' in p_xml or 'w:ascii="Dubai"' in p_xml:
+                has_dubai = True
+            
+            p_text = p.text.strip()
+            if re.match(r'^(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
+                h1_headings.append(p_text)
+            elif re.match(r'^(?:13|۱۳)\-(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
+                h2_headings.append(p_text)
+
+        # Check tables
+        tables_count = len(doc.tables)
+        has_table_headers = False
+        if tables_count > 0:
+            first_tbl = doc.tables[0]
+            if len(first_tbl.rows) > 0 and len(first_tbl.rows[0].cells) > 0:
+                has_table_headers = True
+
+        all_14_present = len(h1_headings) >= 14
+        sec_13_subsecs_present = len(h2_headings) >= 14
+
+        is_valid = bool(all_14_present and sec_13_subsecs_present and has_bidi and has_dubai and tables_count >= 2)
+
+        return {
+            "inspection_status": "INSPECTION_PASSED" if is_valid else "STRUCTURAL_DEFECT",
+            "verified": is_valid,
+            "paragraphs_count": len(doc.paragraphs),
+            "h1_headings_count": len(h1_headings),
+            "h1_headings_detected": h1_headings[:15],
+            "all_14_sections_present": all_14_present,
+            "h2_subsections_count": len(h2_headings),
+            "sec_13_subsections_present": sec_13_subsecs_present,
+            "tables_count": tables_count,
+            "has_table_headers": has_table_headers,
+            "openxml_rtl_bidi_detected": has_bidi,
+            "dubai_font_detected": has_dubai
+        }
 
 def main():
     parser = argparse.ArgumentParser(description="Master Persian Research Proposal Word Docx Generator")

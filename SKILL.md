@@ -15,8 +15,8 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 153-assertion test harness
-  (Static analysis zero leakage, 9-domain generalization fixtures, 65 adversarial stress tests, and 60-test benchmark).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 161-assertion test harness
+  (Static analysis zero leakage, 12-domain generalization fixtures, 70 adversarial stress tests, and 60-test benchmark).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.1)

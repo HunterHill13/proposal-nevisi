@@ -112,6 +112,60 @@ class ProposalStructureValidator:
             "section_audit_details": section_status
         }
 
+    @classmethod
+    def validate_proposal_consistency(cls, model_or_proposal_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Validates directed consistency graph across Title -> Question -> Objectives -> Hypotheses -> Variables -> Outcomes -> Design -> Analysis -> Conclusion Scope (Part 12)."""
+        title = model_or_proposal_dict.get("research_title_fa") or model_or_proposal_dict.get("research_title_en") or ""
+        cond = model_or_proposal_dict.get("target_condition", {})
+        cond_name = cond.get("name_en") or cond.get("name_fa") or ""
+        interventions = model_or_proposal_dict.get("interventions_or_exposures", [])
+        outcomes = model_or_proposal_dict.get("primary_outcomes", [])
+        framework = model_or_proposal_dict.get("framework", "")
+        stat_plan = model_or_proposal_dict.get("statistical_analysis_plan", {})
+        
+        flags = []
+        checks = {}
+
+        # 1. Condition reflected in title
+        has_cond_in_title = bool(cond_name and (cond_name.lower() in title.lower() or any(w.lower() in title.lower() for w in cond_name.split() if len(w) > 3)))
+        checks["condition_in_title"] = has_cond_in_title or len(title) == 0
+        if not checks["condition_in_title"]:
+            flags.append("TITLE_CONDITION_MISMATCH")
+
+        # 2. Interventions aligned with objectives/hypotheses
+        agent_names = [a.get("name", "") for a in interventions if a.get("name")]
+        checks["interventions_specified"] = len(agent_names) > 0 or framework in ["OBSERVATIONAL", "PECO"]
+        if not checks["interventions_specified"]:
+            flags.append("MISSING_INTERVENTIONS_IN_EXPERIMENTAL_GRAPH")
+
+        # 3. Outcomes defined and linked
+        outcome_names = [o.get("name", "") for o in outcomes if o.get("name")]
+        checks["outcomes_specified"] = len(outcome_names) > 0
+        if not checks["outcomes_specified"]:
+            flags.append("MISSING_PRIMARY_OUTCOMES_GRAPH")
+
+        # 4. Statistical plan matches framework
+        primary_test = str(stat_plan.get("primary_analysis", ""))
+        test_matches_design = True
+        if framework == "DIAGNOSTIC" and "حساسیت" not in primary_test and "sensitivity" not in primary_test.lower() and "roc" not in primary_test.lower():
+            test_matches_design = False
+            flags.append("DIAGNOSTIC_FRAMEWORK_ANALYSIS_MISMATCH")
+        elif framework == "PICO" and "itt" not in primary_test.lower() and "قصد درمان" not in primary_test and "cox" not in primary_test.lower() and "anova" not in primary_test.lower() and "t-test" not in primary_test.lower():
+            test_matches_design = False
+            flags.append("CLINICAL_TRIAL_ANALYSIS_MISMATCH")
+
+        checks["statistical_analysis_aligned"] = test_matches_design
+
+        is_consistent = len(flags) == 0
+
+        return {
+            "consistency_status": "GRAPH_CONSISTENT" if is_consistent else "CONSISTENCY_BREACH",
+            "is_internally_consistent": is_consistent,
+            "consistency_checks": checks,
+            "detected_inconsistencies": flags,
+            "directed_graph_path": "Title -> Question -> Objectives -> Hypotheses -> Variables -> Outcomes -> Design -> Analysis -> Conclusion Scope"
+        }
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):

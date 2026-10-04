@@ -32,6 +32,34 @@ OBSERVATIONAL_DESIGNS = [
 class GenericClaimEntailmentEngine:
     """Audits scientific claim entailment, overclaim risks, and numerical traceability."""
 
+    INJECTION_PATTERNS = [
+        r'ignore\s+previous\s+instructions',
+        r'system\s+prompt',
+        r'override\s+all\s+rules',
+        r'<script[\s>]',
+        r'javascript:',
+        r'data:\s*text/html'
+    ]
+
+    @classmethod
+    def sanitize_text(cls, text: str) -> Dict[str, Any]:
+        """Detects prompt injection or hostile payloads in raw scientific text (Part 36)."""
+        is_suspicious = False
+        flagged_patterns = []
+        cleaned = text
+        for pat in cls.INJECTION_PATTERNS:
+            if re.search(pat, text, re.IGNORECASE):
+                is_suspicious = True
+                flagged_patterns.append(pat)
+                cleaned = re.sub(pat, "[SANITIZED_PROMPT_INJECTION]", cleaned, flags=re.IGNORECASE)
+
+        return {
+            "is_suspicious": is_suspicious,
+            "flagged_patterns": flagged_patterns,
+            "sanitized_text": cleaned,
+            "security_status": "POTENTIAL_INJECTION_FLAGGED" if is_suspicious else "CLEAN"
+        }
+
     @classmethod
     def audit_causal_language(cls, claim_text: str, source_study_design: str) -> Dict[str, Any]:
         """Audits causal vs correlational language boundaries and flags overclaims."""

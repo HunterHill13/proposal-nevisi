@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ReferenceRecordSchema",
+  "description": "Schema for individual reference records with granular temporal audit and retraction/correction/identity verification.",
+  "type": "object",
+  "required": ["ref_id", "title", "authors", "year"],
+  "properties": {
+    "ref_id": { "type": "string" },
+    "title": { "type": "string" },
+    "authors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "journal": { "type": "string" },
+    "year": { "type": ["integer", "null"] },
+    "publication_date": { "type": ["string", "null"] },
+    "doi": { "type": ["string", "null"] },
+    "pmid": { "type": ["string", "null"] },
+    "openalex_id": { "type": ["string", "null"] },
+    "evidence_role": {
+      "type": "string",
+      "enum": [
+        "PRIMARY_EVIDENCE",
+        "PRIMARY_DIRECT_EFFICACY",
+        "SECONDARY_EVIDENCE",
+        "BACKGROUND_EPIDEMIOLOGY",
+        "METHODOLOGICAL_BENCHMARK",
+        "UNCERTAIN_ROLE"
+      ]
+    },
+    "temporal_class": {
+      "type": "string",
+      "enum": [
+        "CORE_RECENT_PRIMARY",
+        "CORE_RECENT_SECONDARY",
+        "FOUNDATIONAL_METHODOLOGY",
+        "LANDMARK_GUIDELINE",
+        "CLASSICAL_METHOD",
+        "HISTORICAL_BACKGROUND",
+        "OUT_OF_WINDOW_NON_FOUNDATIONAL",
+        "DATE_UNCERTAIN"
+      ]
+    },
+    "foundational_justification": {
+      "type": "object",
+      "properties": {
+        "is_justified": { "type": "boolean" },
+        "category": { "type": "string" },
+        "rationale": { "type": "string" },
+        "no_modern_alternative_exists": { "type": "boolean" },
+        "section_scope": { "type": "string" }
+      }
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "EXACT_VERIFIED",
+        "MINOR_VARIATION",
+        "CORRECTED",
+        "RETRACTED",
+        "IDENTITY_CONFLICT",
+        "CONFLICT_OR_UNVERIFIED",
+        "UNVERIFIED"
+      ]
+    }
+  }
+}

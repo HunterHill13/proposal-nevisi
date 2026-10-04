@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SearchProvenanceSchema",
+  "description": "Provenance record tracking multi-database literature search queries, adapters, timestamps, and PRISMA 2020 flow accounting.",
+  "type": "object",
+  "required": [
+    "provenance_type",
+    "total_queries_executed",
+    "databases_queried",
+    "records_retrieved",
+    "records_screened",
+    "records_included",
+    "records_excluded",
+    "query_event_logs",
+    "reproducibility_verified"
+  ],
+  "properties": {
+    "provenance_type": { "type": "string", "enum": ["SEARCH_PROVENANCE_RECORD"] },
+    "total_queries_executed": { "type": "integer", "minimum": 0 },
+    "databases_queried": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "records_retrieved": { "type": "integer", "minimum": 0 },
+    "records_screened": { "type": "integer", "minimum": 0 },
+    "records_included": { "type": "integer", "minimum": 0 },
+    "records_excluded": { "type": "integer", "minimum": 0 },
+    "aggregated_exclusion_reasons": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "query_event_logs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["database", "exact_query", "search_layer", "execution_status"],
+        "properties": {
+          "database": { "type": "string" },
+          "exact_query": { "type": "string" },
+          "search_layer": { "type": "string" },
+          "execution_status": {
+            "type": "string",
+            "enum": [
+              "NOT_EXECUTED",
+              "QUERY_GENERATED",
+              "SEARCH_EXECUTED",
+              "RETRIEVAL_PARTIAL",
+              "METADATA_VERIFIED",
+              "FULL_TEXT_VERIFIED",
+              "ABSTRACT_ONLY",
+              "SCREENED_INCLUDED",
+              "SCREENED_EXCLUDED"
+            ]
+          },
+          "results_count": { "type": "integer" },
+          "retrieved_count": { "type": "integer" },
+          "screened_count": { "type": "integer" },
+          "included_count": { "type": "integer" },
+          "excluded_count": { "type": "integer" },
+          "timestamp": { "type": "string" },
+          "is_reproducible": { "type": "boolean" }
+        }
+      }
+    },
+    "reproducibility_verified": { "type": "boolean" }
+  }
+}

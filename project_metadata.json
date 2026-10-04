@@ -11,10 +11,10 @@
     "zero_hardcode_biological_leakage": true
   },
   "metrics": {
-    "total_unified_tests": 153,
+    "total_unified_tests": 161,
     "suite_1_static_analysis_tests": 19,
-    "suite_2_multi_domain_generalization_tests": 9,
-    "suite_3_adversarial_stress_and_negative_rejection_tests": 65,
+    "suite_2_multi_domain_generalization_tests": 12,
+    "suite_3_adversarial_stress_and_negative_rejection_tests": 70,
     "suite_4_benchmark_assertions": 60,
     "mandatory_proposal_sections": 14,
     "section_13_subsections": 14,
