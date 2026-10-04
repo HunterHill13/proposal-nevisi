@@ -813,9 +813,20 @@ class GenericReferenceAuditor:
                 "is_contextually_relevant": False,
                 "rejection_reason": "REJECT_LOW_CONTEXTUAL_RELEVANCE",
                 "rejection_category": "INCOMPATIBLE_BIOLOGICAL_SYSTEM",
+                "relevance_tier": "IRRELEVANT",
                 "matched_incompatible_indicator": found_incompatible,
                 "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Pure chemical keyword match without contextual relevance is prohibited.",
                 "scores": {
+                    "biological_topic_alignment": 0.0,
+                    "condition_phenotype_alignment": 0.0,
+                    "primary_agent_alignment": 0.5,
+                    "comparator_second_agent_alignment": 0.0,
+                    "experimental_model_population_alignment": 0.0,
+                    "outcome_alignment": 0.0,
+                    "mechanistic_pathway_alignment": 0.0,
+                    "study_design_alignment": 0.0,
+                    "research_question_fit": 0.0,
+                    "proposal_section_utility": 0.0,
                     "direct_relevance": 0.0,
                     "model_relevance": 0.0,
                     "intervention_relevance": 0.5,
@@ -827,53 +838,134 @@ class GenericReferenceAuditor:
                 }
             }
 
-        # 2. Evaluate 8 Dimensions
-        has_agent = any(a in combined_text for a in agent_names) if agent_names else True
-        intervention_rel = 1.0 if has_agent else 0.3
+        # 2. Evaluate 10 Universal Relevance Dimensions
+        # Dimension 1: biological_topic_alignment
+        bio_align = 1.0 if not found_incompatible else 0.0
+        if any(k in combined_text for k in [domain, "biomedical", "medicine", "clinical", "therapeutic", "cellular", "molecular"] + cond_names):
+            bio_align = 1.0
+        elif is_foundational_method:
+            bio_align = 1.0
+        else:
+            bio_align = 0.8
+            
+        # Dimension 2: condition_phenotype_alignment
+        has_cond = any(c in combined_text for c in cond_names if len(c) > 3) if cond_names else True
+        cond_align = 1.0 if has_cond else (0.5 if any(k in combined_text for k in ["disease", "syndrome", "pathology", "tumor", "carcinoma", "infection", "disorder", "dysfunction"]) else 0.2)
         
+        # Dimension 3: primary_agent_alignment
+        has_agent = any(a in combined_text for a in agent_names) if agent_names else True
+        prim_agent = 1.0 if has_agent else 0.3
+        
+        # Dimension 4: comparator_second_agent_alignment
+        has_comp = bool(record.get("comparator")) or ("control" in combined_text) or (len(agent_names) > 1 and any(agent_names[1] in combined_text for _ in [1]))
+        comp_agent = 1.0 if has_comp else 0.5
+        
+        # Dimension 5: experimental_model_population_alignment
         has_model = False
         if primary_sys and any(k in combined_text for k in primary_sys.split() if len(k) > 3):
             has_model = True
         elif any(k in combined_text for k in ["human", "cell culture", "in vitro", "murine", "mouse", "rat", "patient", "clinical"]):
             has_model = True
-        model_rel = 1.0 if has_model else 0.4
+        model_align = 1.0 if has_model else 0.4
         
-        has_cond = any(c in combined_text for c in cond_names if len(c) > 3) if cond_names else True
-        direct_rel = 1.0 if (has_agent and has_cond) else (0.6 if (has_agent or has_cond) else 0.2)
-        
+        # Dimension 6: outcome_alignment
         has_outcome = any(o in combined_text for o in outcomes if len(o) > 3) if outcomes else False
-        outcome_rel = 1.0 if has_outcome else (0.7 if any(k in combined_text for k in ["viability", "apoptosis", "survival", "toxicity", "efficacy", "inhibition", "expression"]) else 0.3)
+        outcome_align = 1.0 if has_outcome else (0.7 if any(k in combined_text for k in ["viability", "apoptosis", "survival", "toxicity", "efficacy", "inhibition", "expression"]) else 0.3)
         
+        # Dimension 7: mechanistic_pathway_alignment
         has_mech = any(m in combined_text for m in mechanisms if len(m) > 3) if mechanisms else False
-        mechanistic_rel = 1.0 if has_mech else (0.7 if any(k in combined_text for k in ["pathway", "signaling", "phosphorylation", "receptor", "caspase", "cleavage", "activation"]) else 0.3)
+        mech_align = 1.0 if has_mech else (0.7 if any(k in combined_text for k in ["pathway", "signaling", "phosphorylation", "receptor", "caspase", "cleavage", "activation"]) else 0.3)
         
-        has_method = is_foundational_method or any(k in combined_text for k in ["assay", "method", "protocol", "synergy", "isobologram", "ic50", "combination index", "median effect"])
-        method_rel = 1.0 if has_method else 0.5
+        # Dimension 8: study_design_alignment
+        has_method = is_foundational_method or any(k in combined_text for k in ["assay", "method", "protocol", "synergy", "isobologram", "ic50", "combination index", "median effect", "rct", "experimental", "in vitro", "in vivo"])
+        design_align = 1.0 if has_method else 0.5
         
-        transferability = 1.0 if (direct_rel >= 0.6 or is_foundational_method) else 0.4
+        # Dimension 9: research_question_fit
+        if is_foundational_method:
+            q_fit = 1.0
+        elif has_agent and has_cond and has_model:
+            q_fit = 1.0
+        elif has_agent and (has_cond or has_model):
+            q_fit = 0.8
+        elif has_agent or has_cond:
+            q_fit = 0.5
+        else:
+            q_fit = 0.2
+            
+        # Dimension 10: proposal_section_utility
+        sec_utility = 1.0 if (has_agent or is_foundational_method) else (0.6 if has_cond else 0.3)
         
+        # Weighted Overall Relevance Calculation
         overall_rel = round(
-            (direct_rel * 0.25) +
-            (intervention_rel * 0.20) +
-            (model_rel * 0.15) +
-            (outcome_rel * 0.15) +
-            (mechanistic_rel * 0.10) +
-            (method_rel * 0.10) +
-            (transferability * 0.05),
+            (bio_align * 0.15) +
+            (cond_align * 0.15) +
+            (prim_agent * 0.15) +
+            (comp_agent * 0.05) +
+            (model_align * 0.15) +
+            (outcome_align * 0.10) +
+            (mech_align * 0.10) +
+            (design_align * 0.05) +
+            (q_fit * 0.05) +
+            (sec_utility * 0.05),
             2
         )
         
-        is_relevant = overall_rel >= 0.40 or is_foundational_method
+        # Backwards compatible legacy aliases
+        direct_rel = 1.0 if (has_agent and has_cond) else (0.6 if (has_agent or has_cond) else 0.2)
+        model_rel = model_align
+        intervention_rel = prim_agent
+        outcome_rel = outcome_align
+        mechanistic_rel = mech_align
+        method_rel = design_align
+        transferability = 1.0 if (direct_rel >= 0.6 or is_foundational_method) else 0.4
+        
+        # 6-Tier Relevance Classification
+        if is_foundational_method or (design_align >= 0.75 and method_rel >= 0.75 and not has_cond and not has_agent):
+            relevance_tier = "METHOD_RELEVANT"
+            is_relevant = True
+        elif overall_rel >= 0.80:
+            relevance_tier = "DIRECTLY_RELEVANT"
+            is_relevant = True
+        elif overall_rel >= 0.65:
+            relevance_tier = "HIGHLY_RELEVANT"
+            is_relevant = True
+        elif overall_rel >= 0.50:
+            relevance_tier = "INDIRECTLY_RELEVANT"
+            is_relevant = True
+        elif overall_rel >= 0.35:
+            relevance_tier = "BACKGROUND_ONLY"
+            is_relevant = True
+        else:
+            relevance_tier = "IRRELEVANT"
+            is_relevant = False
+            
         rejection_reason = None if is_relevant else "REJECT_LOW_CONTEXTUAL_RELEVANCE"
+        rejection_category = None if is_relevant else "LOW_OVERALL_ALIGNMENT"
+        rationale = (
+            f"Contextual alignment verified across target intervention, condition, and biological model (Tier: {relevance_tier}, Score: {overall_rel})."
+            if is_relevant else
+            f"Overall contextual relevance score ({overall_rel}) below acceptance threshold; classified as IRRELEVANT."
+        )
         
         return {
             "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
             "is_contextually_relevant": is_relevant,
+            "relevance_tier": relevance_tier,
             "rejection_reason": rejection_reason,
-            "rejection_category": None if is_relevant else "LOW_OVERALL_ALIGNMENT",
+            "rejection_category": rejection_category,
             "matched_incompatible_indicator": None,
-            "rationale": "Contextual alignment verified across target intervention, condition, and biological model." if is_relevant else "Overall contextual relevance score below minimum acceptance threshold.",
+            "rationale": rationale,
             "scores": {
+                "biological_topic_alignment": bio_align,
+                "condition_phenotype_alignment": cond_align,
+                "primary_agent_alignment": prim_agent,
+                "comparator_second_agent_alignment": comp_agent,
+                "experimental_model_population_alignment": model_align,
+                "outcome_alignment": outcome_align,
+                "mechanistic_pathway_alignment": mech_align,
+                "study_design_alignment": design_align,
+                "research_question_fit": q_fit,
+                "proposal_section_utility": sec_utility,
                 "direct_relevance": direct_rel,
                 "model_relevance": model_rel,
                 "intervention_relevance": intervention_rel,

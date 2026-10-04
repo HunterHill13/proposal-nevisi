@@ -4,25 +4,26 @@ description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
   evidence synthesis, humanization, and Word (.docx) publication engine (v8.2). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
-  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-layer dynamic literature searches
-  (Layers across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
+  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-source federated literature searches
+  (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
   maps 22 cross-study relationship types, detects gaps across 18 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
   clusters study families, cohorts, and trial registries to prevent evidence double-counting (NON_INDEPENDENT_EVIDENCE),
   resolves contradictions across an extensible 15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT),
   builds evidence conflict matrices and evaluates alternative explanations, tracks discovery paths in citation chaining,
   enforces epistemic gap bounds and rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
   enforces 7-level claim entailment and causal language boundaries with sentence-level CLAIM_PROVENANCE_MAP,
+  enforces 10-dimension contextual relevance gate and 6-tier classification strictly dropping IRRELEVANT off-topic records,
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 210-assertion test harness across 7 suites
-  (Static analysis zero leakage, 12-domain generalization fixtures, 79 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 216-assertion test harness across 7 suites
+  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 84 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.2)
 
 این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.2 با ارتقای عمیق موتور شواهد، به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی، اپیدمیولوژیک و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
-> **تذکر شفاف روش‌شناختی:** آزمون‌های نرم‌افزاری ۲۱۰ گانه نشان‌دهنده یکپارچگی محاسباتی و الگوریتمی سدهای سیستم هستند و نباید با کارآزمایی‌های بالینی یا آزمایشگاهی برون‌خط اشتباه گرفته شوند.
+> **تذکر شفاف روش‌شناختی:** آزمون‌های نرم‌افزاری ۲۱۶ گانه نشان‌دهنده یکپارچگی محاسباتی و الگوریتمی سدهای سیستم هستند و نباید با کارآزمایی‌های بالینی یا آزمایشگاهی برون‌خط اشتباه گرفته شوند.
 
 ---
 
@@ -97,7 +98,7 @@ description: >
            ▼
 [ ۱۲. ممیزی خودکار چندبعدی و دروازه کیفیت پیش از پرواز (9D QA Gate) ]
 ├── ارزیابی ۹ بعد کیفی نهایی: تمامیت ساختار، ره‌گیری استنادها، استقلال موضوعی، مرز زمانی، کنترل علیت، تعادل تناقض، انسجام متغیرها، دقت آماری و آزمون‌های رفتاری
-├── اجرای سوئیت تست یکپارچه ۲۱۰ تستی با قبولی ۱۰۰٪
+├── اجرای سوئیت تست یکپارچه ۲۱۶ تستی با قبولی ۱۰۰٪
 ```
 
 ---
@@ -200,15 +201,15 @@ description: >
 python tests/run_all_tests.py
 ```
 این سیستم به صورت پویا ۷ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
-1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته و استقلال سمانتیک کامل (۱۹ تست).
+1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته و استقلال سمانتیک کامل در ۲۲ اسکریپت (۲۲ تست).
 2. **آزمون تعمیم‌پذیری ۱۲ گانه دامنه‌ای (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۱۲ فیکسچر مستقل از رشته‌های مختلف پزشکی (۱۲ تست).
-3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۷۹ گانه (`test_adversarial_scenarios.py`):** ۷۹ آزمون چالش‌برانگیز شامل گیت هم‌خوانی مفهومی، سقف ۲۵ رفرنس، امتیازدهی ۱۴ عاملی، ممانعت از دور زدن قانون زمانی با استناد بالا، قیف غربالگری ۵ مرحله‌ای، الزام دلیل ورود، عدم تطابق DOI، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد و تبیین‌های جایگزین (۷۹ تست).
+3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۸۴ گانه (`test_adversarial_scenarios.py`):** ۸۴ آزمون چالش‌برانگیز شامل آداپتور جستجوی علمی (`ScientificSearchAdapter`)، تجمیع مؤلفه‌های همبند، منحنی اشباع جستجو، گیت ۱۰ بعدی هم‌خوانی مفهومی با ۶ سطح رتبه‌بندی، سقف ۲۵ رفرنس، امتیازدهی ۱۴ عاملی، ممانعت از دور زدن قانون زمانی، قیف غربالگری ۵ مرحله‌ای، الزام توجیه سه‌بخشی ورود، عدم تطابق DOI، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد و تبیین‌های جایگزین (۸۴ تست).
 4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی، الزامات متدولوژیک و رعایت کامل فرمت ۱۴ گانه Word (۶۰ تست).
 5. **سوئیت آزمون جهش‌های علمی (`test_mutations.py`):** آزمون ۱۰ جهش مخرب عمدی با نمره کشندگی ۱۰۰٪ (۱۰ تست).
 6. **سوئیت آزمون‌های خاصیت و اسکیمای Draft-07 (`test_property_and_schemas.py`):** ممیزی ناوردایی‌ها و تطابق اسکیماها (۱۴ تست).
 7. **سوئیت آزمون‌های یکپارچگی سرتاسری E2E (`test_e2e_integration.py`):** شبیه‌سازی کامل پایپ‌لاین از مدل تا کامپایل (۱۶ تست).
 
-**مجموع آزمون‌ها:** ۲۱۰ آزمون مستقل با قبولی ۱۰۰٪ (210 / 210 PASS).
+**مجموع آزمون‌ها:** ۲۱۶ آزمون مستقل با قبولی ۱۰۰٪ (216 / 216 PASS).
 
 ---
 

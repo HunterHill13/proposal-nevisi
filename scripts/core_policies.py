@@ -143,8 +143,22 @@ class ContextualRelevanceConfig:
     """Configures contextual relevance assessment, biological transferability, and irrelevant context exclusion."""
     MIN_OVERALL_RELEVANCE_THRESHOLD: float = 0.50
     
-    # 8 Contextual Relevance Dimensions
+    # 10 Universal Contextual Relevance Dimensions (Phase 4 Relevance Gate)
     RELEVANCE_DIMENSIONS = [
+        "biological_topic_alignment",
+        "condition_phenotype_alignment",
+        "primary_agent_alignment",
+        "comparator_second_agent_alignment",
+        "experimental_model_population_alignment",
+        "outcome_alignment",
+        "mechanistic_pathway_alignment",
+        "study_design_alignment",
+        "research_question_fit",
+        "proposal_section_utility"
+    ]
+    
+    # Legacy alias dimensions for backwards compatibility
+    LEGACY_DIMENSIONS = [
         "direct_relevance",
         "model_relevance",
         "intervention_relevance",
@@ -155,9 +169,20 @@ class ContextualRelevanceConfig:
         "overall_relevance"
     ]
     
+    # 6 Standard Relevance Tiers
+    RELEVANCE_TIERS = [
+        "DIRECTLY_RELEVANT",      # Direct alignment across agent, condition, model, outcomes (>= 0.80)
+        "HIGHLY_RELEVANT",        # High alignment on core components with transferable model/pathway (0.65 - 0.79)
+        "INDIRECTLY_RELEVANT",    # Biological analogue, upstream cascade, or parallel model (0.50 - 0.64)
+        "METHOD_RELEVANT",        # Analytical assay, mathematical formula, or standard protocol (>= 0.70 method score)
+        "BACKGROUND_ONLY",        # Epidemiological background, disease definition (0.35 - 0.49, Section 2/4 only)
+        "IRRELEVANT"              # Off-topic, disconnected context, incompatible species/system (< 0.35)
+    ]
+    
     # Standard Rejection Categories
     REJECTION_REASONS = {
         "REJECT_LOW_CONTEXTUAL_RELEVANCE": "Insufficient alignment with target clinical/biological context; keyword match without contextual transferability",
+        "REJECT_IRRELEVANT_OFF_TOPIC": "Study classified as IRRELEVANT due to disparate biological domain or incompatible context",
         "REJECT_INCOMPATIBLE_BIOLOGICAL_SYSTEM": "Study evaluated incompatible non-target biological system without transferable methodology",
         "REJECT_UNTRANSFERABLE_SPECIES": "Disparate non-target organism without translational or mechanistic bearing on target disease",
         "REJECT_DISCONNECTED_ENDPOINT": "Endpoints evaluated share zero biological, pathological, or pharmacological overlap with target research question",

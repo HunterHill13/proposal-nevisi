@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 210/210 Passed](https://img.shields.io/badge/Unified%20Tests-210%2F210%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 216/216 Passed](https://img.shields.io/badge/Unified%20Tests-216%2F216%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -26,9 +26,10 @@
    - Automatically structures questions using domain-appropriate frameworks: **PICO** (interventions), **PECO** (environmental/occupational exposures), **Diagnostic** (index test vs. reference standard), **Prognostic** (risk stratification), or **Mechanistic** (biochemical signaling cascades).
    - Generates controlled vocabulary, MeSH indexing, explicit boundary criteria, and question decomposition.
 
-2. **12-Layer Dynamic Search Strategy & Decoupled Database Adapters (`scripts/generic_search_planner.py`):**
-   - Decoupled API adapters for PubMed, Europe PMC, Crossref, and OpenAlex.
-   - Connected-component transitive identity graph PRISMA deduplication across unique IDs (PMID, DOI, OpenAlex ID) rather than naive arithmetic summation.
+2. **12-Layer Dynamic Search Strategy & Scientific Search Adapter (`scripts/scientific_search_adapter.py`, `scripts/generic_search_planner.py`):**
+   - Option B (Adapter) + Option C (Selective Borrowing) federated search engine integrating PubMed, Europe PMC, Crossref, and OpenAlex.
+   - Connected-component transitive identity graph deduplication across multiple persistent IDs (PMID, DOI, OpenAlex ID) and title similarity.
+   - Marginal search yield saturation curve calculation to assess literature coverage saturation.
    - Truthful execution status: dry-run/offline searches explicitly return `NOT_EXECUTED` without fabricating database responses; zero-result searches require `EMPTY_RETRIEVAL` state recording.
 
 3. **Explicit Cross-Study Relationships Graph & Claim DAG (`scripts/generic_study_relationships.py`):**
@@ -60,9 +61,10 @@
    - Sample size parameter provenance tracking (`provided`, `literature-derived`, `pilot-derived`, `assumed`, `missing`); returns `SAMPLE_SIZE_REQUIRES_INPUT` without silent assumptions when required parameters are absent.
    - Multi-layer statistical feasibility audit checking design compatibility, distribution assumptions, repeated measures, and censoring.
 
-10. **Multi-Stage Relevance Gate, Mandatory Inclusion Roles & 25-Reference Ceiling (`scripts/generic_reference_auditor.py`):**
+10. **10-Dimension Relevance Gate, 6 Relevance Tiers & 25-Reference Ceiling (`scripts/generic_reference_auditor.py`):**
     - Multi-stage screening funnel: `Broad Retrieval` -> `Topic Screened` -> `Study Relevant & Biological Compatibility` -> `Claim Entailed` -> `Final Top 25 Selection`.
-    - Mandatory biological compatibility gate evaluating 8 relevance dimensions to eliminate pure chemical/agent keyword matches in disparate biological contexts (e.g. livestock reproduction / buck semen cryopreservation, crop agronomy).
+    - Mandatory biological compatibility gate evaluating 10 relevance dimensions (`biological_topic_alignment`, `condition_phenotype_alignment`, `primary_agent_alignment`, `comparator_second_agent_alignment`, `experimental_model_population_alignment`, `outcome_alignment`, `mechanistic_pathway_alignment`, `study_design_alignment`, `research_question_fit`, `proposal_section_utility`).
+    - 6 standard relevance tiers: `DIRECTLY_RELEVANT`, `HIGHLY_RELEVANT`, `INDIRECTLY_RELEVANT`, `METHOD_RELEVANT`, `BACKGROUND_ONLY`, `IRRELEVANT` (strictly dropping `IRRELEVANT` off-topic records like livestock reproduction or crop agronomy in human biomedical proposals).
     - Multi-factor scoring (14 criteria) prioritizing high-yield empirical evidence.
     - Decouples search corpus from proposal references: enforces a strict hard ceiling of **maximum 25 references** (15–25 range) balanced across 5 scientific axes.
     - Mandatory `final_inclusion_reason` (from 5 standard tiers), `proposal_section_supported`, and explicit `why_this_paper_is_needed` justification for every reference entering the final proposal portfolio.
@@ -77,10 +79,10 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
 
-The engine includes a master test harness verifying 210 total software assertions across 7 independent test suites:
-- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all core generic scripts and verifies semantic generalization (19 tests - **PASS**).
+The engine includes a master test harness verifying 216 total software assertions across 7 independent test suites:
+- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts and verifies semantic generalization (22 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 79 stress tests evaluating contextual relevance gates, 25-reference ceiling, 14-factor scoring, screening funnels, mandatory inclusion justifications, fake citations, mismatched DOIs (`IDENTITY_CONFLICT`), retracted/corrected articles, publication status, exact calendar boundary parsing, leap-year safety, rejection of fake foundational exceptions, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA record-level deduplication, decoupled database adapters, prompt injection sanitization, internal consistency directed graph, multi-pillar final scientific release gate verification (79 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 84 stress tests evaluating ScientificSearchAdapter deduplication, search saturation curve, 10-dimension contextual relevance gates, 6 relevance tiers, 25-reference ceiling, 14-factor scoring, screening funnels, mandatory 3-part inclusion justifications, fake citations, mismatched DOIs (`IDENTITY_CONFLICT`), retracted/corrected articles, publication status, exact calendar boundary parsing, leap-year safety, rejection of fake foundational exceptions, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA record-level deduplication, decoupled database adapters, prompt injection sanitization, internal consistency directed graph, multi-pillar final scientific release gate verification (84 tests - **PASS**).
 - **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
 - **Suite 5: Mutation Testing Layer (`test_mutations.py`):** 10 deliberate scientific defect mutations evaluating whether the auditor catches corrupted temporal cutoffs, retracted articles, mismatched DOIs, unsupported assertions, observational causal overclaims, duplicated records, assumed sample sizes, prompt injections, and missing citations (10 tests - **PASS**, 100% Mutation Score).
 - **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 (reordering stability, duplicate invariance, causal gates, unit changes), Draft-07 JSON Schema validation against SEARCH_PROVENANCE, REFERENCE_RECORD, and CLAIM_PROVENANCE, and randomized xenobiology synthetic domain benchmark (14 tests - **PASS**).
@@ -106,15 +108,15 @@ python scripts/master_release_gate.py
 
 ### ویژگی‌های بنیادین نسخه v8.2:
 1. **استقلال کامل از موضوع (Topic-Agnostic Core):** حذف تمام کلیدواژه‌ها و پیش‌فرض‌های ثابت از کدهای هسته و انتقال کامل تعاریف به مدل پویای مسئله پژوهش (`ResearchProblemModel`).
-2. **گیت چندمرحله‌ای هم‌خوانی مفهومی و زیستی (Multi-Stage Relevance Gate):** تفکیک صریح ۴ دروازه پالایش (`بازیابی اولیه` $\rightarrow$ `ارتباط موضوعی` $\rightarrow$ `ارتباط با مطالعه و سازگاری زیستی` $\rightarrow$ `التزام ادعا` $\rightarrow$ `انتخاب ۲۵ رفرنس برتر`) و ممانعت قطعی از ورود مقالات بی‌ارتباط به بافتار زیستی (نظیر انجماد اسپرم دام در انکولوژی یا پزشکی انسانی).
-3. **تفکیک بدنه جستجو از مراجع نهایی و سقف سخت ۲۵ رفرنس:** جستجوی اولیه عمیق، چندپایگاهی و اشباع‌محور، توأم با اعمال سقف قطعی حداکثر ۲۵ رفرنس در پروپوزال نهایی با رتبه‌بندی ۱۴ عاملی، توزیع متوازن در ۵ محور علمی، و الزام ثبت `FINAL_INCLUSION_REASON` و بخش پشتیبانی‌شده در پروپوزال برای تک‌تک مراجع.
+2. **گیت ۱۰ بعدی هم‌خوانی مفهومی و ۶ سطح رتبه‌بندی (10-Dimension Relevance Gate):** سنجش ۱۰ بعد زیستی و روش‌شناختی و تفکیک ۶ سطح رتبه‌بندی (`DIRECTLY_RELEVANT`, `HIGHLY_RELEVANT`, `INDIRECTLY_RELEVANT`, `METHOD_RELEVANT`, `BACKGROUND_ONLY`, `IRRELEVANT`) و ممانعت قطعی و بی‌قیدوشرط از ورود مقالات بی‌ارتباط به بافتار زیستی (نظیر انجماد اسپرم دام در انکولوژی یا پزشکی انسانی).
+3. **تفکیک بدنه جستجو از مراجع نهایی و سقف سخت ۲۵ رفرنس:** جستجوی اولیه عمیق، چندپایگاهی و اشباع‌محور، توأم با اعمال سقف قطعی حداکثر ۲۵ رفرنس در پروپوزال نهایی با رتبه‌بندی ۱۴ عاملی، توزیع متوازن در ۵ محور علمی، و الزام ثبت توجیه سه‌بخشی (`FINAL_INCLUSION_REASON`، بخش پشتیبانی‌شده در پروپوزال و دلیل ضرورت) برای تک‌تک مراجع.
 4. **مرور بر منابع تفصیلی بدون تیترهای مصنوعی:** نگارش یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع در بخش ۳ بدون هدرهای مصنوعی، همراه با سنتز نقادانه بین‌مطالعه‌ای و تحلیل شواهد متناقض.
-5. **استراتژی جستجوی ۱۲ لایه‌ای، آداپتورهای چندپایگاهی و گراف تجمیع هویت در PRISMA:** اتصال چندپایگاهی برای PubMed, Europe PMC, Crossref و OpenAlex با گراف همبندی تجمیع هویت رکوردهای تکراری و ثبت وضعیت صادقانه `NOT_EXECUTED` و `EMPTY_RETRIEVAL`.
+5. **آداپتور جستجوی علمی چندپایگاهی و گراف تجمیع هویت (`ScientificSearchAdapter`):** پیاده‌سازی معماری آداپتور (Option B + C) بر پایه کتابخانه استاندارد پایتون برای PubMed, Europe PMC, Crossref و OpenAlex با گراف همبندی تجمیع هویت شناساگرهای چندگانه (DOI, PMID, OpenAlex ID)، پایش منحنی اشباع جستجو و ثبت وضعیت صادقانه `NOT_EXECUTED` و `EMPTY_RETRIEVAL`.
 6. **دقت زمانی تقویمی و سد ضدتقلب استثناهای کلاسیک:** ارزیابی روز/ماه/سال تقویمی با پشتیبانی سال کبیسه و الزام اثبات استناد بالا ($\ge 100$) یا نقش متدولوژیک بنیادین برای مقالات قدیمی‌تر از پنجره زمانی مجاز (تعداد استناد به تنهایی برای دور زدن قانون زمانی کافی نیست).
 7. **دفتر کل خاستگاه داده‌های کمی و اعتبارسنجی عبارات علّی:** جداسازی کامل اتصال استنادی، ردیابی سند منبع و دلالت علمی ادعا، همراه با بررسی دقیق مقادیر عددی، تبدیل واحدها و مهار ادعای علیت در مطالعات مشاهده‌ای.
 8. **طراحی پروتکل پویا، سیاست داده‌های مفقوده و رهگیری پارامترهای حجم نمونه:** تضمین تمایز `0` و `False` از `MISSING` و اعلام وضعیت `SAMPLE_SIZE_REQUIRES_INPUT` در صورت غیبت پارامترهای حیاتی بدون مفروضات پنهان.
 9. **خروجی رسمی ۱۴ گانه ورد و ابزار بازرسی عمیق XML:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و بازرسی ساختاری فایل docx.
-10. **سوئیت آزمون‌های هفت‌گانه ۲۱۰ تستی و لایه آزمون جهش (Mutation Testing):** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۲۱۰ تستی با کشته شدن ۱۰/۱۰ جهش عمدی (امتیاز جهش ۱۰۰٪) و برقراری ناوردایی‌های کشف پویا و حسابداری آماری.
+10. **سوئیت آزمون‌های هفت‌گانه ۲۱۶ تستی و لایه آزمون جهش (Mutation Testing):** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۲۱۶ تستی با کشته شدن ۱۰/۱۰ جهش عمدی (امتیاز جهش ۱۰۰٪) و برقراری ناوردایی‌های کشف پویا و حسابداری آماری.
 
 ---
 

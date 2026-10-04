@@ -1402,6 +1402,203 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(breach_audit["PORTFOLIO_AUDIT"], "FAIL")
         self.assertTrue(any("EXCEEDS_MAX_REFERENCE_CEILING_25" in v for v in breach_audit["violations"]))
 
+    def test_80_scientific_search_adapter_connected_components_deduplication(self):
+        """Test 80: ScientificSearchAdapter connected-component deduplication across multi-source identifiers."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        raw_corpus = [
+            {"database": "PubMed", "pmid": "12345678", "doi": "10.1016/j.biomed.2023.01", "title": "Therapeutic targeting of Kinase Alpha in cell models", "year": 2023},
+            {"database": "Europe PMC", "pmid": "12345678", "doi": "10.1016/j.biomed.2023.01", "title": "Therapeutic targeting of Kinase Alpha in cell models.", "year": 2023, "abstract": "Full abstract text from Europe PMC."},
+            {"database": "OpenAlex", "openalex_id": "W99887766", "doi": "10.1016/j.biomed.2023.01", "title": "Therapeutic targeting of Kinase Alpha in cell models", "year": 2023},
+            {"database": "Crossref", "doi": "10.1016/j.biomed.2023.01", "title": "Therapeutic Targeting of Kinase Alpha in Cell Models", "year": 2023, "journal": "J Mol Ther"},
+            {"database": "PubMed", "pmid": "87654321", "doi": "10.1016/j.biomed.2023.02", "title": "Distinct study on Receptor Beta signaling", "year": 2024}
+        ]
+        dedup_res = ScientificSearchAdapter.deduplicate_corpus(raw_corpus)
+        self.assertEqual(dedup_res["total_raw"], 5)
+        self.assertEqual(dedup_res["total_unique"], 2)
+        self.assertEqual(dedup_res["duplicate_clusters"], 1)
+        self.assertGreater(dedup_res["reduction_percentage"], 50.0)
+
+        # First cluster must merge sources across PubMed, Europe PMC, OpenAlex, Crossref
+        cluster_rec = dedup_res["unique_records"][0]
+        self.assertEqual(cluster_rec["doi"], "10.1016/j.biomed.2023.01")
+        self.assertEqual(cluster_rec["pmid"], "12345678")
+        self.assertEqual(cluster_rec["openalex_id"], "w99887766")
+        self.assertIn("PubMed", cluster_rec["retrieval_sources"])
+        self.assertIn("Europe PMC", cluster_rec["retrieval_sources"])
+        self.assertIn("OpenAlex", cluster_rec["retrieval_sources"])
+        self.assertIn("Crossref", cluster_rec["retrieval_sources"])
+        self.assertTrue(bool(cluster_rec.get("abstract")))
+
+    def test_81_scientific_search_adapter_saturation_curve(self):
+        """Test 81: ScientificSearchAdapter calculates marginal unique yield and detects search saturation."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        batch_1 = [{"doi": f"10.1000/batch1.{i}", "pmid": f"1000{i}"} for i in range(10)]
+        batch_2 = [{"doi": f"10.1000/batch2.{i}", "pmid": f"2000{i}"} for i in range(10)]
+        batch_3 = [{"doi": f"10.1000/batch1.{i}", "pmid": f"1000{i}"} for i in range(8)] + [{"doi": "10.1000/new.1"}]  # mostly duplicate
+        batch_4 = [{"doi": f"10.1000/batch1.{i}", "pmid": f"1000{i}"} for i in range(10)]  # 100% duplicate
+
+        sat_res = ScientificSearchAdapter.calculate_search_saturation([batch_1, batch_2, batch_3, batch_4])
+        self.assertEqual(sat_res["saturation_status"], "SATURATED")
+        self.assertEqual(sat_res["total_batches_evaluated"], 4)
+        self.assertEqual(sat_res["total_cumulative_unique"], 21)
+        self.assertEqual(sat_res["saturation_curve"][-1]["marginal_yield_ratio"], 0.0)
+
+    def test_82_ten_dimension_relevance_gate_and_six_tier_classification(self):
+        """Test 82: 10-dimension contextual relevance gate accurately assigns all 6 relevance tiers."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Adenocarcinoma", "name_fa": "آدنوکارسینوما"},
+            "population_or_model": {"primary_system": "Target Cell Model Alpha"},
+            "interventions_or_exposures": [{"name": "Experimental Agent X"}],
+            "primary_outcomes": [{"name": "Apoptotic Viability"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Caspase Activation", "target_molecules": ["Caspase-3"]}]
+        }
+
+        # 1. DIRECTLY_RELEVANT paper
+        direct_paper = {
+            "ref_id": "P_DIR",
+            "title": "Experimental Agent X induces apoptotic viability loss in Target Cell Model Alpha Adenocarcinoma via Caspase-3",
+            "year": 2024,
+            "study_design": "IN_VITRO_EXPERIMENTAL"
+        }
+        r_dir = GenericReferenceAuditor.audit_contextual_relevance(direct_paper, problem_model)
+        self.assertTrue(r_dir["is_contextually_relevant"])
+        self.assertEqual(r_dir["relevance_tier"], "DIRECTLY_RELEVANT")
+        self.assertGreaterEqual(r_dir["scores"]["overall_relevance"], 0.80)
+        self.assertEqual(r_dir["scores"]["biological_topic_alignment"], 1.0)
+        self.assertEqual(r_dir["scores"]["condition_phenotype_alignment"], 1.0)
+        self.assertEqual(r_dir["scores"]["primary_agent_alignment"], 1.0)
+
+        # 2. HIGHLY_RELEVANT paper
+        high_paper = {
+            "ref_id": "P_HIGH",
+            "title": "Experimental Agent X modulates apoptosis signaling in cellular oncology models",
+            "year": 2023,
+            "study_design": "IN_VITRO_EXPERIMENTAL"
+        }
+        r_high = GenericReferenceAuditor.audit_contextual_relevance(high_paper, problem_model)
+        self.assertTrue(r_high["is_contextually_relevant"])
+        self.assertEqual(r_high["relevance_tier"], "HIGHLY_RELEVANT")
+        self.assertGreaterEqual(r_high["scores"]["overall_relevance"], 0.65)
+
+        # 3. METHOD_RELEVANT paper
+        method_paper = {
+            "ref_id": "P_METH",
+            "title": "Mathematical formulation and theoretical basis of synergistic interaction analysis in pharmacological assays",
+            "year": 1984,
+            "foundational_justification": {
+                "is_justified": True,
+                "category": "FOUNDATIONAL_MATHEMATICAL_MODEL",
+                "rationale": "Seminal algorithm for synergy index computation."
+            }
+        }
+        r_meth = GenericReferenceAuditor.audit_contextual_relevance(method_paper, problem_model)
+        self.assertTrue(r_meth["is_contextually_relevant"])
+        self.assertEqual(r_meth["relevance_tier"], "METHOD_RELEVANT")
+
+        # 4. IRRELEVANT paper (incompatible biological system - veterinary livestock)
+        irr_paper = {
+            "ref_id": "P_IRR",
+            "title": "Influence of Experimental Agent X on buck semen cryopreservation and ram spermatozoa motility",
+            "abstract": "We evaluated artificial insemination outcomes using cryopreserved buck semen treated with Experimental Agent X.",
+            "year": 2024
+        }
+        r_irr = GenericReferenceAuditor.audit_contextual_relevance(irr_paper, problem_model)
+        self.assertFalse(r_irr["is_contextually_relevant"])
+        self.assertEqual(r_irr["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(r_irr["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+
+    def test_83_scientific_search_adapter_end_to_end_execute_and_screen(self):
+        """Test 83: ScientificSearchAdapter execute_and_screen generates complete 5-stage funnel under ceiling 25."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        problem_model = {
+            "domain": "infectious_diseases",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Viral Encephalitis", "name_fa": "آنسفالیت ویروسی"},
+            "population_or_model": {"primary_system": "Vero E6 cells"},
+            "interventions_or_exposures": [{"name": "Antiviral Molecule Gamma"}],
+            "primary_outcomes": [{"name": "Viral Load Reduction"}]
+        }
+        # 35 candidates with duplicates and off-topic records
+        test_corpus = []
+        for i in range(1, 31):
+            test_corpus.append({
+                "ref_id": f"VIR_{i}",
+                "title": f"Antiviral Molecule Gamma suppresses Viral Encephalitis in Vero E6 cells {i}",
+                "year": 2024,
+                "doi": f"10.1000/vir.{i}",
+                "study_design": "EXPERIMENTAL_IN_VITRO",
+                "primary_findings": "Potent inhibition of viral replication demonstrated."
+            })
+        # Add duplicate
+        test_corpus.append(dict(test_corpus[0]))
+        # Add 3 irrelevant livestock papers
+        for k in range(3):
+            test_corpus.append({
+                "ref_id": f"IRR_{k}",
+                "title": f"Antiviral Molecule Gamma in bull semen cryopreservation trial {k}",
+                "year": 2024,
+                "doi": f"10.1000/bull.{k}"
+            })
+
+        adapter = ScientificSearchAdapter()
+        screen_res = adapter.execute_and_screen(
+            problem_model=problem_model,
+            mode="fixture",
+            fixture_corpus=test_corpus,
+            max_final_refs=25,
+            min_final_refs=15
+        )
+        self.assertEqual(screen_res["final_selected_count"], 25)
+        self.assertEqual(screen_res["reference_portfolio_audit"]["portfolio_status"], "PASS")
+        funnel = screen_res["screening_funnel"]
+        self.assertGreaterEqual(funnel["stage_1_retrieved_broad_corpus"], 34)
+        self.assertEqual(funnel["stage_5_final_proposal_selected"], 25)
+        self.assertGreaterEqual(screen_res["excluded_candidates_count"], 3)
+
+    def test_84_mandatory_three_part_inclusion_justification_enforcement(self):
+        """Test 84: Mandatory 3-part inclusion justifications are enforced for every portfolio reference."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        from core_policies import FINAL_INCLUSION_REASON_CATEGORIES
+        valid_portfolio = [
+            {
+                "ref_id": f"REF_{i:02d}",
+                "citation_number": i,
+                "final_inclusion_reason": FINAL_INCLUSION_REASON_CATEGORIES[i % len(FINAL_INCLUSION_REASON_CATEGORIES)],
+                "proposal_section_supported": ["SECTION_2_PROBLEM_STATEMENT", "SECTION_3_LITERATURE_REVIEW"],
+                "why_this_paper_is_needed": f"Provides indispensable foundational evidence for experimental assay configuration parameter {i}.",
+                "year": 2024,
+                "is_retracted": False,
+                "is_duplicate": False
+            }
+            for i in range(1, 21)
+        ]
+        audit_res = GenericReferenceAuditor.audit_final_reference_portfolio(valid_portfolio)
+        self.assertEqual(audit_res["PORTFOLIO_AUDIT"], "PASS")
+
+        # Mutate 1: Missing final_inclusion_reason
+        mutated_1 = [dict(r) for r in valid_portfolio]
+        mutated_1[3]["final_inclusion_reason"] = None
+        audit_fail_1 = GenericReferenceAuditor.audit_final_reference_portfolio(mutated_1)
+        self.assertEqual(audit_fail_1["PORTFOLIO_AUDIT"], "FAIL")
+        self.assertTrue(any("INVALID_INCLUSION_REASON" in v for v in audit_fail_1["violations"]))
+
+        # Mutate 2: Empty proposal_section_supported
+        mutated_2 = [dict(r) for r in valid_portfolio]
+        mutated_2[5]["proposal_section_supported"] = []
+        audit_fail_2 = GenericReferenceAuditor.audit_final_reference_portfolio(mutated_2)
+        self.assertEqual(audit_fail_2["PORTFOLIO_AUDIT"], "FAIL")
+        self.assertTrue(any("MISSING_SUPPORTED_SECTIONS" in v for v in audit_fail_2["violations"]))
+
+        # Mutate 3: Trivial or empty why_this_paper_is_needed
+        mutated_3 = [dict(r) for r in valid_portfolio]
+        mutated_3[7]["why_this_paper_is_needed"] = "Short"
+        audit_fail_3 = GenericReferenceAuditor.audit_final_reference_portfolio(mutated_3)
+        self.assertEqual(audit_fail_3["PORTFOLIO_AUDIT"], "FAIL")
+        self.assertTrue(any("MISSING_WHY_NEEDED_JUSTIFICATION" in v for v in audit_fail_3["violations"]))
+
 
 if __name__ == "__main__":
     unittest.main()
