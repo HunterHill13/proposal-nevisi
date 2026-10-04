@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 """
 run_all_tests.py - Dynamic Master Unified Test Runner
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Deep Biomedical Research & Proposal Engine)
 
 Dynamically discovers, loads, and executes all standard unittest test cases across:
-1. Static analysis & hard-code leakage audit (17 tests)
-2. Multi-domain generalization tests (5 tests)
-3. Adversarial stress scenarios (16 tests)
+1. Static analysis & hard-code leakage audit (19 tests)
+2. Multi-domain generalization tests (9 tests)
+3. Adversarial stress scenarios (50 tests)
 4. Historical benchmark audit suite (60 tests)
 
 Strictly relies on Python unittest TestLoader and TextTestRunner.
 Zero hard-coded weights, zero fake counts.
 """
+
 
 import os
 import sys

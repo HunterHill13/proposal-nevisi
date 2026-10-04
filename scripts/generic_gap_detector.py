@@ -181,6 +181,57 @@ class GenericGapDetector:
             "grounding_gaps": active_categories
         }
 
+    @classmethod
+    def audit_gap_assertion_epistemic_rigor(
+        cls,
+        gap_claim_statement: str,
+        search_metadata: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Audits that research gaps are stated with epistemic rigor (Prompt Pt 21):
+        Prohibits absolute claims like 'no study exists in the universe'.
+        Requires: 'In our systematic search across [databases] using [queries] and [date range], no direct retrievable evidence was identified.'
+        If search coverage is suboptimal, GAP_CONFIDENCE must be marked LOW.
+        """
+        claim_lower = gap_claim_statement.lower()
+        ABSOLUTE_UNBOUNDED_CLAIMS = [
+            "no study exists", "no research exists", "never been studied",
+            "completely unstudied", "zero studies exist anywhere", "هیچ مطالعه‌ای در دنیا وجود ندارد"
+        ]
+
+        has_unbounded_claim = any(phrase in claim_lower for phrase in ABSOLUTE_UNBOUNDED_CLAIMS)
+
+        db_count = len(search_metadata.get("databases_searched", []))
+        has_query_trace = bool(search_metadata.get("queries_logged", 0) > 0)
+        has_chaining = bool(search_metadata.get("citation_chaining_completed", False))
+
+        is_search_thorough = (db_count >= 3 and has_query_trace)
+
+        if not is_search_thorough:
+            gap_confidence = "LOW"
+            epistemic_verdict = "PRELIMINARY_GAP_LOW_SEARCH_CONFIDENCE"
+        elif has_unbounded_claim:
+            gap_confidence = "MODERATE"
+            epistemic_verdict = "GAP_LANGUAGE_OVERCLAIM_NEEDS_METHODOLOGICAL_QUALIFICATION"
+        else:
+            gap_confidence = "HIGH"
+            epistemic_verdict = "EVIDENCE_BOUNDED_GAP_VALIDATED"
+
+        permissible_statement = (
+            f"Within the literature retrieved across {', '.join(search_metadata.get('databases_searched', ['indexed databases']))} "
+            f"using targeted query matrices and citation chaining, no direct peer-reviewed empirical evidence was identified addressing this specific question."
+        )
+
+        return {
+            "gap_statement_audited": gap_claim_statement,
+            "has_unbounded_absolute_claim": has_unbounded_claim,
+            "gap_confidence": gap_confidence,
+            "search_thoroughness": "COMPREHENSIVE" if is_search_thorough else "SUBOPTIMAL",
+            "epistemic_verdict": epistemic_verdict,
+            "permissible_formulation": permissible_statement,
+            "status": "PASS" if not has_unbounded_claim and is_search_thorough else "REVISE_LANGUAGE"
+        }
+
+
 if __name__ == "__main__":
     mock_model = {
         "population_or_model": {"primary_system": "Target Model Lineage"},

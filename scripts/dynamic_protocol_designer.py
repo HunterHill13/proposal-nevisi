@@ -8,7 +8,7 @@ and coherent Statistical Analysis Plans tailored strictly to the Research Proble
 """
 
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 STUDY_TIMELINE_TEMPLATES = {
     "EXPERIMENTAL_IN_VITRO": [
@@ -228,8 +228,13 @@ class DynamicProtocolDesigner:
 
     @classmethod
     def calculate_sample_size_plan(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:
-        """Provides mathematically rigorous and design-aware sample size guidance."""
+        """Provides mathematically rigorous and design-aware sample size guidance (Prompt Pt 34).
+        If statistical parameters (effect size, variance, event rate) are unknown, explicitly
+        outputs SAMPLE_SIZE_REQUIRES_INPUT rather than inventing fake sample sizes.
+        """
         framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        stat_inputs = model_dict.get("statistical_parameters", {})
+
         if framework == "EXPERIMENTAL_IN_VITRO":
             return {
                 "design_type": "IN_VITRO_CELLULAR",
@@ -250,23 +255,85 @@ class DynamicProtocolDesigner:
                 "pilot_required": False
             }
         elif framework in ["PICO", "PECO", "PROGNOSTIC"]:
+            # Check if required empirical inputs exist
+            p1 = stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion")
+            p2 = stat_inputs.get("expected_intervention_rate") or stat_inputs.get("intervention_proportion")
+            effect_size = stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio")
+
+            if (p1 is None and effect_size is None):
+                return {
+                    "design_type": "HUMAN_CLINICAL_OR_COHORT",
+                    "status": "SAMPLE_SIZE_REQUIRES_INPUT",
+                    "missing_parameters": ["baseline_event_rate", "expected_effect_size_or_hazard_ratio", "minimal_clinically_important_difference"],
+                    "formula_or_standard": "Two-sample survival log-rank / proportions power equation: n = (Z_alpha + Z_beta)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2",
+                    "alpha": 0.05,
+                    "power": 0.80,
+                    "pilot_required": True,
+                    "recommendation": "Empirical baseline event rate is unknown in literature; pilot study or registry inquiry required prior to final sample size fixation. Prohibits guessing."
+                }
+
             return {
                 "design_type": "HUMAN_CLINICAL_OR_COHORT",
+                "status": "SAMPLE_SIZE_COMPUTED",
                 "formula_or_standard": "Two-sample survival log-rank / proportions power equation: n = (Z_alpha + Z_beta)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2",
                 "alpha": 0.05,
                 "power": 0.80,
-                "pilot_required": True,
-                "note": "PILOT_REQUIRED if historical event rate or standard deviation in target sub-population is uncharacterized."
+                "pilot_required": False
             }
         elif framework == "DIAGNOSTIC":
+            prev = stat_inputs.get("prevalence")
+            sens = stat_inputs.get("expected_sensitivity")
+            if prev is None or sens is None:
+                return {
+                    "design_type": "DIAGNOSTIC_ACCURACY",
+                    "status": "SAMPLE_SIZE_REQUIRES_INPUT",
+                    "missing_parameters": ["disease_prevalence", "anticipated_sensitivity", "target_precision_half_width"],
+                    "formula_or_standard": "Buderer's formula for diagnostic sensitivity and specificity: n = (Z_alpha/2)^2 * P * (1-P) / (L^2 * Prevalence)",
+                    "alpha": 0.05,
+                    "precision": 0.05,
+                    "pilot_required": False,
+                    "recommendation": "Disease prevalence and target sensitivity must be specified from epidemiological benchmarks."
+                }
+
             return {
                 "design_type": "DIAGNOSTIC_ACCURACY",
+                "status": "SAMPLE_SIZE_COMPUTED",
                 "formula_or_standard": "Buderer's formula for diagnostic sensitivity and specificity: n = (Z_alpha/2)^2 * P * (1-P) / (L^2 * Prevalence)",
                 "alpha": 0.05,
                 "precision": 0.05,
                 "pilot_required": False
             }
-        return {"design_type": "GENERIC", "pilot_required": False}
+        return {"design_type": "GENERIC", "status": "SAMPLE_SIZE_COMPUTED", "pilot_required": False}
+
+    @classmethod
+    def generate_dynamic_ethics_subsections(cls, model_dict: Dict[str, Any]) -> List[Tuple[str, str, str]]:
+        """Generates dynamic ethics descriptions tailored strictly to study framework while preserving 13-1 to 13-14 structure (Prompt Pt 31, 32)."""
+        framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        cond_fa = model_dict.get("target_condition", {}).get("name_fa", "موضوع پژوهش")
+
+        if framework in ["EXPERIMENTAL_IN_VITRO", "MECHANISTIC"]:
+            ethic_content = (
+                "طرح حاضر یک پژوهش آزمایشگاهی سلولی و مولکولی بر روی رده‌های سلولی استاندارد است. "
+                "کدهای اخلاق مربوط به پژوهش‌های آزمایشگاهی و زیست‌پزشکی رعایت گردیده و کلیه موازین دفع بهداشتی پسماندهای بیولوژیک طبق استانداردهای BSL-2 اعمال می‌گردد. "
+                "به دلیل عدم مداخله بر آزمودنی‌های انسانی یا حیوانات زنده، اخذ فرم رضایت آگاهانه انسانی یا ملاحظات آزمودنی‌های آسیب‌پذیر موضوعیت ندارد (NOT_APPLICABLE_WITH_JUSTIFICATION)."
+            )
+        elif framework == "EXPERIMENTAL_ANIMAL":
+            ethic_content = (
+                "پروتکل مطالعه حاضر به تایید کمیته اخلاق کار با حیوانات آزمایشگاهی دانشگاه رسیده است. "
+                "اصول سه گانه اخلاق زیستی (Replacement, Reduction, Refinement: 3Rs) رعایت شده و پروتکل بیهوشی، بی‌دردی و یوتانایزی مطابق دستورالعمل‌های بین‌المللی ARRIVE اجرا می‌گردد."
+            )
+        elif framework in ["PICO", "CLINICAL_TRIAL"]:
+            ethic_content = (
+                f"پروتکل این کارآزمایی بالینی پیش از آغاز در کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی مصوب و در مرکز کارآزمایی‌های بالینی ایران (IRCT) ثبت خواهد شد. "
+                f"فرم رضایت‌نامه آگاهانه کتبی از کلیه بیماران مبتلا به {cond_fa} اخذ شده و اصل رازداری و امکان خروج داوطلبانه از مطالعه در هر مرحله بدون تاثیر بر روند درمان استاندارد تضمین می‌گردد."
+            )
+        else: # DIAGNOSTIC, PECO, PROGNOSTIC
+            ethic_content = (
+                "نمونه‌گیری و گردآوری داده‌ها صرفاً با رضایت آگاهانه و با کدگذاری ناشناس اطلاعات بیماران صورت می‌پذیرد. "
+                "هیچ‌گونه هزینه اضافی به بیماران تحمیل نخواهد شد و نتایج تست‌ها محرمانه باقی خواهد ماند."
+            )
+
+        return ethic_content
 
     @classmethod
     def validate_objectives_hypotheses_variables_consistency(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:

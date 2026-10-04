@@ -128,6 +128,17 @@ class StudyFamilyDetector:
         # Calculate true independent evidence streams: distinct combination of cohort, research group, and family
         independent_streams = min(unique_families, max(len(cohorts), 1) if cohorts else unique_families)
 
+        # Build explicit NON_INDEPENDENT_EVIDENCE registry for multi-paper families (Prompt Pt 13)
+        non_independent_flags = []
+        for fam_id, member_ids in cluster_info.get("multi_study_families", {}).items():
+            non_independent_flags.append({
+                "family_id": fam_id,
+                "shared_unit_type": "SHARED_COHORT_OR_TRIAL_REGISTRATION",
+                "dependent_publications": member_ids,
+                "status": "NON_INDEPENDENT_EVIDENCE",
+                "weight_policy": "COMBINE_INTO_SINGLE_SYNTHESIS_UNIT"
+            })
+
         return {
             "publication_count": pub_count,
             "study_count": unique_families,
@@ -137,8 +148,11 @@ class StudyFamilyDetector:
             "independent_research_group_count": max(len(research_groups), 1),
             "trial_count": len(trials),
             "evidence_inflation_factor": round(pub_count / max(unique_families, 1), 2),
+            "non_independent_evidence_flags": non_independent_flags,
+            "has_non_independent_overlap": len(non_independent_flags) > 0,
             "synthesis_recommendation": f"Base evidence synthesis weight on {independent_streams} independent evidence streams rather than {pub_count} publications."
         }
+
 
 
 if __name__ == "__main__":

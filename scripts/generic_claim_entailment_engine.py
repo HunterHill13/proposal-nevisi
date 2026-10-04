@@ -16,6 +16,9 @@ CAUSAL_VERBS = [
     r'\bdrives\b', r'\bdriven\b', r'\bdriving\b',
     r'\binduces\b', r'\binduced\b', r'\binducing\b',
     r'\btriggers\b', r'\btriggered\b', r'\btriggering\b',
+    r'\bcures\b', r'\bcured\b', r'\bcuring\b',
+    r'\btreats\b', r'\btreated\b',
+    r'\beliminates\b', r'\beliminated\b',
     r'\bis responsible for\b', r'\bleads directly to\b'
 ]
 
@@ -269,6 +272,58 @@ class GenericClaimEntailmentEngine:
             "is_provenance_traceable": has_location,
             "recorded_location": provenance,
             "provenance_grade": "GRANULAR_LOCATION" if has_location else "DOCUMENT_LEVEL_ONLY"
+        }
+
+    @classmethod
+    def build_claim_provenance_map(cls, proposal_claims: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Constructs an exhaustive CLAIM_PROVENANCE_MAP (Prompt Pt 10, 39).
+        Enforces 6-level strict chain:
+        Proposal sentence -> Atomic claim -> Evidence passage -> Study -> DOI/PMID/identifier -> Database/source.
+        Prohibits numerical claims without full granular provenance.
+        """
+        provenance_records = []
+        untraced_numerical_claims = []
+
+        for item in proposal_claims:
+            sentence = item.get("sentence", "")
+            cid = item.get("claim_id", "CLM_01")
+            claim_text = item.get("claim_text", sentence)
+            passage = item.get("evidence_passage", item.get("passage", ""))
+            study_id = item.get("study_id", item.get("study", ""))
+            doi = item.get("doi", item.get("pmid", ""))
+            db_source = item.get("database_source", "PubMed/Crossref")
+
+            has_numbers = bool(cls.extract_numbers(claim_text))
+            is_fully_traceable = bool(sentence and claim_text and passage and study_id and doi)
+
+            if has_numbers and not is_fully_traceable:
+                untraced_numerical_claims.append({
+                    "claim_id": cid,
+                    "claim_text": claim_text,
+                    "missing_provenance": "NUMERICAL_CLAIM_LACKS_COMPLETE_PASSAGE_OR_IDENTIFIER"
+                })
+
+            provenance_records.append({
+                "proposal_sentence": sentence,
+                "atomic_claim_id": cid,
+                "atomic_claim_text": claim_text,
+                "evidence_passage": passage,
+                "study_identifier": study_id,
+                "citation_doi_or_pmid": doi,
+                "originating_database": db_source,
+                "has_numbers": has_numbers,
+                "is_traceable": is_fully_traceable
+            })
+
+        all_numerical_traceable = (len(untraced_numerical_claims) == 0)
+
+        return {
+            "total_claims_mapped": len(provenance_records),
+            "fully_traceable_count": sum(1 for p in provenance_records if p["is_traceable"]),
+            "untraced_numerical_claims_count": len(untraced_numerical_claims),
+            "untraced_numerical_claims": untraced_numerical_claims,
+            "provenance_compliance_status": "COMPLIANT" if all_numerical_traceable else "NON_COMPLIANT_UNTRACED_NUMBERS",
+            "provenance_map": provenance_records
         }
 
     @staticmethod

@@ -75,29 +75,73 @@ class GenericReferenceAuditor:
         }
 
     def audit_temporal_tier(self, ref: Dict[str, Any]) -> Dict[str, Any]:
-        """Enforces the 6-year recency rule with explicit foundational justification requirements."""
+        """Enforces the 6-year recency rule with explicit AGE_JUSTIFICATION storage (Prompt Pt 2)."""
         year = ref.get("year", self.current_year)
         justification = ref.get("foundational_justification", {})
 
         if year >= self.cutoff_year:
             tier = "RECENT_PRIMARY_EVIDENCE"
+            age_justification = "RECENT_DIRECT_EVIDENCE"
             justified = True
             note = f"Published in {year} (within {self.max_primary_age}-year window)."
         else:
             tier = "FOUNDATIONAL/HISTORICAL_EVIDENCE"
             if justification.get("is_justified"):
+                age_justification = justification.get("category", "HISTORICAL_FOUNDATION")
                 justified = True
-                note = f"Foundational exception approved: {justification.get('category')} - {justification.get('rationale')}"
+                note = f"Foundational exception approved: {age_justification} - {justification.get('rationale')}"
             else:
+                age_justification = "OUTDATED_DIRECT_EVIDENCE"
                 justified = False
-                note = f"Published in {year} (< {self.cutoff_year}) without verified foundational justification."
+                note = f"Published in {year} (< {self.cutoff_year}) without verified foundational justification. Must be separated from core recent evidence."
 
         return {
             "ref_id": ref.get("ref_id"),
             "year": year,
             "temporal_tier": tier,
+            "age_justification": age_justification,
             "is_temporally_valid": justified,
             "audit_note": note
+        }
+
+    @staticmethod
+    def audit_publication_status(ref_metadata: Dict[str, Any]) -> Dict[str, Any]:
+        """Audits retraction, correction, expression of concern, and duplication (Prompt Pt 12, 43).
+        Status values: RETRACTED, CORRECTION_AVAILABLE, EXPRESSION_OF_CONCERN, DUPLICATE_PUBLICATION, STANDARD_PEER_REVIEWED.
+        Retracted papers MUST be excluded from core evidence synthesis.
+        """
+        title = str(ref_metadata.get("title", "")).lower()
+        notes = str(ref_metadata.get("notes", "")).lower()
+        raw_status = str(ref_metadata.get("status", "")).lower()
+
+        is_retracted = ref_metadata.get("is_retracted", False) or "retracted" in raw_status or "retraction" in title or "retraction notice" in notes
+        is_corrected = ref_metadata.get("is_corrected", False) or "erratum" in title or "corrigendum" in title or "correction" in raw_status
+        is_concern = ref_metadata.get("expression_of_concern", False) or "expression of concern" in title or "expression of concern" in notes
+        is_duplicate = ref_metadata.get("is_duplicate", False) or "duplicate publication" in notes
+
+        if is_retracted:
+            pub_status = "RETRACTED"
+            action = "EXCLUDE_FROM_EVIDENCE_SYNTHESIS"
+        elif is_concern:
+            pub_status = "EXPRESSION_OF_CONCERN"
+            action = "FLAG_METHODOLOGICAL_UNCERTAINTY"
+        elif is_corrected:
+            pub_status = "CORRECTION_AVAILABLE"
+            action = "PREFER_CORRECTED_VERSION"
+        elif is_duplicate:
+            pub_status = "DUPLICATE_PUBLICATION"
+            action = "CLUSTER_INTO_PRIMARY_STUDY_FAMILY"
+        else:
+            pub_status = "STANDARD_PEER_REVIEWED"
+            action = "RETAIN_FOR_SYNTHESIS"
+
+        return {
+            "ref_id": ref_metadata.get("ref_id", ref_metadata.get("doi", "UNKNOWN")),
+            "publication_status": pub_status,
+            "action_required": action,
+            "is_eligible_for_synthesis": pub_status != "RETRACTED",
+            "is_corrected": is_corrected,
+            "is_retracted": is_retracted
         }
 
     @staticmethod
@@ -299,6 +343,54 @@ class GenericReferenceAuditor:
             "explicitly_acknowledged_missing": compliant_markers,
             "status": "COMPLIANT" if is_clean else "NON_COMPLIANT_SILENT_EMPTY_FIELDS",
             "rule": "Parameters without empirical evidence must explicitly specify NOT_REPORTED, UNKNOWN, or NOT_APPLICABLE."
+        }
+
+    @classmethod
+    def generate_evidence_delta_report(
+        cls,
+        previous_corpus: List[Dict[str, Any]],
+        current_corpus: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Generates an incremental evidence delta report for living research updates (Prompt Pt 25).
+        Categorizes articles into: NEW_STUDIES, UPDATED_STUDIES, CORRECTED_STUDIES, RETRACTED_STUDIES, UNCHANGED_STUDIES.
+        """
+        prev_map = {s.get("doi") or s.get("study_id") or s.get("title"): s for s in previous_corpus}
+        curr_map = {s.get("doi") or s.get("study_id") or s.get("title"): s for s in current_corpus}
+
+        new_studies = []
+        updated_studies = []
+        corrected_studies = []
+        retracted_studies = []
+        unchanged_studies = []
+
+        for key, curr_s in curr_map.items():
+            if key not in prev_map:
+                new_studies.append(curr_s.get("study_id", key))
+            else:
+                prev_s = prev_map[key]
+                if curr_s.get("is_retracted") and not prev_s.get("is_retracted"):
+                    retracted_studies.append(curr_s.get("study_id", key))
+                elif curr_s.get("is_corrected") and not prev_s.get("is_corrected"):
+                    corrected_studies.append(curr_s.get("study_id", key))
+                elif curr_s != prev_s:
+                    updated_studies.append(curr_s.get("study_id", key))
+                else:
+                    unchanged_studies.append(curr_s.get("study_id", key))
+
+        return {
+            "delta_status": "DELTA_COMPUTED",
+            "total_previous": len(previous_corpus),
+            "total_current": len(current_corpus),
+            "new_studies_count": len(new_studies),
+            "new_studies": new_studies,
+            "updated_studies_count": len(updated_studies),
+            "updated_studies": updated_studies,
+            "corrected_studies_count": len(corrected_studies),
+            "corrected_studies": corrected_studies,
+            "retracted_studies_count": len(retracted_studies),
+            "retracted_studies": retracted_studies,
+            "unchanged_studies_count": len(unchanged_studies),
+            "unchanged_studies": unchanged_studies
         }
 
 

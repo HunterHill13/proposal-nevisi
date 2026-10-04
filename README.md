@@ -67,10 +67,10 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
 
-The engine includes a master test harness verifying 110 total assertions across 4 independent test suites:
+The engine includes a master test harness verifying 138 total assertions across 4 independent test suites:
 - **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all core generic scripts and verifies semantic generalization (19 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 9 distinct biomedical fixtures: Preclinical Oncology, Clinical Cardiology, Infectious Disease, Molecular Diagnostics, Epidemiological Cohort, Basic Molecular Biology, Preclinical Animal Pharmacology, Endocrinology Clinical RCT, and Nephrology Prognostic Biomarkers (9 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios (`test_adversarial_scenarios.py`):** 22 stress tests evaluating fake citations, mismatched DOIs, retracted/corrected articles, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, and missing metadata (22 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios (`test_adversarial_scenarios.py`):** 50 stress tests evaluating fake citations, mismatched DOIs, retracted/corrected articles, publication status, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA accounting, multi-layer graph, and sample size uncertainty (50 tests - **PASS**).
 - **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
 
 ```bash
@@ -83,18 +83,18 @@ python tests/run_all_tests.py
 <a name="فارسی"></a>
 ## مستندات فارسی
 
-مهارت **Proposal-Nevisi (نسخه v8.0)** یک پلتفرم جامع، تعاملی، مستقل از موضوع و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
+مهارت **Proposal-Nevisi (نسخه v8.1)** یک پلتفرم جامع، تعاملی، مستقل از موضوع و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
 
-### ویژگی‌های بنیادین نسخه v8.0:
+### ویژگی‌های بنیادین نسخه v8.1:
 1. **استقلال کامل از موضوع (Topic-Agnostic Core):** حذف تمام کلیدواژه‌ها و پیش‌فرض‌های ثابت از کدهای هسته و انتقال کامل تعاریف به مدل پویای مسئله پژوهش (`ResearchProblemModel`).
-2. **استراتژی جستجوی ۹ لایه‌ای و اشباع شواهد (9-Layer Search):** جستجوی همزمان شواهد موافق، شواهد متناقض/منفی، زنجیره‌سازی استنادی و سنجش نقطه اشباع برای پرهیز از سوگیری تأییدطلبانه.
-3. **گراف روابط ۲۲ گانه بین‌مطالعه‌ای و آشکارساز ۱۱ گانه شکاف‌های پژوهشی:** ترسیم دقیق ارتباطات متدولوژیک و علمی میان مقالات و کشف ساختارمند گپ‌های علمی.
-4. **همسنجی متناسب با طراحی مطالعه:** ارزیابی همسنجی و سوگیری مطالعات بر پایه متدولوژی واقعی آن‌ها (سلولی، حیوانی، کارآزمایی بالینی، دقت تشخیصی و کوهورت).
-5. **تاکسونومی ۱۵ گانه تناقضات:** تفکیک هوشمندانه تناقض واقعی از اختلاف ناشی از دوز، حلال یا رده سلولی، همراه با اعمال قواعد عدم اثبات اثر و نفی مغالطه هم‌افزایی.
-6. **دروازه زبان علّی و ره‌گیری عددی:** جلوگیری از ادعای علیت بر پایه داده‌های همبستگی و تضمین ره‌گیری تمام اعداد در دفتر شواهد (`EVIDENCE_LEDGER`).
-7. **طراحی پروتکل پویا و اعتبارسنجی ساختار ۱۴ گانه:** تولید پویای جدول متغیرها، گانت چارت زمان‌بندی، آزمون‌های آماری و ممیزی سخت‌گیرانه ساختار ۱۴ گانه و زیربخش‌های ۱۳-۱ تا ۱۳-۱۴ با پشتیبانی از نیم‌فاصله و ارقام فارسی.
+2. **استراتژی جستجوی ۱۲ لایه‌ای و اشباع شواهد (12-Layer Search):** جستجوی همزمان شواهد موافق، شواهد متناقض/منفی، زنجیره‌سازی استنادی و تفکیک پوشش جستجو از اشباع شواهد.
+3. **ماتریس جامعیت شواهد و تحلیل مسیرهای مستقل شواهد:** بررسی کامل جریان‌های شواهد (مستقیم، مؤلفه‌ها، مکانیسم، سمیت، شواهد منفی، تکرار و کارآزمایی بالینی).
+4. **سلسله‌مراتب شواهد وابسته به سؤال (Question-Conditional Evidence Hierarchy):** وزن‌دهی پویا به شواهد بر اساس نوع سؤال (درمانی، مکانیکی، تشخیصی، پیش‌آگهی).
+5. **ماتریس تعارض شواهد و تحلیل توضیحات جایگزین:** تفکیک هوشمندانه تناقض واقعی از اختلاف ناشی از پارامترهای زمینه‌ای، همراه با ارزیابی سوگیری انتشار و مصنوعات سنجش.
+6. **دروازه زبان علّی و ره‌گیری عددی:** جلوگیری از ادعای علیت بر پایه داده‌های همبستگی و ثبت دقیق خاستگاه ادعاها (`CLAIM_PROVENANCE_MAP`).
+7. **طراحی پروتکل پویا و اعتبارسنجی ساختار ۱۴ گانه:** تولید پویای جدول متغیرها، گانت چارت زمان‌بندی، آزمون‌های آماری و ممیزی سخت‌گیرانه ساختار ۱۴ گانه و زیربخش‌های ۱۳-۱ تا ۱۳-۱۴.
 8. **خروجی رسمی ۱۴ گانه ورد:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و نگارش یک پاراگراف تفصیلی مجزا برای تک‌تک مراجع در مرور منابع.
-9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۱۱۰ تستی بدون ادعای ساختگی (110 / 110 PASS).
+9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۱۳۸ تستی بدون ادعای ساختگی (138 / 138 PASS).
 
 ---
 

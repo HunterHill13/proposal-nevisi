@@ -74,19 +74,30 @@ SECTION_CONTENT_EXPECTATIONS: Dict[int, Dict[str, Any]] = {
 # ==============================================================================
 
 class TemporalPolicyConfig:
-    CURRENT_OPERATING_YEAR: int = 2026
+    import datetime
+    CURRENT_OPERATING_YEAR: int = datetime.datetime.now().year
     MAX_PRIMARY_EVIDENCE_AGE_YEARS: int = 6
-    PRIMARY_EVIDENCE_CUTOFF_YEAR: int = 2020  # CURRENT_OPERATING_YEAR - 6
-    MINIMUM_RECENT_PRIMARY_PROPORTION: float = 0.75  # >= 75% of main evidence must be recent
+    PRIMARY_EVIDENCE_CUTOFF_YEAR: int = CURRENT_OPERATING_YEAR - 6
+    MINIMUM_RECENT_PRIMARY_PROPORTION: float = 0.70  # >= 70% of main evidence must be recent
 
     APPROVED_FOUNDATIONAL_CATEGORIES: Dict[str, str] = {
-        "FOUNDATIONAL_MATHEMATICAL_MODEL": "Seminal mathematical/pharmacological framework or synergy equation",
+        "FOUNDATIONAL_MATHEMATICAL_MODEL": "Seminal mathematical/pharmacological framework, index, or synergy equation",
         "ORIGINAL_DIAGNOSTIC_CRITERIA": "Landmark international diagnostic criteria (e.g. WHO staging criteria, Gold Standard)",
         "SEMINAL_DISCOVERY": "First isolation/discovery of virus, gene, receptor, or biological pathway",
         "STANDARDIZED_ASSAY_METHOD": "Seminal assay methodology protocol still universally referenced across literature",
         "LANDMARK_HISTORICAL_BENCHMARK": "Seminal clinical trial or benchmark epidemiological cohort study",
-        "ORIGINAL_CHEMICAL_SYNTHESIS": "Original extraction, NMR elucidation, or chemical synthesis of agent"
+        "ORIGINAL_CHEMICAL_SYNTHESIS": "Original extraction, NMR elucidation, or chemical synthesis of agent",
+        "METHODOLOGICAL_LANDMARK": "Methodological landmark or standard analytical assay protocol",
+        "HISTORICAL_FOUNDATION": "Historical background or established scientific framework",
+        "CLASSICAL_STATISTICAL_METHOD": "Classical statistical or epidemiological method introducing standard metrics"
     }
+
+    OUTDATED_DIRECT_EVIDENCE: str = "OUTDATED_DIRECT_EVIDENCE"  # Old study reporting routine direct finding without landmark status
+
+    @classmethod
+    def get_cutoff_year(cls, current_year: int = None) -> int:
+        cy = current_year or cls.CURRENT_OPERATING_YEAR
+        return cy - cls.MAX_PRIMARY_EVIDENCE_AGE_YEARS
 
 # ==============================================================================
 # 3. SEVEN-LEVEL CLAIM ENTAILMENT SCALE
@@ -159,6 +170,7 @@ CONTRADICTION_TAXONOMY: Dict[str, str] = {
 UNIVERSAL_GAP_TAXONOMY: Dict[str, str] = {
     "KNOWLEDGE_GAP": "Fundamental gap in current biomedical knowledge or disease pathology",
     "EVIDENCE_GAP": "Scarcity of empirical studies evaluating specific intervention or question",
+    "DIRECT_EVIDENCE_GAP": "Absence of direct empirical studies testing the specific intervention on target condition",
     "MECHANISTIC_GAP": "Incomplete signaling pathway elucidation or unverified intermediate cascades",
     "METHODOLOGICAL_GAP": "Reliance on legacy assays lacking modern quantitative rigor or reproducibility",
     "POPULATION_GAP": "Lack of evidence in specific clinical, demographic, or disease sub-populations",
@@ -166,12 +178,14 @@ UNIVERSAL_GAP_TAXONOMY: Dict[str, str] = {
     "INTERVENTION_GAP": "Optimal agent configuration, analogue superiority, or delivery mode uncharacterized",
     "DOSE_GAP": "Lack of concentration-response mapping within physiological / non-toxic boundaries",
     "TIMING_GAP": "Uncharacterized therapeutic window, kinetic duration, or chronopharmacology",
+    "LONGITUDINAL_GAP": "Lack of longitudinal follow-up, durable response evaluation, or late recurrence data",
     "OUTCOME_GAP": "Primary endpoints restricted to surrogate markers without functional / phenotype validation",
     "TRANSLATIONAL_GAP": "In vitro efficacy uncorroborated in intact physiological or in vivo systems",
     "SAFETY_GAP": "Incomplete toxicological boundaries, therapeutic window, or organ-sparing assessment",
     "CONTRADICTION_GAP": "Unresolved discrepancies across published studies under divergent experimental contexts",
     "COMBINATION_GAP": "Lack of empirical studies evaluating direct simultaneous co-administration or multi-agent synergy",
-    "REPLICATION_GAP": "Absence of independent confirmatory replications in separate laboratory environments"
+    "REPLICATION_GAP": "Absence of independent confirmatory replications in separate laboratory environments",
+    "IMPLEMENTATION_GAP": "Lack of evidence regarding real-world feasibility, barrier analysis, or adoption"
 }
 
 
@@ -191,7 +205,7 @@ STUDY_DESIGN_ROB_TOOL_MAP: Dict[str, str] = {
 }
 
 # ==============================================================================
-# 7. EVIDENCE TYPE HIERARCHY & WEIGHTING
+# 7. QUESTION-CONDITIONAL EVIDENCE HIERARCHY & WEIGHTING
 # ==============================================================================
 
 EVIDENCE_TYPE_HIERARCHY: Dict[str, Dict[str, Any]] = {
@@ -208,4 +222,49 @@ EVIDENCE_TYPE_HIERARCHY: Dict[str, Dict[str, Any]] = {
     "NARRATIVE_REVIEW": {"tier": 10, "is_primary": False, "weight": 0.2, "synthesis_rule": "Non-systematic commentary; background context only, cannot substantiate causal claims."},
     "EXPERT_OPINION_EDITORIAL": {"tier": 11, "is_primary": False, "weight": 0.1, "synthesis_rule": "Author opinion; excluded from quantitative certainty weighting."}
 }
+
+def get_question_conditional_hierarchy(question_type: str, study_design: str) -> Dict[str, Any]:
+    """Dynamically weights evidence relevance and quality conditional on the scientific question type (Prompt Pt 14).
+    Therapeutic Efficacy: RCT > Prospective Cohort > Retrospective > Animal > In Vitro
+    Molecular Mechanism: In Vitro / In Vivo Mechanistic > Ex Vivo > Clinical Association
+    Diagnostic Accuracy: Diagnostic Accuracy (QUADAS-2) > Prospective Screening > Case-Control
+    Prognostic Factor: Prospective Cohort > Registry Analysis > Cross-sectional
+    """
+    q_type = (question_type or "THERAPEUTIC_EFFICACY").upper()
+    s_design = (study_design or "IN_VITRO_EXPERIMENTAL").upper()
+
+    base_record = EVIDENCE_TYPE_HIERARCHY.get(s_design, {"tier": 5, "weight": 0.5, "is_primary": True})
+    conditional_weight = base_record["weight"]
+    relevance_note = "Standard hierarchy weighting applied."
+
+    if "MECHANISTIC" in q_type or "MOLECULAR" in q_type or "BASIC_SCIENCE" in q_type:
+        if "IN_VITRO" in s_design or "MECHANISTIC" in s_design or "EX_VIVO" in s_design:
+            conditional_weight = min(1.0, base_record["weight"] + 0.45)
+            relevance_note = "Mechanistic question prioritizes direct biochemical and cellular perturbation assays."
+        elif "RCT" in s_design or "CLINICAL" in s_design:
+            conditional_weight = 0.60
+            relevance_note = "Clinical trial provides indirect evidence for intracellular molecular cascades."
+    elif "DIAGNOSTIC" in q_type:
+        if "DIAGNOSTIC" in s_design or "QUADAS" in s_design:
+            conditional_weight = 0.95
+            relevance_note = "Diagnostic accuracy study with gold-standard comparison is the primary evidence."
+        elif "IN_VITRO" in s_design:
+            conditional_weight = 0.30
+            relevance_note = "Analytical bench assay provides analytical validity only, not clinical diagnostic accuracy."
+    elif "PROGNOSTIC" in q_type:
+        if "PROSPECTIVE_COHORT" in s_design:
+            conditional_weight = 0.95
+            relevance_note = "Prospective longitudinal cohort is the gold standard for prognostic risk stratification."
+        elif "IN_VITRO" in s_design:
+            conditional_weight = 0.20
+            relevance_note = "In vitro models cannot estimate patient time-to-event survival hazard ratios."
+
+    return {
+        "question_type": q_type,
+        "study_design": s_design,
+        "base_weight": base_record["weight"],
+        "conditional_weight": round(conditional_weight, 3),
+        "relevance_note": relevance_note,
+        "is_primary_evidence": base_record.get("is_primary", True)
+    }
 

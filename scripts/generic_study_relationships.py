@@ -248,6 +248,54 @@ class GenericStudyRelationshipEngine:
             "claim_nodes": claim_nodes
         }
 
+    @classmethod
+    def build_multi_layer_evidence_graph(
+        cls,
+        studies: List[Dict[str, Any]],
+        claims: List[Dict[str, Any]],
+        evidence_nodes: List[Dict[str, Any]],
+        research_questions: List[Dict[str, Any]],
+        gaps: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Constructs a 5-layer integrated scientific graph (Prompt Pt 9):
+        1. Study nodes (Publications)
+        2. Claim nodes (Assertions)
+        3. Evidence nodes (Passages / Results / Numbers)
+        4. Research Question nodes (Inquiries)
+        5. Gap nodes (Unresolved frontiers)
+        Enables end-to-end tracing: Conclusion -> Claim -> Evidence Passage -> Study -> Identifier.
+        """
+        nodes = {
+            "study_nodes": [s.get("study_id", s.get("doi", f"STUDY_{i}")) for i, s in enumerate(studies)],
+            "claim_nodes": [c.get("claim_id", f"CLM_{i}") for i, c in enumerate(claims)],
+            "evidence_nodes": [e.get("evidence_id", f"EVI_{i}") for i, e in enumerate(evidence_nodes)],
+            "question_nodes": [q.get("question_id", f"RQ_{i}") for i, q in enumerate(research_questions)],
+            "gap_nodes": [g.get("gap_category", f"GAP_{i}") for i, g in enumerate(gaps)]
+        }
+
+        traceable_chains = []
+        for c in claims:
+            cid = c.get("claim_id")
+            sid = c.get("source_study_id")
+            passage = c.get("evidence_passage", c.get("text_or_data", "Empirical finding"))
+            traceable_chains.append({
+                "claim_id": cid,
+                "statement": c.get("claim_text"),
+                "supported_by_study": sid,
+                "evidence_passage": passage,
+                "addressed_gap": c.get("addressed_gap", "GENERAL_KNOWLEDGE_GAP"),
+                "is_traceable": bool(sid and passage)
+            })
+
+        return {
+            "graph_layers": 5,
+            "total_nodes": sum(len(v) for v in nodes.values()),
+            "node_distribution": {k: len(v) for k, v in nodes.items()},
+            "traceable_provenance_chains": traceable_chains,
+            "provenance_traceability_rate": round(sum(1 for t in traceable_chains if t["is_traceable"]) / max(len(traceable_chains), 1), 3),
+            "status": "MULTI_LAYER_GRAPH_BUILT"
+        }
+
 if __name__ == "__main__":
     test_studies = [
         {

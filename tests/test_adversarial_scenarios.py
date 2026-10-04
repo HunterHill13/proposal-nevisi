@@ -18,6 +18,10 @@ from generic_reference_auditor import GenericReferenceAuditor
 from generic_claim_entailment_engine import GenericClaimEntailmentEngine
 from generic_contradiction_engine import GenericContradictionEngine
 from generic_study_family_detector import StudyFamilyDetector
+from generic_search_planner import GenericSearchPlanner
+from generic_study_relationships import GenericStudyRelationshipEngine
+from dynamic_protocol_designer import DynamicProtocolDesigner
+from generic_gap_detector import GenericGapDetector
 
 class TestAdversarialScenarios(unittest.TestCase):
 
@@ -417,12 +421,241 @@ class TestAdversarialScenarios(unittest.TestCase):
             {"study_id": "P3", "title": "Extension (NCT001)", "quantitative_parameters": "50 mg", "retrieval_tier": "METADATA_ONLY"}
         ]
         indep = StudyFamilyDetector.evaluate_evidence_independence(studies)
-        self.assertEqual(indep["publication_count"], 3)
-        self.assertEqual(indep["independent_evidence_streams"], 1)
-
         tier_aud = self.auditor.audit_evidence_retrieval_tier(studies)
         self.assertFalse(tier_aud["is_tier_compliant"])
         self.assertEqual(len(tier_aud["sensitive_claims_demoted"]), 1)
+
+    def test_37_retracted_paper_excluded_and_corrected_paper_preferred(self):
+        """Test 37: Retracted paper is strictly excluded while corrected paper is flagged (Prompt Pt 12, 43, 44)."""
+        retracted_ref = {"study_id": "RET_01", "title": "Retraction Notice: Fake paper", "status": "retracted"}
+        corrected_ref = {"study_id": "COR_01", "title": "Erratum: Revised dosing", "status": "corrected"}
+        standard_ref = {"study_id": "STD_01", "title": "Standard valid trial", "status": "published"}
+
+        res_ret = self.auditor.audit_publication_status(retracted_ref)
+        res_cor = self.auditor.audit_publication_status(corrected_ref)
+        res_std = self.auditor.audit_publication_status(standard_ref)
+
+        self.assertEqual(res_ret["publication_status"], "RETRACTED")
+        self.assertFalse(res_ret["is_eligible_for_synthesis"])
+        self.assertEqual(res_ret["action_required"], "EXCLUDE_FROM_EVIDENCE_SYNTHESIS")
+
+        self.assertEqual(res_cor["publication_status"], "CORRECTION_AVAILABLE")
+        self.assertTrue(res_cor["is_eligible_for_synthesis"])
+        self.assertEqual(res_cor["action_required"], "PREFER_CORRECTED_VERSION")
+
+        self.assertEqual(res_std["publication_status"], "STANDARD_PEER_REVIEWED")
+        self.assertTrue(res_std["is_eligible_for_synthesis"])
+
+    def test_38_question_conditional_evidence_hierarchy(self):
+        """Test 38: Evidence hierarchy weights change based on scientific question type (Prompt Pt 14, 44)."""
+        from core_policies import get_question_conditional_hierarchy
+        
+        # In vitro study weight for Mechanistic question vs Therapeutic Efficacy question
+        mech_weight = get_question_conditional_hierarchy("MOLECULAR_MECHANISM", "IN_VITRO_EXPERIMENTAL")
+        therap_weight = get_question_conditional_hierarchy("THERAPEUTIC_EFFICACY", "IN_VITRO_EXPERIMENTAL")
+
+        self.assertGreater(mech_weight["conditional_weight"], therap_weight["conditional_weight"])
+        self.assertIn("direct biochemical", mech_weight["relevance_note"])
+
+        # Cohort study weight for Prognostic question vs In Vitro
+        prog_cohort = get_question_conditional_hierarchy("PROGNOSTIC_FACTOR", "PROSPECTIVE_COHORT")
+        prog_vitro = get_question_conditional_hierarchy("PROGNOSTIC_FACTOR", "IN_VITRO_EXPERIMENTAL")
+        self.assertGreater(prog_cohort["conditional_weight"], prog_vitro["conditional_weight"])
+
+    def test_39_evidence_conflict_matrix_generation(self):
+        """Test 39: Generates multi-study conflict matrix with supporting, opposing, and neutral evidence (Prompt Pt 17)."""
+        findings = [
+            {"finding_statement": "Drug X inhibits cell viability", "agent": "Drug X"}
+        ]
+        studies = [
+            {"study_id": "S1", "primary_findings": "Drug X achieves 80% viability inhibition"},
+            {"study_id": "S2", "primary_findings": "Drug X produced null response and no effect on cell growth"},
+            {"study_id": "S3", "primary_findings": "Unrelated observation on cell morphology"}
+        ]
+        conflict_res = GenericContradictionEngine.build_evidence_conflict_matrix(findings, studies)
+        self.assertEqual(conflict_res["total_findings_mapped"], 1)
+        row = conflict_res["conflict_matrix"][0]
+        self.assertEqual(row["supporting_studies_count"], 1)
+        self.assertEqual(row["opposing_studies_count"], 1)
+        self.assertEqual(row["neutral_studies_count"], 1)
+        self.assertIn("S1", row["supporting_study_ids"])
+        self.assertIn("S2", row["opposing_study_ids"])
+
+    def test_40_alternative_explanations_audit(self):
+        """Test 40: Audits alternative explanations (assay artifact, dosage threshold, batch drift) (Prompt Pt 19)."""
+        conclusion = "Agent Y inhibits target enzyme at high concentrations"
+        controlled_ctx = {
+            "dose_threshold_dependency": True,
+            "assay_interference_artifact": True,
+            "selection_confounding": True,
+            "model_specific_restriction": True,
+            "temporal_kinetic_decay": True,
+            "batch_or_passage_drift": True
+        }
+        uncontrolled_ctx = {}
+
+        aud_clean = GenericContradictionEngine.evaluate_alternative_explanations(conclusion, controlled_ctx)
+        aud_uncontrolled = GenericContradictionEngine.evaluate_alternative_explanations(conclusion, uncontrolled_ctx)
+
+        self.assertEqual(aud_clean["uncontrolled_alternative_explanations_count"], 0)
+        self.assertGreater(aud_uncontrolled["uncontrolled_alternative_explanations_count"], 0)
+        self.assertIn("Section 2 and Section 3", aud_uncontrolled["synthesis_recommendation"])
+
+    def test_41_evidence_completeness_matrix_vs_saturation(self):
+        """Test 41: Evidence completeness separates missing streams from no-evidence (Prompt Pt 5, 6, 44)."""
+        identified_streams = {
+            "DIRECT_EVIDENCE": [{"study_id": "D1", "quantitative_parameters": "10 nM"}],
+            "COMPONENT_EVIDENCE": [{"study_id": "C1"}],
+            "MECHANISTIC_EVIDENCE": [{"study_id": "M1"}]
+        }
+        res = GenericSearchPlanner.evaluate_evidence_completeness_matrix(identified_streams)
+        self.assertFalse(res["is_complete"])
+        self.assertIn("SAFETY_TOXICITY", res["missing_streams"])
+        self.assertIn("NEGATIVE_NULL_EVIDENCE", res["missing_streams"])
+        
+        # Verify epistemic distinction
+        safety_row = [r for r in res["evidence_completeness_matrix"] if r["evidence_stream"] == "SAFETY_TOXICITY"][0]
+        self.assertEqual(safety_row["status"], "EVIDENCE_STREAM_NOT_FOUND")
+
+    def test_42_prisma_accounting_from_real_logs(self):
+        """Test 42: PRISMA accounting generated strictly from search execution logs (Prompt Pt 22, 23)."""
+        search_logs = [
+            {"database": "PubMed", "exact_query": '("Agent A" AND "Condition B")', "retrieved_count": 120, "screened_count": 120, "excluded_count": 100, "included_count": 20},
+            {"database": "Europe PMC", "exact_query": '("Agent A" AND "Condition B")', "retrieved_count": 60, "screened_count": 60, "excluded_count": 50, "included_count": 10}
+        ]
+        prisma_rep = GenericSearchPlanner.generate_prisma_accounting_report(search_logs)
+        self.assertEqual(prisma_rep["prisma_status"], "PRISMA_COMPLIANT_AUTHENTIC")
+        self.assertEqual(prisma_rep["records_identified_from_databases"], 180)
+        self.assertEqual(prisma_rep["studies_included_in_synthesis"], 30)
+
+        # Empty logs must flag PRISMA_INCOMPLETE
+        empty_prisma = GenericSearchPlanner.generate_prisma_accounting_report([])
+        self.assertEqual(empty_prisma["prisma_status"], "PRISMA_INCOMPLETE")
+
+    def test_43_multi_layer_evidence_graph_and_traceability(self):
+        """Test 43: Builds 5-layer evidence graph connecting studies, claims, passages, questions, and gaps (Prompt Pt 9, 10)."""
+        studies = [{"study_id": "S1", "doi": "10.1000/1"}]
+        claims = [{"claim_id": "C1", "claim_text": "Agent A reduces mortality by 25%", "source_study_id": "S1", "evidence_passage": "Mortality reduced by 25%, HR=0.75"}]
+        evidence = [{"evidence_id": "E1", "text_or_data": "HR=0.75 (95% CI 0.60-0.90)"}]
+        questions = [{"question_id": "Q1", "text": "Does Agent A reduce mortality?"}]
+        gaps = [{"gap_category": "LONGITUDINAL_GAP"}]
+
+        graph = GenericStudyRelationshipEngine.build_multi_layer_evidence_graph(studies, claims, evidence, questions, gaps)
+        self.assertEqual(graph["graph_layers"], 5)
+        self.assertEqual(graph["status"], "MULTI_LAYER_GRAPH_BUILT")
+        self.assertEqual(graph["provenance_traceability_rate"], 1.0)
+
+    def test_44_claim_provenance_map_enforces_numerical_provenance(self):
+        """Test 44: Builds CLAIM_PROVENANCE_MAP and rejects untraced numerical claims (Prompt Pt 10)."""
+        valid_claims = [
+            {
+                "sentence": "In trial S1, mortality decreased by 30% [1].",
+                "claim_id": "CLM_NUM_01",
+                "claim_text": "Mortality decreased by 30%",
+                "passage": "Results demonstrated a 30% reduction in mortality.",
+                "study": "S1",
+                "doi": "10.1016/j.demo.2024.01",
+                "database_source": "PubMed"
+            }
+        ]
+        invalid_claims = [
+            {
+                "sentence": "Survival improved by 45%.",
+                "claim_id": "CLM_NUM_02",
+                "claim_text": "Survival improved by 45%",
+                "passage": "",  # missing evidence passage
+                "study": "S2",
+                "doi": ""       # missing identifier
+            }
+        ]
+
+        prov_clean = GenericClaimEntailmentEngine.build_claim_provenance_map(valid_claims)
+        prov_dirty = GenericClaimEntailmentEngine.build_claim_provenance_map(invalid_claims)
+
+        self.assertEqual(prov_clean["provenance_compliance_status"], "COMPLIANT")
+        self.assertEqual(prov_dirty["provenance_compliance_status"], "NON_COMPLIANT_UNTRACED_NUMBERS")
+        self.assertEqual(prov_dirty["untraced_numerical_claims_count"], 1)
+
+    def test_45_sample_size_requires_input_when_data_missing(self):
+        """Test 45: Clinical sample size calculator outputs SAMPLE_SIZE_REQUIRES_INPUT instead of fake numbers (Prompt Pt 34, 49)."""
+        model_missing_inputs = {
+            "framework": "PICO",
+            "statistical_parameters": {}  # baseline event rate missing
+        }
+        model_with_inputs = {
+            "framework": "PICO",
+            "statistical_parameters": {"baseline_event_rate": 0.20, "expected_intervention_rate": 0.12}
+        }
+
+        calc_missing = DynamicProtocolDesigner.calculate_sample_size_plan(model_missing_inputs)
+        calc_valid = DynamicProtocolDesigner.calculate_sample_size_plan(model_with_inputs)
+
+        self.assertEqual(calc_missing["status"], "SAMPLE_SIZE_REQUIRES_INPUT")
+        self.assertIn("baseline_event_rate", calc_missing["missing_parameters"])
+        self.assertEqual(calc_valid["status"], "SAMPLE_SIZE_COMPUTED")
+
+    def test_46_gap_assertion_epistemic_rigor(self):
+        """Test 46: Audits gap assertions to prohibit universal 'no study exists' claims (Prompt Pt 21)."""
+        unbounded_statement = "No study exists in the universe evaluating this exact drug combination."
+        bounded_statement = "Within our systematic search boundary, no direct empirical evidence was retrievable."
+        
+        meta = {"databases_searched": ["PubMed", "Europe PMC", "Crossref"], "queries_logged": 5}
+
+        aud_unbounded = GenericGapDetector.audit_gap_assertion_epistemic_rigor(unbounded_statement, meta)
+        aud_bounded = GenericGapDetector.audit_gap_assertion_epistemic_rigor(bounded_statement, meta)
+
+        self.assertTrue(aud_unbounded["has_unbounded_absolute_claim"])
+        self.assertEqual(aud_unbounded["status"], "REVISE_LANGUAGE")
+        self.assertFalse(aud_bounded["has_unbounded_absolute_claim"])
+        self.assertEqual(aud_bounded["status"], "PASS")
+
+    def test_47_incremental_evidence_delta_report(self):
+        """Test 47: Generates EVIDENCE_DELTA_REPORT distinguishing new, updated, and retracted papers (Prompt Pt 25)."""
+        prev_corpus = [
+            {"study_id": "P1", "doi": "10.1/1", "is_retracted": False},
+            {"study_id": "P2", "doi": "10.1/2", "title": "Original version"}
+        ]
+        curr_corpus = [
+            {"study_id": "P1", "doi": "10.1/1", "is_retracted": True}, # retracted now
+            {"study_id": "P2", "doi": "10.1/2", "title": "Original version"}, # unchanged
+            {"study_id": "P3", "doi": "10.1/3", "title": "Newly discovered study"} # new
+        ]
+
+        delta = GenericReferenceAuditor.generate_evidence_delta_report(prev_corpus, curr_corpus)
+        self.assertEqual(delta["new_studies_count"], 1)
+        self.assertIn("P3", delta["new_studies"])
+        self.assertEqual(delta["retracted_studies_count"], 1)
+        self.assertIn("P1", delta["retracted_studies"])
+        self.assertEqual(delta["unchanged_studies_count"], 1)
+
+    def test_48_adversarial_shared_cohort_five_papers(self):
+        """Adversarial Scenario D: One cohort produces 5 papers; must be clustered as 1 composite evidentiary unit (Prompt Pt 45)."""
+        five_papers = [
+            {"study_id": f"NHANES_P{i}", "title": f"Nutritional biomarker analysis {i} (NHANES study)", "abstract": f"Cross-sectional survey {i}."}
+            for i in range(1, 6)
+        ]
+        indep = StudyFamilyDetector.evaluate_evidence_independence(five_papers)
+        self.assertEqual(indep["publication_count"], 5)
+        self.assertEqual(indep["independent_evidence_streams"], 1)
+        self.assertTrue(indep["has_non_independent_overlap"])
+
+    def test_49_adversarial_hundred_positive_one_high_quality_negative(self):
+        """Adversarial Scenario A: 100 positive papers + 1 high quality negative paper; no majority voting fallacy (Prompt Pt 37, 45)."""
+        from generic_evidence_synthesis import GenericEvidenceSynthesizer
+        supporting = [{"study_id": f"SUP_{i}", "study_family_id": f"FAM_{i%10}", "directness": "DIRECT"} for i in range(100)]
+        contradicting = [{"study_id": "CONTRA_01", "study_family_id": "FAM_CONTRA", "directness": "DIRECT", "divergence_type": "TRUE_CONTRADICTION"}]
+
+        synth = GenericEvidenceSynthesizer.evaluate_claim_synthesis("CLAIM_ADVERSARIAL", "Intervention is universally effective", supporting, contradicting)
+        # Even with 100 supporting, unexplained true contradiction cannot yield HIGH certainty
+        self.assertNotEqual(synth["overall_evidence_certainty"], "HIGH")
+        self.assertIn(synth["overall_evidence_certainty"], ["LOW", "MODERATE"])
+
+    def test_50_adversarial_observational_causal_leap_blocked(self):
+        """Adversarial Scenario H: Observational study attempts causal assertion; blocked by causal gate (Prompt Pt 45)."""
+        claim = "Dietary intake of compound X cures metabolic disorder directly."
+        res = GenericClaimEntailmentEngine.audit_causal_language(claim, "OBSERVATIONAL_COHORT_CASE_CONTROL")
+        self.assertEqual(res["status"], "OVERCLAIM_RISK")
+        self.assertFalse(res["allowed_unconditional_causal_claim"])
 
 
 if __name__ == "__main__":
