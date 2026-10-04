@@ -744,11 +744,28 @@ class GenericReferenceAuditor:
             if cond_dict.get("name_en"): cond_names.append(str(cond_dict["name_en"]).lower())
             if cond_dict.get("name_fa"): cond_names.append(str(cond_dict["name_fa"]).lower())
             cond_names.extend([str(s).lower() for s in cond_dict.get("synonyms", []) if s])
+            # Controlled vocabulary / MeSH terms expansion
+            cond_names.extend([str(m).lower() for m in cond_dict.get("mesh_terms", []) if m])
+            cond_names.extend([str(a).lower() for a in cond_dict.get("abbreviations", []) if a])
         elif isinstance(cond_dict, str):
             cond_names.append(cond_dict.lower())
+
+        # Generate automatic standard acronyms / derived abbreviations for multi-word conditions
+        for cn in list(cond_names):
+            words = [w for w in cn.split() if w not in ["of", "and", "the", "in", "for"]]
+            if len(words) >= 2:
+                acronym = "".join(w[0] for w in words).lower()
+                if len(acronym) >= 3 and acronym not in cond_names:
+                    cond_names.append(acronym)
             
         pop_dict = p_dict.get("population_or_model", {})
         primary_sys = str(pop_dict.get("primary_system", "")).lower() if isinstance(pop_dict, dict) else str(pop_dict).lower()
+        if isinstance(pop_dict, dict):
+            model_synonyms = [str(s).lower() for s in pop_dict.get("synonyms", []) if s]
+            model_cell_lines = [str(c).lower() for c in pop_dict.get("cell_lines", []) if c]
+        else:
+            model_synonyms = []
+            model_cell_lines = []
         
         interventions = p_dict.get("interventions_or_exposures", [])
         agent_names = []
@@ -756,6 +773,8 @@ class GenericReferenceAuditor:
             if isinstance(ag, dict):
                 if ag.get("name"): agent_names.append(str(ag["name"]).lower())
                 agent_names.extend([str(s).lower() for s in ag.get("synonyms", []) if s])
+                agent_names.extend([str(m).lower() for m in ag.get("mesh_terms", []) if m])
+                agent_names.extend([str(c).lower() for c in ag.get("chemical_names", []) if c])
             elif isinstance(ag, str):
                 agent_names.append(ag.lower())
                 
@@ -763,6 +782,7 @@ class GenericReferenceAuditor:
         for o in p_dict.get("primary_outcomes", []):
             if isinstance(o, dict) and o.get("name"):
                 outcomes.append(str(o["name"]).lower())
+                outcomes.extend([str(s).lower() for s in o.get("synonyms", []) if s])
             elif isinstance(o, str):
                 outcomes.append(o.lower())
                 
@@ -771,6 +791,7 @@ class GenericReferenceAuditor:
             if isinstance(m, dict):
                 if m.get("pathway_name"): mechanisms.append(str(m["pathway_name"]).lower())
                 mechanisms.extend([str(t).lower() for t in m.get("target_molecules", []) if t])
+                mechanisms.extend([str(s).lower() for s in m.get("synonyms", []) if s])
             elif isinstance(m, str):
                 mechanisms.append(m.lower())
 
@@ -878,6 +899,10 @@ class GenericReferenceAuditor:
                     if re.search(r'\b' + re.escape(root), combined_text):
                         has_model = True
                         break
+            if not has_model and (model_synonyms or model_cell_lines):
+                all_model_aliases = model_synonyms + model_cell_lines
+                if any(re.search(r'\b' + re.escape(m) + r'\b', combined_text) for m in all_model_aliases if len(m) >= 3):
+                    has_model = True
             if not has_model and any(re.search(r'\b' + re.escape(k) + r'\b', combined_text) for k in [
                 "human cell line", "cancer cell line", "cell culture model", "cell culture system", 
                 "in vitro cancer model", "cellular oncology models", "cellular oncology model", 

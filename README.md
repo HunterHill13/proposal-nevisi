@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 218/218 Passed](https://img.shields.io/badge/Unified%20Tests-218%2F218%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 224/224 Passed](https://img.shields.io/badge/Unified%20Tests-224%2F224%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -19,6 +19,7 @@
 ## English Documentation
 
 **Proposal-Nevisi (v8.2)** is an autonomous, publication-grade academic research proposal drafting framework and **General-Purpose Evidence-Driven Medical Research Engine**. Redesigned from the ground up to eliminate all hard-coded domain dependencies, v8.2 operates across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
+> **Methodological Note & Scientific Limitations:** Contextual relevance scoring uses normalized/stemmed keyword heuristics, MeSH controlled vocabulary expansion, and deterministic biological incompatibility rules (not unconstrained LLM semantic intuition). All 224 automated software tests establish software specification conformance, PRISMA accounting, and logic gate integrity, and are strictly distinguished from external empirical clinical trials.
 
 ### Core Architecture & Capabilities (v8.2)
 

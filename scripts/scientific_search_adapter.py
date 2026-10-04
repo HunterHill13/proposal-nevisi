@@ -25,6 +25,7 @@ import time
 import urllib.request
 import urllib.parse
 import urllib.error
+import xml.etree.ElementTree as ET
 import difflib
 from typing import Dict, List, Any, Optional, Set, Tuple
 
@@ -131,24 +132,72 @@ class FixtureSearchBackend(BaseScientificSearchBackend):
 class KDenseCompatibilityBackend(BaseScientificSearchBackend):
     """Compatibility bridge for K-Dense scientific agent skills and local science tools.
     
-    Translates standard K-Dense paper-lookup, literature-review, and citation-management
-    paradigms into standardized Proposal-Nevisi Study Evidence records.
+    Acts as a pluggable Retrieval-Only Adapter that translates K-Dense paper-lookup,
+    literature-review, and citation-management output structures into standardized
+    Proposal-Nevisi Study Evidence records with full field provenance.
+    Leaves all relevance, entailment, and portfolio decisions to Proposal-Nevisi.
     """
     backend_name: str = "KDenseCompatible"
 
     def __init__(self, primary_backend: Optional[BaseScientificSearchBackend] = None):
         self.primary_backend = primary_backend or PubMedBackend()
 
+    @staticmethod
+    def normalize_kdense_record(raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalizes a K-Dense / Science skill output item into Proposal-Nevisi format."""
+        doi = raw_record.get("doi")
+        if doi:
+            doi = str(doi).strip().lower().replace("https://doi.org/", "").replace("http://doi.org/", "")
+
+        pmid = raw_record.get("pmid") or raw_record.get("ext_id")
+        if pmid:
+            pmid = str(pmid).strip()
+
+        openalex_id = raw_record.get("openalex_id") or raw_record.get("id")
+        if openalex_id and "openalex.org" in str(openalex_id):
+            openalex_id = str(openalex_id).split("/")[-1].strip().lower()
+
+        title = str(raw_record.get("title", "")).strip().rstrip(".")
+        abstract = str(raw_record.get("abstract", raw_record.get("abstractText", ""))).strip()
+        authors = raw_record.get("authors", [])
+        if isinstance(authors, str):
+            authors = [a.strip() for a in authors.split(",") if a.strip()]
+
+        year = raw_record.get("year") or raw_record.get("publication_year") or raw_record.get("pubYear")
+        if year and str(year).isdigit():
+            year = int(year)
+        else:
+            year = None
+
+        journal = str(raw_record.get("journal", raw_record.get("journalTitle", raw_record.get("source", "")))).strip()
+
+        normalized = {
+            "database": raw_record.get("database", "KDense/PaperLookup"),
+            "doi": doi,
+            "pmid": pmid,
+            "openalex_id": openalex_id,
+            "title": title,
+            "abstract": abstract if abstract else None,
+            "authors": authors,
+            "journal": journal,
+            "year": year,
+            "kdense_interoperable": True,
+            "kdense_schema": "kdense/paper-lookup/v2.4",
+            "field_provenance": {
+                "title": raw_record.get("database", "KDense"),
+                "doi": raw_record.get("database", "KDense") if doi else None,
+                "pmid": raw_record.get("database", "KDense") if pmid else None,
+                "abstract": raw_record.get("database", "KDense") if abstract else None
+            },
+            "raw_metadata": raw_record
+        }
+        return normalized
+
     def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
-        # Delegates search to primary backend while wrapping in K-Dense schema semantics
+        """Delegates search to primary backend while wrapping in K-Dense schema semantics."""
         res = self.primary_backend.search(query, max_results=max_results, mode=mode)
         recs = res.get("records", [])
-        kdense_records = []
-        for r in recs:
-            rc = dict(r)
-            rc["kdense_interoperable"] = True
-            rc["kdense_schema"] = "kdense/paper-lookup/v1"
-            kdense_records.append(rc)
+        kdense_records = [self.normalize_kdense_record(r) for r in recs]
         res["records"] = kdense_records
         res["compatibility_layer"] = "K_DENSE_SCIENTIFIC_SKILLS"
         return res
@@ -165,6 +214,7 @@ class ScientificSearchAdapter:
     API_ENDPOINTS = {
         "PubMed_search": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
         "PubMed_summary": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi",
+        "PubMed_fetch": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
         "Europe_PMC": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
         "OpenAlex": "https://api.openalex.org/works",
         "Crossref": "https://api.crossref.org/works"
@@ -248,12 +298,99 @@ class ScientificSearchAdapter:
 
         return {"_error": "HTTP_REQUEST_FAILED", "details": str(last_error)}
 
+    def _http_get_text(self, url: str, headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+        """Executes HTTP GET request with retries and returns text body."""
+        req_headers = {
+            "User-Agent": self.USER_AGENT,
+            "Accept": "application/xml, text/xml, */*"
+        }
+        if headers:
+            req_headers.update(headers)
+
+        req = urllib.request.Request(url, headers=req_headers)
+        ctx = ssl.create_default_context()
+
+        last_error = None
+        for attempt in range(1, self.MAX_RETRIES + 1):
+            try:
+                with urllib.request.urlopen(req, timeout=self.timeout, context=ctx) as resp:
+                    raw_bytes = resp.read()
+                    charset = resp.headers.get_content_charset() or "utf-8"
+                    text = raw_bytes.decode(charset, errors="replace")
+                    return {"text": text}
+            except urllib.error.HTTPError as http_err:
+                last_error = http_err
+                if http_err.code in [429, 500, 502, 503, 504]:
+                    sleep_time = self.BACKOFF_BASE_SECONDS * (2 ** (attempt - 1))
+                    time.sleep(sleep_time)
+                else:
+                    break
+            except (urllib.error.URLError, TimeoutError, OSError) as net_err:
+                last_error = net_err
+                sleep_time = self.BACKOFF_BASE_SECONDS * (2 ** (attempt - 1))
+                time.sleep(sleep_time)
+
+        return {"_error": "HTTP_REQUEST_FAILED", "details": str(last_error)}
+
+    def fetch_pubmed_abstracts_efetch(self, pmid_list: List[str]) -> Dict[str, str]:
+        """Fetches authentic abstracts for PMIDs via NCBI E-Fetch XML.
+        
+        Extracts structured or plain abstract text cleanly without fabrication.
+        Returns dict mapping pmid -> abstract_text.
+        """
+        if not pmid_list:
+            return {}
+        self._rate_limit("pubmed")
+        fetch_params = {
+            "db": "pubmed",
+            "id": ",".join(pmid_list),
+            "rettype": "abstract",
+            "retmode": "xml"
+        }
+        if self.ncbi_api_key:
+            fetch_params["api_key"] = self.ncbi_api_key
+
+        fetch_url = f"{self.API_ENDPOINTS['PubMed_fetch']}?{urllib.parse.urlencode(fetch_params)}"
+        res = self._http_get_text(fetch_url)
+        if "_error" in res:
+            return {}
+
+        xml_text = res.get("text", "")
+        if not xml_text:
+            return {}
+
+        abstracts_map: Dict[str, str] = {}
+        try:
+            root = ET.fromstring(xml_text)
+            for article in root.iter("PubmedArticle"):
+                pmid_elem = article.find(".//MedlineCitation/PMID")
+                if pmid_elem is None or not pmid_elem.text:
+                    continue
+                pmid = pmid_elem.text.strip()
+                abstract_elem = article.find(".//Article/Abstract")
+                if abstract_elem is None:
+                    continue
+                parts = []
+                for at in abstract_elem.findall("AbstractText"):
+                    label = at.get("Label")
+                    t = "".join(at.itertext()).strip()
+                    if label and t:
+                        parts.append(f"{label}: {t}")
+                    elif t:
+                        parts.append(t)
+                if parts:
+                    abstracts_map[pmid] = "\n".join(parts)
+        except Exception:
+            return {}
+
+        return abstracts_map
+
     # =========================================================================
     # 1. DATABASE-SPECIFIC ADAPTERS
     # =========================================================================
 
     def query_pubmed(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
-        """Queries NCBI PubMed using E-utilities (esearch + esummary)."""
+        """Queries NCBI PubMed using E-utilities (esearch + esummary + efetch for real abstracts)."""
         if mode != "online":
             return {
                 "database": "PubMed",
@@ -309,6 +446,9 @@ class ScientificSearchAdapter:
         summary_url = f"{self.API_ENDPOINTS['PubMed_summary']}?{urllib.parse.urlencode(summary_params)}"
         summary_data = self._http_get_json(summary_url)
 
+        # Retrieve authentic abstracts via E-Fetch XML
+        abstracts_map = self.fetch_pubmed_abstracts_efetch(id_list)
+
         records = []
         result_dict = summary_data.get("result", {})
         for pmid in id_list:
@@ -327,7 +467,7 @@ class ScientificSearchAdapter:
                 if year_m:
                     year = int(year_m.group(1))
 
-                records.append({
+                rec = {
                     "database": "PubMed",
                     "pmid": pmid,
                     "doi": doi,
@@ -337,7 +477,13 @@ class ScientificSearchAdapter:
                     "year": year,
                     "publication_date": pubdate,
                     "raw_metadata": item
-                })
+                }
+                # Assign authentic abstract if fetched from NCBI E-Fetch
+                if pmid in abstracts_map:
+                    rec["abstract"] = abstracts_map[pmid]
+                    rec["abstract_provenance"] = "NCBI_EFETCH_XML"
+
+                records.append(rec)
 
         return {
             "database": "PubMed",
@@ -814,8 +960,20 @@ class ScientificSearchAdapter:
             all_pmids = set()
             all_alex_ids = set()
 
+            # Field-level provenance tracking
+            field_provenance: Dict[str, str] = {}
+            primary_db = canonical.get("database", "UNKNOWN")
+            if canonical.get("title"): field_provenance["title"] = primary_db
+            if canonical.get("doi"): field_provenance["doi"] = primary_db
+            if canonical.get("pmid"): field_provenance["pmid"] = primary_db
+            if canonical.get("openalex_id"): field_provenance["openalex_id"] = primary_db
+            if canonical.get("year"): field_provenance["year"] = primary_db
+            if canonical.get("authors"): field_provenance["authors"] = primary_db
+            if canonical.get("journal"): field_provenance["journal"] = primary_db
+            if canonical.get("abstract"): field_provenance["abstract"] = primary_db
+
             for r in cluster_recs:
-                db_name = r.get("database")
+                db_name = r.get("database", "UNKNOWN")
                 if db_name:
                     all_sources.add(db_name)
                 d = r.get("doi")
@@ -828,17 +986,22 @@ class ScientificSearchAdapter:
                 if a:
                     all_alex_ids.add(str(a).strip().lower())
 
-                # Fill missing canonical fields from secondary records
+                # Fill missing canonical fields from secondary records with exact provenance
                 if not canonical.get("abstract") and r.get("abstract"):
                     canonical["abstract"] = r["abstract"]
+                    field_provenance["abstract"] = db_name
                 if not canonical.get("year") and r.get("year"):
                     canonical["year"] = r["year"]
+                    field_provenance["year"] = db_name
                 if not canonical.get("authors") and r.get("authors"):
                     canonical["authors"] = r["authors"]
+                    field_provenance["authors"] = db_name
                 if not canonical.get("journal") and r.get("journal"):
                     canonical["journal"] = r["journal"]
+                    field_provenance["journal"] = db_name
 
             canonical["retrieval_sources"] = sorted(list(all_sources))
+            canonical["field_provenance"] = field_provenance
             canonical["doi"] = sorted(list(all_dois))[0] if all_dois else canonical.get("doi")
             canonical["pmid"] = sorted(list(all_pmids))[0] if all_pmids else canonical.get("pmid")
             canonical["openalex_id"] = sorted(list(all_alex_ids))[0] if all_alex_ids else canonical.get("openalex_id")
@@ -872,11 +1035,16 @@ class ScientificSearchAdapter:
 
         for b_idx, batch in enumerate(faceted_batches, 1):
             batch_unique = 0
+            has_high_value_discovery = False
             for r in batch:
                 ident = str(r.get("doi") or r.get("pmid") or r.get("title", "")).lower().strip()
                 if ident and ident not in seen_identifiers:
                     seen_identifiers.add(ident)
                     batch_unique += 1
+                    # Detect high-value discovery in new unique items
+                    t_str = f"{r.get('title','')} {r.get('abstract','')} {r.get('study_design','')}".lower()
+                    if any(k in t_str for k in ["contradict", "discrepan", "inconsistent", "isobologram", "synergy index", "rct", "phase iii"]):
+                        has_high_value_discovery = True
 
             marginal_yield = round(batch_unique / max(len(batch), 1), 3)
             saturation_curve.append({
@@ -884,16 +1052,36 @@ class ScientificSearchAdapter:
                 "batch_total": len(batch),
                 "marginal_new_unique": batch_unique,
                 "cumulative_unique": len(seen_identifiers),
-                "marginal_yield_ratio": marginal_yield
+                "marginal_yield_ratio": marginal_yield,
+                "has_high_value_discovery": has_high_value_discovery
             })
 
-        is_saturated = len(saturation_curve) >= 3 and saturation_curve[-1]["marginal_yield_ratio"] < 0.15
+        # Bounded deterministic saturation logic:
+        # Saturated if >= 3 batches and marginal yield < 0.15, EXCEPT if the latest batch surfaced a high-value discovery
+        # Hard ceiling on total batches evaluated (max 8) prevents infinite search loops.
+        latest = saturation_curve[-1] if saturation_curve else {}
+        is_yield_low = len(saturation_curve) >= 3 and latest.get("marginal_yield_ratio", 1.0) < 0.15
+        is_hard_ceiling = len(saturation_curve) >= 8
+
+        if is_hard_ceiling:
+            is_saturated = True
+            sat_status = "SATURATED_HARD_CEILING"
+        elif is_yield_low and not latest.get("has_high_value_discovery", False):
+            is_saturated = True
+            sat_status = "SATURATED"
+        elif is_yield_low and latest.get("has_high_value_discovery", False):
+            is_saturated = False
+            sat_status = "EXPANDING_HIGH_VALUE_DISCOVERY"
+        else:
+            is_saturated = False
+            sat_status = "EXPANDING"
 
         return {
-            "saturation_status": "SATURATED" if is_saturated else "EXPANDING",
+            "saturation_status": sat_status,
+            "is_saturated": is_saturated,
             "total_cumulative_unique": len(seen_identifiers),
             "total_batches_evaluated": len(faceted_batches),
-            "final_marginal_yield_ratio": saturation_curve[-1]["marginal_yield_ratio"] if saturation_curve else 0.0,
+            "final_marginal_yield_ratio": latest.get("marginal_yield_ratio", 0.0),
             "saturation_curve": saturation_curve
         }
 

@@ -1692,6 +1692,136 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(res_semen["relevance_tier"], "IRRELEVANT")
         self.assertEqual(res_semen["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
 
+    def test_87_pubmed_efetch_xml_abstract_extraction_and_provenance(self):
+        """Test 87: PubMed E-Fetch XML parsing extracts real abstracts and assigns exact provenance."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        adapter = ScientificSearchAdapter()
+        mock_xml = """<PubmedArticleSet>
+            <PubmedArticle>
+                <MedlineCitation>
+                    <PMID>99887711</PMID>
+                    <Article>
+                        <Abstract>
+                            <AbstractText Label="BACKGROUND">Lupeol exhibits antineoplastic potential.</AbstractText>
+                            <AbstractText Label="RESULTS">Synergistic apoptotic activation occurred.</AbstractText>
+                        </Abstract>
+                    </Article>
+                </MedlineCitation>
+            </PubmedArticle>
+        </PubmedArticleSet>"""
+        adapter._http_get_text = lambda url, headers=None: {"text": mock_xml}
+        abstracts = adapter.fetch_pubmed_abstracts_efetch(["99887711"])
+        self.assertIn("99887711", abstracts)
+        self.assertIn("BACKGROUND: Lupeol exhibits antineoplastic potential.", abstracts["99887711"])
+        self.assertIn("RESULTS: Synergistic apoptotic activation occurred.", abstracts["99887711"])
+
+    def test_88_field_level_provenance_tracking_in_deduplication(self):
+        """Test 88: Connected-component deduplication tracks precise field-level provenance across sources."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        raw_cluster = [
+            {"database": "PubMed", "pmid": "112233", "doi": "10.1000/study.01", "title": "Authoritative PubMed Title", "year": 2024},
+            {"database": "Europe PMC", "pmid": "112233", "doi": "10.1000/study.01", "title": "Authoritative PubMed Title", "abstract": "Europe PMC retrieved abstract text.", "year": 2024},
+            {"database": "Crossref", "doi": "10.1000/study.01", "journal": "Journal of Translational Oncology", "year": 2024}
+        ]
+        dedup_res = ScientificSearchAdapter.deduplicate_corpus(raw_cluster)
+        self.assertEqual(dedup_res["total_unique"], 1)
+        canon = dedup_res["unique_records"][0]
+        self.assertIn("field_provenance", canon)
+        prov = canon["field_provenance"]
+        self.assertEqual(prov["title"], "PubMed")
+        self.assertEqual(prov["pmid"], "PubMed")
+        self.assertEqual(prov["abstract"], "Europe PMC")
+        self.assertEqual(prov["journal"], "Crossref")
+
+    def test_89_condition_acronym_and_mesh_synonym_expansion_prevents_false_negative(self):
+        """Test 89: Condition acronym and MeSH synonym expansion prevents False Negatives for NSCLC/A549."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {
+                "name_en": "Non-Small Cell Lung Cancer",
+                "abbreviations": ["NSCLC"],
+                "mesh_terms": ["Carcinoma, Non-Small-Cell Lung"]
+            },
+            "population_or_model": {
+                "primary_system": "Pulmonary Epithelial Adenocarcinoma",
+                "cell_lines": ["A549"]
+            },
+            "interventions_or_exposures": [{"name": "Phytochemical Z"}],
+            "primary_outcomes": [{"name": "Apoptosis induction"}]
+        }
+        # Paper using acronym 'NSCLC' and cell line 'A549' without full condition title
+        abbrev_paper = {
+            "ref_id": "P_ABBREV",
+            "title": "Phytochemical Z promotes apoptosis in NSCLC A549 models",
+            "year": 2024,
+            "study_design": "IN_VITRO"
+        }
+        res = GenericReferenceAuditor.audit_contextual_relevance(abbrev_paper, problem_model)
+        self.assertTrue(res["is_contextually_relevant"])
+        self.assertIn(res["relevance_tier"], ["DIRECTLY_RELEVANT", "HIGHLY_RELEVANT"])
+
+    def test_90_saturation_safeguard_keeps_searching_on_high_value_discovery(self):
+        """Test 90: Saturation tracker does not prematurely halt if latest batch discovers high-value evidence."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        batch_1 = [{"doi": f"10.1000/b1.{i}"} for i in range(10)]
+        batch_2 = [{"doi": f"10.1000/b2.{i}"} for i in range(10)]
+        # Batch 3 has low yield (1 new paper out of 10), but that paper is a Phase III RCT / contradiction
+        batch_3 = [{"doi": f"10.1000/b1.{i}"} for i in range(9)] + [{
+            "doi": "10.1000/new.contradiction",
+            "title": "Inconsistent efficacy and contradictory findings in clinical Phase III RCT",
+            "study_design": "RCT"
+        }]
+        sat_res = ScientificSearchAdapter.calculate_search_saturation([batch_1, batch_2, batch_3])
+        self.assertEqual(sat_res["saturation_status"], "EXPANDING_HIGH_VALUE_DISCOVERY")
+        self.assertFalse(sat_res["is_saturated"])
+
+    def test_91_kdense_compatibility_adapter_normalizes_cleanly(self):
+        """Test 91: KDenseCompatibilityBackend normalizes external schema without losing attributes."""
+        from scientific_search_adapter import KDenseCompatibilityBackend
+        raw_kdense_record = {
+            "database": "KDense/PaperLookup",
+            "doi": "https://doi.org/10.1038/s41586-024-001",
+            "pmid": "38899001",
+            "title": "High-throughput investigation of oncogenic pathways",
+            "abstractText": "Detailed mechanistic assessment across cancer models.",
+            "pubYear": 2024,
+            "journalTitle": "Nature",
+            "authors": "Smith J, Doe A"
+        }
+        norm = KDenseCompatibilityBackend.normalize_kdense_record(raw_kdense_record)
+        self.assertEqual(norm["doi"], "10.1038/s41586-024-001")
+        self.assertEqual(norm["pmid"], "38899001")
+        self.assertEqual(norm["year"], 2024)
+        self.assertEqual(norm["authors"], ["Smith J", "Doe A"])
+        self.assertEqual(norm["abstract"], "Detailed mechanistic assessment across cancer models.")
+        self.assertTrue(norm["kdense_interoperable"])
+
+    def test_92_empty_retrieval_zero_hallucination_guarantee(self):
+        """Test 92: Empty retrieval returns NO_VERIFIED_EVIDENCE_RETRIEVED and zero hallucinated citations."""
+        from scientific_search_adapter import ScientificSearchAdapter
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "rare_pediatric_metabolic",
+            "framework": "PICO",
+            "target_condition": {"name_en": "Ultra Rare Condition Omega"},
+            "population_or_model": {"primary_system": "Patient Fibroblasts"},
+            "interventions_or_exposures": [{"name": "Novel Small Molecule 99"}],
+            "primary_outcomes": [{"name": "Enzyme Reactivation"}]
+        }
+        # Empty corpus
+        sel_res = GenericReferenceAuditor.select_optimal_proposal_references(
+            candidate_records=[],
+            problem_model=problem_model,
+            max_references=25,
+            min_references=0,
+            total_retrieved_in_corpus=0
+        )
+        self.assertEqual(sel_res["total_selected"], 0)
+        self.assertEqual(len(sel_res["selected_references"]), 0)
+        self.assertEqual(sel_res["screening_funnel"]["stage_1_retrieved_broad_corpus"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
