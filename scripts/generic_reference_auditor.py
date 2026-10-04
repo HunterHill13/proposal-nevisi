@@ -780,7 +780,9 @@ class GenericReferenceAuditor:
         model_sys = str(record.get("model_system", record.get("organism_cell_line", ""))).lower()
         t_cond = str(record.get("target_condition", "")).lower()
         endpoints = str(record.get("endpoints_evaluated", "")).lower()
-        combined_text = f"{title} {abstract} {model_sys} {t_cond} {endpoints}"
+        findings = str(record.get("primary_findings", "")).lower()
+        design = str(record.get("study_design", "")).lower()
+        combined_text = f"{title} {abstract} {model_sys} {t_cond} {endpoints} {findings} {design}"
 
         # 1. Biological Incompatibility Gate
         is_target_veterinary_repro = any(k in f"{domain} {primary_sys} {' '.join(cond_names)}" for k in ["veterinary", "livestock", "semen", "sperm", "ram", "buck", "bull", "boar", "stallion", "breeding", "agronomy", "crop"])
@@ -843,74 +845,102 @@ class GenericReferenceAuditor:
         # 2. Evaluate 10 Universal Relevance Dimensions
         # Dimension 1: biological_topic_alignment
         bio_align = 1.0 if not found_incompatible else 0.0
-        if any(k in combined_text for k in [domain, "biomedical", "medicine", "clinical", "therapeutic", "cellular", "molecular"] + cond_names):
+        if any(k in combined_text for k in [domain, "biomedical", "medicine", "clinical", "therapeutic", "cellular", "molecular", "pharmacolog", "in_vitro", "in vitro", "in_vivo", "in vivo"] + cond_names):
             bio_align = 1.0
         elif is_foundational_method:
             bio_align = 1.0
         else:
-            bio_align = 0.8
+            bio_align = 0.5
             
         # Dimension 2: condition_phenotype_alignment
         has_cond = any(c in combined_text for c in cond_names if len(c) > 3) if cond_names else True
-        cond_align = 1.0 if has_cond else (0.5 if any(k in combined_text for k in ["disease", "syndrome", "pathology", "tumor", "carcinoma", "infection", "disorder", "dysfunction"]) else 0.2)
+        cond_align = 1.0 if has_cond else (0.5 if any(k in combined_text for k in ["disease", "syndrome", "pathology", "tumor", "carcinoma", "infection", "disorder", "dysfunction", "cancer", "neoplasm", "oncolog"]) else 0.1)
         
         # Dimension 3: primary_agent_alignment
         has_agent = any(a in combined_text for a in agent_names) if agent_names else True
-        prim_agent = 1.0 if has_agent else 0.3
+        prim_agent = 1.0 if has_agent else 0.2
         
         # Dimension 4: comparator_second_agent_alignment
         has_comp = bool(record.get("comparator")) or ("control" in combined_text) or (len(agent_names) > 1 and any(agent_names[1] in combined_text for _ in [1]))
-        comp_agent = 1.0 if has_comp else 0.5
+        comp_agent = 1.0 if has_comp else 0.3
         
         # Dimension 5: experimental_model_population_alignment
         has_model = False
-        if primary_sys and any(k in combined_text for k in primary_sys.split() if len(k) > 3):
-            has_model = True
-        elif any(k in combined_text for k in ["human", "cell culture", "in vitro", "murine", "mouse", "rat", "patient", "clinical"]):
-            has_model = True
-        model_align = 1.0 if has_model else 0.4
+        if is_foundational_method:
+            model_align = 1.0
+        else:
+            # Clean primary_sys terms: exclude generic ubiquitous words ('cell', 'line', 'type', 'human', 'model')
+            if primary_sys:
+                sys_terms = [t.strip().lower() for t in primary_sys.split() if len(t.strip()) > 3 and t.strip().lower() not in ["cell", "line", "type", "with", "from", "human", "model", "primary"]]
+                for t in sys_terms:
+                    # check exact term or trimmed root (e.g., cardiomyocytes -> cardiomyocyte, systems -> system)
+                    root = t[:-1] if t.endswith("s") else t
+                    if re.search(r'\b' + re.escape(root), combined_text):
+                        has_model = True
+                        break
+            if not has_model and any(re.search(r'\b' + re.escape(k) + r'\b', combined_text) for k in [
+                "human cell line", "cancer cell line", "cell culture model", "cell culture system", 
+                "in vitro cancer model", "cellular oncology models", "cellular oncology model", 
+                "murine xenograft", "clinical trial patients", "in_vitro", "in vitro"
+            ]):
+                has_model = True
+            model_align = 1.0 if has_model else 0.2
         
         # Dimension 6: outcome_alignment
         has_outcome = any(o in combined_text for o in outcomes if len(o) > 3) if outcomes else False
-        outcome_align = 1.0 if has_outcome else (0.7 if any(k in combined_text for k in ["viability", "apoptosis", "survival", "toxicity", "efficacy", "inhibition", "expression"]) else 0.3)
+        outcome_align = 1.0 if has_outcome else (0.5 if any(k in combined_text for k in ["viability", "apoptosis", "survival", "toxicity", "efficacy", "inhibition", "expression"]) else 0.1)
         
         # Dimension 7: mechanistic_pathway_alignment
         has_mech = any(m in combined_text for m in mechanisms if len(m) > 3) if mechanisms else False
-        mech_align = 1.0 if has_mech else (0.7 if any(k in combined_text for k in ["pathway", "signaling", "phosphorylation", "receptor", "caspase", "cleavage", "activation"]) else 0.3)
+        mech_align = 1.0 if has_mech else (0.5 if any(k in combined_text for k in ["pathway", "signaling", "phosphorylation", "receptor", "caspase", "cleavage", "activation"]) else 0.1)
         
         # Dimension 8: study_design_alignment
         has_method = is_foundational_method or any(k in combined_text for k in ["assay", "method", "protocol", "synergy", "isobologram", "ic50", "combination index", "median effect", "rct", "experimental", "in vitro", "in vivo"])
-        design_align = 1.0 if has_method else 0.5
+        design_align = 1.0 if has_method else 0.4
         
         # Dimension 9: research_question_fit
         if is_foundational_method:
             q_fit = 1.0
         elif has_agent and has_cond and has_model:
             q_fit = 1.0
-        elif has_agent and (has_cond or has_model):
-            q_fit = 0.8
+        elif has_agent and (has_cond or (has_model and (has_outcome or has_mech))):
+            q_fit = 0.7
         elif has_agent or has_cond:
-            q_fit = 0.5
+            q_fit = 0.3
         else:
-            q_fit = 0.2
+            q_fit = 0.1
             
         # Dimension 10: proposal_section_utility
-        sec_utility = 1.0 if (has_agent or is_foundational_method) else (0.6 if has_cond else 0.3)
+        if is_foundational_method:
+            sec_utility = 1.0
+        elif has_agent and has_cond:
+            sec_utility = 1.0
+        elif has_agent and (has_outcome or has_mech or has_model):
+            sec_utility = 0.6
+        elif has_cond:
+            sec_utility = 0.5
+        else:
+            sec_utility = 0.1
         
         # Weighted Overall Relevance Calculation
         overall_rel = round(
             (bio_align * 0.15) +
-            (cond_align * 0.15) +
+            (cond_align * 0.20) +
             (prim_agent * 0.15) +
             (comp_agent * 0.05) +
             (model_align * 0.15) +
             (outcome_align * 0.10) +
-            (mech_align * 0.10) +
+            (mech_align * 0.05) +
             (design_align * 0.05) +
             (q_fit * 0.05) +
             (sec_utility * 0.05),
             2
         )
+        
+        # Critical Non-Negotiable Gate: If a paper lacks both the target condition and the biological model/outcomes,
+        # pure chemical keyword presence alone CANNOT yield an acceptable score.
+        if not is_foundational_method and not has_cond and not has_model:
+            overall_rel = min(overall_rel, 0.30)
         
         # Backwards compatible legacy aliases
         direct_rel = 1.0 if (has_agent and has_cond) else (0.6 if (has_agent or has_cond) else 0.2)
