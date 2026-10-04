@@ -1,0 +1,100 @@
+{
+  "project_id": "FIXTURE_ANIMAL_NEURO",
+  "domain": "neurology",
+  "framework": "EXPERIMENTAL_ANIMAL",
+  "research_problem_model": {
+    "model_id": "RPM_ANIMAL_001",
+    "research_title_fa": "بررسی اثر محافظت عصبی پپتید شبه گلوکاگون-۱ در مدل موشی تجربی بیماری آلزایمر القاشده با استرپتوزوتوسین",
+    "research_title_en": "Neuroprotective Efficacy of Glucagon-Like Peptide-1 Receptor Agonist Liraglutide on Hippocampal Synaptic Plasticity in Streptozotocin-Induced Murine Model of Alzheimer Disease",
+    "domain": "neurology",
+    "framework": "EXPERIMENTAL_ANIMAL",
+    "target_condition": {
+      "name_en": "Alzheimer Disease and Neurodegeneration",
+      "name_fa": "بیماری آلزایمر و تخریب پیشرونده عصبی",
+      "mesh_term": "Alzheimer Disease",
+      "synonyms": ["Sporadic Alzheimer Dementia", "Cognitive Impairment"]
+    },
+    "population_or_model": {
+      "model_type": "ANIMAL_IN_VIVO",
+      "primary_system": "Adult male C57BL/6J mice (age 10-12 weeks, weight 22-26g)",
+      "secondary_systems": ["Ex vivo hippocampal brain slices"],
+      "normal_control_system": "Sham-operated vehicle microinjected littermates"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Liraglutide",
+        "chemical_or_biological_class": "GLP-1 Receptor Agonist",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Liraglutide", "Glucagon-Like Peptide-1 Receptor Agonists"],
+        "synonyms": ["Victoza", "NN2211"]
+      }
+    ],
+    "comparators": [
+      {"name": "0.9% Normal Saline Vehicle Control", "type": "VEHICLE_CONTROL"},
+      {"name": "Sham Surgical Control", "type": "NEGATIVE_CONTROL"}
+    ],
+    "primary_outcomes": [
+      {"name": "Spatial Learning Escape Latency in Morris Water Maze", "type": "EFFICACY", "measurement_unit": "Seconds to hidden platform", "preferred_assays": ["Morris Water Maze Video Tracking"]},
+      {"name": "Hippocampal CA1 Synaptophysin Expression", "type": "EFFICACY", "measurement_unit": "Optical density / beta-actin ratio", "preferred_assays": ["Immunohistochemistry and Quantitative Western Blot"]}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "GLP-1R / PKA / CREB Neurotrophic Cascade", "target_molecules": ["GLP-1R", "p-CREB", "BDNF"], "expected_modulation": "UPREGULATION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Alzheimer Disease", "Glucagon-Like Peptide-1 Receptor Agonists", "Hippocampus"],
+      "all_synonyms": ["Liraglutide", "spatial memory", "synaptophysin"],
+      "exclusion_terms": ["human clinical trial only", "transgenic APP/PS1 only"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_ANIMAL_LIRA_2021",
+      "study_family_id": "FAM_ANIMAL_LIRA_01",
+      "doi": "10.1016/j.neuropharm.2021.108642",
+      "title": "Liraglutide rescues cognitive deficit and restores synaptic density in rodent models of insulin desensitization",
+      "authors": ["McClean PL", "Parthsarathy V", "Faivre E", "Holscher C"],
+      "year": 2021,
+      "journal": "Neuropharmacology",
+      "study_design": "IN_VIVO_ANIMAL",
+      "design_specific_attributes": {
+        "species_and_strain": "C57BL/6J mice",
+        "sex_and_age": "Male, 12 weeks",
+        "disease_induction_model": "Intracerebroventricular streptozotocin injection (3 mg/kg)",
+        "dosage_and_schedule": "Liraglutide 25 nmol/kg intraperitoneally daily for 28 days",
+        "comparator_control": "Saline vehicle sham control",
+        "randomization_and_blinding": "Random block allocation, blinded video analyst",
+        "sample_size_or_replicates": "8 animals per arm (n=32 total)"
+      },
+      "risk_of_bias": {"tool_used": "SYRCLE_ANIMAL_ROB", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_ANIMAL_MEMORY_RESTORATION"]
+    },
+    {
+      "study_id": "ST_ANIMAL_DOSE_LIMIT_2023",
+      "study_family_id": "FAM_ANIMAL_LIRA_02",
+      "doi": "10.1016/j.brainresbull.2023.05.011",
+      "title": "Supra-pharmacological GLP-1 analogues provoke peripheral gastrointestinal dysmotility without incremental central neuroprotection",
+      "authors": ["Gault VA", "Flatt PR"],
+      "year": 2023,
+      "journal": "Brain Research Bulletin",
+      "study_design": "IN_VIVO_ANIMAL",
+      "design_specific_attributes": {
+        "species_and_strain": "C57BL/6J mice",
+        "dosage_and_schedule": "Liraglutide 100 nmol/kg daily"
+      },
+      "risk_of_bias": {"tool_used": "SYRCLE_ANIMAL_ROB", "overall_rob": "SOME_CONCERNS"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "negative_or_null_findings": [
+        {
+          "category": "DOSE_LIMITATION",
+          "description": "Doses exceeding 50 nmol/kg induced significant weight loss (>15%) and failed to confer superior synaptic protection."
+        }
+      ],
+      "claims_supported": ["CLM_ANIMAL_DOSE_WINDOW"]
+    }
+  ]
+}

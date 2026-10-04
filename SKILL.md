@@ -3,7 +3,7 @@ name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
   evidence synthesis, humanization, and Word (.docx) publication engine (v8.0). Operates across diverse biomedical domains
-  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, basic experimental science). Generates dynamic
+  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
   Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes 9-layer dynamic literature searches
   (Layers A-I across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
   maps 22 cross-study relationship types, detects gaps across 11 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
@@ -11,8 +11,8 @@ description: >
   15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT), enforces epistemic rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
   enforces 7-level claim entailment and causal language boundaries (blocking causal leaps from observational data), guarantees numerical traceability in EVIDENCE_LEDGER,
   enforces the 6-year temporal boundary with explicit foundational justifications, renders publication-grade 14-section Word proposals
-  with individual reference paragraphs, dynamic variable table, Gantt timeline, statistical plan, Dubai Persian typography, native RTL bidi XML, and passes a unified 82-assertion test harness
-  (Static analysis zero leakage, 5-domain generalization fixtures, 16 adversarial stress tests, and 60-test benchmark).
+  with individual reference paragraphs, dynamic variable table, Gantt timeline, statistical plan, Dubai Persian typography, native RTL bidi XML, and passes a unified 110-assertion test harness
+  (Static analysis zero leakage, 9-domain generalization fixtures, 22 adversarial stress tests, and 60-test benchmark).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.0)
@@ -177,12 +177,12 @@ description: >
 python tests/run_all_tests.py
 ```
 این سیستم به صورت پویا ۴ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
-1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای ۱۴ گانه هسته.
-2. **آزمون تعمیم‌پذیری پنج‌گانه (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۵ فیکسچر مستقل (انکولوژی، کاردیولوژی، بیماری‌های عفونی، بیومارکرهای تشخیصی، کوهورت اپیدمیولوژیک).
-3. **آزمون‌های تنش خصمانه ۱۶ گانه (`test_adversarial_scenarios.py`):** ۱۶ آزمون چالش‌برانگیز شامل رفرنس جعلی، DOI نامنطبق، ادعای علیت غیرمجاز، توهم عددی، مغالطه سینرژی، مقالات فاقد متن کامل، و واگرایی ساختاری.
+1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای ۱۴ گانه هسته و استقلال سمانتیک کامل (۱۹ تست).
+2. **آزمون تعمیم‌پذیری ۹ گانه (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۹ فیکسچر مستقل (انکولوژی، کاردیولوژی، بیماری‌های عفونی، بیومارکرهای تشخیصی، کوهورت اپیدمیولوژیک، زیست‌شناسی مولکولی پایه، کارآزمایی بالینی، فارماکولوژی حیوانی، ایمونونفرولوژی پیش‌آگهی).
+3. **آزمون‌های تنش خصمانه ۲۲ گانه (`test_adversarial_scenarios.py`):** ۲۲ آزمون چالش‌برانگیز شامل رفرنس جعلی، DOI نامنطبق، مقالات رترکت‌شده و تصحیح‌شده، شبه‌تکرار درون‌تنی، سوگیری انتشار، ادعای علیت غیرمجاز، جهش ترنسلیشنال، توهم عددی، مغالطه سینرژی، مقالات فاقد متن کامل، و واگرایی ساختاری.
 4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی، الزامات متدولوژیک و رعایت کامل فرمت ۱۴ گانه Word.
 
-**مجموع آزمون‌ها:** ۸۲ آزمون مستقل با قبولی ۱۰۰٪ (82 / 82 PASS).
+**مجموع آزمون‌ها:** ۱۱۰ آزمون مستقل با قبولی ۱۰۰٪ (110 / 110 PASS).
 
 ---
 

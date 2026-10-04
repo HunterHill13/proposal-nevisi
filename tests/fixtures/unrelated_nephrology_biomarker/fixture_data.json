@@ -1,0 +1,93 @@
+{
+  "project_id": "FIXTURE_NEPHRO_MEMBRANOUS",
+  "domain": "nephrology",
+  "framework": "PROGNOSTIC",
+  "research_problem_model": {
+    "model_id": "RPM_NEPHRO_001",
+    "research_title_fa": "بررسی ارزش پیش‌آگهی تیتر آنتی‌بادی ضد گیرنده فسفولیپاز A2 (anti-PLA2R) بر پسرفت پروتئینوری و بقای کلیوی در نفروپاتی غشایی ایدیوپاتیک",
+    "research_title_en": "Prognostic Value of Serial Anti-Phospholipase A2 Receptor (anti-PLA2R) Autoantibody Titers on Clinical Remission and Renal Survival in Idiopathic Membranous Nephropathy",
+    "domain": "nephrology",
+    "framework": "PROGNOSTIC",
+    "target_condition": {
+      "name_en": "Idiopathic Membranous Nephropathy",
+      "name_fa": "نفروپاتی غشایی ایدیوپاتیک",
+      "mesh_term": "Glomerulonephritis, Membranous",
+      "synonyms": ["Primary Membranous Nephropathy", "PLA2R-associated MN"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Adult biopsy-proven primary membranous nephropathy patients with nephrotic range proteinuria",
+      "secondary_systems": ["Outpatient glomerulonephritis registry cohort"],
+      "normal_control_system": "Spontaneous remission low-titer historic cohort"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Anti-PLA2R Serum IgG Antibody Titer",
+        "chemical_or_biological_class": "Autoimmune Glomerular Biomarker",
+        "role": "EXPOSURE_FACTOR",
+        "mesh_terms": ["Autoantibodies", "Receptors, Phospholipase A2"],
+        "synonyms": ["anti-PLA2R IgG"]
+      }
+    ],
+    "comparators": [
+      {"name": "Persistent Seronegative Status (< 14 RU/mL)", "type": "STANDARD_OF_CARE"}
+    ],
+    "primary_outcomes": [
+      {"name": "Complete Remission of Proteinuria (< 0.3 g/24h)", "type": "EFFICACY", "measurement_unit": "Time in months to complete remission", "preferred_assays": ["24-hour urine protein quantification"]},
+      {"name": "Doubling of Serum Creatinine or End-Stage Kidney Disease", "type": "HAZARD_RATIO", "measurement_unit": "Adjusted Hazard Ratio (95% CI)", "preferred_assays": ["Estimated GFR and clinical registry follow-up"]}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "Podocyte Immune Complex Deposition and Complement C5b-9 Lysis", "target_molecules": ["PLA2R1", "Subepithelial IgG4", "C5b-9 membrane attack complex"], "expected_modulation": "INHIBITION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Glomerulonephritis, Membranous", "Autoantibodies", "Receptors, Phospholipase A2"],
+      "all_synonyms": ["anti-PLA2R", "membranous nephropathy", "podocyte injury"],
+      "exclusion_terms": ["lupus nephritis secondary MN", "malignancy associated MN"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_NEPHRO_BECK_2021",
+      "study_family_id": "FAM_NEPHRO_PLA2R_01",
+      "doi": "10.1681/ASN.2020111624",
+      "title": "Anti-PLA2R antibody level predicts long-term renal outcome and treatment response in adult membranous nephropathy",
+      "authors": ["Beck LH", "Bonegio RG", "Lambeau G", "Salant DJ"],
+      "year": 2021,
+      "journal": "Journal of the American Society of Nephrology",
+      "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL",
+      "design_specific_attributes": {
+        "target_population_criteria": "218 patients with biopsy-confirmed membranous nephropathy followed prospectively for 5 years",
+        "endpoint_assays": ["ELISA titer quantification and serum creatinine"]
+      },
+      "risk_of_bias": {"tool_used": "NEWCASTLE_OTTAWA_SCALE", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_NEPHRO_PROGNOSTIC_ACCURACY"]
+    },
+    {
+      "study_id": "ST_NEPHRO_DISCORDANT_2023",
+      "study_family_id": "FAM_NEPHRO_PLA2R_02",
+      "doi": "10.1016/j.kint.2023.04.018",
+      "title": "Discordance between immunological clearance and clinical proteinuria remission in advanced glomerulosclerosis",
+      "authors": ["Ruggenenti P", "Debiec H", "Ronco P"],
+      "year": 2023,
+      "journal": "Kidney International",
+      "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL",
+      "design_specific_attributes": {
+        "target_population_criteria": "Patients with chronicity index > 50% on baseline renal biopsy"
+      },
+      "risk_of_bias": {"tool_used": "NEWCASTLE_OTTAWA_SCALE", "overall_rob": "SOME_CONCERNS"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "negative_or_null_findings": [
+        {
+          "category": "TIME_LIMITATION",
+          "description": "Anti-PLA2R serological negativation preceded proteinuria reduction by median 8.4 months, causing false premature treatment termination in acute phases."
+        }
+      ],
+      "claims_supported": ["CLM_NEPHRO_KINETIC_LAG"]
+    }
+  ]
+}

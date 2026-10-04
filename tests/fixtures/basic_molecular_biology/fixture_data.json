@@ -1,0 +1,105 @@
+{
+  "project_id": "FIXTURE_BASIC_MOLBIO",
+  "domain": "basic_biomedical",
+  "framework": "MECHANISTIC",
+  "research_problem_model": {
+    "model_id": "RPM_MOLBIO_001",
+    "research_title_fa": "بررسی نقش مسیر یوبیکوئیتین-پروتئازوم در تخریب پروتئین سرکوبگر تومور p53 تحت استرس اکسیداتیو",
+    "research_title_en": "Elucidation of Ubiquitin-Proteasome Mediated Degradation of p53 Tumor Suppressor Under Hydrogen Peroxide Induced Oxidative Stress",
+    "domain": "basic_biomedical",
+    "framework": "MECHANISTIC",
+    "target_condition": {
+      "name_en": "Oxidative Stress and Cellular Senescence",
+      "name_fa": "استرس اکسیداتیو و پیری سلولی",
+      "mesh_term": "Oxidative Stress",
+      "synonyms": ["Reactive Oxygen Species Damage", "Cellular Senescence"]
+    },
+    "population_or_model": {
+      "model_type": "CELL_CULTURE_IN_VITRO",
+      "primary_system": "HEK293 embryonic kidney cell line expressing wild-type p53",
+      "secondary_systems": ["Purified in vitro proteasome 26S reconstituted complex"],
+      "normal_control_system": "Untreated normoxic vehicle controls"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Bortezomib",
+        "chemical_or_biological_class": "26S Proteasome Inhibitor",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Bortezomib", "Proteasome Inhibitors"],
+        "synonyms": ["PS-341", "Velcade"]
+      },
+      {
+        "name": "Hydrogen Peroxide",
+        "chemical_or_biological_class": "Exogenous Oxidant Stressor",
+        "role": "EXPOSURE_FACTOR",
+        "mesh_terms": ["Hydrogen Peroxide"],
+        "synonyms": ["H2O2"]
+      }
+    ],
+    "comparators": [
+      {"name": "0.1% Saline Vehicle Control", "type": "VEHICLE_CONTROL"}
+    ],
+    "primary_outcomes": [
+      {"name": "p53 Polyubiquitination Clearance Rate", "type": "EFFICACY", "measurement_unit": "Ubiquitination intensity ratio", "preferred_assays": ["Co-Immunoprecipitation and Western Blotting"]},
+      {"name": "Relative Caspase-3 Cleavage Activation", "type": "EFFICACY", "measurement_unit": "Fold change over baseline", "preferred_assays": ["Fluorometric Caspase-3 Assay"]}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "MDM2 E3 Ligase Autoubiquitination and p53 Stabilization", "target_molecules": ["MDM2", "p53", "Ubiquitin"], "expected_modulation": "INHIBITION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Oxidative Stress", "Proteasome Inhibitors", "Tumor Suppressor Protein p53"],
+      "all_synonyms": ["Bortezomib", "p53 stabilization", "proteasome clearance"],
+      "exclusion_terms": ["hematologic malignancy clinical trial", "in vivo xenograft only"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_MOLBIO_EXP_2022",
+      "study_family_id": "FAM_MOLBIO_P53_01",
+      "doi": "10.1074/jbc.RA121.019876",
+      "title": "Proteasomal dynamics regulate p53 half-life under acute oxidative challenge",
+      "authors": ["Vassilev LT", "Chen J", "Lane DP"],
+      "year": 2022,
+      "journal": "Journal of Biological Chemistry",
+      "study_design": "IN_VITRO_EXPERIMENTAL",
+      "design_specific_attributes": {
+        "model_system_identity": "HEK293 culture",
+        "concentration_gradient": "Bortezomib 10 to 50 nM",
+        "exposure_duration": "6 to 24 hours",
+        "endpoint_assay_mechanism": "Immunoblot densitometry and ubiquitin pull-down",
+        "replicate_structure": "Triplicate biological clones, n=3"
+      },
+      "risk_of_bias": {"tool_used": "IN_VITRO_REPLICATION_CRITERIA", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_MOLBIO_P53_STABILIZATION"]
+    },
+    {
+      "study_id": "ST_MOLBIO_NULL_2024",
+      "study_family_id": "FAM_MOLBIO_P53_02",
+      "doi": "10.1016/j.freeradbiomed.2023.11.015",
+      "title": "Chronic low-dose oxidant exposure bypasses proteasomal rescue in senescence",
+      "authors": ["Goldstein I", "Rotter V"],
+      "year": 2024,
+      "journal": "Free Radical Biology and Medicine",
+      "study_design": "IN_VITRO_EXPERIMENTAL",
+      "design_specific_attributes": {
+        "model_system_identity": "HEK293 senescence model",
+        "concentration_gradient": "Bortezomib 2 nM",
+        "exposure_duration": "72 hours"
+      },
+      "risk_of_bias": {"tool_used": "IN_VITRO_REPLICATION_CRITERIA", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "negative_or_null_findings": [
+        {
+          "category": "NULL_RESULT",
+          "description": "Sub-nanomolar bortezomib failed to block p53 depletion during prolonged 72h oxidative stress (p=0.34)."
+        }
+      ],
+      "claims_supported": ["CLM_MOLBIO_CHRONIC_LIMIT"]
+    }
+  ]
+}

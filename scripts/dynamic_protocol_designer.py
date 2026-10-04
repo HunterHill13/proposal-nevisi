@@ -43,6 +43,27 @@ STUDY_TIMELINE_TEMPLATES = {
         ("فاز ۴: اجرای آزمون استاندارد طلایی (Gold Standard) مرجع", 5, 8),
         ("فاز ۵: محاسبه شاخص‌های تشخیصی (حساسیت، ویژگی، ROC curve)", 8, 10),
         ("فاز ۶: اعتبارسنجی تکرارپذیری، تحلیل آماری و گزارش نتایج", 10, 12)
+    ],
+    "PECO": [
+        ("فاز ۱: طراحی پروتکل مواجهه، استقرار سیستم‌های پایش محیطی و اخذ مجوز اخلاق", 1, 3),
+        ("فاز ۲: شناسایی و ورود افراد مواجهه‌یافته و گروه کنترل همتاشده", 3, 6),
+        ("فاز ۳: سنجش دوز مواجهه تجمعی، نمونه‌گیری زیستی و کنترل مخدوش‌کننده‌ها", 6, 12),
+        ("فاز ۴: پیگیری دوره‌ای ثبت پیامدهای بیماری و شاخص‌های بالینی", 10, 18),
+        ("فاز ۵: مدل‌سازی رگرسیونی، تحلیل متغیرهای مخدوش‌کننده و تدوین گزارش", 18, 20)
+    ],
+    "PROGNOSTIC": [
+        ("فاز ۱: تعریف کوهورت پیش‌آگهی، معیارهای ورود و ثبت بیومارکرهای پایه", 1, 3),
+        ("فاز ۲: ارزیابی فاکتورهای پیش‌آگهی و اندازه‌گیری متغیرهای پیش‌بین", 3, 6),
+        ("فاز ۳: پیگیری بقا و ثبت رخدادهای بالینی (Time-to-Event)", 6, 16),
+        ("فاز ۴: تحلیل بقای کاپلان-مایر و مدل خطرات متناسب کاکس", 16, 18),
+        ("فاز ۵: اعتبارسنجی داخلی مدل و گزارش قدرت تفکیک و کالیبراسیون", 18, 20)
+    ],
+    "MECHANISTIC": [
+        ("فاز ۱: طراحی مداخله‌های ژنتیکی و فارماکولوژیک بر مسیر پیام‌رسانی", 1, 2),
+        ("فاز ۲: کشت سلولی، تیمار با مهارکننده‌ها و سنجش اهداف بالادست", 2, 4),
+        ("فاز ۳: سنجش‌های بیوشیمیایی فسفوریلاسیون، شکافت پروتئینی و بیان ژن", 4, 7),
+        ("فاز ۴: ارزیابی فنوتیپی عملکردی (بقا، آپوپتوز، ترشح و مهاجرت)", 7, 9),
+        ("فاز ۵: اثبات پیوستگی کسکید با رویکردهای نجات (Rescue Experiments) و تحلیل نهایی", 9, 12)
     ]
 }
 
@@ -165,23 +186,120 @@ class DynamicProtocolDesigner:
         is_multi_agent = len(interventions) > 1
         
         tests = []
-        if is_multi_agent:
-            tests.append("تحلیل واریانس دوطرفه (Two-way ANOVA) جهت ارزیابی اثرات اصلی و اثر متقابل (Interaction effect)")
-            tests.append("آزمون تعقیبی توکی (Tukey's HSD post-hoc test) جهت مقایسه‌های چندگانه میان گروه‌ها")
-            tests.append("مدل‌های ریاضی استاندارد سنجش هم‌افزایی (مانند نسبت ترکیب یا نمایه میان‌کنش) جهت تعیین ماهیت تعامل")
+        if framework in ["EXPERIMENTAL_IN_VITRO", "EXPERIMENTAL_ANIMAL"]:
+            if is_multi_agent:
+                tests.append("تحلیل واریانس دوطرفه (Two-way ANOVA) جهت ارزیابی اثرات اصلی و اثر متقابل (Interaction effect)")
+                tests.append("آزمون تعقیبی توکی (Tukey's HSD post-hoc test) جهت مقایسه‌های چندگانه میان گروه‌ها")
+                tests.append("مدل‌های ریاضی استاندارد سنجش هم‌افزایی (مانند نسبت ترکیب یا نمایه میان‌کنش) جهت تعیین ماهیت تعامل")
+            else:
+                tests.append("تحلیل واریانس یک‌طرفه (One-way ANOVA) همراه با آزمون تعقیبی دانت یا توکی")
+            tests.append("آزمون شاپیرو-ویلک (Shapiro-Wilk) جهت بررسی نرمال بودن توزیع داده‌ها")
+        elif framework == "PICO":
+            tests.append("تحلیل قصد درمان (Intention-to-Treat: ITT) به عنوان استراتژی اولیه تحلیل کارآزمایی")
+            tests.append("مدل خطرات متناسب کاکس (Cox Proportional Hazards Model) جهت برازش نرخ رخدادها و برآورد نسبت خطر (Hazard Ratio)")
+            tests.append("منحنی‌های بقای کاپلان-مایر (Kaplan-Meier survival curves) همراه با آزمون لگ-رتبه‌ای (Log-rank test)")
+            tests.append("آزمون‌های مقایسه میانگین زوجی یا تحلیل کوواریانس (ANCOVA) برای تنظیم مقادیر پایه")
+        elif framework == "DIAGNOSTIC":
+            tests.append("محاسبه شاخص‌های تشخیصی: حساسیت (Sensitivity)، ویژگی (Specificity)، ارزش اخباری مثبت (PPV) و منفی (NPV)")
+            tests.append("ترسیم منحنی مشخصه عملکرد سیستم (ROC Curve) و محاسبه مساحت زیر منحنی (AUC) با فواصل اطمینان ۹۵٪")
+            tests.append("آزمون مک‌نمار (McNemar's test) جهت مقایسه عملکرد آزمون شاخص و استاندارد مرجع")
+            tests.append("بررسی پایایی بین ارزیاب‌ها با ضریب کاپای کوهن (Cohen's Kappa)")
+        elif framework == "PECO":
+            tests.append("مدل رگرسیون لجستیک چندمتغیره (Multivariable Logistic Regression) جهت تعدیل مخدوش‌کننده‌ها")
+            tests.append("برآورد نسبت شانس تعدیل‌شده (Adjusted Odds Ratio: aOR) با فواصل اطمینان ۹۵٪")
+            tests.append("آزمون تمایل مواجهه (Propensity Score Matching) جهت همتاسازی گروه‌های در معرض و غیر در معرض")
+        elif framework == "PROGNOSTIC":
+            tests.append("مدل رگرسیون خطرات متناسب کاکس چندمتغیره (Multivariable Cox Regression)")
+            tests.append("محاسبه شاخص هارل (Harrell's C-index) جهت سنجش قدرت تفکیک مدل پیش‌آگهی")
+            tests.append("منحنی کالیبراسیون (Calibration Plot) جهت اعتبارسنجی انطباق پیش‌بینی با رخداد واقعی")
         else:
             tests.append("تحلیل واریانس یک‌طرفه (One-way ANOVA) همراه با آزمون تعقیبی دانت یا توکی")
 
-        tests.append("آزمون شاپیرو-ویلک (Shapiro-Wilk) جهت بررسی نرمال بودن توزیع داده‌ها")
-        tests.append("سطح معنی‌داری آماری در تمام تحلیل‌ها p < 0.05 لحاظ خواهد شد")
+        tests.append("سطح معنی‌داری آماری در تمام تحلیل‌ها p < 0.05 با فواصل اطمینان ۹۵٪ دوطرفه لحاظ خواهد شد")
 
         return {
             "primary_analysis": tests[0],
             "post_hoc_analysis": tests[1] if len(tests) > 1 else "Dunnett's test",
             "distribution_test": "Shapiro-Wilk normality test",
             "alpha_threshold": 0.05,
-            "statistical_software": "GraphPad Prism / R Statistical Environment",
+            "statistical_software": "R Statistical Environment / GraphPad Prism / SPSS",
             "complete_testing_strategy": tests
+        }
+
+    @classmethod
+    def calculate_sample_size_plan(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Provides mathematically rigorous and design-aware sample size guidance."""
+        framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        if framework == "EXPERIMENTAL_IN_VITRO":
+            return {
+                "design_type": "IN_VITRO_CELLULAR",
+                "biological_replicates": 3,
+                "technical_replicates_per_plate": 3,
+                "total_independent_runs": 3,
+                "pseudo_replication_warning": "Technical replicates within the same plate must be averaged and treated as 1 biological unit to avoid pseudo-replication.",
+                "formula_or_standard": "Triplicate independent biological passages (n=3 biological replicates, each assayed in technical triplicate)",
+                "pilot_required": False
+            }
+        elif framework == "EXPERIMENTAL_ANIMAL":
+            return {
+                "design_type": "IN_VIVO_ANIMAL",
+                "animals_per_group": 6,
+                "formula_or_standard": "Mead's Resource Equation (E = N - B - T, where 10 <= E <= 20) and Charlebois Power Calculation",
+                "alpha": 0.05,
+                "power": 0.80,
+                "pilot_required": False
+            }
+        elif framework in ["PICO", "PECO", "PROGNOSTIC"]:
+            return {
+                "design_type": "HUMAN_CLINICAL_OR_COHORT",
+                "formula_or_standard": "Two-sample survival log-rank / proportions power equation: n = (Z_alpha + Z_beta)^2 * (p1(1-p1) + p2(1-p2)) / (p1 - p2)^2",
+                "alpha": 0.05,
+                "power": 0.80,
+                "pilot_required": True,
+                "note": "PILOT_REQUIRED if historical event rate or standard deviation in target sub-population is uncharacterized."
+            }
+        elif framework == "DIAGNOSTIC":
+            return {
+                "design_type": "DIAGNOSTIC_ACCURACY",
+                "formula_or_standard": "Buderer's formula for diagnostic sensitivity and specificity: n = (Z_alpha/2)^2 * P * (1-P) / (L^2 * Prevalence)",
+                "alpha": 0.05,
+                "precision": 0.05,
+                "pilot_required": False
+            }
+        return {"design_type": "GENERIC", "pilot_required": False}
+
+    @classmethod
+    def validate_objectives_hypotheses_variables_consistency(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Cross-validates Objectives <-> Hypotheses <-> Variables <-> Statistical Plan consistency graph."""
+        objectives = model_dict.get("specific_objectives", [])
+        hypotheses = model_dict.get("hypotheses", [])
+        interventions = model_dict.get("interventions_or_exposures", [])
+        outcomes = model_dict.get("primary_outcomes", [])
+
+        orphan_objectives = []
+        orphan_hypotheses = []
+        orphan_variables = []
+
+        # Validate that variables exist for target outcomes and interventions
+        if not interventions:
+            orphan_variables.append("MISSING_INDEPENDENT_VARIABLE")
+        if not outcomes:
+            orphan_variables.append("MISSING_DEPENDENT_VARIABLE")
+
+        # In standard interventional/experimental research, every hypothesis must correspond to at least one specific objective
+        if hypotheses and objectives and len(hypotheses) > len(objectives) + 2:
+            orphan_hypotheses.append("UNGROUNDED_HYPOTHESIS_EXCEEDING_OBJECTIVES")
+
+        is_consistent = (len(orphan_objectives) == 0 and len(orphan_hypotheses) == 0 and len(orphan_variables) == 0)
+
+        return {
+            "consistency_status": "CONSISTENT" if is_consistent else "DISCREPANCY_DETECTED",
+            "is_graph_fully_connected": is_consistent,
+            "objectives_count": len(objectives),
+            "hypotheses_count": len(hypotheses),
+            "interventions_count": len(interventions),
+            "outcomes_count": len(outcomes),
+            "discrepancies": orphan_variables + orphan_hypotheses + orphan_objectives
         }
 
 if __name__ == "__main__":

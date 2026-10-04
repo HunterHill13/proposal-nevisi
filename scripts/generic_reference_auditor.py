@@ -12,13 +12,18 @@ import json
 import difflib
 from typing import Dict, List, Any, Optional
 
+try:
+    from core_policies import TemporalPolicyConfig
+except ImportError:
+    from scripts.core_policies import TemporalPolicyConfig
+
 class GenericReferenceAuditor:
     """Universal reference auditor operating without hard-coded biological assumptions."""
 
     def __init__(
         self,
-        current_year: int = 2026,
-        max_primary_age_years: int = 6,
+        current_year: int = TemporalPolicyConfig.CURRENT_OPERATING_YEAR,
+        max_primary_age_years: int = TemporalPolicyConfig.MAX_PRIMARY_EVIDENCE_AGE_YEARS,
         min_required_references: int = 15,
         target_model: Optional[Dict[str, Any]] = None
     ):
@@ -43,7 +48,14 @@ class GenericReferenceAuditor:
         authors_verified = [a.lower() for a in verified_metadata.get("authors", [])]
         author_match = any(a in " ".join(authors_verified) for a in authors_local) if authors_local else False
 
-        if sim >= 0.85 and year_match:
+        is_retracted = verified_metadata.get("is_retracted", False) or "retracted" in verified_metadata.get("status", "").lower() or "retraction" in title_verified.lower()
+        is_corrected = verified_metadata.get("is_corrected", False) or "erratum" in title_verified.lower() or "corrigendum" in title_verified.lower()
+
+        if is_retracted:
+            status = "RETRACTED"
+        elif is_corrected:
+            status = "CORRECTED"
+        elif sim >= 0.85 and year_match:
             status = "EXACT_VERIFIED"
         elif sim >= 0.60:
             status = "MINOR_VARIATION"
@@ -56,7 +68,9 @@ class GenericReferenceAuditor:
             "title_similarity": round(sim, 3),
             "year_match": year_match,
             "author_overlap": author_match,
-            "doi": local_ref.get("doi")
+            "doi": local_ref.get("doi"),
+            "is_retracted": is_retracted,
+            "is_corrected": is_corrected
         }
 
     def audit_temporal_tier(self, ref: Dict[str, Any]) -> Dict[str, Any]:

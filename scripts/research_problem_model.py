@@ -33,6 +33,11 @@ SUPPORTED_DOMAINS = [
     "neurology",
     "pulmonology",
     "gastroenterology",
+    "nephrology",
+    "hematology",
+    "rheumatology",
+    "dermatology",
+    "urology",
     "diagnostics",
     "basic_biomedical"
 ]

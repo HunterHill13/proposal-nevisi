@@ -164,6 +164,71 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertFalse(aud2["is_provenance_traceable"])
 
 
+    def test_17_retracted_and_corrected_article_handling(self):
+        """Test 17: Retracted and corrected papers are appropriately flagged and isolated."""
+        retracted_local = {"ref_id": "REF_RET", "title": "Fabricated trial on miracle cure", "year": 2021}
+        retracted_meta = {"title": "Fabricated trial on miracle cure", "year": 2021, "is_retracted": True, "status": "Retracted"}
+        res_ret = self.auditor.audit_bibliographic_fields(retracted_local, retracted_meta)
+        self.assertEqual(res_ret["verification_status"], "RETRACTED")
+        self.assertTrue(res_ret["is_retracted"])
+
+        corrected_local = {"ref_id": "REF_COR", "title": "Trial with amended dosage", "year": 2022}
+        corrected_meta = {"title": "Erratum: Trial with amended dosage", "year": 2022, "is_corrected": True}
+        res_cor = self.auditor.audit_bibliographic_fields(corrected_local, corrected_meta)
+        self.assertEqual(res_cor["verification_status"], "CORRECTED")
+        self.assertTrue(res_cor["is_corrected"])
+
+    def test_18_pseudo_replication_detection(self):
+        """Test 18: Flagging technical replicates substituted for biological sample size."""
+        in_vitro_flawed = {
+            "replicate_structure": "Technical replicates in triplicate pipette wells",
+            "sample_size": "96 wells"
+        }
+        res = GenericClaimEntailmentEngine.audit_pseudo_replication("IN_VITRO_EXPERIMENTAL", in_vitro_flawed)
+        self.assertTrue(res["has_pseudo_replication_risk"])
+        self.assertIn("TECHNICAL_REPLICATES_ONLY", res["flags"])
+
+    def test_19_publication_bias_small_study_gate(self):
+        """Test 19: Publication bias assessment returns NOT_ASSESSABLE when studies < 10 (Cochrane §10.4.3.1)."""
+        underpowered_studies = [{"study_id": f"S_{i}"} for i in range(5)]
+        res = GenericContradictionEngine.evaluate_publication_bias(underpowered_studies)
+        self.assertEqual(res["publication_bias_status"], "NOT_ASSESSABLE")
+        self.assertIn("at least 10 studies", res["reason"])
+
+    def test_20_translational_overclaim_detection(self):
+        """Test 20: Preclinical in vitro study claiming human clinical cure triggers translational overclaim flag."""
+        study_vitro = {"study_id": "S_PETRI", "study_design": "IN_VITRO_EXPERIMENTAL"}
+        overclaim = GenericClaimEntailmentEngine.detect_translational_overclaim(
+            "Compound Z achieves complete clinical efficacy and patient cure.",
+            study_vitro["study_design"]
+        )
+        self.assertIsNotNone(overclaim)
+        self.assertEqual(overclaim["flag"], "TRANSLATIONAL_OVERCLAIM_PRECLINICAL_TO_CLINICAL")
+
+    def test_21_protocol_consistency_graph_orphan_detection(self):
+        """Test 21: Inconsistent protocol graph missing independent or dependent variables is flagged."""
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        broken_model = {
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "interventions_or_exposures": [],  # Missing intervention!
+            "primary_outcomes": [{"name": "Viability"}]
+        }
+        res = DynamicProtocolDesigner.validate_objectives_hypotheses_variables_consistency(broken_model)
+        self.assertEqual(res["consistency_status"], "DISCREPANCY_DETECTED")
+        self.assertFalse(res["is_graph_fully_connected"])
+        self.assertIn("MISSING_INDEPENDENT_VARIABLE", res["discrepancies"])
+
+    def test_22_abstract_only_claim_demotion(self):
+        """Test 22: Studies marked as ABSTRACT_ONLY cannot provide full-text factual confirmation."""
+        study_abs = {"study_id": "S_ABS_01", "study_design": "IN_VITRO_EXPERIMENTAL", "fulltext_status": "ABSTRACT_ONLY"}
+        facts = [{"directness": "DIRECT_EVIDENCE", "text_or_data": "IC50 = 12 uM in abstract summary"}]
+        # When evaluating fulltext_status == ABSTRACT_ONLY, engine flags partial evidence status
+        res = GenericClaimEntailmentEngine.evaluate_claim_entailment(
+            "CLM_ABS", "Compound leads to IC50 of 12 uM in purified recombinant assay.", study_abs, facts
+        )
+        self.assertIn(res["entailment_status"], ["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED"])
+
+
 if __name__ == "__main__":
     unittest.main()
 

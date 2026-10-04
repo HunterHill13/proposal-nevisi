@@ -10,23 +10,10 @@ TRUE_CONTRADICTION vs CONTEXTUAL_DISAGREEMENT without domain-specific hard-codin
 import json
 from typing import Dict, List, Any, Optional
 
-EXTENSIBLE_CONTRADICTION_TAXONOMY = {
-    "NULL_RESULT": "No statistically significant difference between intervention and comparator (p >= 0.05)",
-    "NO_EFFECT": "Biological inertness; absence of phenotypic or biochemical shift at tested range",
-    "ANTAGONISM": "Combined efficacy is strictly inferior to monotherapy or CI > 1.2",
-    "SUBADDITIVITY": "Combined response is less than algebraic sum without overt antagonism",
-    "TOXICITY": "Dose-limiting tissue necrosis, host cell lethality, or organ damage",
-    "OFF_TARGET_EFFECT": "Non-specific engagement with unintended pathways or receptors",
-    "RESISTANCE": "Acquired or innate loss of sensitivity, selection of escape mutations",
-    "NON_RESPONSE": "Primary non-responsiveness within specific genetic or clinical subsets",
-    "SAFETY_LIMITATION": "Narrow therapeutic window; overlapping MTD and biologically active dose",
-    "DOSE_LIMITATION": "Activity restricted to supra-physiological, clinically unachievable levels",
-    "TIME_LIMITATION": "Rapidly transient effect due to receptor desensitization or negative feedback",
-    "MODEL_LIMITATION": "Efficacy demonstrated in 2D cell cultures but completely failed in 3D or in vivo models",
-    "TRANSLATIONAL_FAILURE": "Preclinical in vitro / animal efficacy failed to translate to clinical benefit",
-    "METHODOLOGICAL_CONFLICT": "Apparent effect driven by optical interference, vehicle toxicity, or assay artifact",
-    "CONTRADICTORY_RESULT": "Opposite biological effect observed under ostensibly identical experimental parameters"
-}
+try:
+    from core_policies import CONTRADICTION_TAXONOMY as EXTENSIBLE_CONTRADICTION_TAXONOMY
+except ImportError:
+    from scripts.core_policies import CONTRADICTION_TAXONOMY as EXTENSIBLE_CONTRADICTION_TAXONOMY
 
 class GenericContradictionEngine:
     """Detects, categorizes, and contextualizes scientific disagreements."""
@@ -36,6 +23,17 @@ class GenericContradictionEngine:
         """Convenience method to audit and detect contradictions across a set of studies."""
         negative_findings = []
         for s in studies:
+            explicit_neg = s.get("negative_or_null_findings", [])
+            if explicit_neg and isinstance(explicit_neg, list):
+                for item in explicit_neg:
+                    negative_findings.append({
+                        "study_id": s.get("study_id"),
+                        "category": item.get("category", "NULL_RESULT"),
+                        "description": item.get("description", ""),
+                        "target_context": s.get("design_specific_attributes", {})
+                    })
+                continue
+
             findings_text = str(s.get("primary_findings", "")) + " " + str(s.get("title", ""))
             category = None
             if "rebound" in findings_text.lower():
@@ -142,6 +140,27 @@ class GenericContradictionEngine:
             "discrepancy_analyses": analyses,
             "search_boundary": search_boundary,
             "epistemic_caveat": "Identified negative findings provide essential boundary conditions and safety/efficacy thresholds."
+        }
+
+    @classmethod
+    def evaluate_publication_bias(cls, studies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Evaluates publication bias / small-study effects across study cohort.
+        Returns NOT_ASSESSABLE when fewer than 10 studies are available (Cochrane handbook rule).
+        """
+        n_studies = len(studies)
+        if n_studies < 10:
+            return {
+                "publication_bias_status": "NOT_ASSESSABLE",
+                "study_count": n_studies,
+                "reason": "Funnel plot asymmetry and Egger test require at least 10 studies (Cochrane Handbook §10.4.3.1). Reporting absence of bias with fewer than 10 studies is methodologically invalid."
+            }
+        
+        has_negative = any(bool(s.get("negative_or_null_findings")) for s in studies)
+        return {
+            "publication_bias_status": "ASSESSED_SUFFICIENT_POWER",
+            "study_count": n_studies,
+            "funnel_asymmetry_detected": not has_negative,
+            "recommendation": "Perform formal Egger linear regression and trim-and-fill analysis."
         }
 
 

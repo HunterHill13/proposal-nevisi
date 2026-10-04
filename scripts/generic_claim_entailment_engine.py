@@ -68,6 +68,49 @@ class GenericClaimEntailmentEngine:
                     }
         return None
 
+    @classmethod
+    def detect_translational_overclaim(cls, claim_text: str, source_study_design: str) -> Optional[Dict[str, str]]:
+        """Flags unwarranted clinical/therapeutic efficacy claims derived purely from in vitro or animal models."""
+        text_lower = claim_text.lower()
+        clinical_markers = [
+            r'\bclinical efficacy\b', r'\bpatient cure\b', r'\btreats human\b',
+            r'\beffective in patients\b', r'\btherapeutic cure\b', r'\bclinical outcome\b'
+        ]
+        is_preclinical = (
+            "IN_VITRO" in source_study_design.upper() or
+            "ANIMAL" in source_study_design.upper() or
+            source_study_design in ["IN_VITRO_EXPERIMENTAL", "ANIMAL_IN_VIVO_PRECLINICAL"]
+        )
+        if is_preclinical:
+            for marker in clinical_markers:
+                if re.search(marker, text_lower):
+                    return {
+                        "flag": "TRANSLATIONAL_OVERCLAIM_PRECLINICAL_TO_CLINICAL",
+                        "detected_phrase": marker.replace(r'\b', ''),
+                        "recommendation": "Qualify findings as preclinical cellular/animal model evidence without claiming human clinical efficacy."
+                    }
+        return None
+
+    @classmethod
+    def audit_pseudo_replication(cls, study_design: str, design_attributes: Dict[str, Any]) -> Dict[str, Any]:
+        """Flags pseudo-replication where technical replicates are treated as independent biological replicates."""
+        replicate_info = str(design_attributes.get("replicate_structure", "")).lower()
+        sample_size_raw = str(design_attributes.get("sample_size", "")).lower()
+        
+        is_vitro = "IN_VITRO" in study_design.upper()
+        flags = []
+        if is_vitro:
+            if "technical replicate" in replicate_info and "biological replicate" not in replicate_info:
+                flags.append("TECHNICAL_REPLICATES_ONLY")
+            if "wells" in sample_size_raw and "independent experiments" not in replicate_info:
+                flags.append("WELL_COUNT_SUBSTITUTED_FOR_BIOLOGICAL_N")
+
+        return {
+            "has_pseudo_replication_risk": len(flags) > 0,
+            "flags": flags,
+            "recommendation": "Ensure sample size N reflects independent biological clone preparations, not repeated pipette wells." if flags else "Replication structure acceptable."
+        }
+
     @staticmethod
     def extract_numbers(text: str) -> List[str]:
         """Extracts numerical quantities and percentages from claim strings."""

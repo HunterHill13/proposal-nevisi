@@ -1,0 +1,99 @@
+{
+  "project_id": "FIXTURE_RCT_ENDOCRINOLOGY",
+  "domain": "endocrinology",
+  "framework": "PICO",
+  "research_problem_model": {
+    "model_id": "RPM_RCT_001",
+    "research_title_fa": "بررسی اثر هورمون رشد نوترکیب بر ترکیب بدنی و حساسیت به انسولین در کودکان مبتلا به سندرم پرادر-ویلی",
+    "research_title_en": "Efficacy of Recombinant Human Growth Hormone on Body Composition and Peripheral Insulin Sensitivity in Pediatric Patients with Prader-Willi Syndrome: A Multicenter Randomized Double-Blind Controlled Trial",
+    "domain": "endocrinology",
+    "framework": "PICO",
+    "target_condition": {
+      "name_en": "Prader-Willi Syndrome and Morbid Obesity",
+      "name_fa": "سندرم پرادر-ویلی و چاقی شدید کودکان",
+      "mesh_term": "Prader-Willi Syndrome",
+      "synonyms": ["PWS", "Chromosome 15q11-q13 Imprinting Defect"]
+    },
+    "population_or_model": {
+      "model_type": "HUMAN_CLINICAL",
+      "primary_system": "Pediatric patients aged 4 to 12 years with genetically confirmed Prader-Willi Syndrome",
+      "secondary_systems": ["Pediatric endocrinology tertiary centers"],
+      "normal_control_system": "Placebo administered matched PWS cohort"
+    },
+    "interventions_or_exposures": [
+      {
+        "name": "Somatropin",
+        "chemical_or_biological_class": "Recombinant Human Growth Hormone",
+        "role": "PRIMARY_AGENT",
+        "mesh_terms": ["Human Growth Hormone", "Somatropin"],
+        "synonyms": ["rhGH", "Norditropin", "Genotropin"]
+      }
+    ],
+    "comparators": [
+      {"name": "Identical Subcutaneous Placebo Injection", "type": "PLACEBO"}
+    ],
+    "primary_outcomes": [
+      {"name": "Change in Lean Body Mass by DEXA Scan", "type": "EFFICACY", "measurement_unit": "Kilograms lean mass change at 52 weeks", "preferred_assays": ["Dual-Energy X-ray Absorptiometry (DEXA)"]},
+      {"name": "Homeostatic Model Assessment for Insulin Resistance (HOMA-IR)", "type": "SAFETY", "measurement_unit": "HOMA-IR index", "preferred_assays": ["Fasting plasma glucose and insulin immunoassay"]}
+    ],
+    "hypothesized_mechanisms": [
+      {"pathway_name": "IGF-1 / Lipolysis and Protein Anabolism Cascade", "target_molecules": ["GH Receptor", "IGF-1", "mTORC1"], "expected_modulation": "UPREGULATION"}
+    ],
+    "controlled_vocabulary": {
+      "primary_mesh": ["Prader-Willi Syndrome", "Human Growth Hormone", "Body Composition"],
+      "all_synonyms": ["rhGH", "somatropin", "pediatric obesity"],
+      "exclusion_terms": ["growth hormone deficiency in adults", "acromegaly"]
+    }
+  },
+  "studies": [
+    {
+      "study_id": "ST_RCT_PWS_2022",
+      "study_family_id": "FAM_RCT_PWS_01",
+      "doi": "10.1210/clinem/dgac235",
+      "title": "Long-term randomized trial of growth hormone replacement demonstrates sustained improvement in lean muscle accrual in Prader-Willi syndrome",
+      "authors": ["Carrel AL", "Myers SE", "Whitman BY", "Allen DB"],
+      "year": 2022,
+      "journal": "Journal of Clinical Endocrinology & Metabolism",
+      "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+      "design_specific_attributes": {
+        "target_population_criteria": "84 prepubertal children with PWS",
+        "intervention_regimen": "Somatropin 1.0 mg/m2/day subcutaneously",
+        "comparator_type": "Matching daily subcutaneous placebo",
+        "primary_endpoint_definition": "Change in DEXA total lean body mass at 12 months",
+        "randomization_allocation": "1:1 computer generated block randomization with central allocation concealment",
+        "blinding_procedure": "Double-blinded participants, clinicians, and DEXA evaluators",
+        "follow_up_completeness": "94% complete 12-month follow up"
+      },
+      "risk_of_bias": {"tool_used": "COCHRANE_ROB2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "claims_supported": ["CLM_RCT_LEAN_MASS_ACCRUAL"]
+    },
+    {
+      "study_id": "ST_RCT_PWS_SUG_2023",
+      "study_family_id": "FAM_RCT_PWS_02",
+      "doi": "10.1111/cen.14890",
+      "title": "Impaired glucose tolerance and transient hyperinsulinemia during high-dose growth hormone therapy in obese syndromes",
+      "authors": ["Deal CL", "Tony M", "Hoybye C"],
+      "year": 2023,
+      "journal": "Clinical Endocrinology",
+      "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+      "design_specific_attributes": {
+        "target_population_criteria": "Subgroup analysis of high-BMI children receiving > 1.5 mg/m2/day somatropin",
+        "intervention_regimen": "High-dose Somatropin"
+      },
+      "risk_of_bias": {"tool_used": "COCHRANE_ROB2", "overall_rob": "LOW_RISK"},
+      "directness": "DIRECT",
+      "fulltext_status": "FULL_TEXT_AVAILABLE",
+      "temporal_tier": "RECENT_PRIMARY_EVIDENCE",
+      "negative_or_null_findings": [
+        {
+          "category": "SAFETY_LIMITATION",
+          "description": "Supra-physiological dosing elevated fasting HOMA-IR significantly requiring protocol-mandated dose titrations."
+        }
+      ],
+      "claims_supported": ["CLM_RCT_INSULIN_TOLERANCE_WINDOW"]
+    }
+  ]
+}

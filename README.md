@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 82/82 Passed](https://img.shields.io/badge/Unified%20Tests-82%2F82%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 110/110 Passed](https://img.shields.io/badge/Unified%20Tests-110%2F110%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
 
@@ -66,11 +66,11 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
 
-The engine includes a master test harness verifying 82 total assertions across 4 independent test suites:
-- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 14 core generic scripts (**PASS**).
-- **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 5 distinct biomedical fixtures: Preclinical Oncology, Clinical Cardiology (SGLT2 in HFpEF), Infectious Disease (Paxlovid resistance in COVID-19), Molecular Diagnostics (ctDNA liquid biopsy), and Epidemiological Cohort (Particulate matter exposure & COPD) (**PASS**).
-- **Suite 3: Adversarial Stress Scenarios (`test_adversarial_scenarios.py`):** 16 stress tests evaluating fake citations, mismatched DOIs, causal overclaims, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, and missing metadata (**PASS**).
-- **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (**PASS**).
+The engine includes a master test harness verifying 110 total assertions across 4 independent test suites:
+- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all core generic scripts and verifies semantic generalization (19 tests - **PASS**).
+- **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 9 distinct biomedical fixtures: Preclinical Oncology, Clinical Cardiology, Infectious Disease, Molecular Diagnostics, Epidemiological Cohort, Basic Molecular Biology, Preclinical Animal Pharmacology, Endocrinology Clinical RCT, and Nephrology Prognostic Biomarkers (9 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios (`test_adversarial_scenarios.py`):** 22 stress tests evaluating fake citations, mismatched DOIs, retracted/corrected articles, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, and missing metadata (22 tests - **PASS**).
+- **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
 
 ```bash
 # Run the complete test suite
@@ -93,7 +93,7 @@ python tests/run_all_tests.py
 6. **دروازه زبان علّی و ره‌گیری عددی:** جلوگیری از ادعای علیت بر پایه داده‌های همبستگی و تضمین ره‌گیری تمام اعداد در دفتر شواهد (`EVIDENCE_LEDGER`).
 7. **طراحی پروتکل پویا و اعتبارسنجی ساختار ۱۴ گانه:** تولید پویای جدول متغیرها، گانت چارت زمان‌بندی، آزمون‌های آماری و ممیزی سخت‌گیرانه ساختار ۱۴ گانه و زیربخش‌های ۱۳-۱ تا ۱۳-۱۴ با پشتیبانی از نیم‌فاصله و ارقام فارسی.
 8. **خروجی رسمی ۱۴ گانه ورد:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و نگارش یک پاراگراف تفصیلی مجزا برای تک‌تک مراجع در مرور منابع.
-9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۸۲ تستی بدون ادعای ساختگی (82 / 82 PASS).
+9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۱۱۰ تستی بدون ادعای ساختگی (110 / 110 PASS).
 
 ---
 

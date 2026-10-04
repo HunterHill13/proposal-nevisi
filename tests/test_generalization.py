@@ -152,6 +152,89 @@ class TestMultiDomainGeneralization(unittest.TestCase):
         confounders = [v for v in vars_table if "Confounder" in v["role"] or "مخدوشگر" in v["role"]]
         self.assertGreaterEqual(len(confounders), 1)
 
+    def test_06_basic_molecular_biology_mechanistic_invariants(self):
+        """Fixture F: Basic molecular biology, ubiquitination clearance, and null oxidant thresholds."""
+        data = self._load_fixture("basic_molecular_biology")
+        model = ProblemModelBuilder.create_from_specification(data["research_problem_model"])
+        
+        self.assertEqual(model.framework, "MECHANISTIC")
+        self.assertEqual(model.domain, "basic_biomedical")
+        self.assertIn("p53", model.research_title_en + " " + model.hypothesized_mechanisms[0].target_molecules[1])
+        
+        # Mechanistic timeline must contain molecular rescue and signaling phases
+        timeline = DynamicProtocolDesigner.generate_timeline("MECHANISTIC")
+        titles = " ".join(t["phase_title"] for t in timeline)
+        self.assertIn("مسیر پیام‌رسانی", titles)
+        self.assertIn("فسفوریلاسیون", titles)
+        
+        # Contradiction detection on null findings
+        studies = data.get("studies", [])
+        contra = GenericContradictionEngine.detect_contradictions(studies)
+        self.assertEqual(contra["total_negative_findings"], 1)
+
+    def test_07_animal_experimental_preclinical_invariants(self):
+        """Fixture G: Preclinical in vivo animal study, Mead resource equation, and ethical vetting."""
+        data = self._load_fixture("animal_experimental")
+        model = ProblemModelBuilder.create_from_specification(data["research_problem_model"])
+        
+        self.assertEqual(model.framework, "EXPERIMENTAL_ANIMAL")
+        self.assertEqual(model.domain, "neurology")
+        self.assertEqual(model.population_or_model.model_type, "ANIMAL_IN_VIVO")
+        
+        # Sample size guidance must reference Mead's Resource equation
+        sample_plan = DynamicProtocolDesigner.calculate_sample_size_plan(model.to_dict())
+        self.assertEqual(sample_plan["design_type"], "IN_VIVO_ANIMAL")
+        self.assertIn("Mead", sample_plan["formula_or_standard"])
+        
+        # Timeline must feature animal quarantine and bioethics
+        timeline = DynamicProtocolDesigner.generate_timeline("EXPERIMENTAL_ANIMAL")
+        titles = " ".join(t["phase_title"] for t in timeline)
+        self.assertIn("حیوانات", titles)
+        self.assertIn("اخلاق", titles)
+
+    def test_08_clinical_rct_endocrinology_invariants(self):
+        """Fixture H: Human clinical randomized double-blind trial, ITT analysis, and safety boundaries."""
+        data = self._load_fixture("clinical_rct_endocrinology")
+        model = ProblemModelBuilder.create_from_specification(data["research_problem_model"])
+        
+        self.assertEqual(model.framework, "PICO")
+        self.assertEqual(model.domain, "endocrinology")
+        self.assertEqual(model.population_or_model.model_type, "HUMAN_CLINICAL")
+        
+        # Statistical plan must enforce Intention-to-Treat (ITT) and survival / Cox models
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(model.to_dict())
+        stat_text = " ".join(stat_plan["complete_testing_strategy"])
+        self.assertIn("قصد درمان", stat_text)
+        self.assertIn("کاکس", stat_text)
+        
+        # Sample size for human clinical trial requires pilot data if parameters uncharacterized
+        sample_plan = DynamicProtocolDesigner.calculate_sample_size_plan(model.to_dict())
+        self.assertTrue(sample_plan["pilot_required"])
+
+    def test_09_unrelated_nephrology_biomarker_invariants(self):
+        """Fixture I: Completely distinct topic (Nephrology prognostic autoantibody, C-index, ROC)."""
+        data = self._load_fixture("unrelated_nephrology_biomarker")
+        model = ProblemModelBuilder.create_from_specification(data["research_problem_model"])
+        
+        self.assertEqual(model.framework, "PROGNOSTIC")
+        self.assertEqual(model.domain, "nephrology")
+        self.assertIn("PLA2R", model.research_title_en + " " + model.interventions_or_exposures[0].name)
+        
+        # Statistical plan for prognostic models must include C-index and calibration
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(model.to_dict())
+        stat_text = " ".join(stat_plan["complete_testing_strategy"])
+        self.assertIn("هارل", stat_text)
+        self.assertIn("کالیبراسیون", stat_text)
+        
+        # Dual-path search matrix must not contain any leaked terms from other topics
+        planner = GenericSearchPlanner(model)
+        matrix = planner.build_query_matrix()
+        matrix_str = json.dumps(matrix).lower()
+        self.assertNotIn("lupeol", matrix_str)
+        self.assertNotIn("ndv", matrix_str)
+        self.assertNotIn("cancer", matrix_str)
+        self.assertIn("membranous nephropathy", matrix_str)
+
 def run_generalization_suite() -> bool:
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMultiDomainGeneralization)
     runner = unittest.TextTestRunner(verbosity=1)

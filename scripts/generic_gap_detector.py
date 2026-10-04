@@ -10,19 +10,10 @@ based on authentic evidence trails, boundary conditions, and study cohort charac
 import json
 from typing import Dict, List, Any, Optional
 
-UNIVERSAL_GAP_TAXONOMY = {
-    "POPULATION_GAP": "Lack of evidence in specific clinical, demographic, or disease sub-populations",
-    "MODEL_GAP": "Preclinical findings restricted to simplified 2D monocultures or non-human lineages",
-    "INTERVENTION_GAP": "Optimal agent configuration, analogue superiority, or delivery mode uncharacterized",
-    "COMBINATION_GAP": "Absence of empirical multi-agent interaction or synergy evaluation",
-    "DOSE_GAP": "Lack of concentration-response mapping within physiological / non-toxic boundaries",
-    "MECHANISTIC_GAP": "Incomplete signaling pathway elucidation or unverified intermediate cascades",
-    "OUTCOME_GAP": "Primary endpoints restricted to surrogate markers without functional / phenotype validation",
-    "METHODOLOGICAL_GAP": "Reliance on legacy assays lacking modern quantitative rigor or reproducibility standards",
-    "TRANSLATIONAL_GAP": "In vitro efficacy uncorroborated in intact physiological or in vivo systems",
-    "SAFETY_GAP": "Incomplete toxicological boundaries, therapeutic window, or organ-sparing assessment",
-    "CONTRADICTION_GAP": "Unresolved discrepancies across published studies under divergent experimental contexts"
-}
+try:
+    from core_policies import UNIVERSAL_GAP_TAXONOMY
+except ImportError:
+    from scripts.core_policies import UNIVERSAL_GAP_TAXONOMY
 
 class GenericGapDetector:
     """Detects, categorizes, and validates evidence-based research gaps."""

@@ -11,41 +11,11 @@ omission, or ordering drift.
 import os
 import re
 import sys
-from typing import Dict, List, Any, Tuple
-
-MANDATORY_14_SECTIONS = [
-    (1, "موضوع", [r"موضوع", r"عنوان"]),
-    (2, "بیان مسئله", [r"بیان\s*مس[ئأه]له"]),
-    (3, "مرور بر منابع", [r"مرور\s*بر\s*منابع", r"پیشینه\s*پژوهش"]),
-    (4, "اهمیت و ضرورت تحقیق", [r"اهمیت\s*و\s*ضرورت"]),
-    (5, "تعریف واژه‌ها", [r"تعریف\s*واژه"]),
-    (6, "اهداف جزیی", [r"اهداف\s*جز[ئیی]"]),
-    (7, "اهداف کلی", [r"هدف\s*کلی", r"اهداف\s*کلی"]),
-    (8, "اهداف کاربردی", [r"اهداف\s*کاربردی"]),
-    (9, "فرضیات و سوالات", [r"فرضی[اه]ت\s*و\s*س[وؤ]الات", r"فرضیه‌ها\s*و\s*پرسش‌ها"]),
-    (10, "دستاوردها", [r"دستاوردها"]),
-    (11, "جدول متغیرها", [r"جدول\s*متغیرها", r"متغیرها"]),
-    (12, "جدول زمان‌بندی و مراحل اجرا", [r"جدول\s*زمان[\s\-]*بندی", r"مراحل\s*اجرا"]),
-    (13, "روش اجرا", [r"روش\s*اجرا", r"متدولوژی"]),
-    (14, "منابع مورد استفاده", [r"منابع\s*(?:مورد\s*استفاده)?", r"فهرست\s*منابع"])
-]
-
-MANDATORY_SUBSECTIONS_13 = [
-    ("13-1", "نوع مطالعه", [r"نوع\s*مطالعه"]),
-    ("13-2", "جامعه مورد مطالعه", [r"جامعه\s*مورد\s*مطالعه"]),
-    ("13-3", "محل انجام مطالعه", [r"محل\s*انجام"]),
-    ("13-4", "معیارهای ورود به مطالعه", [r"معیارهای\s*ورود"]),
-    ("13-5", "معیارهای خروج از مطالعه", [r"معیارهای\s*خروج"]),
-    ("13-6", "ابزارهای گردآوری اطلاعات", [r"ابزارهای\s*گردآوری"]),
-    ("13-7", "تعیین اعتبار ابزار گردآوری", [r"اعتبار\s*ابزار", r"روایی"]),
-    ("13-8", "تعیین پایایی / ابزار گردآوری", [r"پایایی", r"تعیین\s*ابزار"]),
-    ("13-9", "حجم نمونه و روش محاسبه آن", [r"حجم\s*نمونه"]),
-    ("13-10", "روش تجزیه و تحلیل داده", [r"تجزیه\s*و\s*تحلیل\s*داده", r"تحلیل\s*آماری"]),
-    ("13-11", "ملاحظات اخلاقی در صورت نیاز", [r"ملاحظات\s*اخلاقی"]),
-    ("13-12", "نکات امنیتی و حفاظت زیستی", [r"حفاظت\s*(?:زیستی|پروژه)", r"نکات\s*امنیتی"]),
-    ("13-13", "مشکلات و محدودیت‌ها", [r"مشکلات\s*و\s*محدودیت"]),
-    ("13-14", "شیوه اجرایی و مراحل طرح", [r"شیوه\s*اجرایی", r"مراحل\s*طرح"])
-]
+from typing import Dict, List, Any, Optional
+try:
+    from core_policies import MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
+except ImportError:
+    from scripts.core_policies import MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
 
 class ProposalStructureValidator:
     """Validates structural integrity, ordering, and presence of all required sections."""
@@ -103,6 +73,25 @@ class ProposalStructureValidator:
         has_var_table = bool(re.search(r"\|\s*نام\s*متغیر\s*\|", text) or re.search(r"\|\s*متغیر\s*\|", text))
         has_timeline = bool(re.search(r"\|\s*فاز[^\n\|]*\|", text) or re.search(r"\|\s*مرحله[^\n\|]*\|", text) or re.search(r"گانت", text) or re.search(r"زمان[\s\-\u200c]*بندی", text))
 
+        # 4. Content Depth Audit (Minimum Word Counts & Substantive Proportions)
+        words = text.split()
+        total_word_count = len(words)
+        
+        # Word counts per section
+        sec_2_match = re.search(r"(?:^|\n)##?\s*(?:2|۲)[\.\-:]?\s*بیان\s*مس[ئأه]له", text)
+        sec_3_match = re.search(r"(?:^|\n)##?\s*(?:3|۳)[\.\-:]?\s*مرور\s*بر\s*منابع", text)
+        sec_4_match = re.search(r"(?:^|\n)##?\s*(?:4|۴)[\.\-:]?\s*اهمیت\s*و\s*ضرورت", text)
+        
+        sec_2_words = 0
+        if sec_2_match and sec_3_match:
+            sec_2_text = text[sec_2_match.end():sec_3_match.start()]
+            sec_2_words = len(sec_2_text.split())
+            
+        sec_3_words = 0
+        if sec_3_match and sec_4_match:
+            sec_3_text = text[sec_3_match.end():sec_4_match.start()]
+            sec_3_words = len(sec_3_text.split())
+
         passed = (len(missing_sections) == 0 and len(missing_subsections) == 0 and not ordering_violated and has_var_table and has_timeline)
 
         status_str = "PASS" if passed else "FAIL"
@@ -114,6 +103,9 @@ class ProposalStructureValidator:
             "section_ordering_intact": not ordering_violated,
             "variable_table_present": has_var_table,
             "timeline_schedule_present": has_timeline,
+            "total_word_count": total_word_count,
+            "problem_statement_word_count": sec_2_words,
+            "literature_review_word_count": sec_3_words,
             "missing_sections": missing_sections,
             "missing_subsections_13": missing_subsections,
             "section_audit_details": section_status
