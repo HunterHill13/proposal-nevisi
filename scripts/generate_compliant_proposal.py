@@ -127,17 +127,26 @@ class ProposalGenerator:
                 agent_name = s.get("intervention_agent", "عامل مداخله")
                 quant = s.get("quantitative_parameters", "")
                 
-                # Independent analytical paragraph
+                # Evidence-to-Text Density Controller: Independent analytical paragraph
                 para = s.get("review_paragraph") or s.get("literature_review_paragraph")
                 if not para:
+                    # Synthesize full 8-dimensional academic paragraph
+                    comparator = s.get("comparator", "گروه کنترل استاندارد")
+                    endpoints = s.get("endpoints_evaluated", "شاخص‌های عملکردی و بیوشیمیایی")
+                    limitation = s.get("limitations", "محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت")
+                    relevance = s.get("relevance_to_current_study", f"تعیین مقادیر پایه برای طراحی مداخله در طرح جاری")
+                    
                     para = (
-                        f"**{lead_author} و همکاران ({year})** در پژوهشی با طراحی {design} به ارزیابی اثرات {agent_name} در {model_sys} پرداختند [{cnum}]. "
-                        f"در این مطالعه، شاخص‌های اصلی سنجش عملکرد با تکیه بر پروتکل‌های استاندارد تعیین گردید. "
-                        f"یافته‌های اصلی حاکی از آن بود که: {findings}. "
+                        f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی اثرات **{agent_name}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
+                        f"در این پژوهش، متغیرهای پیامد از جمله {endpoints} مورد سنجش قرار گرفتند. "
+                        f"یافته‌های کلیدی نشان داد که {findings}. "
                     )
                     if quant:
-                        para += f"از نظر متغیرهای کمی، مقادیر گزارش‌شده به صورت ({quant}) ثبت گردیده است. "
-                    para += f"این بررسی اگرچه افق‌های مهمی در زمینه اثر مداخله گشود، اما به دلیل محدودیت در شرایط دوز یا بازه زمانی، لزوم ارزیابی تکمیلی در طرح حاضر را اثبات می‌کند [{cnum}]."
+                        para += f"از بعد مقادیر کمی و پارامترهای اندازه‌گیری‌شده، شاخص‌ها به میزان ({quant}) مستند شده‌اند. "
+                    para += (
+                        f"با وجود اعتبار روش‌شناختی، این بررسی با محدودیت‌هایی نظیر {limitation} مواجه بوده است؛ "
+                        f"از این رو، پژوهش حاضر با هدف {relevance}، یافته‌های این مطالعه را به عنوان پیش‌زمینه مورد واکاوی و بسط تجربی قرار می‌دهد [{cnum}]."
+                    )
                 lit_paragraphs.append(para)
 
             # Build cross-study synthesis narrative
