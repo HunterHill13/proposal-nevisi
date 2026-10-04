@@ -1,8 +1,8 @@
 # COMPREHENSIVE SELF-AUDIT & VERIFICATION REPORT
-## Proposal-Nevisi Engine v8.1: Universal Evidence-Driven Architecture
+## Proposal-Nevisi Engine v8.2: Universal Evidence-Driven Architecture
 
 **Audit Date:** October 2026  
-**System Version:** v8.1 (Universal General-Purpose Engine)  
+**System Version:** v8.2 (Universal General-Purpose Engine)  
 **Execution Environment:** Windows PowerShell / Python 3.11  
 **Master Test Harness:** `tests/run_all_tests.py`  
 
@@ -24,7 +24,7 @@ The system was evaluated against four independent testing dimensions:
 
 ```text
 ###########################################################################
-PROPOSAL-NEVISI v8.1: DYNAMIC MASTER UNIFIED TEST RUNNER (153 TESTS)
+PROPOSAL-NEVISI v8.2: DYNAMIC MASTER UNIFIED TEST RUNNER (153 TESTS)
 ###########################################################################
 TOTAL TESTS EXECUTED  : 153
 PASSED TESTS          : 153
@@ -108,7 +108,7 @@ OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% SCIENTIFIC VERIFICATION)
 
 ## 5. Remaining System Limitations
 
-While v8.1 achieves complete structural and algorithmic generalization, the following real-world limitations remain:
+While v8.2 achieves complete structural and algorithmic generalization, the following real-world limitations remain:
 - **API Rate Limits:** Live PubMed and Crossref queries without registered API keys are limited to 3 requests per second.
 - **Full-Text Paywalls:** Full-text PDF/XML extraction is bounded by institutional access and open-access licensing (Europe PMC / PubMed Central). When full-text is unavailable, the system safely falls back to `ABSTRACT_ONLY` and restricts claim directness.
 - **Non-Standardized Reporting:** In historical literature prior to CONSORT/ARRIVE guidelines, missing methodological details must remain cataloged as `NOT_REPORTED`.

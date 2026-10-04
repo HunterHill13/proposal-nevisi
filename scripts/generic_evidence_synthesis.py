@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_evidence_synthesis.py - Evidence-Weighted Multi-Dimensional Synthesis
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Performs evidence-weighted synthesis across 8 certainty dimensions, avoids simple majority voting,
 incorporates study families, and provides structured epistemic uncertainty accounting.

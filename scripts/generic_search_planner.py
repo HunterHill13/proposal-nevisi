@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_search_planner.py - Multi-Facet Dual-Path Literature Search Planner
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Generates an 8-facet query matrix and dual-path search plan (SUPPORTING vs CONTRADICTING)
 dynamically from any ResearchProblemModel across biomedical fields.

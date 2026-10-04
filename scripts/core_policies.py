@@ -48,8 +48,32 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "8.1.0")
-VERSION_DISPLAY = PROJECT_METADATA.get("version_display", "v8.1.0")
+ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "8.2.0")
+VERSION_DISPLAY = PROJECT_METADATA.get("version_display", "v8.2.0")
+
+FINAL_INCLUSION_REASON_CATEGORIES = [
+    "DIRECT_DISEASE_MODEL_EVIDENCE",    # Direct experimental evidence on target disease/cell/animal model
+    "INTERVENTION_EFFICACY_EVIDENCE",   # Efficacy/synergy/combination data for primary or secondary intervention
+    "MECHANISTIC_RATIONALE",            # Molecular pathways, signaling cascades, targets, apoptosis, gene expression
+    "METHODOLOGICAL_BENCHMARK",         # Standard bioassay, mathematical model, CI formula, analytical benchmark
+    "SAFETY_SELECTIVITY_BOUNDARY"       # Toxicity boundaries, therapeutic window, selectivity index, null evidence
+]
+
+PROPOSAL_SECTIONS_FOR_EVIDENCE = [
+    "SECTION_1_TITLE",
+    "SECTION_2_PROBLEM_STATEMENT",
+    "SECTION_3_LITERATURE_REVIEW",
+    "SECTION_4_NECESSITY",
+    "SECTION_5_DEFINITIONS",
+    "SECTION_6_SPECIFIC_OBJECTIVES",
+    "SECTION_7_GENERAL_OBJECTIVES",
+    "SECTION_8_APPLIED_OBJECTIVES",
+    "SECTION_9_HYPOTHESES_QUESTIONS",
+    "SECTION_10_DELIVERABLES",
+    "SECTION_11_VARIABLE_TABLE",
+    "SECTION_12_TIMELINE",
+    "SECTION_13_METHODOLOGY"
+]
 
 # ==============================================================================
 # 1. INSTITUTIONAL 14-SECTION PROPOSAL STRUCTURE (NON-NEGOTIABLE)

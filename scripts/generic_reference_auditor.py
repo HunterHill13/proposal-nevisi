@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_reference_auditor.py - Topic-Agnostic Bibliographic, Temporal & Citation Auditor
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Performs field-level verification against Crossref/PubMed, audits temporal boundaries,
 validates foundational justifications, and strictly detects citation padding.
@@ -13,9 +13,15 @@ import difflib
 from typing import Dict, List, Any, Optional, Tuple
 
 try:
-    from core_policies import TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES, ContextualRelevanceConfig
+    from core_policies import (
+        TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
+        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE
+    )
 except ImportError:
-    from scripts.core_policies import TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES, ContextualRelevanceConfig
+    from scripts.core_policies import (
+        TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
+        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE
+    )
 
 class GenericReferenceAuditor:
     """Universal reference auditor operating without hard-coded biological assumptions."""
@@ -998,11 +1004,12 @@ class GenericReferenceAuditor:
         candidate_records: List[Dict[str, Any]],
         problem_model: Any,
         max_references: int = MAX_FINAL_REFERENCES,
-        min_references: int = MIN_FINAL_REFERENCES
+        min_references: int = MIN_FINAL_REFERENCES,
+        total_retrieved_in_corpus: Optional[int] = None
     ) -> Dict[str, Any]:
         """Filters, audits, ranks, and selects the optimal balanced reference portfolio
         under a strict hard ceiling of maximum 25 references.
-        Separates deep search corpus from final proposal references.
+        Separates deep search corpus from final proposal references and tracks a 5-stage screening funnel.
         """
         auditor = cls()
         excluded = []
@@ -1019,12 +1026,13 @@ class GenericReferenceAuditor:
                 excluded.append({"ref_id": ref_id, "reason": "REJECT_DUPLICATE", "details": "Duplicate record cluster."})
                 continue
 
-            # 2. Contextual Relevance Gate
+            # 2. Contextual Relevance Gate (Rejects off-topic biological contexts)
             rel_audit = cls.audit_contextual_relevance(r, problem_model)
             if not rel_audit.get("is_contextually_relevant"):
                 excluded.append({
                     "ref_id": ref_id,
                     "reason": rel_audit.get("rejection_reason", "REJECT_LOW_CONTEXTUAL_RELEVANCE"),
+                    "category": rel_audit.get("rejection_category", "LOW_OVERALL_ALIGNMENT"),
                     "details": rel_audit.get("rationale")
                 })
                 continue
@@ -1046,6 +1054,14 @@ class GenericReferenceAuditor:
                 "score": score_data["composite_score"],
                 "score_details": score_data
             })
+
+        # Calculate 5-Stage Screening Funnel metrics
+        total_retrieved = total_retrieved_in_corpus if total_retrieved_in_corpus is not None else len(candidate_records)
+        retracted_or_dup_count = len([e for e in excluded if e["reason"] in ["REJECT_RETRACTED", "REJECT_DUPLICATE"]])
+        total_topic_screened = max(0, total_retrieved - retracted_or_dup_count)
+        relevance_rejected_count = len([e for e in excluded if "RELEVANCE" in e["reason"] or e.get("category") == "INCOMPATIBLE_BIOLOGICAL_SYSTEM"])
+        total_study_relevant = max(0, total_topic_screened - relevance_rejected_count)
+        total_eligible = len(scored_candidates)
 
         # Sort by score descending
         scored_candidates.sort(key=lambda x: x["score"], reverse=True)
@@ -1107,16 +1123,49 @@ class GenericReferenceAuditor:
                 selected_sc.append(sc)
                 selected_ids.add(rid)
 
-        # Build final selected records re-indexed 1..N
+        # Build final selected records re-indexed 1..N with mandatory inclusion justifications
         final_selected_records = []
         for idx, sc in enumerate(selected_sc, 1):
-            r_copy = dict(sc["record"])
+            rec_orig = sc["record"]
+            # Determine explicit inclusion reason and supported proposal section
+            if sc in axis_method:
+                default_inc = "METHODOLOGICAL_BENCHMARK"
+                default_sec = ["SECTION_3_LITERATURE_REVIEW", "SECTION_13_METHODOLOGY"]
+                default_why = "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution."
+            elif sc in axis_safety:
+                default_inc = "SAFETY_SELECTIVITY_BOUNDARY"
+                default_sec = ["SECTION_2_PROBLEM_STATEMENT", "SECTION_3_LITERATURE_REVIEW", "SECTION_4_NECESSITY"]
+                default_why = "Establishes non-toxic biological boundaries, selectivity index, and vehicle tolerability limits."
+            elif sc in axis_mech:
+                default_inc = "MECHANISTIC_RATIONALE"
+                default_sec = ["SECTION_2_PROBLEM_STATEMENT", "SECTION_3_LITERATURE_REVIEW", "SECTION_9_HYPOTHESES_QUESTIONS"]
+                default_why = "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+            elif sc in axis_model:
+                default_inc = "DIRECT_DISEASE_MODEL_EVIDENCE"
+                default_sec = ["SECTION_2_PROBLEM_STATEMENT", "SECTION_3_LITERATURE_REVIEW", "SECTION_11_VARIABLE_TABLE"]
+                default_why = "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior."
+            else:
+                default_inc = "INTERVENTION_EFFICACY_EVIDENCE"
+                default_sec = ["SECTION_2_PROBLEM_STATEMENT", "SECTION_3_LITERATURE_REVIEW", "SECTION_4_NECESSITY", "SECTION_6_SPECIFIC_OBJECTIVES"]
+                default_why = "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+
+            r_copy = dict(rec_orig)
             r_copy["citation_number"] = idx
             r_copy["selection_score"] = sc["score"]
+            r_copy["final_inclusion_reason"] = r_copy.get("final_inclusion_reason") or default_inc
+            r_copy["proposal_section_supported"] = r_copy.get("proposal_section_supported") or default_sec
+            r_copy["why_this_paper_is_needed"] = r_copy.get("why_this_paper_is_needed") or default_why
             final_selected_records.append(r_copy)
 
         return {
             "selection_status": "OPTIMAL_SELECTION_COMPLETE",
+            "screening_funnel": {
+                "stage_1_retrieved_broad_corpus": total_retrieved,
+                "stage_2_topic_screened": total_topic_screened,
+                "stage_3_study_relevant": total_study_relevant,
+                "stage_4_claim_entailed_eligible": total_eligible,
+                "stage_5_final_proposal_selected": len(final_selected_records)
+            },
             "total_candidates_evaluated": len(candidate_records),
             "total_selected": len(final_selected_records),
             "max_reference_ceiling": max_references,
@@ -1132,6 +1181,70 @@ class GenericReferenceAuditor:
                 "methodological": len([s for s in selected_sc if s in axis_method]),
                 "safety_null": len([s for s in selected_sc if s in axis_safety])
             }
+        }
+
+    @classmethod
+    def audit_final_reference_portfolio(
+        cls,
+        references: List[Dict[str, Any]],
+        max_references: int = MAX_FINAL_REFERENCES,
+        min_references: int = MIN_FINAL_REFERENCES
+    ) -> Dict[str, Any]:
+        """Audits the final reference portfolio to enforce:
+        1. Hard ceiling of <= 25 references.
+        2. Floor of >= 15 references.
+        3. Mandatory presence of final_inclusion_reason, proposal_section_supported, and why_this_paper_is_needed.
+        4. Zero retracted, duplicate, or identity-conflicted papers.
+        5. Sequential citation numbering without gaps.
+        """
+        violations = []
+        count = len(references)
+
+        if count > max_references:
+            violations.append(f"EXCEEDS_MAX_REFERENCE_CEILING_25: Reference count ({count}) exceeds maximum ceiling ({max_references}).")
+        elif count < min_references:
+            violations.append(f"BELOW_MIN_REFERENCE_FLOOR_15: Reference count ({count}) is below minimum floor ({min_references}).")
+
+        seen_nums = []
+        for idx, ref in enumerate(references, 1):
+            ref_id = ref.get("ref_id", ref.get("doi", f"REF_{idx}"))
+            
+            # Check retracted / duplicate
+            if ref.get("is_retracted"):
+                violations.append(f"RETRACTED_ARTICLE_IN_PORTFOLIO: Reference {ref_id} is retracted.")
+            if ref.get("is_duplicate"):
+                violations.append(f"DUPLICATE_ARTICLE_IN_PORTFOLIO: Reference {ref_id} is a duplicate.")
+
+            # Check mandatory inclusion justifications
+            inc_reason = ref.get("final_inclusion_reason")
+            if not inc_reason or inc_reason not in FINAL_INCLUSION_REASON_CATEGORIES:
+                violations.append(f"INVALID_INCLUSION_REASON: Reference {ref_id} missing valid final_inclusion_reason.")
+
+            sec_supp = ref.get("proposal_section_supported")
+            if not sec_supp or not isinstance(sec_supp, list) or len(sec_supp) == 0:
+                violations.append(f"MISSING_SUPPORTED_SECTIONS: Reference {ref_id} missing proposal_section_supported.")
+
+            why_needed = ref.get("why_this_paper_is_needed")
+            if not why_needed or len(str(why_needed).strip()) < 15:
+                violations.append(f"MISSING_WHY_NEEDED_JUSTIFICATION: Reference {ref_id} missing substantive why_this_paper_is_needed.")
+
+            c_num = ref.get("citation_number")
+            if c_num is not None:
+                seen_nums.append(c_num)
+
+        # Check numbering
+        if seen_nums and seen_nums != list(range(1, count + 1)):
+            violations.append(f"NON_SEQUENTIAL_CITATION_NUMBERING: Expected 1..{count}, found {seen_nums[:5]}...")
+
+        passed = len(violations) == 0
+        return {
+            "portfolio_status": "PASS" if passed else "FAIL",
+            "PORTFOLIO_AUDIT": "PASS" if passed else "FAIL",
+            "total_references": count,
+            "max_reference_ceiling": max_references,
+            "min_reference_floor": min_references,
+            "violations_count": len(violations),
+            "violations": violations
         }
 
 

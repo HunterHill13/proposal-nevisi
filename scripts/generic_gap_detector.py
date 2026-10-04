@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_gap_detector.py - Evidence-Based Research Gap Identification Engine
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Derives research gaps systematically across 11 universal gap categories
 based on authentic evidence trails, boundary conditions, and study cohort characteristics.

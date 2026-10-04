@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_study_relationships.py - Dynamic Cross-Study Relationship Graph Engine
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Constructs an explicit, typed, and mathematically grounded relationship graph
 between biomedical studies without topic-specific hard-coding.

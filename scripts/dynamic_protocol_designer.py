@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 dynamic_protocol_designer.py - Dynamic Variables, Timeline, and Statistical Planning
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Generates dynamic Variable Tables, study-type-specific Gantt Timelines,
 and coherent Statistical Analysis Plans tailored strictly to the Research Problem Model.

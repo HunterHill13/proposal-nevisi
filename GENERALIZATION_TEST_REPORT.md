@@ -2,7 +2,7 @@
 ## Universal Evidence Synthesis Across 12 Diverse Biomedical & Clinical Domains
 
 **Report Date:** October 2026  
-**System Architecture:** Proposal-Nevisi Engine v8.1  
+**System Architecture:** Proposal-Nevisi Engine v8.2  
 **Harness Module:** 	ests/test_generalization.py (12 Tests - 100% Passed)
 
 ---
@@ -144,4 +144,4 @@ This report documents the empirical evaluation of the proposal-nevisi core engin
 
 ## 4. Generalization Conclusion
 
-The test suite confirms that the proposal-nevisi v8.1 engine successfully decouples evidence-seeking principles from specific therapeutic compounds or experimental systems. Across all 12 diverse biomedical disciplines, the system automatically tailors search strategies, required evidence streams, risk-of-bias frameworks, and structural validation while preserving zero hard-coding leakage and 100% authentic test execution.
+The test suite confirms that the proposal-nevisi v8.2 engine successfully decouples evidence-seeking principles from specific therapeutic compounds or experimental systems. Across all 12 diverse biomedical disciplines, the system automatically tailors search strategies, required evidence streams, risk-of-bias frameworks, and structural validation while preserving zero hard-coding leakage and 100% authentic test execution.

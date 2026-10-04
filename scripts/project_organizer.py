@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 project_organizer.py - Standard Biomedical Proposal Workspace Structurer
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Automatically provisions and maintains a clean, multi-tier directory structure
 for any research proposal project session:

@@ -1,4 +1,4 @@
-# FINAL RESEARCH ENGINE RELEASE AUDIT REPORT (v8.1.0)
+# FINAL RESEARCH ENGINE RELEASE AUDIT REPORT (v8.2.0)
 ## Universal Evidence-Driven Medical Research, Adversarial Verification & Institutional Proposal Engine
 
 **Release Version:** 8.1.0  
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary & Release Scope
 
-This forensic engineering audit report confirms the completion of the transition of proposal-nevisi from an oncology-biased prototype into a **Universal, Domain-Agnostic, Evidence-First, Adversarially Verified Medical/Biomedical Research & Institutional Proposal Engine (v8.1.0)**.
+This forensic engineering audit report confirms the completion of the transition of proposal-nevisi from an oncology-biased prototype into a **Universal, Domain-Agnostic, Evidence-First, Adversarially Verified Medical/Biomedical Research & Institutional Proposal Engine (v8.2.0)**.
 
 The engine has undergone complete code hardening, decoupling, adversarial testing, and generalization validation across **12 diverse biomedical disciplines** (basic science, molecular biology, animal models, clinical RCTs, observational cohorts, toxicology, biomaterials, and diagnostics) with zero hardcoded disease/compound bias, zero fake execution claims, and 100% authentic test pass rates.
 
@@ -143,4 +143,4 @@ The 70 adversarial scenarios in 	ests/test_adversarial_scenarios.py assert robus
 - **Architecture:** Topic-Agnostic, Evidence-First, Modular Pipeline
 - **Verification Harness:** 161 Unified Tests (0 Failures, 0 Skips)
 - **Institutional Format:** 14 Iranian Academic Proposal Sections (Dubai Persian RTL OpenXML)
-- **Release Status:** **PRODUCTION READY (v8.1.0)**
+- **Release Status:** **PRODUCTION READY (v8.2.0)**

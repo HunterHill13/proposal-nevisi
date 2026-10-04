@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 multi_dimensional_qa_gate.py - Comprehensive 9-Dimension Pre-Flight QA Gate
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Executes exhaustive quality assurance before finalizing proposal artifacts across 9 distinct dimensions:
 1. Scientific QA

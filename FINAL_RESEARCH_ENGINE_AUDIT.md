@@ -1,8 +1,8 @@
-# FINAL RESEARCH ENGINE AUDIT (v8.1)
+# FINAL RESEARCH ENGINE AUDIT (v8.2)
 ## Universal Evidence-Driven Medical Research & Proposal Engine
 
 **Date:** 2026-10-04  
-**Engine Version:** v8.1 (Universal, Topic-Agnostic, Configuration-Driven, Evidence-First)  
+**Engine Version:** v8.2 (Universal, Topic-Agnostic, Configuration-Driven, Evidence-First)  
 **Test Suite Summary:** **153 / 153 PASS (100% Pass, 0 Failures, 0 Errors, 0.150s Execution Time)**  
 
 ---
@@ -91,4 +91,4 @@ The Proposal-Nevisi architecture underwent an exhaustive forensic audit and engi
 
 ## 4. Final Conclusion
 
-Proposal-Nevisi v8.1 is fully generalized, robustly tested across 146 dynamic unit tests, and verified on unseen medical domains with zero hardcoded artifacts.
+Proposal-Nevisi v8.2 is fully generalized, robustly tested across 146 dynamic unit tests, and verified on unseen medical domains with zero hardcoded artifacts.

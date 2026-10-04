@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 research_problem_model.py - Dynamic Topic Decomposition & Framework Selection
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Transforms raw user research topics into structured, framework-aligned
 Research Problem Models across oncology, cardiology, infectious diseases,

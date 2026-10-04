@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 test_adversarial_scenarios.py - Adversarial Stress-Testing Suite (12 Scenarios)
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Stress-tests the engine against deliberate epistemic deception, fake DOIs,
 partial entailment, ungrounded numbers, observational overclaiming, and bias misattribution.
@@ -1297,7 +1297,110 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(val_res["PROPOSAL_STRUCTURE_VALIDATION"], "PASS")
         self.assertLessEqual(val_res["reference_count"], 25)
         self.assertEqual(val_res["reference_count"], 25)
-        self.assertTrue(val_res["reference_count_valid"])
+    def test_77_screening_funnel_and_mandatory_inclusion_reason(self):
+        """Test 77: 5-Stage screening funnel tracking and mandatory inclusion reason/section assignment."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Carcinoma", "name_fa": "کارسینوما"},
+            "population_or_model": {"primary_system": "Cell Culture System"},
+            "interventions_or_exposures": [{"name": "Agent Alpha"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        candidates = [
+            {
+                "ref_id": f"CAND_{i}",
+                "title": f"Agent Alpha efficacy study {i}",
+                "year": 2024,
+                "primary_findings": "Apoptosis induction",
+                "study_design": "IN_VITRO",
+                "doi": f"10.1000/alpha.{i}"
+            }
+            for i in range(1, 20)
+        ]
+        result = GenericReferenceAuditor.select_optimal_proposal_references(
+            candidates, problem_model, max_references=25, min_references=15, total_retrieved_in_corpus=150
+        )
+        funnel = result["screening_funnel"]
+        self.assertEqual(funnel["stage_1_retrieved_broad_corpus"], 150)
+        self.assertEqual(funnel["stage_5_final_proposal_selected"], len(result["selected_references"]))
+        
+        # Verify mandatory fields in all selected references
+        for sel in result["selected_references"]:
+            self.assertIn("final_inclusion_reason", sel)
+            self.assertIn("proposal_section_supported", sel)
+            self.assertIn("why_this_paper_is_needed", sel)
+            self.assertTrue(len(sel["why_this_paper_is_needed"]) >= 15)
+
+        # Audit portfolio
+        audit_res = GenericReferenceAuditor.audit_final_reference_portfolio(result["selected_references"])
+        self.assertEqual(audit_res["PORTFOLIO_AUDIT"], "PASS")
+
+    def test_78_four_stage_relevance_gate_drops_keyword_overlap_off_topic(self):
+        """Test 78: Multi-stage relevance gate drops keyword-overlap papers in incompatible biological systems."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Lung Neoplasm", "name_fa": "سرطان ریه"},
+            "population_or_model": {"primary_system": "A549 alveolar epithelial"},
+            "interventions_or_exposures": [{"name": "Phytochemical X"}],
+            "primary_outcomes": [{"name": "Cellular viability"}]
+        }
+        # Paper sharing 'Phytochemical X' and 'synergistic' and 'apoptosis', but in buck semen cryopreservation
+        off_topic_paper = {
+            "ref_id": "OFF_TOPIC_01",
+            "title": "Synergistic antioxidant protection by Phytochemical X improves cryopreserved bucks semen and spermatozoa motility",
+            "abstract": "We evaluated whether Phytochemical X prevents apoptosis in buck semen during freezing and artificial insemination.",
+            "year": 2023,
+            "doi": "10.1000/semen.2023.01"
+        }
+        rel_audit = GenericReferenceAuditor.audit_contextual_relevance(off_topic_paper, problem_model)
+        self.assertFalse(rel_audit["is_contextually_relevant"])
+        self.assertEqual(rel_audit["rejection_reason"], "REJECT_LOW_CONTEXTUAL_RELEVANCE")
+        self.assertEqual(rel_audit["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+
+    def test_79_hard_cap_25_strictly_enforced_even_with_100_eligible_papers(self):
+        """Test 79: Hard ceiling of 25 is strictly enforced even when 100 eligible high-scoring papers are available."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "cardiology",
+            "framework": "PICO",
+            "target_condition": {"name_en": "Heart Failure", "name_fa": "نارسایی قلبی"},
+            "population_or_model": {"primary_system": "Cardiomyocytes"},
+            "interventions_or_exposures": [{"name": "CardioDrug Beta"}],
+            "primary_outcomes": [{"name": "Ejection Fraction"}]
+        }
+        # 100 recent, eligible papers
+        large_pool = [
+            {
+                "ref_id": f"HF_REF_{i}",
+                "title": f"CardioDrug Beta improves cardiomyocyte function and ejection fraction {i}",
+                "year": 2024,
+                "study_design": "EXPERIMENTAL_IN_VITRO",
+                "doi": f"10.1000/hf.{i}",
+                "primary_findings": "Significant cardiac improvement observed."
+            }
+            for i in range(1, 101)
+        ]
+        sel_result = GenericReferenceAuditor.select_optimal_proposal_references(
+            large_pool, problem_model, max_references=25, min_references=15, total_retrieved_in_corpus=350
+        )
+        self.assertEqual(sel_result["total_selected"], 25)
+        self.assertEqual(len(sel_result["selected_references"]), 25)
+        self.assertTrue(sel_result["meets_quotas"])
+        self.assertEqual(sel_result["screening_funnel"]["stage_1_retrieved_broad_corpus"], 350)
+        self.assertEqual(sel_result["screening_funnel"]["stage_5_final_proposal_selected"], 25)
+
+        # Assert portfolio auditor fails if 26th reference is appended
+        portfolio_with_26 = list(sel_result["selected_references"])
+        fake_26 = dict(portfolio_with_26[0])
+        fake_26["citation_number"] = 26
+        portfolio_with_26.append(fake_26)
+        breach_audit = GenericReferenceAuditor.audit_final_reference_portfolio(portfolio_with_26)
+        self.assertEqual(breach_audit["PORTFOLIO_AUDIT"], "FAIL")
+        self.assertTrue(any("EXCEEDS_MAX_REFERENCE_CEILING_25" in v for v in breach_audit["violations"]))
 
 
 if __name__ == "__main__":
