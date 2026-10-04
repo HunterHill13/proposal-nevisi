@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 test_generalization.py - Multi-Domain Biomedical Pipeline Generalization Tests
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Asserts rigorous, domain-specific scientific invariants across 5 diverse disciplines:
   1. Oncology Preclinical (In vitro combination therapy, synergy, and vehicle boundaries)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 proposal_structure_validator.py - Strict Institutional 14-Section Proposal Structure Gate
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Validates that proposal documents (Markdown and compiled DOCX) strictly adhere
 to the institutional Iranian medical research structure without section merging,

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 self_audit_suite.py - Backward Compatibility Shim for Benchmark Test Suite
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Delegates to tests/test_benchmark_audit.py.
 """

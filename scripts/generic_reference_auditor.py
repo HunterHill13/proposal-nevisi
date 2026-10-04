@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_reference_auditor.py - Topic-Agnostic Bibliographic, Temporal & Citation Auditor
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Performs field-level verification against Crossref/PubMed, audits temporal boundaries,
 validates foundational justifications, and strictly detects citation padding.

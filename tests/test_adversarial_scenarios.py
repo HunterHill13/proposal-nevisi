@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 test_adversarial_scenarios.py - Adversarial Stress-Testing Suite (12 Scenarios)
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Stress-tests the engine against deliberate epistemic deception, fake DOIs,
 partial entailment, ungrounded numbers, observational overclaiming, and bias misattribution.

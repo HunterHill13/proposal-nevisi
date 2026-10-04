@@ -17,9 +17,9 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi (v8.0)** is an autonomous, publication-grade academic research proposal drafting framework and **General-Purpose Evidence-Driven Medical Research Engine**. Redesigned from the ground up to eliminate all hard-coded domain dependencies, v8.0 operates across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, and **Basic Experimental Science**.
+**Proposal-Nevisi (v8.1)** is an autonomous, publication-grade academic research proposal drafting framework and **General-Purpose Evidence-Driven Medical Research Engine**. Redesigned from the ground up to eliminate all hard-coded domain dependencies, v8.1 operates across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, and **Basic Experimental Science**.
 
-### Core Architecture & Capabilities (v8.0)
+### Core Architecture & Capabilities (v8.1)
 
 1. **Dynamic Research Problem Modeler (`scripts/research_problem_model.py`):**
    - Automatically structures questions using domain-appropriate frameworks: **PICO** (interventions), **PECO** (environmental/occupational exposures), **Diagnostic** (index test vs. reference standard), **Prognostic** (risk stratification), or **Mechanistic** (biochemical signaling cascades).
@@ -33,7 +33,7 @@
    - Maps 22 distinct cross-study relationship types (`DIRECT_REPLICATION`, `CONCEPTUAL_REPLICATION`, `EXTENSION`, `TRANSLATIONAL_EXTENSION`, `SUPPORTS`, `CONTRADICTS`, `METHODOLOGICAL_INHERITANCE`, etc.) and builds acyclic Claim Dependency DAGs.
 
 4. **Evidence-Based Research Gap Detector (`scripts/generic_gap_detector.py`):**
-   - Systematically classifies research gaps across 15 universal taxonomy categories (`KNOWLEDGE_GAP`, `MECHANISTIC_GAP`, `METHODOLOGICAL_GAP`, `TRANSLATIONAL_GAP`, `POPULATION_GAP`, `COMBINATION_GAP`, etc.) with importance tiers.
+   - Systematically classifies research gaps across 18 universal taxonomy categories (`KNOWLEDGE_GAP`, `MECHANISTIC_GAP`, `METHODOLOGICAL_GAP`, `TRANSLATIONAL_GAP`, `POPULATION_GAP`, `COMBINATION_GAP`, etc.) with importance tiers.
 
 5. **Study Family De-Duplication & Independent Streams (`scripts/generic_study_family_detector.py`):**
    - Automatically detects shared trial registrations (e.g. `NCTxxxx`), multi-center cohorts (e.g. `UK Biobank`, `NHANES`), and secondary subgroup publications to calculate independent evidence streams and prevent artificial evidence double-counting.

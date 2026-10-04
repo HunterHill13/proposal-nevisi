@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_comparability_engine.py - Study-Design-Aware Pairwise Comparability Analyzer
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Dynamically evaluates comparability across in vitro, animal, clinical, and diagnostic studies
 without forcing a single rigid checklist.

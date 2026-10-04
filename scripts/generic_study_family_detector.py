@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_study_family_detector.py - Study Family & Duplicate Publication De-Duplication
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Detects shared trial IDs (NCTxxxx), shared epidemiological cohorts (NHANES, UK Biobank, etc.),
 and isolates Systematic Reviews from underlying primary papers to prevent double-counting.

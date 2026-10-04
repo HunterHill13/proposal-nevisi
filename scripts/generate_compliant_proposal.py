@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 generate_compliant_proposal.py - Universal Medical Research Proposal Generator
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Generates publication-grade, institutional 14-section medical research proposals
 from structured Problem Models and Study Evidence Records, and compiles them to

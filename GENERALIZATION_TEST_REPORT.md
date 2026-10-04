@@ -95,4 +95,4 @@ This report documents the empirical evaluation of the `proposal-nevisi` core eng
 
 ## 4. Generalization Conclusion
 
-The test suite confirms that the `proposal-nevisi` v8.0 engine successfully decouples evidence-seeking principles from specific therapeutic compounds or experimental systems. The system adapts its schemas, risk-of-bias frameworks, comparability criteria, and query matrices dynamically to the user's research question while maintaining rigorous epistemic integrity across all biomedical domains.
+The test suite confirms that the `proposal-nevisi` v8.1 engine successfully decouples evidence-seeking principles from specific therapeutic compounds or experimental systems. The system adapts its schemas, risk-of-bias frameworks, comparability criteria, and query matrices dynamically to the user's research question while maintaining rigorous epistemic integrity across all biomedical domains.

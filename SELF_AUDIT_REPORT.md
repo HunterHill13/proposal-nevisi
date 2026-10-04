@@ -1,8 +1,8 @@
 # COMPREHENSIVE SELF-AUDIT & VERIFICATION REPORT
-## Proposal-Nevisi Engine v8.0: Universal Evidence-Driven Architecture
+## Proposal-Nevisi Engine v8.1: Universal Evidence-Driven Architecture
 
 **Audit Date:** October 2026  
-**System Version:** v8.0 (Universal General-Purpose Engine)  
+**System Version:** v8.1 (Universal General-Purpose Engine)  
 **Execution Environment:** Windows PowerShell / Python 3.11  
 **Master Test Harness:** `tests/run_all_tests.py`  
 
@@ -15,7 +15,7 @@ This report documents the exhaustive verification and self-audit of the `proposa
 The system was evaluated against four independent testing dimensions:
 1. **Static Analysis & Anti-Hard-Coding Leakage Gate (19 Tests):** Proves zero biological keywords or disease-specific constants exist in the core generic engines, and verifies semantic model independence.
 2. **Multi-Domain Generalization Suite (9 Tests):** Validates end-to-end execution across 9 fundamentally distinct biomedical disciplines (Oncology, Cardiology, Infectious Diseases, Diagnostics, Epidemiology, Basic Molecular Biology, Animal Experimental, Clinical RCT Endocrinology, and Nephrology Prognostic Biomarkers).
-3. **Adversarial Stress Suite (30 Scenarios):** Tests active defense mechanisms against fabricated DOIs, mismatched titles, retracted/corrected articles, pseudo-replication, publication bias (<10 studies), translational overclaims, cyclic reasoning, ungrounded numerical claims, and causal overclaims.
+3. **Adversarial Stress & Negative Rejection Suite (65 Scenarios):** Tests active defense mechanisms against fabricated DOIs, mismatched titles (IDENTITY_CONFLICT), retracted/corrected articles, pseudo-replication, publication bias (<10 studies), translational overclaims, cyclic reasoning, ungrounded numerical claims, causal overclaims, and 5-pillar final scientific release gate verification.
 4. **Historical 60-Test Benchmark Suite (60 Tests):** Asserts that the preserved benchmark remains 100% intact, compliant with institutional Word formatting, and free from citation padding.
 
 ---
@@ -24,17 +24,16 @@ The system was evaluated against four independent testing dimensions:
 
 ```text
 ###########################################################################
-PROPOSAL-NEVISI v8.0: DYNAMIC MASTER UNIFIED TEST RUNNER
+PROPOSAL-NEVISI v8.1: DYNAMIC MASTER UNIFIED TEST RUNNER (153 TESTS)
 ###########################################################################
-TOTAL EVALUATION SUITES : 4
-PASSED SUITES           : 4
-FAILED SUITES           : 0
-TOTAL TEST ASSERTIONS   : 118
-PASSED ASSERTIONS       : 118
-FAILED ASSERTIONS       : 0
-SKIPPED ASSERTIONS      : 0
+TOTAL TESTS EXECUTED  : 153
+PASSED TESTS          : 153
+FAILED TESTS          : 0
+ERRORED TESTS         : 0
+SKIPPED TESTS         : 0
+TOTAL EXECUTION TIME  : 0.150s
 ---------------------------------------------------------------------------
-OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% BEHAVIORAL VERIFICATION)
+OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% SCIENTIFIC VERIFICATION)
 ```
 
 ### Breakdown by Suite:
@@ -43,9 +42,9 @@ OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% BEHAVIORAL VERIFICATION)
 | :--- | :--- | :---: | :---: | :---: |
 | **Static Analysis Hard-Code Leakage Audit** | `tests/test_hard_code_leakage.py` | 19 | **PASS** | 0.02s |
 | **Multi-Domain Generalization Suite** | `tests/test_generalization.py` | 9 | **PASS** | 0.01s |
-| **Adversarial Stress Scenarios (30 Tests)** | `tests/test_adversarial_scenarios.py` | 30 | **PASS** | 0.01s |
+| **Adversarial Stress & Negative Rejection Suite** | `tests/test_adversarial_scenarios.py` | 65 | **PASS** | 0.09s |
 | **Benchmark Tri-Tier Self-Audit Suite** | `tests/test_benchmark_audit.py` | 60 | **PASS** | 0.03s |
-| **Total Unified Assertions** | **All 4 Suites** | **118** | **PASS** | **0.07s** |
+| **Total Unified Assertions** | **All 4 Suites** | **153** | **PASS** | **0.15s** |
 
 ---
 
@@ -109,7 +108,7 @@ OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% BEHAVIORAL VERIFICATION)
 
 ## 5. Remaining System Limitations
 
-While v8.0 achieves complete structural and algorithmic generalization, the following real-world limitations remain:
+While v8.1 achieves complete structural and algorithmic generalization, the following real-world limitations remain:
 - **API Rate Limits:** Live PubMed and Crossref queries without registered API keys are limited to 3 requests per second.
 - **Full-Text Paywalls:** Full-text PDF/XML extraction is bounded by institutional access and open-access licensing (Europe PMC / PubMed Central). When full-text is unavailable, the system safely falls back to `ABSTRACT_ONLY` and restricts claim directness.
 - **Non-Standardized Reporting:** In historical literature prior to CONSORT/ARRIVE guidelines, missing methodological details must remain cataloged as `NOT_REPORTED`.

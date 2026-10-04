@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_claim_entailment_engine.py - Dynamic Claim-Evidence Entailment & Causal Gate
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Decomposes scientific prose into atomic claims, audits 7-level entailment against source evidence,
 enforces causal vs correlational language boundaries, and checks numerical traceability.

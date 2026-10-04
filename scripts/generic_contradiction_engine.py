@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 generic_contradiction_engine.py - Extensible Contradiction & Negative Evidence Analyzer
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Classifies negative evidence across 15 universal categories and resolves
 TRUE_CONTRADICTION vs CONTEXTUAL_DISAGREEMENT without domain-specific hard-coding.

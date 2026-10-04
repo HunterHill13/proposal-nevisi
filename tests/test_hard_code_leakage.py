@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 test_hard_code_leakage.py - Comprehensive Static Analysis & Anti-Hard-Coding Leakage Gate
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Scans ALL Python scripts in scripts/ without manual whitelisting.
 Inspects 100% of lines: including code, docstrings, comments, and __main__ blocks.

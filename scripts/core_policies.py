@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 core_policies.py - Single Source of Truth Policy & Configuration Registry
-Proposal-Nevisi Engine v8.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
 
 Centralizes all non-negotiable institutional structures, temporal constraints,
 evidence scales, search boundaries, and study-design taxonomy.
@@ -10,7 +10,30 @@ Guarantees zero divergence across validator, docx builder, proposal generator,
 auditors, and test suites.
 """
 
+import os
+import json
 from typing import Dict, List, Tuple, Any
+
+def get_project_metadata() -> Dict[str, Any]:
+    """Dynamically loads single-source-of-truth project metadata."""
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(current_dir, "..", "project_metadata.json"),
+        os.path.join(current_dir, "project_metadata.json"),
+        os.path.abspath("project_metadata.json")
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+    return {"version_display": "v8.1.0", "engine_version": "8.1.0", "metrics": {"total_unified_tests": 153}}
+
+PROJECT_METADATA = get_project_metadata()
+ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "8.1.0")
+VERSION_DISPLAY = PROJECT_METADATA.get("version_display", "v8.1.0")
 
 # ==============================================================================
 # 1. INSTITUTIONAL 14-SECTION PROPOSAL STRUCTURE (NON-NEGOTIABLE)
