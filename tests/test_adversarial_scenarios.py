@@ -41,7 +41,9 @@ class TestAdversarialScenarios(unittest.TestCase):
         local = {"ref_id": "REF_MISMATCH", "title": "Oncolytic activity in lung cancer", "doi": "10.1056/NEJMoa123", "year": 2023}
         authoritative = {"title": "Clinical cardiology trial of beta blockers", "doi": "10.1056/NEJMoa123", "year": 2018}
         res = self.auditor.audit_bibliographic_fields(local, authoritative)
-        self.assertEqual(res["verification_status"], "CONFLICT_OR_UNVERIFIED")
+        self.assertIn(res["verification_status"], ["IDENTITY_CONFLICT", "CONFLICT_OR_UNVERIFIED"])
+        self.assertTrue(res.get("identity_conflict", False))
+        self.assertFalse(res.get("core_evidence_eligible", True))
         self.assertFalse(res["year_match"])
 
     def test_03_partial_claim_support(self):
@@ -904,6 +906,89 @@ class TestAdversarialScenarios(unittest.TestCase):
         tier_audit = self.auditor.audit_evidence_retrieval_tier(studies_to_audit)
         self.assertIn("sensitive_claims_demoted", tier_audit)
         self.assertEqual(len(tier_audit["sensitive_claims_demoted"]), 1)
+
+    def test_59_rejection_of_retracted_paper_from_core_evidence(self):
+        """Part 30 Negative Test: Retracted paper is strictly rejected from core evidence synthesis."""
+        retracted_ref = {
+            "ref_id": "REF_RETRACTED_01",
+            "title": "Novel therapy cures cardiovascular illness",
+            "year": 2023,
+            "status": "RETRACTED",
+            "is_retracted": True
+        }
+        res = self.auditor.audit_publication_status(retracted_ref)
+        self.assertEqual(res["publication_status"], "RETRACTED")
+        self.assertEqual(res["action_required"], "EXCLUDE_FROM_EVIDENCE_SYNTHESIS")
+        self.assertFalse(res["is_eligible_for_synthesis"])
+
+    def test_60_rejection_of_identity_conflict_doi_mismatch(self):
+        """Part 30 Negative Test: Reference with DOI pointing to mismatched publication is excluded."""
+        local = {"ref_id": "REF_CONFLICT", "title": "In vitro oncology efficacy of agent X", "doi": "10.1001/jama.2020.123"}
+        verified = {"title": "Pediatric asthma guidelines in primary care", "doi": "10.1001/jama.2020.123"}
+        res = self.auditor.audit_bibliographic_fields(local, verified)
+        self.assertEqual(res["verification_status"], "IDENTITY_CONFLICT")
+        self.assertTrue(res["identity_conflict"])
+        self.assertFalse(res["core_evidence_eligible"])
+
+    def test_61_rejection_of_unjustified_out_of_window_paper(self):
+        """Part 30 Negative Test: Paper outside 6-year window without approved foundational exception is rejected."""
+        old_paper = {
+            "ref_id": "REF_OLD_UNAPPROVED",
+            "publication_date": "2015-04-12",
+            "year": 2015,
+            "evidence_role": "PRIMARY_EVIDENCE",
+            "foundational_justification": {"is_justified": False}
+        }
+        res = self.auditor.audit_temporal_tier(old_paper)
+        self.assertEqual(res["temporal_class"], "OUT_OF_WINDOW_NON_FOUNDATIONAL")
+        self.assertFalse(res["is_temporally_valid"])
+        self.assertFalse(res["core_evidence_eligible"])
+        self.assertFalse(res["recent_evidence_eligible"])
+
+    def test_62_rejection_of_untraced_numerical_claim(self):
+        """Part 30 Negative Test: Numerical claim without complete provenance passage is flagged."""
+        from generic_claim_entailment_engine import GenericClaimEntailmentEngine
+        claims = [
+            {"sentence": "Mortality was reduced by 48.5%.", "claim_id": "C_NUM", "claim_text": "Mortality reduced by 48.5%", "study_id": "S1"} # missing passage & doi
+        ]
+        res = GenericClaimEntailmentEngine.build_claim_provenance_map(claims)
+        self.assertEqual(res["provenance_compliance_status"], "NON_COMPLIANT_UNTRACED_NUMBERS")
+        self.assertEqual(res["untraced_numerical_claims_count"], 1)
+
+    def test_63_rejection_of_causal_claim_from_observational_study(self):
+        """Part 30 Negative Test: Causal verb inferred from observational study design is rejected."""
+        from generic_claim_entailment_engine import GenericClaimEntailmentEngine
+        claim = "Dietary intake of sodium causes cardiovascular mortality."
+        res = GenericClaimEntailmentEngine.audit_causal_language(claim, "OBSERVATIONAL_COHORT_CASE_CONTROL")
+        self.assertEqual(res["status"], "OVERCLAIM_RISK")
+        self.assertIn("causes", res["flagged_causal_words"])
+        self.assertFalse(res["allowed_unconditional_causal_claim"])
+
+    def test_64_rejection_of_granular_claim_from_abstract_only(self):
+        """Part 30 Negative Test: Granular subgroup parameter extracted from abstract-only paper is demoted."""
+        studies = [
+            {"study_id": "S_ABS_LEAP", "retrieval_tier": "ABSTRACT_VERIFIED", "subgroup_analysis_extracted": True, "requires_full_text": True}
+        ]
+        res = self.auditor.audit_evidence_retrieval_tier(studies)
+        self.assertFalse(res["is_tier_compliant"])
+        self.assertEqual(len(res["sensitive_claims_demoted"]), 1)
+        self.assertEqual(res["sensitive_claims_demoted"][0]["reason"], "GRANULAR_PARAMETRIC_CLAIM_REQUIRES_FULL_TEXT")
+
+    def test_65_final_scientific_release_gate_verification(self):
+        """Part 33 Test: Multi-pillar final scientific release gate validation."""
+        from multi_dimensional_qa_gate import MultiDimensionalQAGate
+        res_model = {"framework": "PICO", "interventions_or_exposures": [{"name": "A"}], "primary_outcomes": [{"name": "O"}]}
+        ref_audit = {"retracted_papers_count": 0, "padding_detected_count": 0, "unverified_references_count": 0}
+        claim_audit = {"untraced_numerical_claims_count": 0, "causal_overclaim_violations": 0, "synergy_fallacies_count": 0}
+        meth_audit = {"is_graph_fully_connected": True, "is_feasible": True}
+        out_artifacts = {"sections_count": 14, "section_13_subsections_count": 14, "has_rtl_typography": True}
+
+        gate_res = MultiDimensionalQAGate.execute_scientific_release_gate(
+            res_model, ref_audit, claim_audit, meth_audit, out_artifacts
+        )
+        self.assertEqual(gate_res["FINAL_SCIENTIFIC_RELEASE_STATUS"], "APPROVED")
+        self.assertTrue(gate_res["is_release_authorized"])
+        self.assertEqual(gate_res["passed_gates_count"], 5)
 
 
 if __name__ == "__main__":

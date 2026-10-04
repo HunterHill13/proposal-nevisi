@@ -366,6 +366,74 @@ class GenericClaimEntailmentEngine:
             "audit_note": "All numerical conversions are mathematically traceable." if len(invalid_transforms) == 0 else "Untraced mathematical transformations detected."
         }
 
+    @classmethod
+    def build_claim_citation_matrix(
+        cls,
+        claims: List[Dict[str, Any]],
+        evidence_corpus: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Constructs a CLAIM_CITATION_MATRIX mapping paragraph claims to immediate supporting evidence (Part 13)."""
+        study_map = {s.get("study_id") or s.get("doi"): s for s in evidence_corpus}
+        matrix_rows = []
+        unlinked_claims = []
+
+        for c in claims:
+            cid = c.get("claim_id", "CLM_01")
+            text = c.get("claim_text", "")
+            s_id = c.get("study_id") or c.get("source_study_id")
+            s_rec = study_map.get(s_id)
+
+            if s_rec:
+                matrix_rows.append({
+                    "claim_id": cid,
+                    "claim_text": text,
+                    "study_id": s_id,
+                    "doi": s_rec.get("doi", "NOT_REPORTED"),
+                    "year": s_rec.get("year", "NOT_REPORTED"),
+                    "study_design": s_rec.get("study_design", "NOT_REPORTED"),
+                    "entailment_level": c.get("entailment_level", "DIRECTLY_SUPPORTED"),
+                    "source_location": s_rec.get("source_location", "NOT_REPORTED")
+                })
+            else:
+                unlinked_claims.append(cid)
+
+        is_complete = (len(unlinked_claims) == 0)
+        return {
+            "matrix_type": "CLAIM_CITATION_MATRIX",
+            "total_claims": len(claims),
+            "linked_claims_count": len(matrix_rows),
+            "unlinked_claims_count": len(unlinked_claims),
+            "unlinked_claim_ids": unlinked_claims,
+            "is_matrix_complete": is_complete,
+            "matrix": matrix_rows
+        }
+
+    @classmethod
+    def audit_evidence_to_text_density(
+        cls,
+        text_word_count: int,
+        cited_evidence_count: int,
+        min_density_ratio: float = 0.015
+    ) -> Dict[str, Any]:
+        """Audits EVIDENCE_TO_TEXT_DENSITY ensuring text is grounded in substantive evidence corpus (Part 39).
+        Calculates citations per 100 words. Prevents thin text padding unsupported by evidence.
+        """
+        ratio = (cited_evidence_count / max(text_word_count, 1))
+        citations_per_hundred_words = round(ratio * 100, 2)
+        is_adequate = (ratio >= min_density_ratio)
+
+        return {
+            "audit_type": "EVIDENCE_TO_TEXT_DENSITY_AUDIT",
+            "text_word_count": text_word_count,
+            "cited_evidence_count": cited_evidence_count,
+            "density_ratio": round(ratio, 4),
+            "citations_per_hundred_words": citations_per_hundred_words,
+            "min_required_ratio": min_density_ratio,
+            "status": "DENSE_EVIDENCE_GROUNDED" if is_adequate else "THIN_EVIDENCE_PADDING_SUSPECTED",
+            "is_density_compliant": is_adequate,
+            "recommendation": "Text density meets scientific citation grounding standards." if is_adequate else "Text length is disproportionately large compared to cited evidence; strengthen empirical grounding."
+        }
+
 
 if __name__ == "__main__":
     study_obs = {"study_id": "STUDY_OBS_01", "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL"}

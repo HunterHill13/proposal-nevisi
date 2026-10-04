@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.0)
+### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.1)
 ### موتور جامع و تعمیم‌پذیر سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 146/146 Passed](https://img.shields.io/badge/Unified%20Tests-146%2F146%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 153/153 Passed](https://img.shields.io/badge/Unified%20Tests-153%2F153%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
 
@@ -67,10 +67,10 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
 
-The engine includes a master test harness verifying 146 total assertions across 4 independent test suites:
+The engine includes a master test harness verifying 153 total assertions across 4 independent test suites:
 - **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all core generic scripts and verifies semantic generalization (19 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 9 distinct biomedical fixtures: Preclinical Oncology, Clinical Cardiology, Infectious Disease, Molecular Diagnostics, Epidemiological Cohort, Basic Molecular Biology, Preclinical Animal Pharmacology, Endocrinology Clinical RCT, and Nephrology Prognostic Biomarkers (9 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios (`test_adversarial_scenarios.py`):** 58 stress tests evaluating fake citations, mismatched DOIs, retracted/corrected articles, publication status, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA accounting, multi-layer graph, sample size uncertainty, unseen novel domains, non-interventional frameworks, and multi-intervention interactions (58 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 65 stress tests evaluating fake citations, mismatched DOIs (IDENTITY_CONFLICT), retracted/corrected articles, publication status, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA accounting, multi-layer graph, sample size uncertainty, unseen novel domains, non-interventional frameworks, multi-intervention interactions, and multi-pillar final scientific release gate verification (65 tests - **PASS**).
 - **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
 
 ```bash
@@ -94,7 +94,7 @@ python tests/run_all_tests.py
 6. **دروازه زبان علّی و ره‌گیری عددی:** جلوگیری از ادعای علیت بر پایه داده‌های همبستگی و ثبت دقیق خاستگاه ادعاها (`CLAIM_PROVENANCE_MAP`).
 7. **طراحی پروتکل پویا و اعتبارسنجی ساختار ۱۴ گانه:** تولید پویای جدول متغیرها، گانت چارت زمان‌بندی، آزمون‌های آماری و ممیزی سخت‌گیرانه ساختار ۱۴ گانه و زیربخش‌های ۱۳-۱ تا ۱۳-۱۴.
 8. **خروجی رسمی ۱۴ گانه ورد:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و نگارش یک پاراگراف تفصیلی مجزا برای تک‌تک مراجع در مرور منابع.
-9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۱۴۶ تستی بدون ادعای ساختگی (146 / 146 PASS).
+9. **آزمون‌های اعتبارسنجی چهارگانه:** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۱۵۳ تستی بدون ادعای ساختگی (153 / 153 PASS).
 
 ---
 

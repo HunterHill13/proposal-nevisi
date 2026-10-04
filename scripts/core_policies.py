@@ -75,10 +75,21 @@ SECTION_CONTENT_EXPECTATIONS: Dict[int, Dict[str, Any]] = {
 
 class TemporalPolicyConfig:
     import datetime
-    CURRENT_OPERATING_YEAR: int = datetime.datetime.now().year
+    CURRENT_OPERATING_DATE: datetime.date = datetime.date.today()
+    CURRENT_OPERATING_YEAR: int = CURRENT_OPERATING_DATE.year
     MAX_PRIMARY_EVIDENCE_AGE_YEARS: int = 6
     PRIMARY_EVIDENCE_CUTOFF_YEAR: int = CURRENT_OPERATING_YEAR - 6
-    MINIMUM_RECENT_PRIMARY_PROPORTION: float = 0.70  # >= 70% of main evidence must be recent
+
+    # 6 Standard Temporal Classes (Part 3)
+    TEMPORAL_CLASSES = [
+        "CORE_RECENT_PRIMARY",
+        "CORE_RECENT_SECONDARY",
+        "HISTORICAL_BACKGROUND",
+        "FOUNDATIONAL_METHODOLOGY",
+        "LANDMARK_GUIDELINE",
+        "CLASSICAL_METHOD",
+        "OUT_OF_WINDOW_NON_FOUNDATIONAL"
+    ]
 
     APPROVED_FOUNDATIONAL_CATEGORIES: Dict[str, str] = {
         "FOUNDATIONAL_MATHEMATICAL_MODEL": "Seminal mathematical/pharmacological framework, index, or synergy equation",
@@ -98,6 +109,16 @@ class TemporalPolicyConfig:
     def get_cutoff_year(cls, current_year: int = None) -> int:
         cy = current_year or cls.CURRENT_OPERATING_YEAR
         return cy - cls.MAX_PRIMARY_EVIDENCE_AGE_YEARS
+
+    @classmethod
+    def get_cutoff_date(cls, current_date=None):
+        import datetime
+        cd = current_date or cls.CURRENT_OPERATING_DATE
+        try:
+            return cd.replace(year=cd.year - cls.MAX_PRIMARY_EVIDENCE_AGE_YEARS)
+        except ValueError:
+            # Handle Feb 29 leap year
+            return cd.replace(month=2, day=28, year=cd.year - cls.MAX_PRIMARY_EVIDENCE_AGE_YEARS)
 
 # ==============================================================================
 # 3. SEVEN-LEVEL CLAIM ENTAILMENT SCALE

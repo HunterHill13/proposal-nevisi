@@ -2,7 +2,7 @@
 ## Universal Evidence Synthesis Across Oncology, Cardiology, Infectious Diseases, and Diagnostics
 
 **Report Date:** October 2026  
-**System Architecture:** Proposal-Nevisi Engine v8.0  
+**System Architecture:** Proposal-Nevisi Engine v8.1  
 **Harness Module:** `tests/test_generalization.py`  
 
 ---

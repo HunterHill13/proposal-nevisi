@@ -347,38 +347,50 @@ class DynamicProtocolDesigner:
 
         chain_breaks = []
 
-        # 1. Check Independent & Dependent Variables
+        # 1. Check Research Questions
+        questions = model_dict.get("research_questions", [])
+        
+        # 2. Check Independent & Dependent Variables
         if not interventions:
             chain_breaks.append("MISSING_INDEPENDENT_VARIABLE")
         if not outcomes:
             chain_breaks.append("MISSING_DEPENDENT_VARIABLE")
 
-        # 2. Check Objective <-> Endpoint Linkage
+        # 3. Check Objective <-> Endpoint Linkage
         if objectives and not endpoints:
             chain_breaks.append("OBJECTIVE_WITHOUT_ENDPOINT")
 
-        # 3. Check Endpoint <-> Variable Linkage
+        # 4. Check Endpoint <-> Variable Linkage
         outcome_names = [o.get("name", "").lower() for o in outcomes]
         for ep in endpoints:
             if outcome_names and not any(o in str(ep).lower() or str(ep).lower() in o for o in outcome_names):
                 chain_breaks.append(f"ENDPOINT_WITHOUT_VARIABLE: {ep}")
 
-        # 4. Check Variable <-> Analysis Linkage
+        # 5. Check Variable <-> Analysis Linkage
         stat_plan = cls.generate_statistical_plan(model_dict)
         if not stat_plan.get("primary_analysis"):
             chain_breaks.append("VARIABLE_WITHOUT_ANALYSIS")
 
-        # 5. Check Hypothesis <-> Objective Alignment
+        # 6. Check Hypothesis <-> Objective Alignment
         if hypotheses and not objectives:
             chain_breaks.append("HYPOTHESIS_WITHOUT_OBJECTIVE")
         elif hypotheses and objectives and len(hypotheses) > len(objectives) + 2:
             chain_breaks.append("UNGROUNDED_HYPOTHESIS_EXCEEDING_OBJECTIVES")
+
+        # 7. Check Question <-> Hypothesis / Objective Linkage
+        if questions and not (hypotheses or objectives):
+            chain_breaks.append("QUESTION_WITHOUT_OBJECTIVE_OR_HYPOTHESIS")
 
         is_consistent = (len(chain_breaks) == 0)
 
         return {
             "consistency_status": "CONSISTENT" if is_consistent else "DISCREPANCY_DETECTED",
             "is_graph_fully_connected": is_consistent,
+            "chain_elements_verified": [
+                "Question", "Outcome", "Objective", "Hypothesis",
+                "Independent_Variable", "Dependent_Variable", "Analysis_Method"
+            ],
+            "questions_count": len(questions),
             "objectives_count": len(objectives),
             "hypotheses_count": len(hypotheses),
             "interventions_count": len(interventions),

@@ -60,8 +60,14 @@ class GenericReferenceAuditor:
             status = "EXACT_VERIFIED"
         elif sim >= 0.60:
             status = "MINOR_VARIATION"
+        elif (local_ref.get("doi") and verified_metadata.get("doi")) and sim < 0.40:
+            status = "IDENTITY_CONFLICT"
         else:
             status = "CONFLICT_OR_UNVERIFIED"
+
+        identity_conflict = (status == "IDENTITY_CONFLICT") or (sim < 0.40 and bool(title_local and title_verified))
+        if identity_conflict and status != "RETRACTED":
+            status = "IDENTITY_CONFLICT"
 
         return {
             "ref_id": local_ref.get("ref_id"),
@@ -71,36 +77,90 @@ class GenericReferenceAuditor:
             "author_overlap": author_match,
             "doi": local_ref.get("doi"),
             "is_retracted": is_retracted,
-            "is_corrected": is_corrected
+            "is_corrected": is_corrected,
+            "identity_conflict": identity_conflict,
+            "core_evidence_eligible": (status in ["EXACT_VERIFIED", "MINOR_VARIATION", "CORRECTED"])
         }
 
     def audit_temporal_tier(self, ref: Dict[str, Any]) -> Dict[str, Any]:
-        """Enforces the 6-year recency rule with explicit AGE_JUSTIFICATION storage (Prompt Pt 2)."""
-        year = ref.get("year", self.current_year)
+        """Enforces the 6-year recency rule with exact date parsing and 7 temporal classes (Parts 2 & 3)."""
+        pub_date_str = ref.get("publication_date") or ref.get("date")
+        year = ref.get("year")
+        date_uncertain = False
+
+        if pub_date_str:
+            match = re.match(r'^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?', str(pub_date_str).strip())
+            if match:
+                parsed_year = int(match.group(1))
+                year = year or parsed_year
+            else:
+                date_uncertain = True
+        elif not year:
+            date_uncertain = True
+
+        if date_uncertain and not year:
+            return {
+                "ref_id": ref.get("ref_id"),
+                "year": None,
+                "publication_date": pub_date_str,
+                "temporal_tier": "DATE_UNCERTAIN",
+                "temporal_class": "DATE_UNCERTAIN",
+                "evidence_role": "UNCERTAIN_ROLE",
+                "age_justification": "DATE_UNCERTAIN",
+                "is_temporally_valid": False,
+                "core_evidence_eligible": False,
+                "recent_evidence_eligible": False,
+                "audit_note": "Publication date and year are completely unverified/uncertain."
+            }
+
+        year = year or self.current_year
         justification = ref.get("foundational_justification", {})
+        evidence_role = ref.get("evidence_role", "PRIMARY_EVIDENCE")
 
         if year >= self.cutoff_year:
             tier = "RECENT_PRIMARY_EVIDENCE"
+            temporal_class = "CORE_RECENT_PRIMARY" if evidence_role == "PRIMARY_EVIDENCE" else "CORE_RECENT_SECONDARY"
             age_justification = "RECENT_DIRECT_EVIDENCE"
             justified = True
+            core_eligible = True
+            recent_eligible = True
             note = f"Published in {year} (within {self.max_primary_age}-year window)."
         else:
             tier = "FOUNDATIONAL/HISTORICAL_EVIDENCE"
             if justification.get("is_justified"):
-                age_justification = justification.get("category", "HISTORICAL_FOUNDATION")
+                cat = justification.get("category", "HISTORICAL_FOUNDATION")
+                age_justification = cat
                 justified = True
+                recent_eligible = False
+                core_eligible = (evidence_role != "PRIMARY_EVIDENCE")
+                if cat in ["FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD", "METHODOLOGICAL_LANDMARK"]:
+                    temporal_class = "FOUNDATIONAL_METHODOLOGY"
+                elif cat in ["ORIGINAL_DIAGNOSTIC_CRITERIA", "LANDMARK_HISTORICAL_BENCHMARK"]:
+                    temporal_class = "LANDMARK_GUIDELINE"
+                elif cat in ["CLASSICAL_STATISTICAL_METHOD"]:
+                    temporal_class = "CLASSICAL_METHOD"
+                else:
+                    temporal_class = "HISTORICAL_BACKGROUND"
                 note = f"Foundational exception approved: {age_justification} - {justification.get('rationale')}"
             else:
+                temporal_class = "OUT_OF_WINDOW_NON_FOUNDATIONAL"
                 age_justification = "OUTDATED_DIRECT_EVIDENCE"
                 justified = False
+                core_eligible = False
+                recent_eligible = False
                 note = f"Published in {year} (< {self.cutoff_year}) without verified foundational justification. Must be separated from core recent evidence."
 
         return {
             "ref_id": ref.get("ref_id"),
             "year": year,
+            "publication_date": pub_date_str,
             "temporal_tier": tier,
+            "temporal_class": temporal_class,
+            "evidence_role": evidence_role,
             "age_justification": age_justification,
             "is_temporally_valid": justified,
+            "core_evidence_eligible": core_eligible,
+            "recent_evidence_eligible": recent_eligible,
             "audit_note": note
         }
 
@@ -311,6 +371,15 @@ class GenericReferenceAuditor:
                     "reason": "QUANTITATIVE_CLAIM_FROM_METADATA_ONLY"
                 })
 
+            # Abstract-only cannot sustain granular methodology, subgroup, or deep parameter claims (Part 10)
+            has_granular = bool(s.get("requires_full_text") or s.get("subgroup_analysis_extracted") or s.get("unreported_in_abstract"))
+            if has_granular and tier in ["ABSTRACT_VERIFIED", "METADATA_ONLY", "UNVERIFIED"]:
+                sensitive_claims_demoted.append({
+                    "study_id": s.get("study_id"),
+                    "tier": tier,
+                    "reason": "GRANULAR_PARAMETRIC_CLAIM_REQUIRES_FULL_TEXT"
+                })
+
         return {
             "tier_distribution": tier_counts,
             "total_studies_audited": len(study_evidence),
@@ -391,6 +460,59 @@ class GenericReferenceAuditor:
             "retracted_studies": retracted_studies,
             "unchanged_studies_count": len(unchanged_studies),
             "unchanged_studies": unchanged_studies
+        }
+
+    def audit_core_evidence_recency(
+        self,
+        core_claims: List[Dict[str, Any]],
+        references: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Audits that core primary scientific claims are supported by recent evidence within 6-year window (Part 4).
+        Historical or foundational references are permitted for background/methodology, but core direct claims
+        must have active recent empirical support.
+        """
+        ref_map = {r.get("ref_id"): r for r in references}
+        claims_lacking_recent_support = []
+        verified_core_claims = []
+
+        for claim in core_claims:
+            cid = claim.get("claim_id", "CLM_UNKNOWN")
+            ctext = claim.get("claim_text", "")
+            cited_refs = claim.get("supporting_reference_ids", [])
+            is_core_claim = claim.get("is_core_claim", True)
+
+            if not is_core_claim:
+                continue
+
+            has_recent = False
+            for rid in cited_refs:
+                r = ref_map.get(rid)
+                if r:
+                    audit_res = self.audit_temporal_tier(r)
+                    if audit_res.get("recent_evidence_eligible", False) and audit_res.get("temporal_class") == "CORE_RECENT_PRIMARY":
+                        has_recent = True
+                        break
+
+            if has_recent:
+                verified_core_claims.append(cid)
+            else:
+                claims_lacking_recent_support.append({
+                    "claim_id": cid,
+                    "claim_text": ctext,
+                    "cited_reference_ids": cited_refs,
+                    "issue": "CORE_CLAIM_LACKS_RECENT_PRIMARY_SUPPORT"
+                })
+
+        all_compliant = (len(claims_lacking_recent_support) == 0)
+        return {
+            "audit_type": "CORE_EVIDENCE_RECENCY_AUDIT",
+            "status": "COMPLIANT" if all_compliant else "NON_COMPLIANT_OUTDATED_CORE_CLAIMS",
+            "is_compliant": all_compliant,
+            "total_core_claims_evaluated": len(verified_core_claims) + len(claims_lacking_recent_support),
+            "verified_recent_claims_count": len(verified_core_claims),
+            "claims_lacking_recent_support_count": len(claims_lacking_recent_support),
+            "claims_lacking_recent_support": claims_lacking_recent_support,
+            "rule": f"All core direct claims must be substantiated by primary studies published within {self.max_primary_age} years (>= {self.cutoff_year})."
         }
 
 

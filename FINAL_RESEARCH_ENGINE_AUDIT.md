@@ -3,7 +3,7 @@
 
 **Date:** 2026-10-04  
 **Engine Version:** v8.1 (Universal, Topic-Agnostic, Configuration-Driven, Evidence-First)  
-**Test Suite Summary:** **146 / 146 PASS (100% Pass, 0 Failures, 0 Errors, 0.181s Execution Time)**  
+**Test Suite Summary:** **153 / 153 PASS (100% Pass, 0 Failures, 0 Errors, 0.150s Execution Time)**  
 
 ---
 
@@ -17,9 +17,9 @@ The Proposal-Nevisi architecture underwent an exhaustive forensic audit and engi
 | :--- | :--- | :--- | :--- | :--- |
 | `test_hard_code_leakage.py` | Static code analysis against biological/chemical entities, drugs, viruses, and cell lines across all `scripts/` | 19 Tests | 19 / 19 PASS | Clean |
 | `test_general_domains.py` / `test_generalization.py` | 9 independent medical & biomedical disciplines (oncology, cardiology, infectious diseases, diagnostics, nephrology, endocrinology, etc.) | 9 Tests | 9 / 9 PASS | Clean |
-| `test_adversarial_scenarios.py` | Adversarial scenarios, stress tests, unseen topics, non-interventional frameworks, multi-agent interactions, epistemic gates | 58 Tests | 58 / 58 PASS | Clean |
+| `test_adversarial_scenarios.py` | Adversarial scenarios, stress tests, negative rejection tests, unseen topics, non-interventional frameworks, multi-agent interactions, epistemic gates | 65 Tests | 65 / 65 PASS | Clean |
 | `self_audit_suite.py` | Benchmark assertions, structural compliance, Word format, Iranian institutional 14 sections | 60 Tests | 60 / 60 PASS | Clean |
-| **Unified Test Suite** | **`tests/run_all_tests.py`** | **146 Tests** | **146 / 146 PASS** | **100% PASS** |
+| **Unified Test Suite** | **`tests/run_all_tests.py`** | **153 Tests** | **153 / 153 PASS** | **100% PASS** |
 
 ---
 
