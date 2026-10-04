@@ -91,8 +91,41 @@ class ProposalStructureValidator:
         if sec_3_match and sec_4_match:
             sec_3_text = text[sec_3_match.end():sec_4_match.start()]
             sec_3_words = len(sec_3_text.split())
+        
+        # 5. Reference count and Section 14 ceiling audit (Strict 15-25 References)
+        sec_14_text = ""
+        sec_14_match = re.search(r"(?:^|\n)##?\s*(?:14|۱۴)[\.\-:]?\s*(?:منابع|فهرست\s*منابع|references)", text, re.IGNORECASE)
+        if sec_14_match:
+            sec_14_text = text[sec_14_match.end():]
+        ref_entries = re.findall(r'(?:^|\n)\s*\[\s*\d+\s*\]', sec_14_text)
+        ref_count = len(ref_entries)
+        
+        ref_count_valid = True
+        ref_violation = None
+        if sec_14_match and ref_count > 0:
+            if ref_count > 25:
+                ref_count_valid = False
+                ref_violation = f"EXCEEDS_MAX_REFERENCE_CEILING_25 (Count: {ref_count}, Ceiling: 25)"
+            elif ref_count < 15:
+                ref_count_valid = False
+                ref_violation = f"BELOW_MIN_REFERENCE_FLOOR_15 (Count: {ref_count}, Floor: 15)"
 
-        passed = (len(missing_sections) == 0 and len(missing_subsections) == 0 and not ordering_violated and has_var_table and has_timeline)
+        # 6. Check Section 3 for prohibited artificial axis grouping headers
+        has_artificial_axis_headers = False
+        if sec_3_match and sec_4_match:
+            sec_3_body = text[sec_3_match.end():sec_4_match.start()]
+            if re.search(r'###\s*محور\s+', sec_3_body) or re.search(r'###\s*Axis\s+', sec_3_body, re.IGNORECASE):
+                has_artificial_axis_headers = True
+
+        passed = (
+            len(missing_sections) == 0 and
+            len(missing_subsections) == 0 and
+            not ordering_violated and
+            has_var_table and
+            has_timeline and
+            (ref_count_valid or not sec_14_match) and
+            not has_artificial_axis_headers
+        )
 
         status_str = "PASS" if passed else "FAIL"
 
@@ -104,6 +137,10 @@ class ProposalStructureValidator:
             "section_ordering_intact": not ordering_violated,
             "variable_table_present": has_var_table,
             "timeline_schedule_present": has_timeline,
+            "reference_count": ref_count,
+            "reference_count_valid": ref_count_valid,
+            "reference_ceiling_violation": ref_violation,
+            "has_artificial_axis_headers": has_artificial_axis_headers,
             "total_word_count": total_word_count,
             "problem_statement_word_count": sec_2_words,
             "literature_review_word_count": sec_3_words,

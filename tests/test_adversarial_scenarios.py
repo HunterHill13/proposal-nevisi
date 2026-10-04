@@ -1097,6 +1097,208 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(res["consistency_status"], "CONSISTENCY_BREACH")
         self.assertIn("DIAGNOSTIC_FRAMEWORK_ANALYSIS_MISMATCH", res["detected_inconsistencies"])
 
+    def test_71_contextual_relevance_gate_rejects_disconnected_biological_system(self):
+        """Test 71: Mandatory Contextual Relevance Gate strictly rejects papers situated in disconnected
+        biological contexts (e.g. buck semen cryopreservation) despite matching intervention chemical keywords."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Non-Small Cell Lung Carcinoma", "name_fa": "سرطان ریه", "synonyms": ["NSCLC"]},
+            "population_or_model": {"primary_system": "A549 pulmonary carcinoma cell line"},
+            "interventions_or_exposures": [{"name": "Lupeol", "synonyms": ["Lup-20(29)-en-3beta-ol"]}],
+            "primary_outcomes": [{"name": "Cell Viability Inhibition"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Apoptosis", "target_molecules": ["Caspase-3"]}]
+        }
+        # Disconnected context paper: Lupeol in bucks semen cryopreservation
+        irrelevant_paper = {
+            "ref_id": "REF_IRR_01",
+            "title": "Synergistic enhancement of post-thaw sperm motility: Lupeol improves the quality of cryopreserved bucks semen",
+            "abstract": "The present study investigated whether dietary triterpenoid Lupeol protects buck spermatozoa during freeze-thaw cycles in livestock artificial insemination.",
+            "year": 2023,
+            "model_system": "Caprine bucks spermatozoa",
+            "target_condition": "Veterinary cryopreservation injury"
+        }
+        audit_res = GenericReferenceAuditor.audit_contextual_relevance(irrelevant_paper, problem_model)
+        self.assertFalse(audit_res["is_contextually_relevant"])
+        self.assertEqual(audit_res["rejection_reason"], "REJECT_LOW_CONTEXTUAL_RELEVANCE")
+        self.assertEqual(audit_res["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+        self.assertIn("semen", audit_res["matched_incompatible_indicator"])
+
+    def test_72_reference_selection_strictly_enforces_ceiling_25(self):
+        """Test 72: Optimal proposal reference selection strictly enforces hard ceiling of maximum 25 references."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "oncology",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Lung Cancer", "name_fa": "سرطان ریه"},
+            "population_or_model": {"primary_system": "A549 cells"},
+            "interventions_or_exposures": [{"name": "Compound X"}],
+            "primary_outcomes": [{"name": "Viability"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Apoptosis", "target_molecules": ["Caspase-3"]}]
+        }
+        # Generate 40 candidate records
+        candidates = []
+        for i in range(1, 41):
+            candidates.append({
+                "ref_id": f"REF_{i:02d}",
+                "title": f"Empirical evaluation of Compound X efficacy in cellular model {i}",
+                "year": 2021 + (i % 5),
+                "authors": [f"Author_{i} A"],
+                "journal": "J Cancer Res",
+                "doi": f"10.1000/jcr.{i:04d}",
+                "pmid": f"3000{i:04d}",
+                "study_design": "IN_VITRO_EXPERIMENTAL",
+                "model_system": "A549 cells",
+                "intervention_agent": "Compound X",
+                "primary_findings": f"Inhibition of proliferation at concentration {i} uM",
+                "endpoints_evaluated": "Viability and apoptosis",
+                "evidence_role": "PRIMARY_EVIDENCE"
+            })
+        selection = GenericReferenceAuditor.select_optimal_proposal_references(candidates, problem_model, max_references=25)
+        self.assertEqual(selection["selection_status"], "OPTIMAL_SELECTION_COMPLETE")
+        self.assertLessEqual(selection["total_selected"], 25)
+        self.assertEqual(selection["total_selected"], 25)
+        self.assertLessEqual(len(selection["selected_references"]), 25)
+        self.assertTrue(selection["meets_quotas"])
+        # Invariant: Citations are sequential 1..N
+        citation_nums = [r["citation_number"] for r in selection["selected_references"]]
+        self.assertEqual(citation_nums, list(range(1, 26)))
+
+    def test_73_high_citation_count_alone_cannot_bypass_temporal_policy(self):
+        """Test 73: Outdated direct evidence (> 6 years old) cannot bypass temporal policy through high citation counts alone."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        auditor = GenericReferenceAuditor(current_year=2026, max_primary_age_years=6)
+        # Highly cited (850 citations) routine observational trial from 2012
+        highly_cited_old_paper = {
+            "ref_id": "REF_HIGH_CITE_OLD",
+            "title": "Clinical observational analysis of drug response in cohort",
+            "year": 2012,
+            "evidence_role": "PRIMARY_DIRECT_EFFICACY",
+            "foundational_justification": {
+                "is_justified": True,
+                "category": "HISTORICAL_BACKGROUND",
+                "rationale": "High citation count paper reporting standard observational response",
+                "citation_count": 850
+            }
+        }
+        res = auditor.audit_temporal_tier(highly_cited_old_paper)
+        self.assertFalse(res["core_evidence_eligible"])
+        self.assertFalse(res["recent_evidence_eligible"])
+        self.assertEqual(res["temporal_class"], "OUT_OF_WINDOW_NON_FOUNDATIONAL")
+        self.assertEqual(res["age_justification"], "OUTDATED_DIRECT_EVIDENCE")
+
+    def test_74_14_factor_reference_scoring_composite_derivation(self):
+        """Test 74: Reference multi-factor scoring evaluates all 14 criteria and computes bounded composite score."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        problem_model = {
+            "domain": "cardiology",
+            "framework": "PICO",
+            "target_condition": {"name_en": "Heart Failure", "name_fa": "نارسایی قلبی"},
+            "population_or_model": {"primary_system": "Adult Patients"},
+            "interventions_or_exposures": [{"name": "Drug A"}],
+            "primary_outcomes": [{"name": "Hospitalization Rate"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Remodeling"}]
+        }
+        record = {
+            "ref_id": "REF_CARDIO_01",
+            "title": "Randomized evaluation of Drug A in adult heart failure patients",
+            "year": 2024,
+            "authors": ["Smith J", "Doe A"],
+            "journal": "Circulation",
+            "doi": "10.1161/circ.2024.12345",
+            "pmid": "38100123",
+            "study_design": "RANDOMIZED_CONTROLLED_TRIAL",
+            "risk_of_bias": {"overall_rob": "LOW_RISK"},
+            "quantitative_parameters": "HR = 0.72 (95% CI: 0.61-0.85)",
+            "claims_supported": ["CLM_01"]
+        }
+        score_data = GenericReferenceAuditor.score_reference(record, problem_model)
+        self.assertIn("composite_score", score_data)
+        self.assertGreaterEqual(score_data["composite_score"], 70.0)
+        factors = score_data["factor_scores"]
+        self.assertEqual(len(factors), 14)
+        for criterion in [
+            "direct_relevance", "model_relevance", "intervention_relevance", "comparator_relevance",
+            "outcome_relevance", "mechanistic_relevance", "methodological_quality", "recency",
+            "directness_of_evidence", "uniqueness_non_redundancy", "necessity_for_specific_claim",
+            "sentence_support_fidelity", "scientific_authority", "reliable_metadata"
+        ]:
+            self.assertIn(criterion, factors)
+            self.assertGreaterEqual(factors[criterion], 0)
+            self.assertLessEqual(factors[criterion], 10)
+
+    def test_75_problem_decomposition_and_adaptive_search_iteration(self):
+        """Test 75: Dynamic search problem decomposition and adaptive query expansion."""
+        from generic_search_planner import GenericSearchPlanner
+        problem_model = {
+            "domain": "infectious_disease",
+            "framework": "PICO",
+            "target_condition": {"name_en": "Influenza A", "mesh_term": "Influenza, Human", "synonyms": ["Flu"]},
+            "population_or_model": {"primary_system": "MDCK cell culture"},
+            "interventions_or_exposures": [{"name": "Antiviral Z", "chemical_or_biological_class": "Neuraminidase Inhibitor"}],
+            "primary_outcomes": [{"name": "Viral Titer"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Neuraminidase Cleavage", "target_molecules": ["NA"]}]
+        }
+        decomp = GenericSearchPlanner.decompose_problem_for_search(problem_model)
+        self.assertEqual(decomp["domain"], "infectious_disease")
+        self.assertEqual(decomp["condition_facets"]["primary_term"], "Influenza A")
+        self.assertIn("Antiviral Z", decomp["intervention_facets"]["agent_names"])
+
+        # Test adaptive iteration with incomplete corpus missing safety and replication
+        current_corpus = [{
+            "study_id": "S_01",
+            "title": "Antiviral Z reduces Influenza A viral titer in MDCK culture",
+            "evidence_role": "PRIMARY_DIRECT_EFFICACY",
+            "primary_findings": "Significant titer reduction"
+        }]
+        adapt_res = GenericSearchPlanner.adaptive_search_iteration(current_corpus, problem_model, iteration_number=1)
+        self.assertEqual(adapt_res["iteration_number"], 1)
+        self.assertFalse(adapt_res["evidence_completeness_status"])
+        self.assertTrue(len(adapt_res["adaptive_expanded_queries"]) > 0)
+
+    def test_76_proposal_generation_eliminates_artificial_axis_headers_and_caps_references(self):
+        """Test 76: Proposal generator eliminates artificial axis headers and strictly adheres to max 25 references."""
+        from generate_compliant_proposal import ProposalGenerator
+        from proposal_structure_validator import ProposalStructureValidator
+        spec = {
+            "research_title_fa": "بررسی اثرات مداخله X بر سیستم Y",
+            "research_title_en": "Evaluation of Intervention X on System Y",
+            "domain": "general_biomedical",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Pathological Condition", "name_fa": "شرایط پاتولوژیک"},
+            "population_or_model": {"primary_system": "Cellular Model Y"},
+            "interventions_or_exposures": [{"name": "Intervention X"}],
+            "primary_outcomes": [{"name": "Cellular Response"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Signaling Cascade"}],
+            "studies": [
+                {
+                    "ref_id": f"REF_{i}",
+                    "title": f"Experimental evaluation {i}",
+                    "authors": [f"Researcher_{i} A"],
+                    "year": 2024,
+                    "journal": "J Biomed Res",
+                    "doi": f"10.1000/jbr.{i}",
+                    "primary_findings": f"Observed response at dose {i}",
+                    "study_design": "IN_VITRO_EXPERIMENTAL",
+                    "model_system": "Cellular Model Y",
+                    "intervention_agent": "Intervention X"
+                }
+                for i in range(1, 35) # 34 candidate studies
+            ]
+        }
+        md_text = ProposalGenerator.assemble_proposal(spec)
+        # Check no artificial axis headers
+        self.assertNotIn("### محور", md_text)
+        self.assertNotIn("### Axis", md_text)
+        
+        # Validate structure
+        val_res = ProposalStructureValidator.validate_proposal_text(md_text)
+        self.assertEqual(val_res["PROPOSAL_STRUCTURE_VALIDATION"], "PASS")
+        self.assertLessEqual(val_res["reference_count"], 25)
+        self.assertEqual(val_res["reference_count"], 25)
+        self.assertTrue(val_res["reference_count_valid"])
+
 
 if __name__ == "__main__":
     unittest.main()

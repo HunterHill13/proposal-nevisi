@@ -105,8 +105,43 @@ SECTION_CONTENT_EXPECTATIONS: Dict[int, Dict[str, Any]] = {
     11: {"min_variables": 3, "required_columns": ["name", "role", "type", "operational_def", "measurement", "unit"]},
     12: {"min_phases": 4, "gantt_chart_required": True},
     13: {"min_subsections": 14, "min_words": 500},
-    14: {"min_references": 15, "zero_padding_rule": True}
+    14: {"min_references": 15, "max_references": 25, "zero_padding_rule": True}
 }
+
+MAX_FINAL_REFERENCES: int = 25
+MIN_FINAL_REFERENCES: int = 15
+
+# ==============================================================================
+# 8. CONTEXTUAL RELEVANCE & BIOLOGICAL COMPATIBILITY POLICIES
+# ==============================================================================
+
+class ContextualRelevanceConfig:
+    """Configures contextual relevance assessment, biological transferability, and irrelevant context exclusion."""
+    MIN_OVERALL_RELEVANCE_THRESHOLD: float = 0.50
+    
+    # 8 Contextual Relevance Dimensions
+    RELEVANCE_DIMENSIONS = [
+        "direct_relevance",
+        "model_relevance",
+        "intervention_relevance",
+        "outcome_relevance",
+        "mechanistic_relevance",
+        "methodological_relevance",
+        "transferability",
+        "overall_relevance"
+    ]
+    
+    # Standard Rejection Categories
+    REJECTION_REASONS = {
+        "REJECT_LOW_CONTEXTUAL_RELEVANCE": "Insufficient alignment with target clinical/biological context; keyword match without contextual transferability",
+        "REJECT_INCOMPATIBLE_BIOLOGICAL_SYSTEM": "Study evaluated incompatible non-target biological system without transferable methodology",
+        "REJECT_UNTRANSFERABLE_SPECIES": "Disparate non-target organism without translational or mechanistic bearing on target disease",
+        "REJECT_DISCONNECTED_ENDPOINT": "Endpoints evaluated share zero biological, pathological, or pharmacological overlap with target research question",
+        "REJECT_RETRACTED_OR_CONFLICT": "Article is retracted or exhibits severe identity/integrity conflict",
+        "REJECT_TEMPORAL_BREACH": "Article exceeds 6-year recency threshold without approved foundational methodology exception"
+    }
+
+
 
 # ==============================================================================
 # 2. TEMPORAL EVIDENCE POLICY CONFIGURATION

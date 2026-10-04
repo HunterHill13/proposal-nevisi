@@ -358,6 +358,166 @@ class GenericSearchPlanner:
             }
         }
 
+    @classmethod
+    def decompose_problem_for_search(cls, model: Any) -> Dict[str, Any]:
+        """Decomposes any research problem model into multi-faceted search targets:
+        question components, MeSH hierarchies, chemical/intervention synonyms,
+        biological model variants, outcome biomarkers, pathway nodes, and safety boundaries.
+        """
+        if hasattr(model, "to_dict"):
+            m_dict = model.to_dict()
+        elif isinstance(model, dict):
+            m_dict = model.get("research_problem_model", model)
+        else:
+            m_dict = {}
+
+        domain = m_dict.get("domain", "biomedical")
+        framework = m_dict.get("framework", "PICO")
+
+        cond = m_dict.get("target_condition", {})
+        cond_en = cond.get("name_en", "") if isinstance(cond, dict) else str(cond)
+        cond_mesh = cond.get("mesh_term", "") if isinstance(cond, dict) else ""
+        cond_synonyms = cond.get("synonyms", []) if isinstance(cond, dict) else []
+
+        pop = m_dict.get("population_or_model", {})
+        system = pop.get("primary_system", "") if isinstance(pop, dict) else str(pop)
+        sec_systems = pop.get("secondary_systems", []) if isinstance(pop, dict) else []
+
+        interventions = m_dict.get("interventions_or_exposures", [])
+        agent_names = []
+        agent_synonyms = []
+        agent_classes = []
+        for ag in interventions:
+            if isinstance(ag, dict):
+                if ag.get("name"): agent_names.append(ag["name"])
+                if ag.get("chemical_or_biological_class"): agent_classes.append(ag["chemical_or_biological_class"])
+                agent_synonyms.extend(ag.get("synonyms", []))
+            elif isinstance(ag, str):
+                agent_names.append(ag)
+
+        outcomes = m_dict.get("primary_outcomes", [])
+        outcome_names = [o.get("name") for o in outcomes if isinstance(o, dict) and o.get("name")]
+
+        mechs = m_dict.get("hypothesized_mechanisms", [])
+        pathways = [m.get("pathway_name") for m in mechs if isinstance(m, dict) and m.get("pathway_name")]
+        molecules = []
+        for m in mechs:
+            if isinstance(m, dict):
+                molecules.extend(m.get("target_molecules", []))
+
+        return {
+            "model_id": m_dict.get("model_id", "RPM_SEARCH_DECOMPOSED"),
+            "domain": domain,
+            "framework": framework,
+            "condition_facets": {
+                "primary_term": cond_en,
+                "mesh_term": cond_mesh,
+                "synonyms": cond_synonyms
+            },
+            "population_model_facets": {
+                "primary_system": system,
+                "secondary_systems": sec_systems
+            },
+            "intervention_facets": {
+                "agent_names": agent_names,
+                "classes": agent_classes,
+                "synonyms": agent_synonyms
+            },
+            "outcome_facets": {
+                "primary_outcomes": outcome_names
+            },
+            "mechanistic_facets": {
+                "pathways": pathways,
+                "target_molecules": molecules
+            }
+        }
+
+    @classmethod
+    def generate_expanded_query_matrix(cls, model: Any) -> Dict[str, Any]:
+        """Generates comprehensive, multi-layer search query matrix without artificial retrieval caps."""
+        if isinstance(model, ResearchProblemModel):
+            planner = cls(model)
+        else:
+            try:
+                from research_problem_model import ProblemModelBuilder
+            except ImportError:
+                from scripts.research_problem_model import ProblemModelBuilder
+            m_dict = model.get("research_problem_model", model) if isinstance(model, dict) else {}
+            built_model = ProblemModelBuilder.create_from_specification(m_dict)
+            planner = cls(built_model)
+        return planner.build_query_matrix()
+
+    @classmethod
+    def adaptive_search_iteration(
+        cls,
+        current_records: List[Dict[str, Any]],
+        model: Any,
+        iteration_number: int = 1,
+        new_search_facets: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """Dynamically adapts search based on identified evidence gaps and completeness analysis.
+        Expands queries iteratively to target missing streams without artificial pagination caps.
+        """
+        decomp = cls.decompose_problem_for_search(model)
+        framework = decomp.get("framework", "PICO")
+        required_streams = cls.get_required_evidence_streams(framework)
+
+        # Categorize current records into streams
+        streams_map: Dict[str, List[Dict[str, Any]]] = {s: [] for s in required_streams}
+        for r in current_records:
+            findings = str(r.get("primary_findings", r.get("title", ""))).lower()
+            role = str(r.get("evidence_role", "")).upper()
+            design = str(r.get("study_design", "")).upper()
+
+            if "NEGATIVE" in role or any(k in findings for k in ["no effect", "null", "antagonis", "toxic", "resistance"]):
+                if "NEGATIVE_NULL_EVIDENCE" in streams_map: streams_map["NEGATIVE_NULL_EVIDENCE"].append(r)
+                if "SAFETY_TOXICITY" in streams_map and any(k in findings for k in ["toxic", "adverse"]): streams_map["SAFETY_TOXICITY"].append(r)
+            elif "MECHANIS" in role or any(k in findings for k in ["pathway", "signaling", "caspase", "cleavage", "receptor"]):
+                if "MECHANISTIC_EVIDENCE" in streams_map: streams_map["MECHANISTIC_EVIDENCE"].append(r)
+                if "MECHANISTIC_PATHWAY" in streams_map: streams_map["MECHANISTIC_PATHWAY"].append(r)
+            elif "COMPONENT" in role or "MONOTHERAPY" in role:
+                if "COMPONENT_EVIDENCE" in streams_map: streams_map["COMPONENT_EVIDENCE"].append(r)
+            elif "REPLICATION" in role or "reproducib" in findings:
+                if "REPLICATION_EVIDENCE" in streams_map: streams_map["REPLICATION_EVIDENCE"].append(r)
+            else:
+                if "DIRECT_EVIDENCE" in streams_map: streams_map["DIRECT_EVIDENCE"].append(r)
+                if "DIRECT_CYTOTOXICITY_EFFICACY" in streams_map: streams_map["DIRECT_CYTOTOXICITY_EFFICACY"].append(r)
+                if "DIRECT_CLINICAL_EFFICACY" in streams_map: streams_map["DIRECT_CLINICAL_EFFICACY"].append(r)
+
+        completeness_eval = cls.evaluate_evidence_completeness_matrix(streams_map, required_streams)
+        missing_streams = completeness_eval.get("missing_streams", [])
+
+        # Formulate targeted adaptive queries for missing streams
+        adaptive_queries = []
+        cond_term = decomp["condition_facets"]["primary_term"]
+        agent_names = decomp["intervention_facets"]["agent_names"]
+        primary_agent = agent_names[0] if agent_names else "Intervention"
+
+        for stream in missing_streams:
+            if "NEGATIVE" in stream or "NULL" in stream:
+                adaptive_queries.append(f'("{primary_agent}" AND "{cond_term}" AND ("null response" OR "ineffective" OR "no difference" OR "failed to inhibit" OR "resistance"))')
+            elif "SAFETY" in stream or "TOXICITY" in stream:
+                adaptive_queries.append(f'("{primary_agent}" AND ("therapeutic index" OR "cytotoxicity threshold" OR "maximum tolerated dose" OR "adverse effect"))')
+            elif "MECHANIS" in stream:
+                pathways = decomp["mechanistic_facets"]["pathways"]
+                p_term = pathways[0] if pathways else "pathway"
+                adaptive_queries.append(f'("{primary_agent}" AND "{p_term}" AND ("molecular mechanism" OR "target phosphorylation" OR "cascade"))')
+            elif "REPLICATION" in stream:
+                adaptive_queries.append(f'("{primary_agent}" AND "{cond_term}" AND ("replication study" OR "multicenter validation" OR "reproducibility"))')
+
+        saturation_eval = cls.assess_search_saturation([len(current_records)])
+
+        return {
+            "iteration_number": iteration_number,
+            "total_corpus_evaluated": len(current_records),
+            "evidence_completeness_status": completeness_eval["is_complete"],
+            "missing_evidence_streams": missing_streams,
+            "adaptive_expanded_queries": adaptive_queries,
+            "completeness_ratio": completeness_eval["completeness_ratio"],
+            "saturation_status": saturation_eval["saturation_reached"],
+            "next_recommended_action": "SYNTHESIZE_EVIDENCE" if (completeness_eval["is_complete"] or iteration_number >= 3) else "EXECUTE_ADAPTIVE_EXPANSION_QUERIES"
+        }
+
     @staticmethod
     def assess_search_saturation(
         iteration_yields: List[int],

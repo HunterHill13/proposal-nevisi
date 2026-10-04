@@ -13,9 +13,9 @@ import difflib
 from typing import Dict, List, Any, Optional, Tuple
 
 try:
-    from core_policies import TemporalPolicyConfig
+    from core_policies import TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES, ContextualRelevanceConfig
 except ImportError:
-    from scripts.core_policies import TemporalPolicyConfig
+    from scripts.core_policies import TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES, ContextualRelevanceConfig
 
 class GenericReferenceAuditor:
     """Universal reference auditor operating without hard-coded biological assumptions."""
@@ -700,6 +700,438 @@ class GenericReferenceAuditor:
             "claims_lacking_recent_support_count": len(claims_lacking_recent_support),
             "claims_lacking_recent_support": claims_lacking_recent_support,
             "rule": f"All core direct claims must be substantiated by primary studies published within {self.max_primary_age} years (>= {self.cutoff_year})."
+        }
+
+    @classmethod
+    def _extract_model_dict(cls, problem_model: Any) -> Dict[str, Any]:
+        """Extracts problem model dictionary from dict, schema, or object."""
+        if problem_model is None:
+            return {}
+        if hasattr(problem_model, "to_dict") and callable(problem_model.to_dict):
+            return problem_model.to_dict()
+        if isinstance(problem_model, dict):
+            if "research_problem_model" in problem_model:
+                return problem_model["research_problem_model"]
+            return problem_model
+        res = {}
+        for attr in ["domain", "framework", "target_condition", "population_or_model", "interventions_or_exposures", "primary_outcomes", "hypothesized_mechanisms", "controlled_vocabulary"]:
+            if hasattr(problem_model, attr):
+                val = getattr(problem_model, attr)
+                if hasattr(val, "to_dict"):
+                    val = val.to_dict()
+                res[attr] = val
+        return res
+
+    @classmethod
+    def audit_contextual_relevance(cls, record: Dict[str, Any], problem_model: Any) -> Dict[str, Any]:
+        """Evaluates contextual relevance across 8 dimensions (direct, model, intervention, outcome,
+        mechanistic, methodological, transferability, overall).
+        Strictly rejects keyword-matching papers situated in disconnected or incompatible biological contexts
+        (e.g., veterinary livestock reproduction, agricultural crop agronomy) when the problem model is human biomedical.
+        """
+        p_dict = cls._extract_model_dict(problem_model)
+        domain = str(p_dict.get("domain", "")).lower()
+        
+        cond_dict = p_dict.get("target_condition", {})
+        cond_names = []
+        if isinstance(cond_dict, dict):
+            if cond_dict.get("name_en"): cond_names.append(str(cond_dict["name_en"]).lower())
+            if cond_dict.get("name_fa"): cond_names.append(str(cond_dict["name_fa"]).lower())
+            cond_names.extend([str(s).lower() for s in cond_dict.get("synonyms", []) if s])
+        elif isinstance(cond_dict, str):
+            cond_names.append(cond_dict.lower())
+            
+        pop_dict = p_dict.get("population_or_model", {})
+        primary_sys = str(pop_dict.get("primary_system", "")).lower() if isinstance(pop_dict, dict) else str(pop_dict).lower()
+        
+        interventions = p_dict.get("interventions_or_exposures", [])
+        agent_names = []
+        for ag in interventions:
+            if isinstance(ag, dict):
+                if ag.get("name"): agent_names.append(str(ag["name"]).lower())
+                agent_names.extend([str(s).lower() for s in ag.get("synonyms", []) if s])
+            elif isinstance(ag, str):
+                agent_names.append(ag.lower())
+                
+        outcomes = []
+        for o in p_dict.get("primary_outcomes", []):
+            if isinstance(o, dict) and o.get("name"):
+                outcomes.append(str(o["name"]).lower())
+            elif isinstance(o, str):
+                outcomes.append(o.lower())
+                
+        mechanisms = []
+        for m in p_dict.get("hypothesized_mechanisms", []):
+            if isinstance(m, dict):
+                if m.get("pathway_name"): mechanisms.append(str(m["pathway_name"]).lower())
+                mechanisms.extend([str(t).lower() for t in m.get("target_molecules", []) if t])
+            elif isinstance(m, str):
+                mechanisms.append(m.lower())
+
+        # Record attributes
+        title = str(record.get("title", "")).lower()
+        abstract = str(record.get("abstract", "")).lower()
+        model_sys = str(record.get("model_system", record.get("organism_cell_line", ""))).lower()
+        t_cond = str(record.get("target_condition", "")).lower()
+        endpoints = str(record.get("endpoints_evaluated", "")).lower()
+        combined_text = f"{title} {abstract} {model_sys} {t_cond} {endpoints}"
+
+        # 1. Biological Incompatibility Gate
+        is_target_veterinary_repro = any(k in f"{domain} {primary_sys} {' '.join(cond_names)}" for k in ["veterinary", "livestock", "semen", "sperm", "ram", "buck", "bull", "boar", "stallion", "breeding", "agronomy", "crop"])
+        
+        DISCONNECTED_INDICATORS = [
+            "semen", "spermatozoa", "cryopreservation of semen", "cryopreserved semen",
+            "cryopreserved bucks", "bucks semen", "buck semen", "ram semen", "bull semen",
+            "boar semen", "stallion semen", "livestock breeding", "artificial insemination",
+            "crop yield", "plant fertilizer", "soil salinity", "timber preservation"
+        ]
+        
+        found_incompatible = None
+        if not is_target_veterinary_repro:
+            for ind in DISCONNECTED_INDICATORS:
+                if ind in combined_text:
+                    found_incompatible = ind
+                    break
+        
+        # Check foundational methodology exception
+        just = record.get("foundational_justification") or {}
+        cat = just.get("category")
+        is_foundational_method = bool(just.get("is_justified")) and cat in [
+            "FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD",
+            "METHODOLOGICAL_LANDMARK", "CLASSICAL_STATISTICAL_METHOD"
+        ]
+        
+        if found_incompatible and not is_foundational_method:
+            return {
+                "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
+                "is_contextually_relevant": False,
+                "rejection_reason": "REJECT_LOW_CONTEXTUAL_RELEVANCE",
+                "rejection_category": "INCOMPATIBLE_BIOLOGICAL_SYSTEM",
+                "matched_incompatible_indicator": found_incompatible,
+                "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Pure chemical keyword match without contextual relevance is prohibited.",
+                "scores": {
+                    "direct_relevance": 0.0,
+                    "model_relevance": 0.0,
+                    "intervention_relevance": 0.5,
+                    "outcome_relevance": 0.0,
+                    "mechanistic_relevance": 0.0,
+                    "methodological_relevance": 0.0,
+                    "transferability": 0.0,
+                    "overall_relevance": 0.07
+                }
+            }
+
+        # 2. Evaluate 8 Dimensions
+        has_agent = any(a in combined_text for a in agent_names) if agent_names else True
+        intervention_rel = 1.0 if has_agent else 0.3
+        
+        has_model = False
+        if primary_sys and any(k in combined_text for k in primary_sys.split() if len(k) > 3):
+            has_model = True
+        elif any(k in combined_text for k in ["human", "cell culture", "in vitro", "murine", "mouse", "rat", "patient", "clinical"]):
+            has_model = True
+        model_rel = 1.0 if has_model else 0.4
+        
+        has_cond = any(c in combined_text for c in cond_names if len(c) > 3) if cond_names else True
+        direct_rel = 1.0 if (has_agent and has_cond) else (0.6 if (has_agent or has_cond) else 0.2)
+        
+        has_outcome = any(o in combined_text for o in outcomes if len(o) > 3) if outcomes else False
+        outcome_rel = 1.0 if has_outcome else (0.7 if any(k in combined_text for k in ["viability", "apoptosis", "survival", "toxicity", "efficacy", "inhibition", "expression"]) else 0.3)
+        
+        has_mech = any(m in combined_text for m in mechanisms if len(m) > 3) if mechanisms else False
+        mechanistic_rel = 1.0 if has_mech else (0.7 if any(k in combined_text for k in ["pathway", "signaling", "phosphorylation", "receptor", "caspase", "cleavage", "activation"]) else 0.3)
+        
+        has_method = is_foundational_method or any(k in combined_text for k in ["assay", "method", "protocol", "synergy", "isobologram", "ic50", "combination index", "median effect"])
+        method_rel = 1.0 if has_method else 0.5
+        
+        transferability = 1.0 if (direct_rel >= 0.6 or is_foundational_method) else 0.4
+        
+        overall_rel = round(
+            (direct_rel * 0.25) +
+            (intervention_rel * 0.20) +
+            (model_rel * 0.15) +
+            (outcome_rel * 0.15) +
+            (mechanistic_rel * 0.10) +
+            (method_rel * 0.10) +
+            (transferability * 0.05),
+            2
+        )
+        
+        is_relevant = overall_rel >= 0.40 or is_foundational_method
+        rejection_reason = None if is_relevant else "REJECT_LOW_CONTEXTUAL_RELEVANCE"
+        
+        return {
+            "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
+            "is_contextually_relevant": is_relevant,
+            "rejection_reason": rejection_reason,
+            "rejection_category": None if is_relevant else "LOW_OVERALL_ALIGNMENT",
+            "matched_incompatible_indicator": None,
+            "rationale": "Contextual alignment verified across target intervention, condition, and biological model." if is_relevant else "Overall contextual relevance score below minimum acceptance threshold.",
+            "scores": {
+                "direct_relevance": direct_rel,
+                "model_relevance": model_rel,
+                "intervention_relevance": intervention_rel,
+                "outcome_relevance": outcome_rel,
+                "mechanistic_relevance": mechanistic_rel,
+                "methodological_relevance": method_rel,
+                "transferability": transferability,
+                "overall_relevance": overall_rel
+            }
+        }
+
+    @classmethod
+    def score_reference(cls, record: Dict[str, Any], problem_model: Any, target_claims: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+        """Calculates multi-factor score across 14 scientific and methodological criteria (0-10 each)."""
+        relevance_audit = cls.audit_contextual_relevance(record, problem_model)
+        rel_scores = relevance_audit.get("scores", {})
+        
+        # 1. direct_relevance (0-10)
+        s_direct = int(rel_scores.get("direct_relevance", 0.5) * 10)
+        # 2. model_relevance (0-10)
+        s_model = int(rel_scores.get("model_relevance", 0.5) * 10)
+        # 3. intervention_relevance (0-10)
+        s_interv = int(rel_scores.get("intervention_relevance", 0.5) * 10)
+        # 4. comparator_relevance (0-10)
+        has_comp = bool(record.get("comparator")) or ("control" in str(record.get("abstract", "")).lower())
+        s_comp = 10 if has_comp else 6
+        # 5. outcome_relevance (0-10)
+        s_outcome = int(rel_scores.get("outcome_relevance", 0.5) * 10)
+        # 6. mechanistic_relevance (0-10)
+        s_mech = int(rel_scores.get("mechanistic_relevance", 0.5) * 10)
+        # 7. methodological_quality (0-10)
+        rob_dict = record.get("risk_of_bias", {})
+        overall_rob = rob_dict.get("overall_rob", "MODERATE_RISK")
+        if overall_rob == "LOW_RISK":
+            s_qual = 10
+        elif overall_rob == "MODERATE_RISK":
+            s_qual = 7
+        else:
+            s_qual = 4
+        if record.get("quantitative_parameters"):
+            s_qual = min(10, s_qual + 1)
+        # 8. recency (0-10)
+        year = record.get("year")
+        current_year = TemporalPolicyConfig.CURRENT_OPERATING_YEAR
+        just = record.get("foundational_justification") or {}
+        is_foundational = bool(just.get("is_justified"))
+        if year:
+            try:
+                age = current_year - int(year)
+                if age <= 3:
+                    s_recency = 10
+                elif age <= 6:
+                    s_recency = 8
+                elif is_foundational:
+                    s_recency = 6
+                else:
+                    s_recency = 0
+            except (ValueError, TypeError):
+                s_recency = 2
+        else:
+            s_recency = 2
+        # 9. directness_of_evidence (0-10)
+        design = str(record.get("study_design", "")).upper()
+        if any(k in design for k in ["RCT", "EXPERIMENTAL", "IN_VITRO", "IN_VIVO", "CLINICAL"]):
+            s_directness = 10
+        elif any(k in design for k in ["COHORT", "CASE_CONTROL"]):
+            s_directness = 8
+        elif any(k in design for k in ["SYSTEMATIC_REVIEW", "META_ANALYSIS"]):
+            s_directness = 7
+        else:
+            s_directness = 4
+        # 10. uniqueness_non_redundancy (0-10)
+        s_unique = 9 if not record.get("is_duplicate") else 2
+        # 11. necessity_for_specific_claim (0-10)
+        claims_supp = record.get("claims_supported", [])
+        s_necessity = 10 if claims_supp else 6
+        # 12. sentence_support_fidelity (0-10)
+        entailment = record.get("entailment_level", "DIRECTLY_SUPPORTED")
+        if entailment == "DIRECTLY_SUPPORTED":
+            s_fidelity = 10
+        elif entailment == "PARTIALLY_SUPPORTED":
+            s_fidelity = 7
+        elif entailment == "INFERRED":
+            s_fidelity = 4
+        else:
+            s_fidelity = 0
+        # 13. scientific_authority (0-10)
+        s_auth = 8
+        if record.get("doi") and (record.get("pmid") or record.get("openalex_id")):
+            s_auth = 10
+        # 14. reliable_metadata (0-10)
+        if record.get("is_retracted"):
+            s_meta = 0
+        elif record.get("is_expression_of_concern"):
+            s_meta = 3
+        else:
+            s_meta = 10
+
+        factors = {
+            "direct_relevance": s_direct,
+            "model_relevance": s_model,
+            "intervention_relevance": s_interv,
+            "comparator_relevance": s_comp,
+            "outcome_relevance": s_outcome,
+            "mechanistic_relevance": s_mech,
+            "methodological_quality": s_qual,
+            "recency": s_recency,
+            "directness_of_evidence": s_directness,
+            "uniqueness_non_redundancy": s_unique,
+            "necessity_for_specific_claim": s_necessity,
+            "sentence_support_fidelity": s_fidelity,
+            "scientific_authority": s_auth,
+            "reliable_metadata": s_meta
+        }
+        total_score = round(sum(factors.values()) * (100.0 / 140.0), 1)
+        
+        return {
+            "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
+            "composite_score": total_score,
+            "factor_scores": factors,
+            "is_contextually_relevant": relevance_audit.get("is_contextually_relevant", True),
+            "relevance_audit": relevance_audit
+        }
+
+    @classmethod
+    def select_optimal_proposal_references(
+        cls,
+        candidate_records: List[Dict[str, Any]],
+        problem_model: Any,
+        max_references: int = MAX_FINAL_REFERENCES,
+        min_references: int = MIN_FINAL_REFERENCES
+    ) -> Dict[str, Any]:
+        """Filters, audits, ranks, and selects the optimal balanced reference portfolio
+        under a strict hard ceiling of maximum 25 references.
+        Separates deep search corpus from final proposal references.
+        """
+        auditor = cls()
+        excluded = []
+        scored_candidates = []
+
+        for r in candidate_records:
+            ref_id = r.get("ref_id", r.get("doi", r.get("title", "UNKNOWN")))
+            
+            # 1. Retraction / Conflict check
+            if r.get("is_retracted"):
+                excluded.append({"ref_id": ref_id, "reason": "REJECT_RETRACTED", "details": "Article is retracted."})
+                continue
+            if r.get("is_duplicate"):
+                excluded.append({"ref_id": ref_id, "reason": "REJECT_DUPLICATE", "details": "Duplicate record cluster."})
+                continue
+
+            # 2. Contextual Relevance Gate
+            rel_audit = cls.audit_contextual_relevance(r, problem_model)
+            if not rel_audit.get("is_contextually_relevant"):
+                excluded.append({
+                    "ref_id": ref_id,
+                    "reason": rel_audit.get("rejection_reason", "REJECT_LOW_CONTEXTUAL_RELEVANCE"),
+                    "details": rel_audit.get("rationale")
+                })
+                continue
+
+            # 3. Temporal Policy Gate
+            temp_audit = auditor.audit_temporal_tier(r)
+            if not temp_audit.get("is_temporally_valid"):
+                excluded.append({
+                    "ref_id": ref_id,
+                    "reason": "REJECT_TEMPORAL_BREACH",
+                    "details": temp_audit.get("audit_note", "Exceeds 6-year window without valid foundational exception.")
+                })
+                continue
+
+            # 4. Multi-Factor Scoring
+            score_data = cls.score_reference(r, problem_model)
+            scored_candidates.append({
+                "record": r,
+                "score": score_data["composite_score"],
+                "score_details": score_data
+            })
+
+        # Sort by score descending
+        scored_candidates.sort(key=lambda x: x["score"], reverse=True)
+
+        # 5. Classify by Scientific Axes
+        axis_core = []      # Target: 8-10
+        axis_mech = []      # Target: 5-8
+        axis_model = []     # Target: 3-5
+        axis_method = []    # Target: 2-3
+        axis_safety = []    # Target: 2-3
+
+        for sc in scored_candidates:
+            rec = sc["record"]
+            just = rec.get("foundational_justification") or {}
+            findings = str(rec.get("primary_findings", rec.get("title", ""))).lower()
+            endpoints = str(rec.get("endpoints_evaluated", "")).lower()
+            role = str(rec.get("evidence_role", "")).upper()
+            design = str(rec.get("study_design", "")).upper()
+
+            if just.get("category") in ["FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD", "METHODOLOGICAL_LANDMARK", "CLASSICAL_STATISTICAL_METHOD"] or "METHOD" in design:
+                axis_method.append(sc)
+            elif any(k in findings for k in ["toxicity", "safe", "null", "no effect", "adverse", "limit", "resistance"]) or any(k in endpoints for k in ["toxicity", "safety", "hemolysis"]):
+                axis_safety.append(sc)
+            elif any(k in findings for k in ["pathway", "signaling", "caspase", "apoptosis", "mechanism", "cleavage", "phosphorylation", "bax", "bcl-2", "survivin"]):
+                axis_mech.append(sc)
+            elif "model" in role.lower() or "characterization" in role.lower() or "epidemiol" in role.lower() or any(k in findings for k in ["cell line", "expression", "overexpression", "baseline"]):
+                axis_model.append(sc)
+            else:
+                axis_core.append(sc)
+
+        # 6. Balanced Selection up to max_references (max 25)
+        selected_sc = []
+        selected_ids = set()
+
+        def add_from_axis(axis_list, target_count):
+            added = 0
+            for item in axis_list:
+                rid = item["record"].get("ref_id", item["record"].get("doi"))
+                if rid not in selected_ids and len(selected_sc) < max_references:
+                    selected_sc.append(item)
+                    selected_ids.add(rid)
+                    added += 1
+                    if added >= target_count:
+                        break
+
+        # Allocate balanced quotas
+        add_from_axis(axis_core, 9)
+        add_from_axis(axis_mech, 6)
+        add_from_axis(axis_model, 4)
+        add_from_axis(axis_method, 3)
+        add_from_axis(axis_safety, 3)
+
+        # Fill remaining slots up to max_references with remaining highest scored candidates
+        for sc in scored_candidates:
+            if len(selected_sc) >= max_references:
+                break
+            rid = sc["record"].get("ref_id", sc["record"].get("doi"))
+            if rid not in selected_ids:
+                selected_sc.append(sc)
+                selected_ids.add(rid)
+
+        # Build final selected records re-indexed 1..N
+        final_selected_records = []
+        for idx, sc in enumerate(selected_sc, 1):
+            r_copy = dict(sc["record"])
+            r_copy["citation_number"] = idx
+            r_copy["selection_score"] = sc["score"]
+            final_selected_records.append(r_copy)
+
+        return {
+            "selection_status": "OPTIMAL_SELECTION_COMPLETE",
+            "total_candidates_evaluated": len(candidate_records),
+            "total_selected": len(final_selected_records),
+            "max_reference_ceiling": max_references,
+            "min_reference_floor": min_references,
+            "meets_quotas": min_references <= len(final_selected_records) <= max_references,
+            "selected_references": final_selected_records,
+            "excluded_candidates_count": len(excluded),
+            "excluded_candidates": excluded,
+            "axis_distribution": {
+                "core_direct": len([s for s in selected_sc if s in axis_core]),
+                "mechanistic": len([s for s in selected_sc if s in axis_mech]),
+                "model_pathology": len([s for s in selected_sc if s in axis_model]),
+                "methodological": len([s for s in selected_sc if s in axis_method]),
+                "safety_null": len([s for s in selected_sc if s in axis_safety])
+            }
         }
 
 

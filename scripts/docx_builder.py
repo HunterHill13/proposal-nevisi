@@ -428,6 +428,11 @@ class DocxBuilder:
         has_bidi = False
         has_dubai = False
 
+        PERSIAN_TO_INT = {
+            "۱": 1, "۲": 2, "۳": 3, "۴": 4, "۵": 5, "۶": 6, "۷": 7, "۸": 8, "۹": 9,
+            "۱۰": 10, "۱۱": 11, "۱۲": 12, "۱۳": 13, "۱۴": 14
+        }
+
         for p in doc.paragraphs:
             p_xml = p._p.xml
             if "<w:bidi" in p_xml:
@@ -436,11 +441,15 @@ class DocxBuilder:
                 has_dubai = True
             
             p_text = p.text.strip()
-            m_h1 = re.match(r'^(?:([0-9]{1,2})|[۰-۹]{1,2})\.\s+', p_text)
-            if m_h1:
-                h1_headings.append(p_text)
-                if m_h1.group(1):
-                    h1_numbers.append(int(m_h1.group(1)))
+            m_h1 = re.match(r'^([0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text)
+            is_h1_size = ('w:sz w:val="28"' in p_xml or 'w:szCs w:val="28"' in p_xml or any(r.font.size and r.font.size.pt >= 13.5 for r in p.runs))
+            
+            if m_h1 and is_h1_size:
+                num_str = m_h1.group(1)
+                num_val = int(num_str) if num_str.isdigit() else PERSIAN_TO_INT.get(num_str)
+                if num_val and 1 <= num_val <= 14:
+                    h1_headings.append(p_text)
+                    h1_numbers.append(num_val)
             elif re.match(r'^(?:13|۱۳)\-(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
                 h2_headings.append(p_text)
 

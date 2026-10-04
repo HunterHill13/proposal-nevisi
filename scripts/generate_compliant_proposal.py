@@ -28,6 +28,7 @@ try:
     from generic_contradiction_engine import GenericContradictionEngine
     from generic_claim_entailment_engine import GenericClaimEntailmentEngine
     from generic_study_relationships import GenericStudyRelationshipEngine
+    from generic_reference_auditor import GenericReferenceAuditor
     from proposal_structure_validator import ProposalStructureValidator
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
@@ -38,6 +39,7 @@ except ImportError:
     from generic_contradiction_engine import GenericContradictionEngine
     from generic_claim_entailment_engine import GenericClaimEntailmentEngine
     from generic_study_relationships import GenericStudyRelationshipEngine
+    from generic_reference_auditor import GenericReferenceAuditor
     from proposal_structure_validator import ProposalStructureValidator
 
 class ProposalGenerator:
@@ -74,6 +76,22 @@ class ProposalGenerator:
         studies = data.get("studies", [])
         framework = data.get("framework", "EXPERIMENTAL_IN_VITRO")
         model_dict = data.get("research_problem_model", data)
+
+        # Enforce Contextual Relevance Gate and Strict Hard Ceiling of Maximum 25 References
+        if studies:
+            try:
+                from generic_reference_auditor import GenericReferenceAuditor
+                selection_res = GenericReferenceAuditor.select_optimal_proposal_references(
+                    candidate_records=studies,
+                    problem_model=model_dict,
+                    max_references=25,
+                    min_references=15
+                )
+                if selection_res.get("selected_references"):
+                    studies = selection_res["selected_references"]
+            except Exception:
+                if len(studies) > 25:
+                    studies = studies[:25]
 
         # Multi-layer Problem Statement synthesis if problem_text is brief
         if len(problem_text.split()) < 150:
@@ -121,8 +139,8 @@ class ProposalGenerator:
         
         if studies:
             lit_paragraphs = []
-            for s in studies:
-                cnum = s.get("citation_number", len(lit_paragraphs) + 1)
+            for idx, s in enumerate(studies, 1):
+                cnum = s.get("citation_number", idx)
                 authors = s.get("authors", [])
                 lead_author = authors[0] if authors else "محققان"
                 year = s.get("year", 2024)
@@ -132,27 +150,29 @@ class ProposalGenerator:
                 agent_name = s.get("intervention_agent", "عامل مداخله")
                 quant = s.get("quantitative_parameters", "")
                 
-                # Evidence-to-Text Density Controller: Independent analytical paragraph
+                comparator = s.get("comparator", "گروه کنترل استاندارد")
+                endpoints = s.get("endpoints_evaluated", "شاخص‌های عملکردی و بیوشیمیایی")
+                limitation = s.get("limitations", "محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت")
+                relevance = s.get("relevance_to_current_study", "تعیین مقادیر پایه برای طراحی مداخله در طرح جاری")
+                
+                # Check for existing curated paragraph, ensuring citation number is synchronized
                 para = s.get("review_paragraph") or s.get("literature_review_paragraph")
-                if not para:
-                    # Synthesize full 8-dimensional academic paragraph
-                    comparator = s.get("comparator", "گروه کنترل استاندارد")
-                    endpoints = s.get("endpoints_evaluated", "شاخص‌های عملکردی و بیوشیمیایی")
-                    limitation = s.get("limitations", "محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت")
-                    relevance = s.get("relevance_to_current_study", f"تعیین مقادیر پایه برای طراحی مداخله در طرح جاری")
-                    
+                if para:
+                    para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
+                else:
                     para = (
-                        f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی اثرات **{agent_name}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
-                        f"در این پژوهش، متغیرهای پیامد از جمله {endpoints} مورد سنجش قرار گرفتند. "
-                        f"یافته‌های کلیدی نشان داد که {findings}. "
+                        f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی هدفمند اثرات **{agent_name}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
+                        f"هدف اصلی این بررسی، سنجش دقیق متغیرهای پیامد از جمله {endpoints} بوده است. "
+                        f"یافته‌های تجربی حاصل نشان داد که {findings}. "
                     )
                     if quant:
-                        para += f"از بعد مقادیر کمی و پارامترهای اندازه‌گیری‌شده، شاخص‌ها به میزان ({quant}) مستند شده‌اند. "
+                        para += f"از حیث مقادیر کمی و پارامترهای اندازه‌گیری‌شده، شاخص‌ها به میزان ({quant}) مستند گردید. "
                     para += (
-                        f"با وجود اعتبار روش‌شناختی، این بررسی با محدودیت‌هایی نظیر {limitation} مواجه بوده است؛ "
-                        f"از این رو، پژوهش حاضر با هدف {relevance}، یافته‌های این مطالعه را به عنوان پیش‌زمینه مورد واکاوی و بسط تجربی قرار می‌دهد [{cnum}]."
+                        f"اگرچه این مطالعه شواهد اولیه معتبری فراهم می‌آورد، اما با محدودیت‌هایی نظیر {limitation} همراه بوده است. "
+                        f"بر همین اساس در طرح حاضر، با هدف {relevance}، نتایج مذکور به عنوان مبنای استخراج پارامترها و طراحی مراحل تکمیلی مورد واکاوی قرار می‌گیرند [{cnum}]."
                     )
                 lit_paragraphs.append(para)
+
 
             # Build cross-study synthesis narrative
             cross_synthesis_paragraphs = []
