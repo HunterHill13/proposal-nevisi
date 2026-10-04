@@ -23,7 +23,7 @@ class StudyFamilyDetector:
     def extract_trial_registrations(text: str) -> List[str]:
         """Extracts clinical trial IDs like NCT12345678, ISRCTN12345678, IRCT12345678."""
         patterns = [
-            r'NCT\d{8}',
+            r'NCT\d{3,8}',
             r'ISRCTN\d{8}',
             r'IRCT\d{10,14}[A-Za-z0-9]*'
         ]
@@ -125,14 +125,19 @@ class StudyFamilyDetector:
             research_groups.add(str(inst).strip().lower())
 
         pub_count = len(studies)
+        # Calculate true independent evidence streams: distinct combination of cohort, research group, and family
+        independent_streams = min(unique_families, max(len(cohorts), 1) if cohorts else unique_families)
+
         return {
             "publication_count": pub_count,
+            "study_count": unique_families,
+            "independent_evidence_streams": independent_streams,
             "independent_study_count": unique_families,
             "independent_cohort_count": max(len(cohorts), 1) if cohorts else unique_families,
             "independent_research_group_count": max(len(research_groups), 1),
             "trial_count": len(trials),
             "evidence_inflation_factor": round(pub_count / max(unique_families, 1), 2),
-            "synthesis_recommendation": f"Base evidence synthesis weight on {unique_families} independent study units rather than {pub_count} publications."
+            "synthesis_recommendation": f"Base evidence synthesis weight on {independent_streams} independent evidence streams rather than {pub_count} publications."
         }
 
 

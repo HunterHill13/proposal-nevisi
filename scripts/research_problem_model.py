@@ -103,9 +103,82 @@ class ResearchProblemModel:
     hypothesized_mechanisms: List[HypothesizedMechanism]
     controlled_vocabulary: ControlledVocabulary
     eligibility_criteria: Dict[str, List[str]] = field(default_factory=dict)
+    specific_objectives: List[str] = field(default_factory=list)
+    hypotheses: List[str] = field(default_factory=list)
+    endpoints: List[str] = field(default_factory=list)
+
+    def decompose_research_question(self) -> Dict[str, Any]:
+        """Deep decomposition: Question -> Concepts -> Entities -> Relationships -> Evidence Questions -> Search Families (Phase 3)."""
+        concepts = [self.target_condition.name_en] + [agt.name for agt in self.interventions_or_exposures]
+        entities = {
+            "target_condition": self.target_condition.name_en,
+            "population_model": self.population_or_model.primary_system,
+            "agents": [agt.name for agt in self.interventions_or_exposures],
+            "comparators": [c.name for c in self.comparators],
+            "outcomes": [o.name for o in self.primary_outcomes]
+        }
+        relationships = []
+        for agt in self.interventions_or_exposures:
+            for out in self.primary_outcomes:
+                relationships.append({
+                    "subject": agt.name,
+                    "predicate": "modulates_or_affects",
+                    "object": out.name,
+                    "context": self.population_or_model.primary_system
+                })
+        
+        evidence_questions = self.generate_dynamic_evidence_questions()
+        search_families = [
+            "PRIMARY_EFFICACY", "SAFETY_AND_TOXICITY", "MECHANISTIC_PATHWAY",
+            "MODEL_CHARACTERIZATION", "CONFOUNDERS_AND_BIAS", "ADVERSARIAL_AND_REPLICATION"
+        ]
+
+        return {
+            "research_question_en": f"What is the effect of {', '.join([a.name for a in self.interventions_or_exposures])} on {', '.join([o.name for o in self.primary_outcomes])} in {self.population_or_model.primary_system}?",
+            "concepts": concepts,
+            "entities": entities,
+            "relationships": relationships,
+            "evidence_questions": evidence_questions,
+            "search_families": search_families
+        }
+
+    def generate_dynamic_evidence_questions(self) -> List[Dict[str, Any]]:
+        """Dynamically determines evidence questions based on study framework (Phase 4)."""
+        ev_questions = []
+        agents = [a.name for a in self.interventions_or_exposures]
+        agt_str = ", ".join(agents) if agents else "the intervention"
+        system = self.population_or_model.primary_system
+        cond = self.target_condition.name_en
+
+        if self.framework in ["PICO", "CLINICAL_TRIAL"]:
+            ev_questions.append({"category": "EFFICACY", "question": f"Does {agt_str} significantly improve patient-important outcomes in patients with {cond} compared to control?"})
+            ev_questions.append({"category": "SAFETY", "question": f"What are the serious adverse events, incidence of toxicities, and discontinuation rates associated with {agt_str}?"})
+            ev_questions.append({"category": "DOSE_AND_DURATION", "question": f"What is the optimal therapeutic dosage, administration schedule, and treatment duration for {agt_str}?"})
+            ev_questions.append({"category": "COMPARATIVE_EFFECTIVENESS", "question": f"How does the clinical efficacy of {agt_str} compare against current standard-of-care comparators?"})
+        elif self.framework == "DIAGNOSTIC":
+            ev_questions.append({"category": "ACCURACY", "question": f"What are the pooled sensitivity, specificity, and diagnostic likelihood ratios of {agt_str} for detecting {cond}?"})
+            ev_questions.append({"category": "ROC_AUC", "question": f"What is the area under the ROC curve (AUC) and diagnostic discriminatory ability against the reference standard?"})
+            ev_questions.append({"category": "THRESHOLD", "question": f"What is the pre-specified optimal diagnostic cutoff threshold and inter-assay reproducibility?"})
+        elif self.framework in ["PECO", "OBSERVATIONAL"]:
+            ev_questions.append({"category": "ASSOCIATION", "question": f"Is exposure to {agt_str} independently associated with altered risk or incidence of {cond}?"})
+            ev_questions.append({"category": "CONFOUNDING", "question": f"Do observed effect estimates persist after multivariable adjustment for demographic and clinical confounders?"})
+            ev_questions.append({"category": "DOSE_RESPONSE", "question": f"Is there an observable biological gradient or duration-dependent exposure response?"})
+        elif self.framework == "PROGNOSTIC":
+            ev_questions.append({"category": "PROGNOSTIC_VALUE", "question": f"Does {agt_str} provide independent risk stratification and time-to-event prognostic discrimination in {cond}?"})
+            ev_questions.append({"category": "CALIBRATION_DISCRIMINATION", "question": f"What is the C-index and calibration slope of prognostic models incorporating {agt_str}?"})
+        else: # EXPERIMENTAL_IN_VITRO, EXPERIMENTAL_ANIMAL, MECHANISTIC
+            ev_questions.append({"category": "CONCENTRATION_RESPONSE", "question": f"What is the concentration-dependent inhibitory or modulation curve (IC50/EC50) of {agt_str} in {system}?"})
+            ev_questions.append({"category": "SIGNALING_CASCADE", "question": f"Which specific downstream kinases, transcription factors, or cleavages are modulated by {agt_str}?"})
+            ev_questions.append({"category": "SAFETY_MARGIN", "question": f"Does {agt_str} preserve viability in non-transformed/normal control models at biologically effective doses?"})
+            if len(self.interventions_or_exposures) > 1:
+                ev_questions.append({"category": "COMBINATION_INTERACTION", "question": f"Does concurrent administration of {agt_str} yield formal synergistic, additive, or antagonistic interaction?"})
+
+        return ev_questions
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d["decomposition"] = self.decompose_research_question()
+        return d
 
     def save_json(self, output_path: str):
         with open(output_path, "w", encoding="utf-8") as f:
@@ -176,7 +249,10 @@ class ProblemModelBuilder:
             eligibility_criteria=spec.get("eligibility_criteria", {
                 "inclusion": ["Peer-reviewed original research", "Full-text or structured abstract available"],
                 "exclusion": ["Non-English/Non-Persian manuscripts without summary", "Duplicate datasets"]
-            })
+            }),
+            specific_objectives=spec.get("specific_objectives", []),
+            hypotheses=spec.get("hypotheses", []),
+            endpoints=spec.get("endpoints", [o.name for o in outcomes])
         )
 
 

@@ -4,15 +4,15 @@ description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
   evidence synthesis, humanization, and Word (.docx) publication engine (v8.0). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
-  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes 9-layer dynamic literature searches
-  (Layers A-I across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
-  maps 22 cross-study relationship types, detects gaps across 11 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
+  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes 12-layer dynamic literature searches
+  (Layers A-L across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
+  maps 22 cross-study relationship types, detects gaps across 15 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
   clusters study families and trial registries to prevent evidence double-counting, resolves contradictions across an extensible
   15-category taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT), enforces epistemic rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
   enforces 7-level claim entailment and causal language boundaries (blocking causal leaps from observational data), guarantees numerical traceability in EVIDENCE_LEDGER,
   enforces the 6-year temporal boundary with explicit foundational justifications, renders publication-grade 14-section Word proposals
-  with individual reference paragraphs, dynamic variable table, Gantt timeline, statistical plan, Dubai Persian typography, native RTL bidi XML, and passes a unified 110-assertion test harness
-  (Static analysis zero leakage, 9-domain generalization fixtures, 22 adversarial stress tests, and 60-test benchmark).
+  with individual reference paragraphs, dynamic variable table, Gantt timeline, statistical plan, Dubai Persian typography, native RTL bidi XML, and passes a unified 124-assertion test harness
+  (Static analysis zero leakage, 9-domain generalization fixtures, 36 adversarial stress tests, and 60-test benchmark).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.0)

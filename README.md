@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 110/110 Passed](https://img.shields.io/badge/Unified%20Tests-110%2F110%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 124/124 Passed](https://img.shields.io/badge/Unified%20Tests-124%2F124%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
 
@@ -23,20 +23,20 @@
 
 1. **Dynamic Research Problem Modeler (`scripts/research_problem_model.py`):**
    - Automatically structures questions using domain-appropriate frameworks: **PICO** (interventions), **PECO** (environmental/occupational exposures), **Diagnostic** (index test vs. reference standard), **Prognostic** (risk stratification), or **Mechanistic** (biochemical signaling cascades).
-   - Generates controlled vocabulary, MeSH indexing, and explicit boundary criteria.
+   - Generates controlled vocabulary, MeSH indexing, explicit boundary criteria, and question decomposition.
 
-2. **9-Layer Dynamic Search Strategy & Saturation (`scripts/generic_search_planner.py`):**
-   - Implements 9 comprehensive search layers: Layer A (Direct Intervention/Outcome), Layer B (Component Monotherapies), Layer C (Mechanistic Signaling Pathways), Layer D (Target Disease/Phenotype Models), Layer E (Translational/Clinical Parallels), Layer F (Safety/Toxicology/Adverse Effects), Layer G (Negative/Null Results), Layer H (Contradictory/Antagonistic Evidence), and Layer I (Methodological Standards & Landmark Assays).
-   - Forward/backward citation chaining and automated search saturation scoring.
+2. **12-Layer Dynamic Search Strategy & Saturation (`scripts/generic_search_planner.py`):**
+   - Implements 12 comprehensive search layers (A through L) covering direct, component, mechanistic, model, translational, safety, null, contradiction, methodological, alternative explanations, confounders, and independent replications.
+   - Forward/backward citation chaining, PRISMA 2020 logging, and automated search saturation & coverage scoring.
 
-3. **Explicit Cross-Study Relationships Graph (`scripts/generic_study_relationships.py`):**
-   - Maps 22 distinct cross-study relationship types (`DIRECT_REPLICATION`, `CONCEPTUAL_REPLICATION`, `EXTENSION`, `TRANSLATIONAL_EXTENSION`, `SUPPORTS`, `CONTRADICTS`, `METHODOLOGICAL_INHERITANCE`, etc.) preventing superficial keyword-based association.
+3. **Explicit Cross-Study Relationships Graph & Claim DAG (`scripts/generic_study_relationships.py`):**
+   - Maps 22 distinct cross-study relationship types (`DIRECT_REPLICATION`, `CONCEPTUAL_REPLICATION`, `EXTENSION`, `TRANSLATIONAL_EXTENSION`, `SUPPORTS`, `CONTRADICTS`, `METHODOLOGICAL_INHERITANCE`, etc.) and builds acyclic Claim Dependency DAGs.
 
 4. **Evidence-Based Research Gap Detector (`scripts/generic_gap_detector.py`):**
-   - Systematically classifies research gaps across 11 universal taxonomy categories (`KNOWLEDGE_GAP`, `MECHANISTIC_GAP`, `METHODOLOGICAL_GAP`, `TRANSLATIONAL_GAP`, `POPULATION_GAP`, etc.).
+   - Systematically classifies research gaps across 15 universal taxonomy categories (`KNOWLEDGE_GAP`, `MECHANISTIC_GAP`, `METHODOLOGICAL_GAP`, `TRANSLATIONAL_GAP`, `POPULATION_GAP`, `COMBINATION_GAP`, etc.) with importance tiers.
 
-5. **Study Family De-Duplication (`scripts/generic_study_family_detector.py`):**
-   - Automatically detects shared trial registrations (e.g. `NCTxxxx`), multi-center cohorts (e.g. `UK Biobank`, `NHANES`), and secondary subgroup publications to prevent artificial evidence double-counting.
+5. **Study Family De-Duplication & Independent Streams (`scripts/generic_study_family_detector.py`):**
+   - Automatically detects shared trial registrations (e.g. `NCTxxxx`), multi-center cohorts (e.g. `UK Biobank`, `NHANES`), and secondary subgroup publications to calculate independent evidence streams and prevent artificial evidence double-counting.
 
 6. **Study-Design-Aware Comparability & Bias (`scripts/generic_comparability_engine.py`):**
    - Tailored comparability criteria for in vitro replication, animal SYRCLE standards, clinical RCT RoB2 allocation & blinding, and diagnostic QUADAS-2 standards.
@@ -49,15 +49,16 @@
    - Audits 7-level claim entailment (`DIRECTLY_SUPPORTED` down to `CONTRADICTED`).
    - Flags causal overclaims (`causes`, `induces`) derived from observational designs.
    - Enforces the `NO_SYNERGY_FALLACY` gate (`SYNERGY_NOT_ESTABLISHED` unless direct combination assays exist).
-   - Asserts numerical traceability against `EVIDENCE_LEDGER.json`.
+   - Audits numerical transformations and cross-checks article section consistency.
 
 9. **Dynamic Protocol Designer & 14-Section Structure Gate:**
-   - Generates dynamic Variable Tables, Gantt Timelines, and Statistical Plans (`scripts/dynamic_protocol_designer.py`).
+   - Generates dynamic Variable Tables, Gantt Timelines, Statistical Feasibility audits, and Statistical Plans (`scripts/dynamic_protocol_designer.py`).
    - Validates institutional 14-section layout with subsections 13-1 to 13-14 (`scripts/proposal_structure_validator.py`).
-   - Pre-flight 9-dimensional Quality Assurance gate (`scripts/multi_dimensional_qa_gate.py`).
+   - Pre-flight 11-dimensional Quality Assurance gate (`scripts/multi_dimensional_qa_gate.py`).
 
 10. **Institutional 14-Section Proposal Output (DOCX):**
     - Generates publication-grade Microsoft Word files (`.docx`) matching Iranian university standards.
+
     - Enforces an individual, detailed analytical paragraph per reference in the literature review.
     - Features Dubai Persian typography, complex script bolding (`<w:bCs/>`), and native Right-to-Left bidirectional XML (`<w:bidi/>`).
 

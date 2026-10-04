@@ -22,14 +22,15 @@ class GenericReferenceAuditor:
 
     def __init__(
         self,
-        current_year: int = TemporalPolicyConfig.CURRENT_OPERATING_YEAR,
+        current_year: Optional[int] = None,
         max_primary_age_years: int = TemporalPolicyConfig.MAX_PRIMARY_EVIDENCE_AGE_YEARS,
         min_required_references: int = 15,
         target_model: Optional[Dict[str, Any]] = None
     ):
-        self.current_year = current_year
+        import datetime
+        self.current_year = current_year or datetime.datetime.now().year
         self.max_primary_age = max_primary_age_years
-        self.cutoff_year = current_year - max_primary_age_years
+        self.cutoff_year = self.current_year - max_primary_age_years
         self.min_required_references = min_required_references
         self.target_model = target_model or {}
 
@@ -241,6 +242,63 @@ class GenericReferenceAuditor:
             "meets_minimum_quota": meets_min,
             "minimum_quota_target": self.min_required_references,
             "overall_status": "PASS" if (len(padding_detected) == 0 and meets_min) else "FAIL"
+        }
+
+    @staticmethod
+    def audit_evidence_retrieval_tier(study_evidence: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Audits evidence retrieval tiers ensuring sensitive numerical claims come from verified sources (Phase 35).
+        Tiers: FULL_TEXT_VERIFIED, ABSTRACT_VERIFIED, METADATA_ONLY, UNVERIFIED.
+        """
+        tier_counts = {"FULL_TEXT_VERIFIED": 0, "ABSTRACT_VERIFIED": 0, "METADATA_ONLY": 0, "UNVERIFIED": 0}
+        sensitive_claims_demoted = []
+
+        for s in study_evidence:
+            tier = s.get("retrieval_tier") or ("FULL_TEXT_VERIFIED" if s.get("fulltext_available") else ("ABSTRACT_VERIFIED" if s.get("abstract") else "METADATA_ONLY"))
+            if tier not in tier_counts:
+                tier = "UNVERIFIED"
+            tier_counts[tier] += 1
+
+            # Numerical claims require at least ABSTRACT_VERIFIED or FULL_TEXT_VERIFIED
+            has_quant = bool(s.get("quantitative_parameters") or s.get("dose_concentration_range"))
+            if has_quant and tier in ["METADATA_ONLY", "UNVERIFIED"]:
+                sensitive_claims_demoted.append({
+                    "study_id": s.get("study_id"),
+                    "tier": tier,
+                    "reason": "QUANTITATIVE_CLAIM_FROM_METADATA_ONLY"
+                })
+
+        return {
+            "tier_distribution": tier_counts,
+            "total_studies_audited": len(study_evidence),
+            "sensitive_claims_demoted": sensitive_claims_demoted,
+            "is_tier_compliant": len(sensitive_claims_demoted) == 0,
+            "full_text_proportion": round(tier_counts["FULL_TEXT_VERIFIED"] / max(len(study_evidence), 1), 3)
+        }
+
+    @staticmethod
+    def audit_missing_data_policy(data_dict: Dict[str, Any], required_fields: List[str]) -> Dict[str, Any]:
+        """Enforces that unmeasured/unknown parameters use approved explicit statuses (Phase 36).
+        Approved: NOT_REPORTED, UNKNOWN, NOT_APPLICABLE, UNVERIFIED.
+        Prohibits plausible guessing.
+        """
+        APPROVED_MISSING_MARKERS = {"NOT_REPORTED", "UNKNOWN", "NOT_APPLICABLE", "UNVERIFIED"}
+        missing_fields = []
+        compliant_markers = []
+
+        for f in required_fields:
+            val = data_dict.get(f)
+            if val is None or val == "":
+                missing_fields.append(f)
+            elif str(val).upper() in APPROVED_MISSING_MARKERS:
+                compliant_markers.append({f: str(val).upper()})
+
+        is_clean = len(missing_fields) == 0
+        return {
+            "is_missing_data_compliant": is_clean,
+            "unassigned_empty_fields": missing_fields,
+            "explicitly_acknowledged_missing": compliant_markers,
+            "status": "COMPLIANT" if is_clean else "NON_COMPLIANT_SILENT_EMPTY_FIELDS",
+            "rule": "Parameters without empirical evidence must explicitly specify NOT_REPORTED, UNKNOWN, or NOT_APPLICABLE."
         }
 
 

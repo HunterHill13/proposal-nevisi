@@ -110,6 +110,25 @@ class GenericGapDetector:
                 "proposed_resolution": "Perform head-to-head benchmarking controlling for cell lineage, exposure time, and assay readouts."
             })
 
+        # Assign evidence-backed gap importance tier (Phase 17)
+        for g in identified_gaps:
+            cat = g.get("gap_category")
+            if cat in ["POPULATION_GAP", "TRANSLATIONAL_GAP", "COMBINATION_GAP"]:
+                g["importance_tier"] = "CRITICAL_GAP"
+                g["priority_weight"] = 1.0
+            elif cat in ["MECHANISTIC_GAP", "SAFETY_GAP", "CONTRADICTION_GAP"]:
+                g["importance_tier"] = "IMPORTANT_GAP"
+                g["priority_weight"] = 0.85
+            elif cat in ["DOSE_GAP", "MODEL_GAP", "TIMING_GAP"]:
+                g["importance_tier"] = "MODERATE_GAP"
+                g["priority_weight"] = 0.65
+            elif cat in ["METHODOLOGICAL_GAP", "REPLICATION_GAP"]:
+                g["importance_tier"] = "MINOR_GAP"
+                g["priority_weight"] = 0.45
+            else:
+                g["importance_tier"] = "LOW_VALUE_GAP"
+                g["priority_weight"] = 0.25
+
         # Ensure all gap categories are represented in the gap catalog
         gap_catalog = {}
         for cat, defn in UNIVERSAL_GAP_TAXONOMY.items():

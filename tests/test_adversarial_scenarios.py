@@ -338,7 +338,94 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertIn("11_HUMAN_REVIEW_GATE", res["dimensions"])
         self.assertEqual(res["dimensions"]["11_HUMAN_REVIEW_GATE"]["status"], "HUMAN_REVIEW_REQUIRED")
 
+    def test_31_article_section_mismatch_and_overclaim_detection(self):
+        """Test 31: Abstract claiming significance with non-significant p-value in Results triggers flag (Phase 15)."""
+        res = GenericClaimEntailmentEngine.cross_check_article_sections(
+            abstract_text="The therapy showed statistically significant improvement across cohorts.",
+            results_text="Primary endpoint changes were not significant (p > 0.05).",
+            discussion_text="Preliminary trends suggest possible activity.",
+            conclusion_text="Treatment should be investigated further."
+        )
+        self.assertFalse(res["is_consistent"])
+        self.assertEqual(res["audit_verdict"], "SECTION_DISCREPANCIES_DETECTED")
+        types = [f["type"] for f in res["flagged_inconsistencies"]]
+        self.assertIn("ABSTRACT_RESULT_MISMATCH", types)
+
+    def test_32_statistical_feasibility_incompatible_design_gate(self):
+        """Test 32: Incompatible statistical test/metric triggers STATISTICAL_PLAN_INCONSISTENT (Phase 22)."""
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        incompatible_model = {
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "primary_outcomes": [{"name": "Mortality Rate", "type": "HAZARD_RATIO"}],
+            "interventions_or_exposures": [{"name": "Drug A"}, {"name": "Drug B"}, {"name": "Drug C"}]
+        }
+        res = DynamicProtocolDesigner.audit_statistical_feasibility(incompatible_model, proposed_test="Student t-test")
+        self.assertFalse(res["is_feasible"])
+        self.assertEqual(res["feasibility_status"], "STATISTICAL_PLAN_INCONSISTENT")
+        self.assertIn("TIME_TO_EVENT_ENDPOINT_IN_CELL_CULTURE_MODEL", res["inconsistencies"])
+        self.assertIn("STUDENT_T_TEST_USED_FOR_MULTI_ARM_EXPERIMENT", res["inconsistencies"])
+
+    def test_33_search_coverage_vs_saturation_distinction(self):
+        """Test 33: Search coverage is evaluated independently of search saturation (Phase 20 & 21)."""
+        from generic_search_planner import GenericSearchPlanner
+        sat = GenericSearchPlanner.assess_search_saturation([100, 10, 2], threshold=0.05)
+        self.assertTrue(sat["saturation_reached"])
+        self.assertIn("epistemic_warning", sat)
+
+        cov = GenericSearchPlanner.evaluate_search_coverage(
+            searched_databases=["PubMed", "Europe PMC"],
+            covered_concepts=["Concept A", "Concept B"],
+            required_concepts=["Concept A", "Concept B", "Concept C"],
+            has_contradiction_search=True,
+            has_citation_chaining=False
+        )
+        self.assertIn(cov["coverage_rating"], ["COMPREHENSIVE", "ADEQUATE", "SUBOPTIMAL"])
+        self.assertIn("Concept C", cov["concept_coverage"]["missing_concepts"])
+
+    def test_34_missing_data_policy_strict_enforcement(self):
+        """Test 34: Missing values must explicitly state NOT_REPORTED/UNKNOWN rather than silent empty/guess (Phase 36)."""
+        clean_record = {"dose": "NOT_REPORTED", "replicates": "UNKNOWN", "cell_line": "Target"}
+        dirty_record = {"dose": "", "replicates": None, "cell_line": "Target"}
+        req_fields = ["dose", "replicates", "cell_line"]
+        
+        aud_clean = self.auditor.audit_missing_data_policy(clean_record, req_fields)
+        aud_dirty = self.auditor.audit_missing_data_policy(dirty_record, req_fields)
+        self.assertTrue(aud_clean["is_missing_data_compliant"])
+        self.assertFalse(aud_dirty["is_missing_data_compliant"])
+        self.assertEqual(len(aud_dirty["unassigned_empty_fields"]), 2)
+
+    def test_35_evidence_gap_importance_stratification(self):
+        """Test 35: Gaps are stratified into critical, important, moderate, minor categories (Phase 17)."""
+        from generic_gap_detector import GenericGapDetector
+        target_model = {
+            "population_or_model": {"primary_system": "Patient Group Alpha", "model_type": "HUMAN_CLINICAL"},
+            "interventions_or_exposures": [{"name": "Agent A"}, {"name": "Agent B"}],
+            "hypothesized_mechanisms": [{"pathway_name": "Kinase Pathway"}]
+        }
+        res = GenericGapDetector.identify_gaps(target_model, [], [])
+        gaps = res["identified_gaps"]
+        self.assertGreater(len(gaps), 0)
+        self.assertTrue(all("importance_tier" in g for g in gaps))
+        tiers = [g["importance_tier"] for g in gaps]
+        self.assertTrue(any(t in ["CRITICAL_GAP", "IMPORTANT_GAP"] for t in tiers))
+
+    def test_36_evidence_streams_and_retrieval_tiers(self):
+        """Test 36: Distinguishes publication count from independent streams and audits retrieval tiers (Phase 9 & 35)."""
+        studies = [
+            {"study_id": "P1", "title": "Trial paper (NCT001)", "fulltext_available": True},
+            {"study_id": "P2", "title": "Subgroup (NCT001)", "abstract": "abstract text"},
+            {"study_id": "P3", "title": "Extension (NCT001)", "quantitative_parameters": "50 mg", "retrieval_tier": "METADATA_ONLY"}
+        ]
+        indep = StudyFamilyDetector.evaluate_evidence_independence(studies)
+        self.assertEqual(indep["publication_count"], 3)
+        self.assertEqual(indep["independent_evidence_streams"], 1)
+
+        tier_aud = self.auditor.audit_evidence_retrieval_tier(studies)
+        self.assertFalse(tier_aud["is_tier_compliant"])
+        self.assertEqual(len(tier_aud["sensitive_claims_demoted"]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

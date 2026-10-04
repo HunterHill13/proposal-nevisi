@@ -170,8 +170,10 @@ UNIVERSAL_GAP_TAXONOMY: Dict[str, str] = {
     "TRANSLATIONAL_GAP": "In vitro efficacy uncorroborated in intact physiological or in vivo systems",
     "SAFETY_GAP": "Incomplete toxicological boundaries, therapeutic window, or organ-sparing assessment",
     "CONTRADICTION_GAP": "Unresolved discrepancies across published studies under divergent experimental contexts",
+    "COMBINATION_GAP": "Lack of empirical studies evaluating direct simultaneous co-administration or multi-agent synergy",
     "REPLICATION_GAP": "Absence of independent confirmatory replications in separate laboratory environments"
 }
+
 
 # ==============================================================================
 # 6. STUDY DESIGN COMPATIBILITY & RISK OF BIAS TOOLS
@@ -187,3 +189,23 @@ STUDY_DESIGN_ROB_TOOL_MAP: Dict[str, str] = {
     "SYSTEMATIC_REVIEW_META_ANALYSIS": "AMSTAR_2",
     "METHODOLOGICAL_LANDMARK": "METHOD_VALIDATION_STANDARDS"
 }
+
+# ==============================================================================
+# 7. EVIDENCE TYPE HIERARCHY & WEIGHTING
+# ==============================================================================
+
+EVIDENCE_TYPE_HIERARCHY: Dict[str, Dict[str, Any]] = {
+    "META_ANALYSIS": {"tier": 1, "is_primary": False, "weight": 1.0, "synthesis_rule": "Summarizes primary evidence; must not be counted alongside primary studies."},
+    "SYSTEMATIC_REVIEW": {"tier": 1, "is_primary": False, "weight": 0.95, "synthesis_rule": "Secondary synthesis; unbundle to primary trials to avoid double counting."},
+    "RANDOMIZED_CONTROLLED_TRIAL": {"tier": 2, "is_primary": True, "weight": 0.9, "synthesis_rule": "Primary clinical evidence gold standard."},
+    "CONTROLLED_CLINICAL_STUDY": {"tier": 3, "is_primary": True, "weight": 0.75, "synthesis_rule": "Primary clinical evidence non-randomized."},
+    "PROSPECTIVE_COHORT": {"tier": 4, "is_primary": True, "weight": 0.7, "synthesis_rule": "Primary observational longitudinal evidence."},
+    "RETROSPECTIVE_CASE_CONTROL": {"tier": 5, "is_primary": True, "weight": 0.6, "synthesis_rule": "Primary observational retrospective evidence."},
+    "IN_VIVO_ANIMAL": {"tier": 6, "is_primary": True, "weight": 0.5, "synthesis_rule": "Primary preclinical in vivo animal model."},
+    "EX_VIVO_TISSUE": {"tier": 7, "is_primary": True, "weight": 0.45, "synthesis_rule": "Primary ex vivo human/animal tissue culture."},
+    "IN_VITRO_EXPERIMENTAL": {"tier": 8, "is_primary": True, "weight": 0.4, "synthesis_rule": "Primary preclinical in vitro cell culture."},
+    "CASE_REPORT_SERIES": {"tier": 9, "is_primary": True, "weight": 0.3, "synthesis_rule": "Descriptive clinical case report/series."},
+    "NARRATIVE_REVIEW": {"tier": 10, "is_primary": False, "weight": 0.2, "synthesis_rule": "Non-systematic commentary; background context only, cannot substantiate causal claims."},
+    "EXPERT_OPINION_EDITORIAL": {"tier": 11, "is_primary": False, "weight": 0.1, "synthesis_rule": "Author opinion; excluded from quantitative certainty weighting."}
+}
+

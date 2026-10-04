@@ -111,6 +111,59 @@ class GenericClaimEntailmentEngine:
             "recommendation": "Ensure sample size N reflects independent biological clone preparations, not repeated pipette wells." if flags else "Replication structure acceptable."
         }
 
+    @classmethod
+    def cross_check_article_sections(
+        cls,
+        abstract_text: str,
+        results_text: str,
+        discussion_text: str,
+        conclusion_text: str
+    ) -> Dict[str, Any]:
+        """Cross-checks consistency between Abstract, Results, Discussion, and Conclusion (Phase 15).
+        Flags overclaims, mismatches, and subgroup overgeneralizations.
+        """
+        flags = []
+        abs_l = abstract_text.lower()
+        res_l = results_text.lower()
+        disc_l = discussion_text.lower()
+        conc_l = conclusion_text.lower()
+
+        # 1. Abstract / Results Mismatch (e.g. significance claimed in abstract but not in results)
+        if ("statistically significant" in abs_l or "significant improvement" in abs_l) and ("p > 0.05" in res_l or "not significant" in res_l):
+            flags.append({
+                "type": "ABSTRACT_RESULT_MISMATCH",
+                "detail": "Abstract claims significant effect whereas results document non-significant outcome (p > 0.05)."
+            })
+
+        # 2. Discussion Overgeneralization
+        if any(w in disc_l for w in ["cures all", "universal benefit", "completely eradicates"]) and not any(w in res_l for w in ["100% cure", "complete eradication"]):
+            flags.append({
+                "type": "DISCUSSION_OVERGENERALIZATION",
+                "detail": "Discussion claims universal efficacy unsupported by granular numerical data in Results section."
+            })
+
+        # 3. Conclusion Overclaim
+        if any(w in conc_l for w in ["proves beyond doubt", "conclusively established as standard of care"]) and any(w in disc_l for w in ["preliminary", "underpowered", "limited sample"]):
+            flags.append({
+                "type": "CONCLUSION_OVERCLAIM",
+                "detail": "Conclusion asserts definitive practice changes despite Discussion explicitly acknowledging preliminary limitations."
+            })
+
+        # 4. Subgroup Generalization
+        if "subgroup" in res_l and ("post-hoc" in res_l or "exploratory" in res_l):
+            if not ("subgroup" in conc_l or "exploratory" in conc_l):
+                flags.append({
+                    "type": "SUBGROUP_GENERALIZATION",
+                    "detail": "Exploratory subgroup finding in Results is presented as a general primary outcome in Conclusion."
+                })
+
+        return {
+            "is_consistent": len(flags) == 0,
+            "mismatch_count": len(flags),
+            "flagged_inconsistencies": flags,
+            "audit_verdict": "ARTICLE_SECTIONS_CONSISTENT" if len(flags) == 0 else "SECTION_DISCREPANCIES_DETECTED"
+        }
+
     @staticmethod
     def extract_numbers(text: str) -> List[str]:
         """Extracts numerical quantities and percentages from claim strings."""

@@ -8,7 +8,7 @@ and coherent Statistical Analysis Plans tailored strictly to the Research Proble
 """
 
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 STUDY_TIMELINE_TEMPLATES = {
     "EXPERIMENTAL_IN_VITRO": [
@@ -270,27 +270,43 @@ class DynamicProtocolDesigner:
 
     @classmethod
     def validate_objectives_hypotheses_variables_consistency(cls, model_dict: Dict[str, Any]) -> Dict[str, Any]:
-        """Cross-validates Objectives <-> Hypotheses <-> Variables <-> Statistical Plan consistency graph."""
+        """Cross-validates complete chain: Research Question -> Hypothesis -> Objective -> Independent Variable -> Dependent Variable -> Endpoint -> Statistical Analysis (Phase 24)."""
         objectives = model_dict.get("specific_objectives", [])
         hypotheses = model_dict.get("hypotheses", [])
         interventions = model_dict.get("interventions_or_exposures", [])
         outcomes = model_dict.get("primary_outcomes", [])
+        endpoints = model_dict.get("endpoints", [o.get("name") for o in outcomes])
 
-        orphan_objectives = []
-        orphan_hypotheses = []
-        orphan_variables = []
+        chain_breaks = []
 
-        # Validate that variables exist for target outcomes and interventions
+        # 1. Check Independent & Dependent Variables
         if not interventions:
-            orphan_variables.append("MISSING_INDEPENDENT_VARIABLE")
+            chain_breaks.append("MISSING_INDEPENDENT_VARIABLE")
         if not outcomes:
-            orphan_variables.append("MISSING_DEPENDENT_VARIABLE")
+            chain_breaks.append("MISSING_DEPENDENT_VARIABLE")
 
-        # In standard interventional/experimental research, every hypothesis must correspond to at least one specific objective
-        if hypotheses and objectives and len(hypotheses) > len(objectives) + 2:
-            orphan_hypotheses.append("UNGROUNDED_HYPOTHESIS_EXCEEDING_OBJECTIVES")
+        # 2. Check Objective <-> Endpoint Linkage
+        if objectives and not endpoints:
+            chain_breaks.append("OBJECTIVE_WITHOUT_ENDPOINT")
 
-        is_consistent = (len(orphan_objectives) == 0 and len(orphan_hypotheses) == 0 and len(orphan_variables) == 0)
+        # 3. Check Endpoint <-> Variable Linkage
+        outcome_names = [o.get("name", "").lower() for o in outcomes]
+        for ep in endpoints:
+            if outcome_names and not any(o in str(ep).lower() or str(ep).lower() in o for o in outcome_names):
+                chain_breaks.append(f"ENDPOINT_WITHOUT_VARIABLE: {ep}")
+
+        # 4. Check Variable <-> Analysis Linkage
+        stat_plan = cls.generate_statistical_plan(model_dict)
+        if not stat_plan.get("primary_analysis"):
+            chain_breaks.append("VARIABLE_WITHOUT_ANALYSIS")
+
+        # 5. Check Hypothesis <-> Objective Alignment
+        if hypotheses and not objectives:
+            chain_breaks.append("HYPOTHESIS_WITHOUT_OBJECTIVE")
+        elif hypotheses and objectives and len(hypotheses) > len(objectives) + 2:
+            chain_breaks.append("UNGROUNDED_HYPOTHESIS_EXCEEDING_OBJECTIVES")
+
+        is_consistent = (len(chain_breaks) == 0)
 
         return {
             "consistency_status": "CONSISTENT" if is_consistent else "DISCREPANCY_DETECTED",
@@ -299,7 +315,42 @@ class DynamicProtocolDesigner:
             "hypotheses_count": len(hypotheses),
             "interventions_count": len(interventions),
             "outcomes_count": len(outcomes),
-            "discrepancies": orphan_variables + orphan_hypotheses + orphan_objectives
+            "endpoints_count": len(endpoints),
+            "statistical_plan_aligned": bool(stat_plan.get("primary_analysis")),
+            "discrepancies": chain_breaks
+        }
+
+    @classmethod
+    def audit_statistical_feasibility(cls, model_dict: Dict[str, Any], proposed_test: Optional[str] = None) -> Dict[str, Any]:
+        """Statistical feasibility gate verifying variable type, distribution assumptions, and test compatibility (Phase 22)."""
+        framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        outcomes = model_dict.get("primary_outcomes", [])
+        interventions = model_dict.get("interventions_or_exposures", [])
+
+        inconsistencies = []
+
+        # Check outcome type and appropriate test
+        for out in outcomes:
+            otype = str(out.get("type", "")).upper()
+            if otype in ["HAZARD_RATIO", "MORTALITY", "TIME_TO_EVENT"] and framework == "EXPERIMENTAL_IN_VITRO":
+                inconsistencies.append("TIME_TO_EVENT_ENDPOINT_IN_CELL_CULTURE_MODEL")
+            if otype in ["SENSITIVITY", "SPECIFICITY", "ROC_AUC"] and framework not in ["DIAGNOSTIC", "PROGNOSTIC"]:
+                inconsistencies.append("DIAGNOSTIC_METRIC_IN_INTERVENTIONAL_MODEL")
+
+        # Test compatibility check
+        if proposed_test:
+            p_lower = proposed_test.lower()
+            if "t-test" in p_lower and len(interventions) > 2:
+                inconsistencies.append("STUDENT_T_TEST_USED_FOR_MULTI_ARM_EXPERIMENT")
+            if "one-way anova" in p_lower and len(interventions) > 1 and "factorial" in str(model_dict).lower():
+                inconsistencies.append("ONE_WAY_ANOVA_USED_FOR_FACTORIAL_COMBINATION")
+
+        is_feasible = (len(inconsistencies) == 0)
+        return {
+            "feasibility_status": "STATISTICAL_PLAN_COMPATIBLE" if is_feasible else "STATISTICAL_PLAN_INCONSISTENT",
+            "is_feasible": is_feasible,
+            "inconsistencies": inconsistencies,
+            "recommendation": "Statistical analysis plan conforms with experimental design and endpoint distributions." if is_feasible else f"Revise statistical plan: {', '.join(inconsistencies)}"
         }
 
 if __name__ == "__main__":

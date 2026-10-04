@@ -203,7 +203,42 @@ class GenericSearchPlanner:
             "novel_evidence_rate": round(novel_rate, 4),
             "novel_family_rate": round(family_rate, 4) if new_study_families_yield else None,
             "threshold": threshold,
+            "epistemic_warning": "Search saturation indicates diminishing returns in current search boundary; it is NOT empirical proof of complete literature exhaustiveness (Phase 21).",
             "recommendation": "Evidence saturation satisfied; proceed to synthesis" if is_saturated else "Continue iterative expansion across negative/replication facets"
+        }
+
+    @classmethod
+    def evaluate_search_coverage(
+        cls,
+        searched_databases: List[str],
+        covered_concepts: List[str],
+        required_concepts: List[str],
+        has_contradiction_search: bool,
+        has_citation_chaining: bool
+    ) -> Dict[str, Any]:
+        """Separates Search Coverage from Search Saturation across 7 multi-dimensional parameters (Phase 20)."""
+        standard_dbs = {"PubMed", "Europe PMC", "OpenAlex", "Crossref"}
+        db_coverage = len(set(searched_databases).intersection(standard_dbs)) / len(standard_dbs)
+        
+        missing_concepts = [c for c in required_concepts if c not in covered_concepts]
+        concept_coverage = (len(required_concepts) - len(missing_concepts)) / max(len(required_concepts), 1)
+
+        coverage_score = round((db_coverage * 0.3) + (concept_coverage * 0.3) + (0.2 if has_contradiction_search else 0.0) + (0.2 if has_citation_chaining else 0.0), 3)
+
+        return {
+            "overall_search_coverage_score": coverage_score,
+            "database_coverage": {
+                "databases_queried": searched_databases,
+                "coverage_ratio": round(db_coverage, 2)
+            },
+            "concept_coverage": {
+                "covered_concepts": covered_concepts,
+                "missing_concepts": missing_concepts,
+                "coverage_ratio": round(concept_coverage, 2)
+            },
+            "contradiction_search_covered": has_contradiction_search,
+            "citation_network_covered": has_citation_chaining,
+            "coverage_rating": "COMPREHENSIVE" if coverage_score >= 0.8 else ("ADEQUATE" if coverage_score >= 0.6 else "SUBOPTIMAL")
         }
 
     @staticmethod
