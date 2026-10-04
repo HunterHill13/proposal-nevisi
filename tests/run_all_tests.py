@@ -7,7 +7,7 @@ Proposal-Nevisi Engine v8.1 (Universal Deep Biomedical Research & Proposal Engin
 Dynamically discovers, loads, and executes all standard unittest test cases across:
 1. Static analysis & hard-code leakage audit (19 tests)
 2. Multi-domain generalization tests (9 tests)
-3. Adversarial stress scenarios (50 tests)
+3. Adversarial stress scenarios (58 tests)
 4. Historical benchmark audit suite (60 tests)
 
 Strictly relies on Python unittest TestLoader and TextTestRunner.

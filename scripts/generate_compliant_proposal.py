@@ -44,6 +44,11 @@ class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
 
     @classmethod
+    def generate_full_proposal_markdown(cls, data: Dict[str, Any]) -> str:
+        """Alias for assemble_proposal to provide flexible API."""
+        return cls.assemble_proposal(data)
+
+    @classmethod
     def assemble_proposal(cls, data: Dict[str, Any]) -> str:
         """Assembles the complete 14-section proposal markdown from configuration data."""
         md_parts = []
@@ -335,19 +340,37 @@ class ProposalGenerator:
 
             dynamic_ethics = DynamicProtocolDesigner.generate_dynamic_ethics_subsections(model_dict)
 
+            # Dynamic instrument synthesis
+            instruments_list = []
+            for out in model_dict.get("primary_outcomes", []):
+                m_method = out.get("measurement_method")
+                if m_method and m_method not in instruments_list:
+                    instruments_list.append(m_method)
+            instr_str = "، ".join(instruments_list) if instruments_list else "ابزارهای استاندارد آزمایشگاهی و نرم‌افزارهای تخصصی تحلیلی متناسب با پروتکل مصوب طرح"
+
+            # Dynamic biosafety/security synthesis
+            bsl_spec = model_dict.get("biosafety_level")
+            if bsl_spec:
+                sec_text = f"رعایت دستورالعمل‌های ایمنی زیستی اختصاصی ({bsl_spec}) و دفع پسماندها طبق ضوابط حفاظت زیستی مصوب."
+            else:
+                sec_text = "رعایت کلیه موازین حفاظت و ایمنی متناسب با ماهیت طرح و دستورالعمل‌های مصوب کمیته ایمنی و حفاظت پژوهش."
+
+            # Dynamic reliability statement
+            rep_text = "تکرار مستقل آزمایش‌ها یا اندازه‌گیری‌ها بر مبنای استانداردهای روش‌شناختی مصوب و تایید پایایی ابزارها."
+
             subsecs = [
                 "### ۱۳-۱. نوع مطالعه\nمطالعه تجربی آزمایشگاهی / بالینی بر مبنای پروتکل‌های استاندارد مصوب.",
                 "### ۱۳-۲. جامعه مورد مطالعه\nمدل‌های زیستی، سیستم‌های سلولی یا نمونه‌های انسانی منطبق بر معیارهای مصوب طرح.",
                 "### ۱۳-۳. محل انجام مطالعه\nآزمایشگاه‌های تحقیقاتی و مراکز درمانی دانشگاه علوم پزشکی.",
                 "### ۱۳-۴. معیارهای ورود به مطالعه\nنمونه‌ها یا سلول‌های واجد خلوص بیولوژیک تاییدشده و شرایط استاندارد کشت.",
                 "### ۱۳-۵. معیارهای خروج از مطالعه\nهرگونه آلودگی باکتریایی یا مایکوپلاسمایی، عدم پاسخ‌دهی به کنترل مثبت یا عدم تطابق ژنتیکی.",
-                "### ۱۳-۶. ابزارهای گردآوری اطلاعات\nدستگاه‌های سنجش اسپکتروفتومتری، فلوسایتومتری، الایزا ریدر و نرم‌افزارهای تخصصی تحلیلی.",
+                f"### ۱۳-۶. ابزارهای گردآوری اطلاعات\n{instr_str}.",
                 "### ۱۳-۷. تعیین اعتبار ابزار گردآوری\nکالیبراسیون استاندارد ابزارهای آزمایشگاهی و مقایسه با استانداردهای مرجع بین‌المللی.",
-                "### ۱۳-۸. تعیین پایایی / قابلیت اعتماد ابزار در صورت نیاز\nتکرار مستقل آزمایش‌ها در حداقل سه نوبت زیستی جداگانه با محاسبه ضریب تغییرات (CV < 10%).",
+                f"### ۱۳-۸. تعیین پایایی / قابلیت اعتماد ابزار در صورت نیاز\n{rep_text}",
                 f"### ۱۳-۹. حجم نمونه و روش محاسبه آن\n{ss_text}",
                 f"### ۱۳-۱۰. روش تجزیه و تحلیل داده\n{stat_desc}",
                 f"### ۱۳-۱۱. ملاحظات اخلاقی در صورت نیاز\n{dynamic_ethics}",
-                "### ۱۳-۱۲. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\nرعایت دستورالعمل‌های ایمنی زیستی سطح دو (BSL-2) و دفع پسماندهای عفونی طبق پروتکل‌های حفاظت زیستی.",
+                f"### ۱۳-۱۲. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\n{sec_text}",
                 "### ۱۳-۱۳. مشکلات و محدودیت‌ها\nکنترل نوسانات کشت زیستی، رفع سمیت‌های زمینه‌ای و بهینه‌سازی فرمولاسیون مداخله.",
                 "### ۱۳-۱۴. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع‌آوری اطلاعات\nاجرای مرحله‌ای آزمایش‌ها طبق فازبندی گانت چارت از تایید هویت تا تحلیل داده‌های نهایی."
             ]
@@ -433,6 +456,8 @@ def main():
     print("Proposal Generation Status:", res["status"])
     print("Markdown:", res["md_path"])
     print("Word DOCX:", res["docx_path"])
+
+CompliantProposalGenerator = ProposalGenerator
 
 if __name__ == "__main__":
     main()

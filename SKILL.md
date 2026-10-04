@@ -15,8 +15,8 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 138-assertion test harness
-  (Static analysis zero leakage, 9-domain generalization fixtures, 50 adversarial stress tests, and 60-test benchmark).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 146-assertion test harness
+  (Static analysis zero leakage, 9-domain generalization fixtures, 58 adversarial stress tests, and 60-test benchmark).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.1)
@@ -183,10 +183,10 @@ python tests/run_all_tests.py
 این سیستم به صورت پویا ۴ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
 1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته و استقلال سمانتیک کامل (۱۹ تست).
 2. **آزمون تعمیم‌پذیری ۹ گانه (`test_general_domains.py` / `test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۹ فیکسچر مستقل از رشته‌های مختلف پزشکی (۹ تست).
-3. **آزمون‌های تنش خصمانه ۵۰ گانه (`test_adversarial_scenarios.py`):** ۵۰ آزمون چالش‌برانگیز شامل رفرنس جعلی، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد، تبیین‌های جایگزین، ماتریس تکمیلی بودن، گزارش PRISMA، گراف چندلایه‌ای، ره‌گیری ادعا، ممیزی معرفت‌شناختی شکاف، گزارش دلتا، کوهورت‌های مشترک، جهش علیت و عدم قطعیت حجم نمونه (۵۰ تست).
+3. **آزمون‌های تنش خصمانه ۵۸ گانه (`test_adversarial_scenarios.py`):** ۵۸ آزمون چالش‌برانگیز شامل رفرنس جعلی، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد، تبیین‌های جایگزین، ماتریس تکمیلی بودن، گزارش PRISMA، گراف چندلایه‌ای، ره‌گیری ادعا، ممیزی معرفت‌شناختی شکاف، گزارش دلتا، کوهورت‌های مشترک، جهش علیت، عدم قطعیت حجم نمونه، موضوعات کاملاً جدید خارج از فیکسچر، پروتکل‌های غیرمداخله‌ای، و اثرات متقابل چندمداخله‌ای (۵۸ تست).
 4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی، الزامات متدولوژیک و رعایت کامل فرمت ۱۴ گانه Word (۶۰ تست).
 
-**مجموع آزمون‌ها:** ۱۳۸ آزمون مستقل با قبولی ۱۰۰٪ (138 / 138 PASS).
+**مجموع آزمون‌ها:** ۱۴۶ آزمون مستقل با قبولی ۱۰۰٪ (146 / 146 PASS).
 
 ---
 

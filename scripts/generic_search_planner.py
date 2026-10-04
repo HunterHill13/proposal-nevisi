@@ -69,7 +69,7 @@ class GenericSearchPlanner:
 
         # Layer E: Translational Evidence Queries
         facets["LAYER_E_TRANSLATIONAL_EVIDENCE"] = [
-            f'("{primary_agent}" AND ("in vivo" OR "xenograft" OR "animal model" OR "clinical trial" OR "pharmacokinetics"))'
+            f'("{primary_agent}" AND ("in vivo" OR "animal model" OR "preclinical model" OR "clinical trial" OR "pharmacokinetics"))'
         ]
 
         # Layer F: Safety & Toxicity Queries

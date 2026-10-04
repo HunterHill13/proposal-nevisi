@@ -97,6 +97,7 @@ class ProposalStructureValidator:
         status_str = "PASS" if passed else "FAIL"
 
         return {
+            "status": status_str,
             "PROPOSAL_STRUCTURE_VALIDATION": status_str,
             "all_14_sections_present": len(missing_sections) == 0,
             "all_subsections_13_present": len(missing_subsections) == 0,

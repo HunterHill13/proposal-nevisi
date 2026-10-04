@@ -373,6 +373,10 @@ class DocxBuilder:
     """Wrapper class providing programmatic interface for document generation."""
 
     @classmethod
+    def build_docx_from_markdown(cls, md_content_or_path: str, output_docx_path: str, font_name: str = "Dubai"):
+        cls.build_docx(md_content_or_path, output_docx_path, font_name=font_name)
+
+    @classmethod
     def build_docx(cls, md_content_or_path: str, output_docx_path: str, font_name: str = "Dubai"):
         if os.path.isfile(md_content_or_path):
             build_proposal_docx(md_content_or_path, output_docx_path, font_name=font_name)

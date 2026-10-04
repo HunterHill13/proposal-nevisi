@@ -657,8 +657,257 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(res["status"], "OVERCLAIM_RISK")
         self.assertFalse(res["allowed_unconditional_causal_claim"])
 
+    def test_51_unseen_novel_domain_end_to_end(self):
+        """Part 1 & 23 Test: Completely novel domain outside all fixtures runs end-to-end without core code modifications."""
+        from research_problem_model import ProblemModelBuilder
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        from generic_search_planner import GenericSearchPlanner
+        import json
+
+        novel_spec = {
+            "model_id": "RPM_DENTISTRY_BIOMATERIAL_001",
+            "research_title_fa": "بررسی بازسازی استخوان فک با داربست نانوذرات هیدروکسی‌آپاتیت",
+            "research_title_en": "Evaluation of Alveolar Bone Regeneration Using Hydroxyapatite Nanoscaffolds",
+            "domain": "dental_biomaterials_maxillofacial",  # Completely unseen novel domain string
+            "framework": "EXPERIMENTAL_ANIMAL",
+            "target_condition": {
+                "name_en": "Mandibular Bone Critical Defect",
+                "name_fa": "نقص استخوانی فک",
+                "mesh_term": "Mandibular Defects",
+                "synonyms": ["Alveolar Bone Loss"]
+            },
+            "population_or_model": {
+                "model_type": "ANIMAL_IN_VIVO",
+                "primary_system": "New Zealand Rabbit Mandibular Defect Model",
+                "secondary_systems": [],
+                "normal_control_system": "Autologous Bone Graft"
+            },
+            "interventions_or_exposures": [
+                {
+                    "name": "Hydroxyapatite Nanoscaffold-X",
+                    "chemical_or_biological_class": "Bioceramic Nanocomposite",
+                    "role": "PRIMARY_AGENT",
+                    "mesh_terms": [],
+                    "synonyms": ["HA-Nano-X"]
+                }
+            ],
+            "comparators": [{"name": "Untreated Sham Defect", "type": "NEGATIVE_CONTROL"}],
+            "primary_outcomes": [
+                {"name": "New Bone Formation Volume", "type": "HISTOMORPHOMETRY", "measurement_unit": "% trabecular volume", "measurement_method": "Micro-CT Analysis"}
+            ],
+            "hypothesized_mechanisms": [
+                {"pathway_name": "Osteoblast Runx2 Induction", "target_molecules": ["Runx2", "Osteocalcin"], "expected_modulation": "UPREGULATION"}
+            ],
+            "controlled_vocabulary": {"primary_mesh": ["Mandibular Defects"], "all_synonyms": ["HA-Nano-X"], "exclusion_terms": []}
+        }
+
+        model = ProblemModelBuilder.create_from_specification(novel_spec)
+        self.assertEqual(model.domain, "dental_biomaterials_maxillofacial")
+        
+        # Verify search plan generation
+        planner = GenericSearchPlanner(model)
+        matrix = planner.build_query_matrix()
+        self.assertEqual(matrix["domain"], "dental_biomaterials_maxillofacial")
+        matrix_str = json.dumps(matrix).lower()
+        self.assertIn("mandibular", matrix_str)
+        self.assertIn("hydroxyapatite", matrix_str)
+        self.assertNotIn("cancer", matrix_str)
+        self.assertNotIn("lung", matrix_str)
+
+        # Verify dynamic protocol variables
+        var_table = DynamicProtocolDesigner.generate_variable_table(novel_spec)
+        self.assertTrue(any("Hydroxyapatite Nanoscaffold-X" in v["name"] for v in var_table))
+        self.assertTrue(any("New Bone Formation Volume" in v["name"] for v in var_table))
+
+    def test_52_non_intervention_observational_framework(self):
+        """Part 23 Test: Framework with no pharmacological intervention (PECO / Epidemiological exposure)."""
+        from research_problem_model import ProblemModelBuilder
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        import json
+
+        peco_spec = {
+            "model_id": "RPM_EPIDEMIOLOGY_EXPOSURE_001",
+            "research_title_fa": "بررسی ارتباط مواجهه شغلی با سیلیس و ریسک فیبروز ریوی",
+            "research_title_en": "Occupational Silica Exposure and Risk of Idiopathic Pulmonary Fibrosis",
+            "domain": "occupational_pulmonology",
+            "framework": "PECO",
+            "target_condition": {
+                "name_en": "Idiopathic Pulmonary Fibrosis",
+                "name_fa": "فیبروز ریوی ایدیوپاتیک",
+                "mesh_term": "Idiopathic Pulmonary Fibrosis",
+                "synonyms": ["IPF"]
+            },
+            "population_or_model": {
+                "model_type": "HUMAN_CLINICAL",
+                "primary_system": "Industrial Mining Worker Cohort",
+                "secondary_systems": [],
+                "normal_control_system": "Unexposed Administrative Staff"
+            },
+            "interventions_or_exposures": [
+                {
+                    "name": "Crystalline Silica Dust",
+                    "chemical_or_biological_class": "Environmental Toxicant",
+                    "role": "EXPOSURE",
+                    "mesh_terms": [],
+                    "synonyms": ["Respirable Silica"]
+                }
+            ],
+            "comparators": [{"name": "Ambient Air / Unexposed", "type": "UNEXPOSED_CONTROL"}],
+            "primary_outcomes": [
+                {"name": "Pulmonary Fibrosis Incidence", "type": "INCIDENCE_RATE", "measurement_unit": "Cases per 1000 person-years"}
+            ],
+            "hypothesized_mechanisms": [],
+            "controlled_vocabulary": {"primary_mesh": ["Silicosis"], "all_synonyms": [], "exclusion_terms": []}
+        }
+
+        model = ProblemModelBuilder.create_from_specification(peco_spec)
+        self.assertEqual(model.framework, "PECO")
+
+        # Verify statistical plan infers logistic/propensity modeling for PECO
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(peco_spec)
+        stat_text = json.dumps(stat_plan)
+        self.assertIn("Logistic Regression", stat_text)
+
+    def test_53_multiple_interventions_interaction_modeling(self):
+        """Part 23 Test: Multi-intervention protocol generates Two-Way ANOVA and interaction terms."""
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        import json
+
+        multi_spec = {
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "interventions_or_exposures": [
+                {"name": "Agent Alpha", "chemical_or_biological_class": "Drug"},
+                {"name": "Agent Beta", "chemical_or_biological_class": "Biologic"},
+                {"name": "Agent Gamma", "chemical_or_biological_class": "Nutraceutical"}
+            ],
+            "primary_outcomes": [{"name": "Cell Viability", "measurement_unit": "%"}]
+        }
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(multi_spec)
+        stat_str = json.dumps(stat_plan)
+        self.assertIn("Two-way ANOVA", stat_str)
+        self.assertIn("Interaction effect", stat_str)
+
+    def test_54_diagnostic_study_framework_and_metrics(self):
+        """Part 23 Test: Diagnostic accuracy framework selects ROC AUC, Sensitivity, and Specificity."""
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        import json
+
+        diag_spec = {
+            "framework": "DIAGNOSTIC",
+            "interventions_or_exposures": [],
+            "primary_outcomes": [{"name": "Serum Troponin-I Diagnostic Yield", "measurement_unit": "ng/mL"}]
+        }
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(diag_spec)
+        stat_str = json.dumps(stat_plan)
+        self.assertIn("Sensitivity", stat_str)
+        self.assertIn("ROC Curve", stat_str)
+        self.assertIn("McNemar", stat_str)
+
+    def test_55_prognostic_study_framework_and_metrics(self):
+        """Part 23 Test: Prognostic factor framework selects Cox regression, C-index, and calibration."""
+        from dynamic_protocol_designer import DynamicProtocolDesigner
+        import json
+
+        prog_spec = {
+            "framework": "PROGNOSTIC",
+            "interventions_or_exposures": [],
+            "primary_outcomes": [{"name": "5-Year Overall Survival", "measurement_unit": "Months"}]
+        }
+        stat_plan = DynamicProtocolDesigner.generate_statistical_plan(prog_spec)
+        stat_str = json.dumps(stat_plan)
+        self.assertIn("Cox Regression", stat_str)
+        self.assertIn("Harrell's C-index", stat_str)
+
+    def test_56_full_proposal_generation_unseen_topic(self):
+        """Part 23 & 25 Test: Full end-to-end generation of compliant 14-section proposal on unseen topic."""
+        from generate_compliant_proposal import CompliantProposalGenerator
+        from proposal_structure_validator import ProposalStructureValidator
+
+        unseen_proposal_data = {
+            "research_problem_model": {
+                "model_id": "RPM_UNSEEN_NEPHROLOGY_001",
+                "research_title_fa": "بررسی اثر محافظتی داربست ماتریکس خارج‌سلولی بر فیلتراسیون گلومرولی در نارسایی حاد کلیه",
+                "research_title_en": "Protective Effects of Decellularized ECM Hydrogel on Glomerular Filtration in Acute Kidney Injury",
+                "domain": "renal_regenerative_medicine",
+                "framework": "EXPERIMENTAL_ANIMAL",
+                "target_condition": {"name_en": "Acute Kidney Injury", "name_fa": "آسیب حاد کلیوی", "mesh_term": "Acute Kidney Injury"},
+                "population_or_model": {"model_type": "ANIMAL_IN_VIVO", "primary_system": "Wistar Rat Ischemia-Reperfusion AKI Model"},
+                "interventions_or_exposures": [{"name": "ECM-Hydrogel-K", "chemical_or_biological_class": "Biomimetic Hydrogel"}],
+                "comparators": [{"name": "Normal Saline Sham Control", "type": "VEHICLE_CONTROL"}],
+                "primary_outcomes": [
+                    {"name": "Serum Creatinine Clearance", "measurement_unit": "mL/min", "measurement_method": "Jaffe Reaction Assay"}
+                ],
+                "hypothesized_mechanisms": [{"pathway_name": "Tubular Epithelial Nrf2 Activation", "target_molecules": ["Nrf2", "HO-1"]}]
+            },
+            "literature_corpus": {
+                "studies": [
+                    {
+                        "study_id": "STUDY_RENAL_01",
+                        "title": "Decellularized renal scaffolds promote podocyte restoration",
+                        "authors": ["Chen H", "Wang L"],
+                        "journal": "Biomaterials",
+                        "year": 2024,
+                        "doi": "10.1016/j.biomaterials.2024.120001",
+                        "study_design": "IN_VIVO_ANIMAL",
+                        "directness": "DIRECT",
+                        "primary_findings": "ECM scaffold significantly accelerated glomerular repair in animal models."
+                    },
+                    {
+                        "study_id": "STUDY_RENAL_02",
+                        "title": "Historical principles of ischemia-reperfusion renal pathophysiology",
+                        "authors": ["Smith JD"],
+                        "journal": "Am J Physiol Renal Physiol",
+                        "year": 2005,
+                        "doi": "10.1152/ajprenal.2005.001",
+                        "study_design": "METHODOLOGICAL_LANDMARK",
+                        "foundational_justification": {
+                            "is_justified": True,
+                            "category": "METHODOLOGICAL_LANDMARK",
+                            "rationale": "Landmark protocol establishing standard warm ischemia clamp duration."
+                        },
+                        "primary_findings": "Defines standard 45-minute bilateral renal artery occlusion model."
+                    }
+                ]
+            }
+        }
+
+        md_output = CompliantProposalGenerator.generate_full_proposal_markdown(unseen_proposal_data)
+        self.assertIn("## ۱. موضوع", md_output)
+        self.assertIn("## ۱۳. روش اجرا", md_output)
+        self.assertIn("### ۱۳-۱۱. ملاحظات اخلاقی در صورت نیاز", md_output)
+        self.assertIn("3Rs", md_output)  # Animal ethics automatically derived!
+        self.assertIn("## ۱۴. فهرست منابع", md_output)
+
+        # Validate structure
+        val_res = ProposalStructureValidator.validate_proposal_text(md_output)
+        self.assertEqual(val_res["status"], "PASS")
+
+    def test_57_out_of_window_unjustified_exclusion_from_synthesis(self):
+        """Part 2 & 23 Test: OUT_OF_WINDOW_UNJUSTIFIED paper is blocked from core evidence synthesis."""
+        old_unjustified_ref = {
+            "ref_id": "REF_OLD_UNJUST",
+            "year": 2010,
+            "title": "Routine observational paper from 2010",
+            "foundational_justification": {"is_justified": False}
+        }
+        res = self.auditor.audit_temporal_tier(old_unjustified_ref)
+        self.assertFalse(res["is_temporally_valid"])
+        self.assertEqual(res["age_justification"], "OUTDATED_DIRECT_EVIDENCE")
+
+    def test_58_full_text_availability_and_provenance_tracking(self):
+        """Part 5 & 23 Test: Full-text availability classification and retrieval provenance logging."""
+        studies_to_audit = [
+            {"study_id": "S_FT", "fulltext_available": True, "database": "PubMed", "retrieval_method": "API_EUTILS", "query": "query1"},
+            {"study_id": "S_ABS", "fulltext_available": False, "abstract": "abstract only", "database": "Europe PMC", "retrieval_method": "API_REST", "query": "query2"},
+            {"study_id": "S_META", "fulltext_available": False, "retrieval_tier": "METADATA_ONLY", "quantitative_parameters": "50 uM", "database": "OpenAlex", "retrieval_method": "API_JSON", "query": "query3"}
+        ]
+        tier_audit = self.auditor.audit_evidence_retrieval_tier(studies_to_audit)
+        self.assertIn("sensitive_claims_demoted", tier_audit)
+        self.assertEqual(len(tier_audit["sensitive_claims_demoted"]), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 

@@ -74,6 +74,7 @@ class PrimaryOutcome:
     name: str
     type: str  # EFFICACY, VIABILITY, TOXICITY, SYNERGY, MORTALITY, SENSITIVITY, SPECIFICITY, HAZARD_RATIO
     measurement_unit: str
+    measurement_method: Optional[str] = None
     preferred_assays: List[str] = field(default_factory=list)
 
 @dataclass
@@ -208,11 +209,17 @@ class ProblemModelBuilder:
 
     @classmethod
     def create_from_specification(cls, spec: Dict[str, Any]) -> ResearchProblemModel:
-        """Constructs an instantiated ResearchProblemModel from an input dictionary."""
-        # Validation of required fields
-        domain = spec.get("domain", "basic_biomedical")
-        if domain not in SUPPORTED_DOMAINS:
-            raise ValueError(f"Domain '{domain}' not in supported domains: {SUPPORTED_DOMAINS}")
+        """Constructs an instantiated ResearchProblemModel from an input dictionary.
+        Supports completely dynamic domains without hardcoded restriction.
+        """
+        # Dynamic domain extraction
+        raw_domain = spec.get("domain", "basic_biomedical")
+        if isinstance(raw_domain, str):
+            domain = raw_domain.strip().lower()
+        else:
+            domain = str(raw_domain)
+        if not domain:
+            domain = "basic_biomedical"
 
         title_en = spec.get("research_title_en", "")
         title_fa = spec.get("research_title_fa", "")
