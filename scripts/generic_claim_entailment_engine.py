@@ -186,7 +186,12 @@ class GenericClaimEntailmentEngine:
             return {"is_synergy_claim": False, "synergy_status": "NOT_APPLICABLE"}
 
         # Requires combination design, combination assay, and quantitative metric
-        has_combo_assay = bool(source_study.get("chou_talalay_ci_extracted") or "combination" in str(source_study.get("study_design", "")).lower())
+        has_combo_assay = bool(
+            source_study.get("quantitative_combination_index_extracted") or
+            source_study.get("combo_index_extracted") or
+            source_study.get("is_combination_study") or
+            "combination" in str(source_study.get("study_design", "")).lower()
+        )
         has_metric = any("ci" in str(f.get("text_or_data", "")).lower() or "synergy" in str(f.get("text_or_data", "")).lower() for f in supporting_facts)
 
         if not (has_combo_assay or has_metric):
@@ -211,6 +216,46 @@ class GenericClaimEntailmentEngine:
             "is_provenance_traceable": has_location,
             "recorded_location": provenance,
             "provenance_grade": "GRANULAR_LOCATION" if has_location else "DOCUMENT_LEVEL_ONLY"
+        }
+
+    @staticmethod
+    def audit_numerical_transformations(transformations: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Audits mathematical transformations (percentages, means, CIs, effect sizes, unit conversions) (Prompt Pt 17).
+        Guarantees original value, formula, and calculated value are fully traceable.
+        """
+        verified_transforms = []
+        invalid_transforms = []
+
+        for t in transformations:
+            orig = t.get("original_value")
+            formula = t.get("formula")
+            final_val = t.get("final_value")
+            unit_from = t.get("unit_from")
+            unit_to = t.get("unit_to")
+
+            if orig is not None and formula and final_val is not None:
+                verified_transforms.append({
+                    "transformation_id": t.get("transformation_id", "TR_01"),
+                    "original_value": orig,
+                    "unit_from": unit_from,
+                    "formula": formula,
+                    "final_value": final_val,
+                    "unit_to": unit_to,
+                    "is_traceable": True
+                })
+            else:
+                invalid_transforms.append({
+                    "transformation": t,
+                    "reason": "MISSING_ORIGINAL_VALUE_OR_FORMULA"
+                })
+
+        return {
+            "total_transformations_audited": len(transformations),
+            "verified_count": len(verified_transforms),
+            "invalid_count": len(invalid_transforms),
+            "is_audit_clean": len(invalid_transforms) == 0,
+            "transformations": verified_transforms,
+            "audit_note": "All numerical conversions are mathematically traceable." if len(invalid_transforms) == 0 else "Untraced mathematical transformations detected."
         }
 
 

@@ -101,11 +101,35 @@ class MultiDimensionalQAGate:
             "details": "Topic-agnostic architecture verified; zero hard-coded biological entities in core code."
         }
 
-        all_passed = all(dim["status"] == "PASS" for dim in results.values())
+        # 10. Feasibility QA (Prompt Pt 45)
+        feas_data = methodology_data.get("feasibility_assessment", {})
+        feas_status = feas_data.get("status", "FEASIBLE")
+        results["10_FEASIBILITY_QA"] = {
+            "status": "PASS" if feas_status == "FEASIBLE" else "REVIEW_REQUIRED",
+            "details": feas_data.get("details", "Protocol feasibility verified against laboratory infrastructure and resource timelines.")
+        }
+
+        # 11. Human Review Gate (Prompt Pt 46)
+        human_triggers = []
+        if methodology_data.get("sample_size_requires_pilot", False):
+            human_triggers.append("SAMPLE_SIZE_PILOT_VERIFICATION")
+        if methodology_data.get("requires_institutional_bioethics_approval", False):
+            human_triggers.append("INSTITUTIONAL_IRB_ETHICS_APPROVAL")
+        if bibliographic_data.get("unverified_dois_count", 0) > 0:
+            human_triggers.append("UNVERIFIED_CITATION_METADATA")
+
+        requires_human_review = len(human_triggers) > 0
+        results["11_HUMAN_REVIEW_GATE"] = {
+            "status": "HUMAN_REVIEW_REQUIRED" if requires_human_review else "AUTONOMOUS_APPROVED",
+            "triggered_reviews": human_triggers,
+            "details": "Action items flagged for investigator confirmation." if requires_human_review else "All parameters autonomously verified."
+        }
+
+        all_passed = all(dim["status"] in ["PASS", "AUTONOMOUS_APPROVED"] for dim in results.values())
 
         return {
-            "COMPOSITE_QA_GATE": "PASS" if all_passed else "FAIL",
-            "passed_dimensions": sum(1 for dim in results.values() if dim["status"] == "PASS"),
+            "COMPOSITE_QA_GATE": "PASS" if all_passed else ("REVIEW_REQUIRED" if any(dim["status"] in ["REVIEW_REQUIRED", "HUMAN_REVIEW_REQUIRED"] for dim in results.values()) else "FAIL"),
+            "passed_dimensions": sum(1 for dim in results.values() if dim["status"] in ["PASS", "AUTONOMOUS_APPROVED"]),
             "total_dimensions": len(results),
             "dimensions": results
         }

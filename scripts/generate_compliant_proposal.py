@@ -53,8 +53,9 @@ class ProposalGenerator:
         md_parts.append("")
 
         # 1. موضوع (Title)
-        fa_title = data.get("research_title_fa", "طرح تحقیقاتی علوم پزشکی")
-        en_title = data.get("research_title_en", "Medical Research Proposal")
+        rpm_obj = data.get("research_problem_model", {})
+        fa_title = data.get("research_title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
+        en_title = data.get("research_title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
         md_parts.append("## ۱. موضوع (Title)")
         md_parts.append(f"▪ **عنوان فارسی (Persian Title):**  \n{fa_title}")
         md_parts.append("")
@@ -176,50 +177,109 @@ class ProposalGenerator:
         md_parts.append("")
 
         # 4. اهمیت و ضرورت تحقیق
+        imp_text = data.get("importance_and_necessity_text", "")
+        if not imp_text:
+            cond_n = model_dict.get("target_condition", {}).get("name_fa", "بیماری هدف")
+            imp_text = (
+                f"پژوهش حاضر از ابعاد مختلف واجد اهمیت راهبردی و ضرورت بالینی است:\n\n"
+                f"۱. **کاهش بار سلامت و پیامدهای نامطلوب:** مدیریت بهینه و پیشگیری از پیشرفت {cond_n} نیازمند استراتژی‌های نوین مبتنی بر شواهد است.\n"
+                f"۲. **تولید شواهد بومی و بین‌المللی:** دستیابی به داده‌های دقیق متدولوژیک و فارماکولوژیک امکان توسعه گایدلاین‌های درمانی را فراهم می‌آورد.\n"
+                f"۳. **بهینه‌سازی منابع نظام سلامت:** تعیین اثربخشی و پنجره ایمنی مداخلات به کاهش هزینه‌های درمانی ناشی از بستری‌های مکرر و عوارض جانبی کمک شایانی خواهد نمود."
+            )
         md_parts.append("## ۴. اهمیت و ضرورت تحقیق (Significance & Necessity)")
-        md_parts.append(data.get("importance_and_necessity_text", ""))
+        md_parts.append(imp_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 5. تعریف واژه‌ها
+        def_text = data.get("definitions_text", "")
+        if not def_text:
+            defs = []
+            cond_n = model_dict.get("target_condition", {}).get("name_fa", "")
+            cond_en = model_dict.get("target_condition", {}).get("name_en", "")
+            if cond_n:
+                defs.append(f"▪ **{cond_n} ({cond_en}):** وضعیت پاتولوژیک و بالینی مشخص‌شده به عنوان اختلال هدف در پروتکل مطالعه.")
+            for agt in model_dict.get("interventions_or_exposures", []):
+                defs.append(f"▪ **{agt.get('name')}:** {agt.get('chemical_or_biological_class', 'مداخله یا داروی مورد ارزیابی')} به عنوان عامل مداخله در طرح پژوهشی حاضر.")
+            for out in model_dict.get("primary_outcomes", []):
+                defs.append(f"▪ **{out.get('name')}:** شاخص پیامد اولیه تعیین‌شده جهت سنجش اثربخشی مداخله در قالب {out.get('measurement_unit', 'واحدهای استاندارد')}.")
+            def_text = "\n\n".join(defs) if defs else "واژگان تخصصی و متغیرهای اصلی پژوهش مطابق استانداردهای بین‌المللی تعریف شده‌اند."
         md_parts.append("## ۵. تعریف واژه‌ها (Definition of Terms)")
-        md_parts.append(data.get("definitions_text", ""))
+        md_parts.append(def_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 6. اهداف جزیی
+        spec_text = data.get("specific_objectives_text", "")
+        if not spec_text:
+            aims = []
+            interventions = model_dict.get("interventions_or_exposures", [])
+            outcomes = model_dict.get("primary_outcomes", [])
+            sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم هدف")
+            for idx, out in enumerate(outcomes, 1):
+                aims.append(f"{idx}. تعیین تاثیر مواجهه با مداخله بر میزان {out.get('name')} در {sys_name}.")
+            aims.append(f"{len(aims)+1}. تعیین آستانه ایمنی، تغییرات وابسته به دوز و حداقل غلظت موثر مداخله.")
+            spec_text = "\n".join(aims)
         md_parts.append("## ۶. اهداف جزیی (Specific Objectives)")
-        md_parts.append(data.get("specific_objectives_text", ""))
+        md_parts.append(spec_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 7. اهداف کلی
+        gen_text = data.get("general_objective_text", "")
+        if not gen_text:
+            gen_text = f"تعیین {fa_title}"
         md_parts.append("## ۷. اهداف کلی (General Objective)")
-        md_parts.append(data.get("general_objective_text", f"تعیین {fa_title}"))
+        md_parts.append(gen_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 8. اهداف کاربردی
+        app_text = data.get("applied_objectives_text", "")
+        if not app_text:
+            app_text = (
+                "۱. ارائه شواهد تجربی و آزمایشگاهی متقن جهت راهنمایی مطالعات پیش‌بالینی و بالینی آینده.\n"
+                "۲. کمک به تصمیم‌گیری بالینی و پروتکل‌های درمانی مبتنی بر شواهد در مراکز پژوهشی و درمانی.\n"
+                "۳. فراهم‌سازی مبنای علمی جهت طراحی فرمولاسیون‌ها یا رژیم‌های درمانی بهینه با حداقل عوارض جانبی."
+            )
         md_parts.append("## ۸. اهداف کاربردی (Applied Objectives)")
-        md_parts.append(data.get("applied_objectives_text", ""))
+        md_parts.append(app_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 9. فرضیات و سوالات پژوهش
+        hyp_text = data.get("hypotheses_and_questions_text", "")
+        if not hyp_text:
+            hyps = []
+            interventions = model_dict.get("interventions_or_exposures", [])
+            outcomes = model_dict.get("primary_outcomes", [])
+            sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم هدف")
+            for idx, out in enumerate(outcomes, 1):
+                hyps.append(f"▪ **فرضیه {idx}:** به نظر می‌رسد مداخله پژوهش اثر معنی‌داری بر تغییر شاخص {out.get('name')} در {sys_name} دارد.")
+            hyps.append(f"▪ **سوال پژوهش:** آیا تغییرات مشاهده‌شده در شاخص‌های پیامد وابسته به غلظت مداخله بوده و از نظر آماری معنی‌دار است؟")
+            hyp_text = "\n\n".join(hyps)
         md_parts.append("## ۹. فرضیات و سوالات پژوهش (Hypotheses & Research Questions)")
-        md_parts.append(data.get("hypotheses_and_questions_text", ""))
+        md_parts.append(hyp_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")
 
         # 10. دستاوردها
+        ach_text = data.get("achievements_text", "")
+        if not ach_text:
+            ach_text = (
+                "▪ **تولید داده‌های تجربی ساختارمند:** تدوین دیتاست اعتبارسنجی‌شده پیرامون پاسخ‌های بیولوژیک در مدل مطالعه.\n"
+                "▪ **استخراج شاخص‌های کمی و تحلیلی:** تعیین مقادیر عددی دقیق پارامترهای اثربخشی، نقاط عطف و غلظت‌های موثر.\n"
+                "▪ **انتشار یافته‌ها در نشریات معتبر بین‌المللی:** چاپ حداقل یک مقاله علمی-پژوهشی در ژورنال‌های معتبر تخصصی علوم پزشکی.\n"
+                "▪ **توسعه دانش فنی و ایجاد زیرساخت روش‌شناختی:** بومی‌سازی و بهینه‌سازی متدولوژی سنجش پیامدها در دانشگاه."
+            )
         md_parts.append("## ۱۰. دستاوردها (Achievements & Deliverables)")
-        md_parts.append(data.get("achievements_text", ""))
+        md_parts.append(ach_text)
         md_parts.append("")
         md_parts.append("---")
         md_parts.append("")

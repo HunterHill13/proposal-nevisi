@@ -186,6 +186,68 @@ class GenericStudyRelationshipEngine:
             "edges": all_edges
         }
 
+    @classmethod
+    def build_claim_dependency_graph(cls, atomic_claims: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Constructs an explicit claim dependency DAG ensuring zero cycles (Prompt Pt 25, 26).
+        Differentiates OBSERVED, INFERRED, and HYPOTHESIZED epistemological tiers.
+        """
+        claim_nodes = {}
+        adjacency = {}
+        in_degree = {}
+
+        for clm in atomic_claims:
+            cid = clm.get("claim_id")
+            epistemic_tier = clm.get("epistemic_tier")
+            if not epistemic_tier:
+                if clm.get("supporting_facts") and any(f.get("directness") == "DIRECT_EVIDENCE" for f in clm.get("supporting_facts", [])):
+                    epistemic_tier = "OBSERVED"
+                elif clm.get("upstream_claim_ids"):
+                    epistemic_tier = "INFERRED"
+                else:
+                    epistemic_tier = "HYPOTHESIZED"
+
+            claim_nodes[cid] = {
+                "claim_id": cid,
+                "claim_text": clm.get("claim_text", ""),
+                "epistemic_tier": epistemic_tier,
+                "upstream_claims": clm.get("upstream_claim_ids", []),
+                "downstream_claims": []
+            }
+            adjacency[cid] = []
+            in_degree[cid] = 0
+
+        # Build edges
+        for cid, node in claim_nodes.items():
+            for up in node["upstream_claims"]:
+                if up in adjacency:
+                    adjacency[up].append(cid)
+                    in_degree[cid] = in_degree.get(cid, 0) + 1
+                    claim_nodes[up]["downstream_claims"].append(cid)
+
+        # Detect cycles using Kahn's algorithm
+        queue = [c for c, deg in in_degree.items() if deg == 0]
+        visited_count = 0
+        topological_order = []
+
+        while queue:
+            curr = queue.pop(0)
+            topological_order.append(curr)
+            visited_count += 1
+            for neighbor in adjacency.get(curr, []):
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+
+        has_cycle = visited_count < len(claim_nodes)
+
+        return {
+            "total_claims": len(claim_nodes),
+            "is_acyclic": not has_cycle,
+            "topological_order": topological_order if not has_cycle else [],
+            "cycle_detected": has_cycle,
+            "claim_nodes": claim_nodes
+        }
+
 if __name__ == "__main__":
     test_studies = [
         {

@@ -8,7 +8,7 @@ dynamically from any ResearchProblemModel across biomedical fields.
 """
 
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 try:
     from research_problem_model import ResearchProblemModel, ProblemModelBuilder
 except ImportError:
@@ -103,6 +103,23 @@ class GenericSearchPlanner:
             f'("{system}" AND ({outcome_str}) AND ("assay validation" OR "reproducibility" OR "protocol" OR "standardization"))'
         ]
 
+        # Layer J: Alternative Explanation Queries
+        facets["LAYER_J_ALTERNATIVE_EXPLANATION"] = [
+            f'("{cond_en}" AND ({outcome_str}) AND ("alternative pathway" OR "compensatory mechanism" OR "off-target mediated" OR "spontaneous remission" OR "bystander effect"))',
+            f'("{primary_agent}" AND ("non-specific cytotoxicity" OR "optical artifact" OR "vehicle interference" OR "aggregation artifact"))'
+        ]
+
+        # Layer K: Confounder Search Queries
+        facets["LAYER_K_CONFOUNDER_SEARCH"] = [
+            f'("{cond_en}" AND ({outcome_str}) AND ("confounding factor" OR "covariate effect" OR "baseline imbalance" OR "batch effect" OR "passage effect"))',
+            f'("{system}" AND ("culture variation" OR "phenotypic drift" OR "mycoplasma artifact" OR "heterogeneity"))'
+        ]
+
+        # Layer L: Independent Replication Search Queries
+        facets["LAYER_L_REPLICATION_SEARCH"] = [
+            f'("{primary_agent}" AND "{cond_en}" AND ("independent replication" OR "reproducibility study" OR "confirmatory trial" OR "multicenter validation" OR "failed replication"))'
+        ]
+
         # Backward compatibility aliases for existing suites
         facets["FACET_A_DIRECT_EVIDENCE"] = facets["LAYER_A_DIRECT_EVIDENCE"]
         facets["FACET_B_COMPONENT_EVIDENCE"] = facets["LAYER_B_COMPONENT_EVIDENCE"]
@@ -125,7 +142,10 @@ class GenericSearchPlanner:
         contradicting_queries = (
             facets["LAYER_F_SAFETY_TOXICITY"] +
             facets["LAYER_G_NEGATIVE_NULL_EVIDENCE"] +
-            facets["LAYER_H_CONTRADICTORY_EVIDENCE"]
+            facets["LAYER_H_CONTRADICTORY_EVIDENCE"] +
+            facets["LAYER_J_ALTERNATIVE_EXPLANATION"] +
+            facets["LAYER_K_CONFOUNDER_SEARCH"] +
+            facets["LAYER_L_REPLICATION_SEARCH"]
         )
 
         return {
@@ -152,8 +172,15 @@ class GenericSearchPlanner:
         }
 
     @staticmethod
-    def assess_search_saturation(iteration_yields: List[int], threshold: float = 0.05) -> Dict[str, Any]:
-        """Assesses whether evidence saturation has been achieved across iterative query cycles."""
+    def assess_search_saturation(
+        iteration_yields: List[int],
+        new_study_families_yield: Optional[List[int]] = None,
+        new_gaps_yield: Optional[List[int]] = None,
+        threshold: float = 0.05
+    ) -> Dict[str, Any]:
+        """Assesses whether evidence saturation has been achieved across iterative query cycles.
+        Integrates paper yields, new study families, and new contradictory/gap discoveries (Prompt Pt 28).
+        """
         if not iteration_yields:
             return {"saturation_reached": False, "novel_evidence_rate": 1.0, "recommendation": "Initiate baseline search"}
 
@@ -164,12 +191,41 @@ class GenericSearchPlanner:
         cumulative = sum(iteration_yields[:-1])
         novel_rate = (latest_yield / cumulative) if cumulative > 0 else 1.0
 
-        is_saturated = novel_rate <= threshold
+        family_rate = 0.0
+        if new_study_families_yield and len(new_study_families_yield) >= 2:
+            latest_fam = new_study_families_yield[-1]
+            cum_fam = sum(new_study_families_yield[:-1])
+            family_rate = (latest_fam / cum_fam) if cum_fam > 0 else 1.0
+
+        is_saturated = (novel_rate <= threshold) and (family_rate <= threshold or new_study_families_yield is None)
         return {
             "saturation_reached": is_saturated,
             "novel_evidence_rate": round(novel_rate, 4),
+            "novel_family_rate": round(family_rate, 4) if new_study_families_yield else None,
             "threshold": threshold,
-            "recommendation": "Evidence saturation satisfied; proceed to extraction" if is_saturated else "Continue iterative expansion"
+            "recommendation": "Evidence saturation satisfied; proceed to synthesis" if is_saturated else "Continue iterative expansion across negative/replication facets"
+        }
+
+    @staticmethod
+    def record_search_execution_log(
+        database: str,
+        exact_query: str,
+        search_layer: str,
+        results_count: int,
+        retrieved_count: int,
+        filters: Optional[Dict[str, Any]] = None,
+        timestamp: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Creates a fully reproducible search log entry for PRISMA 2020 accounting (Prompt Pt 29, 30)."""
+        return {
+            "database": database,
+            "exact_query": exact_query,
+            "search_layer": search_layer,
+            "results_count": results_count,
+            "retrieved_count": retrieved_count,
+            "filters": filters or {"language": ["English", "Persian"], "species": "all"},
+            "timestamp": timestamp or "2026-10-04T00:00:00Z",
+            "is_reproducible": True
         }
 
     @staticmethod

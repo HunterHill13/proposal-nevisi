@@ -150,22 +150,22 @@ USER RESEARCH TOPIC & DOMAIN SPECIFICATION
   - Classifies entailment status across 7 standardized levels.
   - Detects overclaim risks and enforces caveat qualification.
 
-### Layer 6: Universal 14-Section Persian Proposal Output (`scripts/docx_builder.py`)
+### Layer 6: Universal 14-Section Persian Proposal Output (`scripts/docx_builder.py`, `scripts/generate_compliant_proposal.py`)
 - Strictly renders the 14 standard sections demanded by Iranian medical universities and institutional review boards:
-  1. موضوع پژوهش (عنوان فارسی و انگلیسی) - Research Title
-  2. بیان مسئله - Statement of Problem (Extensive clinical, biological, and epidemiological background)
-  3. مرور بر منابع - Literature Review (Individual, detailed paragraphs per reference; comprehensive synthesis)
-  4. اهداف پژوهش (کلی، اختصاصی، کاربردی) - Objectives (General, Specific, Applied)
-  5. فرضیات و سؤالات پژوهش - Hypotheses and Research Questions
-  6. نوآوری و جنبه جدید طرح - Innovation & Evidence-Bounded Novelty
-  7. روش اجرای پژوهش - Methodology (14 granular methodological sub-items)
-  8. جدول متغیرها - Variables Specification Table
-  9. ملاحظات اخلاقی و رضایت‌نامه - Ethical Considerations & Codes
-  10. دستاوردهای پژوهش - Expected Research Deliverables
-  11. محدودیت‌های پژوهش - Research Limitations & Mitigation Strategies
-  12. جدول زمان‌بندی و گانت چارت - Timeline & Gantt Schedule
-  13. هزینه‌ها و بودجه‌بندی - Budget & Resources Allocation
-  14. فهرست منابع - References (Strict Arabic numbering, matching inline citations, full DOI/PMID links)
+  1. موضوع (عنوان فارسی و انگلیسی) - Research Title
+  2. بیان مسئله - Problem Statement (Epidemiological burden, current standards, limitations, biological rationale, conflicting evidence, evidence gaps)
+  3. مرور بر منابع - Literature Review (Individual, detailed analytical paragraphs per reference; cross-study synthesis)
+  4. اهمیت و ضرورت تحقیق - Significance & Necessity
+  5. تعریف واژه‌ها - Definition of Key Terms
+  6. اهداف جزیی - Specific Objectives
+  7. اهداف کلی - General Objective
+  8. اهداف کاربردی - Applied Objectives
+  9. فرضیات و سوالات پژوهش - Hypotheses and Research Questions
+  10. دستاوردها - Expected Research Deliverables
+  11. جدول متغیرها - Variables Specification Table (Independent, Dependent, Confounders, Controls)
+  12. جدول زمان‌بندی و مراحل اجرا - Timeline & Phased Gantt Schedule
+  13. روش اجرا - Methodology (Granular sub-sections 13-1 to 13-14)
+  14. منابع مورد استفاده - References (Vancouver format, matching inline citations, full DOI/PMID links)
 - Format Standards: Dubai Persian typography, complex script bolding (`<w:bCs/>`), native Right-to-Left bidirectional XML (`<w:bidi/>`), and clean typographic layouts.
 
 ---

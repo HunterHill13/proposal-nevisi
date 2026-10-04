@@ -98,6 +98,43 @@ class StudyFamilyDetector:
             "double_counting_warnings": double_counting_warnings
         }
 
+    @classmethod
+    def evaluate_evidence_independence(cls, studies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Calculates multi-tiered evidence independence metrics (Prompt Pt 7).
+        Prevents conflating publication count with independent study count.
+        """
+        cluster_info = cls.cluster_studies(studies)
+        unique_families = cluster_info["unique_evidence_families"]
+
+        # Track distinct cohorts and author/research groups
+        cohorts = set()
+        research_groups = set()
+        trials = set()
+
+        for s in studies:
+            text = f"{s.get('title', '')} {s.get('abstract', '')}"
+            c_found = cls.extract_cohort_names(text)
+            for c in c_found:
+                cohorts.add(c)
+            t_found = cls.extract_trial_registrations(text)
+            for t in t_found:
+                trials.add(t)
+
+            lead_author = (s.get("authors", []) or ["UNKNOWN_GROUP"])[0]
+            inst = s.get("affiliation", s.get("institution", lead_author))
+            research_groups.add(str(inst).strip().lower())
+
+        pub_count = len(studies)
+        return {
+            "publication_count": pub_count,
+            "independent_study_count": unique_families,
+            "independent_cohort_count": max(len(cohorts), 1) if cohorts else unique_families,
+            "independent_research_group_count": max(len(research_groups), 1),
+            "trial_count": len(trials),
+            "evidence_inflation_factor": round(pub_count / max(unique_families, 1), 2),
+            "synthesis_recommendation": f"Base evidence synthesis weight on {unique_families} independent study units rather than {pub_count} publications."
+        }
+
 
 if __name__ == "__main__":
     demo_studies = [

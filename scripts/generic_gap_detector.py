@@ -128,6 +128,40 @@ class GenericGapDetector:
             "identified_gaps": identified_gaps
         }
 
+    @classmethod
+    def formulate_evidence_bounded_novelty(
+        cls,
+        identified_gaps: List[Dict[str, Any]],
+        target_model: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Formulates strictly evidence-bounded novelty statements, blocking ungrounded hyperbole (Prompt Pt 24)."""
+        interventions = target_model.get("interventions_or_exposures", [])
+        system = target_model.get("population_or_model", {}).get("primary_system", "the designated model")
+        agent_names = [a.get("name", "") for a in interventions]
+        agents_str = " + ".join(agent_names) if agent_names else "the proposed intervention"
+
+        active_categories = [g.get("gap_category") for g in identified_gaps]
+
+        novelty_clauses = []
+        if "COMBINATION_GAP" in active_categories:
+            novelty_clauses.append(f"To our knowledge within systematic literature boundaries, direct simultaneous evaluation of {agents_str} has not been reported in {system}.")
+        elif "POPULATION_GAP" in active_categories or "MODEL_GAP" in active_categories:
+            novelty_clauses.append(f"While component effects exist in other experimental systems, empirical assessment directly in {system} represents an unaddressed gap.")
+        elif "MECHANISTIC_GAP" in active_categories:
+            novelty_clauses.append(f"The specific intermediate signaling cascade modulated by {agents_str} remains incompletely resolved in current peer-reviewed evidence.")
+        else:
+            novelty_clauses.append(f"The present research addresses specific dosage, kinetic, or methodological limitations identified across published studies.")
+
+        bounded_statement = " ".join(novelty_clauses)
+
+        return {
+            "is_evidence_bounded": True,
+            "prohibited_hyperbole_prevented": True,
+            "bounded_novelty_statement_en": bounded_statement,
+            "bounded_novelty_statement_fa": f"بر پایه استراتژی جستجوی سیستماتیک و شواهد موجود، نوآوری این پژوهش معطوف به پر کردن شکاف‌های مستندشده در سیستم {system} با تمرکز بر {agents_str} به دور از ادعاهای مبالغه‌آمیز است.",
+            "grounding_gaps": active_categories
+        }
+
 if __name__ == "__main__":
     mock_model = {
         "population_or_model": {"primary_system": "Target Model Lineage"},

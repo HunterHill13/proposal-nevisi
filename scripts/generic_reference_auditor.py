@@ -99,6 +99,95 @@ class GenericReferenceAuditor:
             "audit_note": note
         }
 
+    @staticmethod
+    def resolve_effective_publication_date(ref_metadata: Dict[str, Any]) -> Dict[str, Any]:
+        """Resolves between online publication date, print issue date, preprint date, and correction date (Prompt Pt 11)."""
+        print_year = ref_metadata.get("year")
+        online_date = ref_metadata.get("online_publication_date") or ref_metadata.get("epub_date")
+        preprint_date = ref_metadata.get("preprint_date")
+        correction_date = ref_metadata.get("correction_date")
+
+        effective_year = print_year
+        resolution_rule = "PRINT_ISSUE_YEAR"
+        if online_date:
+            try:
+                y = int(str(online_date)[:4])
+                effective_year = min(print_year or y, y)
+                resolution_rule = "EARLIEST_OF_PRINT_OR_ONLINE"
+            except (ValueError, TypeError):
+                pass
+
+        return {
+            "effective_year": effective_year,
+            "resolution_rule": resolution_rule,
+            "has_correction_date": bool(correction_date),
+            "is_preprint": bool(preprint_date and not print_year)
+        }
+
+    @staticmethod
+    def resolve_database_disagreement(records: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Resolves metadata discrepancies across PubMed, Crossref, OpenAlex, and Europe PMC (Prompt Pt 31)."""
+        authority_hierarchy = ["PubMed", "Crossref", "Europe PMC", "OpenAlex"]
+        canonical_record = {}
+        discrepancies = []
+
+        fields = ["title", "year", "journal", "authors", "is_retracted"]
+        for f in fields:
+            observed_values = {}
+            for db, rec in records.items():
+                if f in rec and rec[f] is not None:
+                    observed_values[db] = rec[f]
+
+            unique_vals = set(str(v).strip().lower() for v in observed_values.values())
+            if len(unique_vals) > 1:
+                # Disagreement detected
+                discrepancies.append({
+                    "field": f,
+                    "observed_across_databases": observed_values
+                })
+
+            # Pick highest authority
+            selected_val = None
+            selected_db = None
+            for auth in authority_hierarchy:
+                if auth in observed_values:
+                    selected_val = observed_values[auth]
+                    selected_db = auth
+                    break
+            if selected_val is not None:
+                canonical_record[f] = selected_val
+
+        return {
+            "canonical_metadata": canonical_record,
+            "has_discrepancies": len(discrepancies) > 0,
+            "discrepancies_logged": discrepancies,
+            "resolution_policy": "HIERARCHICAL_AUTHORITY_PUBMED_CROSSREF_EPMC_OPENALEX"
+        }
+
+    def audit_citation_placement(self, proposal_text: str, atomic_claims: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Audits that citations are placed immediately after relevant scientific assertions (Prompt Pt 34)."""
+        misplaced_citations = []
+        for clm in atomic_claims:
+            cid = clm.get("claim_id", "")
+            clm_text = clm.get("claim_text", "")
+            # Verify that claim text in proposal is immediately followed by a citation bracket
+            # e.g., 'claim statement [1]'
+            pos = proposal_text.find(clm_text)
+            if pos != -1:
+                subsequent_snippet = proposal_text[pos + len(clm_text): pos + len(clm_text) + 30]
+                if not re.search(r'\[\d+\]', subsequent_snippet):
+                    misplaced_citations.append({
+                        "claim_id": cid,
+                        "claim_text": clm_text,
+                        "issue": "CITATION_NOT_IMMEDIATELY_ADJACENT"
+                    })
+
+        return {
+            "misplaced_citations_count": len(misplaced_citations),
+            "misplaced_incidents": misplaced_citations,
+            "placement_status": "COMPLIANT" if len(misplaced_citations) == 0 else "REVIEW_REQUIRED"
+        }
+
     def audit_citation_padding(
         self,
         reference_set: List[Dict[str, Any]],

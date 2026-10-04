@@ -229,6 +229,116 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertIn(res["entailment_status"], ["DIRECTLY_SUPPORTED", "PARTIALLY_SUPPORTED"])
 
 
+    def test_23_database_metadata_disagreement_resolution(self):
+        """Test 23: Conflicting metadata across PubMed, Crossref, and OpenAlex resolved hierarchically (Prompt Pt 31)."""
+        db_records = {
+            "OpenAlex": {"title": "Older title variation", "year": 2021},
+            "Crossref": {"title": "Canonical Crossref Title", "year": 2022},
+            "PubMed": {"title": "Canonical PubMed Title", "year": 2022, "journal": "J Clin Invest"}
+        }
+        res = self.auditor.resolve_database_disagreement(db_records)
+        self.assertTrue(res["has_discrepancies"])
+        self.assertEqual(res["canonical_metadata"]["title"], "Canonical PubMed Title")
+        self.assertEqual(res["canonical_metadata"]["year"], 2022)
+
+    def test_24_effective_publication_date_resolution(self):
+        """Test 24: Resolving between print, online, and preprint dates (Prompt Pt 11)."""
+        meta = {
+            "year": 2023,
+            "online_publication_date": "2022-11-15",
+            "correction_date": "2024-02-01"
+        }
+        res = self.auditor.resolve_effective_publication_date(meta)
+        self.assertEqual(res["effective_year"], 2022)
+        self.assertEqual(res["resolution_rule"], "EARLIEST_OF_PRINT_OR_ONLINE")
+        self.assertTrue(res["has_correction_date"])
+
+    def test_25_misplaced_citation_detection(self):
+        """Test 25: Citation placement audit flags claims disconnected from citations (Prompt Pt 34)."""
+        proposal_text = "Treatment inhibits pathway A. A completely separate paragraph describes mortality."
+        claims = [{"claim_id": "CLM_01", "claim_text": "Treatment inhibits pathway A."}]
+        res = self.auditor.audit_citation_placement(proposal_text, claims)
+        self.assertEqual(res["placement_status"], "REVIEW_REQUIRED")
+        self.assertEqual(res["misplaced_citations_count"], 1)
+
+    def test_26_numerical_transformation_audit(self):
+        """Test 26: Numerical conversions require explicit formula, unit, and original provenance (Prompt Pt 17)."""
+        transforms = [
+            {
+                "transformation_id": "TR_01",
+                "original_value": 0.05,
+                "unit_from": "fraction",
+                "formula": "value * 100",
+                "final_value": 5.0,
+                "unit_to": "%"
+            },
+            {
+                "transformation_id": "TR_02",
+                "original_value": None,  # Broken!
+                "formula": "log(value)",
+                "final_value": 1.2
+            }
+        ]
+        res = GenericClaimEntailmentEngine.audit_numerical_transformations(transforms)
+        self.assertFalse(res["is_audit_clean"])
+        self.assertEqual(res["invalid_count"], 1)
+        self.assertEqual(res["verified_count"], 1)
+
+    def test_27_evidence_independence_inflation_gate(self):
+        """Test 27: Conflating 5 publications from 1 trial cohort triggers inflation warning (Prompt Pt 7)."""
+        clustered_studies = [
+            {"study_id": f"PUB_{i}", "title": f"Study report {i} on EMPA (NCT01234567)"}
+            for i in range(1, 6)
+        ]
+        res = StudyFamilyDetector.evaluate_evidence_independence(clustered_studies)
+        self.assertEqual(res["publication_count"], 5)
+        self.assertEqual(res["independent_study_count"], 1)
+        self.assertGreater(res["evidence_inflation_factor"], 1.0)
+
+    def test_28_evidence_bounded_novelty_gate(self):
+        """Test 28: Novelty statements are strictly bounded to identified gaps, blocking hyperbole (Prompt Pt 24)."""
+        from generic_gap_detector import GenericGapDetector
+        gaps = [{"gap_category": "COMBINATION_GAP"}]
+        model = {
+            "interventions_or_exposures": [{"name": "Drug X"}, {"name": "Drug Y"}],
+            "population_or_model": {"primary_system": "Lineage Z"}
+        }
+        res = GenericGapDetector.formulate_evidence_bounded_novelty(gaps, model)
+        self.assertTrue(res["is_evidence_bounded"])
+        self.assertTrue(res["prohibited_hyperbole_prevented"])
+        self.assertIn("Drug X + Drug Y", res["bounded_novelty_statement_en"])
+
+    def test_29_claim_dependency_dag_cycle_prevention(self):
+        """Test 29: Claim dependency graph detects and prevents cyclical reasoning (Prompt Pt 25)."""
+        from generic_study_relationships import GenericStudyRelationshipEngine
+        cyclic_claims = [
+            {"claim_id": "CLM_A", "claim_text": "A causes B", "upstream_claim_ids": ["CLM_B"]},
+            {"claim_id": "CLM_B", "claim_text": "B causes A", "upstream_claim_ids": ["CLM_A"]}
+        ]
+        res = GenericStudyRelationshipEngine.build_claim_dependency_graph(cyclic_claims)
+        self.assertFalse(res["is_acyclic"])
+        self.assertTrue(res["cycle_detected"])
+
+    def test_30_composite_qa_feasibility_and_human_review_gate(self):
+        """Test 30: MultiDimensionalQAGate enforces Feasibility and Human Review dimensions (Prompt Pt 45, 46)."""
+        from multi_dimensional_qa_gate import MultiDimensionalQAGate
+        res = MultiDimensionalQAGate.execute_qa(
+            scientific_data={"unjustified_extrapolations": 0, "synergy_fallacy_detected": False},
+            bibliographic_data={"verified_references": 15, "total_references": 15, "unsupported_references": 0, "unverified_dois_count": 1},
+            evidence_data={"untraced_numbers_count": 0, "studies_with_quantitative_data": 15},
+            citation_data={"citation_coverage_pct": 100.0, "padding_detected": False},
+            structural_data={"PROPOSAL_STRUCTURE_VALIDATION": "PASS"},
+            methodology_data={"boundary_conditions_defined": True, "feasibility_assessment": {"status": "FEASIBLE"}},
+            statistical_data={"primary_test_defined": True, "normality_checked": True},
+            writing_data={"scholarly_tone_verified": True, "artificial_repetition_detected": False},
+            generalization_data={"hardcode_violations": 0}
+        )
+        self.assertEqual(res["total_dimensions"], 11)
+        self.assertIn("10_FEASIBILITY_QA", res["dimensions"])
+        self.assertIn("11_HUMAN_REVIEW_GATE", res["dimensions"])
+        self.assertEqual(res["dimensions"]["11_HUMAN_REVIEW_GATE"]["status"], "HUMAN_REVIEW_REQUIRED")
+
+
 if __name__ == "__main__":
     unittest.main()
 

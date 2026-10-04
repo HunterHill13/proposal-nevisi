@@ -13,10 +13,10 @@
 This report documents the exhaustive verification and self-audit of the `proposal-nevisi` system following its major architectural decoupling from a topic-specific codebase (formerly overfitted to the Lupeol + NDV in vitro lung cancer case study) into a **General-Purpose Evidence-Driven Medical Research and Proposal Engine**.
 
 The system was evaluated against four independent testing dimensions:
-1. **Static Analysis & Anti-Hard-Coding Leakage Gate:** Proves zero biological keywords or disease-specific constants exist in the core generic engines.
-2. **Multi-Domain Generalization Suite:** Validates end-to-end execution across four fundamentally distinct biomedical disciplines (Oncology, Cardiology, Infectious Diseases, and Diagnostics).
-3. **Adversarial Stress Suite (12 Scenarios):** Tests active defense mechanisms against fabricated DOIs, mismatched titles, partial entailment, ungrounded numerical claims, and causal overclaims.
-4. **Historical 60-Test Benchmark Suite:** Asserts that the preserved Lupeol+NDV benchmark remains 100% intact, compliant with institutional Word formatting, and free from citation padding.
+1. **Static Analysis & Anti-Hard-Coding Leakage Gate (19 Tests):** Proves zero biological keywords or disease-specific constants exist in the core generic engines, and verifies semantic model independence.
+2. **Multi-Domain Generalization Suite (9 Tests):** Validates end-to-end execution across 9 fundamentally distinct biomedical disciplines (Oncology, Cardiology, Infectious Diseases, Diagnostics, Epidemiology, Basic Molecular Biology, Animal Experimental, Clinical RCT Endocrinology, and Nephrology Prognostic Biomarkers).
+3. **Adversarial Stress Suite (30 Scenarios):** Tests active defense mechanisms against fabricated DOIs, mismatched titles, retracted/corrected articles, pseudo-replication, publication bias (<10 studies), translational overclaims, cyclic reasoning, ungrounded numerical claims, and causal overclaims.
+4. **Historical 60-Test Benchmark Suite (60 Tests):** Asserts that the preserved benchmark remains 100% intact, compliant with institutional Word formatting, and free from citation padding.
 
 ---
 
@@ -24,13 +24,13 @@ The system was evaluated against four independent testing dimensions:
 
 ```text
 ###########################################################################
-UNIFIED TEST EXECUTION SUMMARY REPORT
+PROPOSAL-NEVISI v8.0: DYNAMIC MASTER UNIFIED TEST RUNNER
 ###########################################################################
 TOTAL EVALUATION SUITES : 4
 PASSED SUITES           : 4
 FAILED SUITES           : 0
-TOTAL TEST ASSERTIONS   : 77
-PASSED ASSERTIONS       : 77
+TOTAL TEST ASSERTIONS   : 118
+PASSED ASSERTIONS       : 118
 FAILED ASSERTIONS       : 0
 SKIPPED ASSERTIONS      : 0
 ---------------------------------------------------------------------------
@@ -41,11 +41,11 @@ OVERALL SYSTEM STATUS: ALL TEST SUITES PASSED (100% BEHAVIORAL VERIFICATION)
 
 | Suite Name | Module Path | Assertions | Status | Duration |
 | :--- | :--- | :---: | :---: | :---: |
-| **Static Analysis Hard-Code Leakage Audit** | `tests/test_hard_code_leakage.py` | 1 | **PASS** | 0.04s |
-| **Multi-Domain Generalization Suite** | `tests/test_generalization.py` | 4 | **PASS** | 0.06s |
-| **Adversarial Stress Scenarios (12 Tests)** | `tests/test_adversarial_scenarios.py` | 12 | **PASS** | 0.07s |
-| **Benchmark Tri-Tier Self-Audit Suite** | `scripts/self_audit_suite.py` | 60 | **PASS** | 0.06s |
-| **Total Unified Assertions** | **All 4 Suites** | **77** | **PASS** | **0.23s** |
+| **Static Analysis Hard-Code Leakage Audit** | `tests/test_hard_code_leakage.py` | 19 | **PASS** | 0.02s |
+| **Multi-Domain Generalization Suite** | `tests/test_generalization.py` | 9 | **PASS** | 0.01s |
+| **Adversarial Stress Scenarios (30 Tests)** | `tests/test_adversarial_scenarios.py` | 30 | **PASS** | 0.01s |
+| **Benchmark Tri-Tier Self-Audit Suite** | `tests/test_benchmark_audit.py` | 60 | **PASS** | 0.03s |
+| **Total Unified Assertions** | **All 4 Suites** | **118** | **PASS** | **0.07s** |
 
 ---
 
