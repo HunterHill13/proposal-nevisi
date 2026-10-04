@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Test Harness: 216/216 Passed](https://img.shields.io/badge/Unified%20Tests-216%2F216%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Test Harness: 218/218 Passed](https://img.shields.io/badge/Unified%20Tests-218%2F218%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -79,10 +79,10 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
 
-The engine includes a master test harness verifying 216 total software assertions across 7 independent test suites:
+The engine includes a master test harness verifying 218 total software assertions across 7 independent test suites:
 - **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts and verifies semantic generalization (22 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 84 stress tests evaluating ScientificSearchAdapter deduplication, search saturation curve, 10-dimension contextual relevance gates, 6 relevance tiers, 25-reference ceiling, 14-factor scoring, screening funnels, mandatory 3-part inclusion justifications, fake citations, mismatched DOIs (`IDENTITY_CONFLICT`), retracted/corrected articles, publication status, exact calendar boundary parsing, leap-year safety, rejection of fake foundational exceptions, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA record-level deduplication, decoupled database adapters, prompt injection sanitization, internal consistency directed graph, multi-pillar final scientific release gate verification (84 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 86 stress tests evaluating swappable search backends, ScientificSearchAdapter deduplication, search saturation curve, 10-dimension contextual relevance gates, 6 relevance tiers, 25-reference ceiling, 14-factor scoring, screening funnels, mandatory 3-part inclusion justifications, fake citations, mismatched DOIs (`IDENTITY_CONFLICT`), retracted/corrected articles, publication status, exact calendar boundary parsing, leap-year safety, rejection of fake foundational exceptions, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA record-level deduplication, decoupled database adapters, prompt injection sanitization, internal consistency directed graph, multi-pillar final scientific release gate verification (86 tests - **PASS**).
 - **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
 - **Suite 5: Mutation Testing Layer (`test_mutations.py`):** 10 deliberate scientific defect mutations evaluating whether the auditor catches corrupted temporal cutoffs, retracted articles, mismatched DOIs, unsupported assertions, observational causal overclaims, duplicated records, assumed sample sizes, prompt injections, and missing citations (10 tests - **PASS**, 100% Mutation Score).
 - **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 (reordering stability, duplicate invariance, causal gates, unit changes), Draft-07 JSON Schema validation against SEARCH_PROVENANCE, REFERENCE_RECORD, and CLAIM_PROVENANCE, and randomized xenobiology synthetic domain benchmark (14 tests - **PASS**).
@@ -116,7 +116,7 @@ python scripts/master_release_gate.py
 7. **دفتر کل خاستگاه داده‌های کمی و اعتبارسنجی عبارات علّی:** جداسازی کامل اتصال استنادی، ردیابی سند منبع و دلالت علمی ادعا، همراه با بررسی دقیق مقادیر عددی، تبدیل واحدها و مهار ادعای علیت در مطالعات مشاهده‌ای.
 8. **طراحی پروتکل پویا، سیاست داده‌های مفقوده و رهگیری پارامترهای حجم نمونه:** تضمین تمایز `0` و `False` از `MISSING` و اعلام وضعیت `SAMPLE_SIZE_REQUIRES_INPUT` در صورت غیبت پارامترهای حیاتی بدون مفروضات پنهان.
 9. **خروجی رسمی ۱۴ گانه ورد و ابزار بازرسی عمیق XML:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و بازرسی ساختاری فایل docx.
-10. **سوئیت آزمون‌های هفت‌گانه ۲۱۶ تستی و لایه آزمون جهش (Mutation Testing):** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۲۱۶ تستی با کشته شدن ۱۰/۱۰ جهش عمدی (امتیاز جهش ۱۰۰٪) و برقراری ناوردایی‌های کشف پویا و حسابداری آماری.
+10. **سوئیت آزمون‌های هفت‌گانه ۲۱۸ تستی و لایه آزمون جهش (Mutation Testing):** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۲۱۸ تستی با کشته شدن ۱۰/۱۰ جهش عمدی (امتیاز جهش ۱۰۰٪) و برقراری ناوردایی‌های کشف پویا و حسابداری آماری.
 
 ---
 

@@ -16,14 +16,14 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 216-assertion test harness across 7 suites
-  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 84 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 218-assertion test harness across 7 suites
+  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 86 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.2)
 
 این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.2 با ارتقای عمیق موتور شواهد، به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی، اپیدمیولوژیک و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
-> **تذکر شفاف روش‌شناختی:** آزمون‌های نرم‌افزاری ۲۱۶ گانه نشان‌دهنده یکپارچگی محاسباتی و الگوریتمی سدهای سیستم هستند و نباید با کارآزمایی‌های بالینی یا آزمایشگاهی برون‌خط اشتباه گرفته شوند.
+> **تذکر شفاف روش‌شناختی:** آزمون‌های نرم‌افزاری ۲۱۸ گانه نشان‌دهنده یکپارچگی محاسباتی و الگوریتمی سدهای سیستم هستند و نباید با کارآزمایی‌های بالینی یا آزمایشگاهی برون‌خط اشتباه گرفته شوند.
 
 ---
 

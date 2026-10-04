@@ -1599,9 +1599,103 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(audit_fail_3["PORTFOLIO_AUDIT"], "FAIL")
         self.assertTrue(any("MISSING_WHY_NEEDED_JUSTIFICATION" in v for v in audit_fail_3["violations"]))
 
+    def test_85_scientific_search_backend_pluggability_and_swapping(self):
+        """Test 85: Swappable search backends (BaseScientificSearchBackend, FixtureSearchBackend, KDenseCompatibilityBackend)."""
+        from scientific_search_adapter import (
+            ScientificSearchAdapter, BaseScientificSearchBackend,
+            FixtureSearchBackend, KDenseCompatibilityBackend, PubMedBackend
+        )
+        sample_fixture = [
+            {"title": "Cardioprotection in clinical heart failure", "doi": "10.1000/cardio.1", "year": 2024},
+            {"title": "Renal outcomes in experimental diabetes", "doi": "10.1000/renal.1", "year": 2023}
+        ]
+        # 1. Custom fixture backend
+        fixture_backend = FixtureSearchBackend(sample_fixture)
+        adapter = ScientificSearchAdapter(custom_backend=fixture_backend)
+        res = adapter.search_federated(queries=["clinical experimental"], databases=["CustomSource"], mode="online")
+        self.assertEqual(res["total_raw_records"], 2)
+        self.assertEqual(res["raw_corpus"][0]["doi"], "10.1000/cardio.1")
+
+        # 2. Dynamic registration & swapping
+        adapter_default = ScientificSearchAdapter()
+        self.assertIsNotNone(adapter_default.get_backend("PubMed"))
+        self.assertIsNotNone(adapter_default.get_backend("KDense"))
+
+        class MockLaboratoryBackend(BaseScientificSearchBackend):
+            backend_name = "MockLabDB"
+            def search(self, query: str, max_results: int = 50, mode: str = "offline"):
+                return {
+                    "database": "MockLabDB",
+                    "query": query,
+                    "status": "EXECUTED",
+                    "results_count": 1,
+                    "records": [{"title": f"Internal Lab Finding on {query}", "doi": "10.1000/lab.1", "year": 2024}]
+                }
+
+        adapter_default.register_backend("InternalLab", MockLaboratoryBackend())
+        self.assertIsNotNone(adapter_default.get_backend("InternalLab"))
+        res_lab = adapter_default.search_federated(queries=["biomarker"], databases=["InternalLab"], mode="online")
+        self.assertEqual(res_lab["total_raw_records"], 1)
+        self.assertEqual(res_lab["raw_corpus"][0]["doi"], "10.1000/lab.1")
+
+        # 3. K-Dense compatibility layer
+        kdense_backend = KDenseCompatibilityBackend(fixture_backend)
+        res_kd = kdense_backend.search("heart", max_results=5, mode="fixture")
+        self.assertEqual(res_kd["compatibility_layer"], "K_DENSE_SCIENTIFIC_SKILLS")
+        self.assertTrue(res_kd["records"][0].get("kdense_interoperable"))
+
+    def test_86_fail_closed_biological_incompatibility_across_disparate_domains(self):
+        """Test 86: Fail-closed biological incompatibility unconditionally rejects disparate domain records regardless of keyword overlap."""
+        from generic_reference_auditor import GenericReferenceAuditor
+        human_oncology_problem = {
+            "domain": "oncology_cellular",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_en": "Lung Neoplasm", "name_fa": "تومور بدخیم ریه"},
+            "population_or_model": {"primary_system": "human pulmonary adenocarcinoma cell line"},
+            "interventions_or_exposures": [{"name": "Phytochemical Alpha"}],
+            "primary_outcomes": [{"name": "Apoptotic Viability"}]
+        }
+
+        # Case 1: Agronomy / Crop yield with Phytochemical Alpha
+        crop_record = {
+            "ref_id": "DISP_AGRI",
+            "title": "Phytochemical Alpha enhances crop yield and soil salinity tolerance in wheat",
+            "abstract": "We observed improved plant fertilizer assimilation and crop yield.",
+            "year": 2024
+        }
+        res_crop = GenericReferenceAuditor.audit_contextual_relevance(crop_record, human_oncology_problem)
+        self.assertFalse(res_crop["is_contextually_relevant"])
+        self.assertEqual(res_crop["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res_crop["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+
+        # Case 2: Poultry chicken feed with Phytochemical Alpha
+        poultry_record = {
+            "ref_id": "DISP_POULTRY",
+            "title": "Dietary Phytochemical Alpha supplementation on broiler chicken feed and poultry weight gain",
+            "abstract": "Broiler chicken feed efficiency and abdominal fat were measured.",
+            "year": 2024
+        }
+        res_poultry = GenericReferenceAuditor.audit_contextual_relevance(poultry_record, human_oncology_problem)
+        self.assertFalse(res_poultry["is_contextually_relevant"])
+        self.assertEqual(res_poultry["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res_poultry["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+
+        # Case 3: Livestock ram semen cryopreservation with Phytochemical Alpha
+        semen_record = {
+            "ref_id": "DISP_SEMEN",
+            "title": "Protective role of Phytochemical Alpha on ram semen cryopreservation and spermatozoa motility",
+            "abstract": "Cryopreserved semen motility was assessed following artificial insemination.",
+            "year": 2024
+        }
+        res_semen = GenericReferenceAuditor.audit_contextual_relevance(semen_record, human_oncology_problem)
+        self.assertFalse(res_semen["is_contextually_relevant"])
+        self.assertEqual(res_semen["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res_semen["rejection_category"], "INCOMPATIBLE_BIOLOGICAL_SYSTEM")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

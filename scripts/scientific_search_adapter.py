@@ -46,6 +46,114 @@ except ImportError:
     from generic_reference_auditor import GenericReferenceAuditor
 
 
+class BaseScientificSearchBackend:
+    """Abstract Base Class for pluggable scientific search backends."""
+    backend_name: str = "BASE"
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        """Executes a search query and returns standardized search results."""
+        raise NotImplementedError("Subclasses must implement search()")
+
+
+class PubMedBackend(BaseScientificSearchBackend):
+    """Concrete backend adapter for NCBI PubMed / E-utilities."""
+    backend_name: str = "PubMed"
+
+    def __init__(self, adapter: Optional["ScientificSearchAdapter"] = None):
+        self.adapter = adapter or ScientificSearchAdapter()
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        return self.adapter.query_pubmed(query, max_results=max_results, mode=mode)
+
+
+class EuropePMCBackend(BaseScientificSearchBackend):
+    """Concrete backend adapter for Europe PMC REST API."""
+    backend_name: str = "Europe PMC"
+
+    def __init__(self, adapter: Optional["ScientificSearchAdapter"] = None):
+        self.adapter = adapter or ScientificSearchAdapter()
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        return self.adapter.query_europe_pmc(query, max_results=max_results, mode=mode)
+
+
+class OpenAlexBackend(BaseScientificSearchBackend):
+    """Concrete backend adapter for OpenAlex Works REST API."""
+    backend_name: str = "OpenAlex"
+
+    def __init__(self, adapter: Optional["ScientificSearchAdapter"] = None):
+        self.adapter = adapter or ScientificSearchAdapter()
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        return self.adapter.query_openalex(query, max_results=max_results, mode=mode)
+
+
+class CrossrefBackend(BaseScientificSearchBackend):
+    """Concrete backend adapter for Crossref Metadata REST API."""
+    backend_name: str = "Crossref"
+
+    def __init__(self, adapter: Optional["ScientificSearchAdapter"] = None):
+        self.adapter = adapter or ScientificSearchAdapter()
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        return self.adapter.query_crossref(query, max_results=max_results, mode=mode)
+
+
+class FixtureSearchBackend(BaseScientificSearchBackend):
+    """Deterministic offline fixture backend for reproducible testing."""
+    backend_name: str = "FixtureCorpus"
+
+    def __init__(self, records: Optional[List[Dict[str, Any]]] = None):
+        self.records = records or []
+
+    def set_records(self, records: List[Dict[str, Any]]) -> None:
+        self.records = list(records)
+
+    def search(self, query: str, max_results: int = 50, mode: str = "fixture") -> Dict[str, Any]:
+        q_terms = [w.lower() for w in query.split() if len(w) > 3]
+        if not q_terms:
+            res_list = self.records[:max_results]
+        else:
+            matched = [
+                r for r in self.records
+                if any(t in f"{r.get('title','')} {r.get('abstract','')} {r.get('doi','')} {r.get('pmid','')}".lower() for t in q_terms)
+            ]
+            res_list = matched[:max_results] if matched else self.records[:max_results]
+        return {
+            "database": self.backend_name,
+            "query": query,
+            "status": "EXECUTED",
+            "results_count": len(res_list),
+            "records": res_list
+        }
+
+
+class KDenseCompatibilityBackend(BaseScientificSearchBackend):
+    """Compatibility bridge for K-Dense scientific agent skills and local science tools.
+    
+    Translates standard K-Dense paper-lookup, literature-review, and citation-management
+    paradigms into standardized Proposal-Nevisi Study Evidence records.
+    """
+    backend_name: str = "KDenseCompatible"
+
+    def __init__(self, primary_backend: Optional[BaseScientificSearchBackend] = None):
+        self.primary_backend = primary_backend or PubMedBackend()
+
+    def search(self, query: str, max_results: int = 50, mode: str = "offline") -> Dict[str, Any]:
+        # Delegates search to primary backend while wrapping in K-Dense schema semantics
+        res = self.primary_backend.search(query, max_results=max_results, mode=mode)
+        recs = res.get("records", [])
+        kdense_records = []
+        for r in recs:
+            rc = dict(r)
+            rc["kdense_interoperable"] = True
+            rc["kdense_schema"] = "kdense/paper-lookup/v1"
+            kdense_records.append(rc)
+        res["records"] = kdense_records
+        res["compatibility_layer"] = "K_DENSE_SCIENTIFIC_SKILLS"
+        return res
+
+
 class ScientificSearchAdapter:
     """Universal federated scientific search engine and deduplication adapter."""
 
@@ -66,13 +174,33 @@ class ScientificSearchAdapter:
         self,
         ncbi_api_key: Optional[str] = None,
         polite_email: Optional[str] = None,
-        timeout: int = DEFAULT_TIMEOUT_SECONDS
+        timeout: int = DEFAULT_TIMEOUT_SECONDS,
+        custom_backend: Optional[BaseScientificSearchBackend] = None
     ):
         self.ncbi_api_key = ncbi_api_key or os.environ.get("NCBI_API_KEY")
         self.polite_email = polite_email or os.environ.get("POLITE_EMAIL", "audit@proposal-nevisi.org")
         self.timeout = timeout
         self.request_delay = 0.12 if self.ncbi_api_key else 0.35
         self.last_request_time: Dict[str, float] = {}
+        self.custom_backend = custom_backend
+        self._registered_backends: Dict[str, BaseScientificSearchBackend] = {}
+        self._init_default_backends()
+
+    def _init_default_backends(self):
+        """Initializes default swappable database backends."""
+        self._registered_backends["PubMed"] = PubMedBackend(self)
+        self._registered_backends["Europe PMC"] = EuropePMCBackend(self)
+        self._registered_backends["OpenAlex"] = OpenAlexBackend(self)
+        self._registered_backends["Crossref"] = CrossrefBackend(self)
+        self._registered_backends["KDense"] = KDenseCompatibilityBackend(self._registered_backends["PubMed"])
+
+    def register_backend(self, name: str, backend: BaseScientificSearchBackend) -> None:
+        """Registers or overrides a scientific search backend."""
+        self._registered_backends[name] = backend
+
+    def get_backend(self, name: str) -> Optional[BaseScientificSearchBackend]:
+        """Retrieves a registered search backend by name."""
+        return self._registered_backends.get(name)
 
     def _rate_limit(self, db_key: str):
         """Enforces cooperative rate-limiting per source API."""
@@ -490,11 +618,14 @@ class ScientificSearchAdapter:
                 "search_log": search_log
             }
 
-        # Online mode: query sources
+        # Online mode: query sources using registered or custom backends
         for q in queries:
             for db in target_dbs:
                 res = None
-                if db == "PubMed":
+                backend = self.custom_backend or self.get_backend(db)
+                if backend:
+                    res = backend.search(q, max_results=max_results_per_source, mode="online")
+                elif db == "PubMed":
                     res = self.query_pubmed(q, max_results=max_results_per_source, mode="online")
                 elif db == "Europe PMC":
                     res = self.query_europe_pmc(q, max_results=max_results_per_source, mode="online")

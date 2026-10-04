@@ -789,7 +789,9 @@ class GenericReferenceAuditor:
             "semen", "spermatozoa", "cryopreservation of semen", "cryopreserved semen",
             "cryopreserved bucks", "bucks semen", "buck semen", "ram semen", "bull semen",
             "boar semen", "stallion semen", "livestock breeding", "artificial insemination",
-            "crop yield", "plant fertilizer", "soil salinity", "timber preservation"
+            "crop yield", "plant fertilizer", "soil salinity", "timber preservation",
+            "aquaculture feeding", "broiler chicken feed", "poultry weight gain",
+            "silkworm breeding", "cotton fiber yield", "grain harvest preservation"
         ]
         
         found_incompatible = None
