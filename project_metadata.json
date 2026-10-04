@@ -1,7 +1,7 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "8.1.0",
-  "version_display": "v8.1.0",
+  "engine_version": "8.2.0",
+  "version_display": "v8.2.0",
   "release_channel": "stable",
   "semantic_release_date": "2026-10-04",
   "architecture": {
@@ -11,11 +11,15 @@
     "zero_hardcode_biological_leakage": true
   },
   "metrics": {
-    "total_unified_tests": 161,
+    "total_unified_tests": 201,
     "suite_1_static_analysis_tests": 19,
     "suite_2_multi_domain_generalization_tests": 12,
     "suite_3_adversarial_stress_and_negative_rejection_tests": 70,
     "suite_4_benchmark_assertions": 60,
+    "suite_5_mutation_testing_tests": 10,
+    "suite_6_property_and_schema_tests": 14,
+    "suite_7_e2e_integration_tests": 16,
+    "mutation_score_pct": 100.0,
     "mandatory_proposal_sections": 14,
     "section_13_subsections": 14,
     "search_strategy_layers_count": 12,

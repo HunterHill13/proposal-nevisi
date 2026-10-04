@@ -237,18 +237,106 @@ class DynamicProtocolDesigner:
         stat_inputs = model_dict.get("statistical_parameters", {})
 
         # Standard parameter audit dictionary
+    @classmethod
+    def classify_data_status(cls, val: Any) -> Dict[str, Any]:
+        """Strictly distinguishes MISSING from False, 0, NOT_REPORTED, and NOT_APPLICABLE (Phase 14)."""
+        if val is None:
+            return {"status": "MISSING", "is_missing": True, "value": None}
+        if isinstance(val, bool):
+            return {"status": "VALID_BOOLEAN", "is_missing": False, "value": val}
+        if isinstance(val, (int, float)):
+            return {"status": "VALID_NUMERIC", "is_missing": False, "value": val}
+        s = str(val).strip()
+        if not s or s.upper() in ["NONE", "NULL", "MISSING", "NA", "N/A"]:
+            return {"status": "MISSING", "is_missing": True, "value": None}
+        if s.upper() == "NOT_REPORTED":
+            return {"status": "NOT_REPORTED", "is_missing": False, "value": "NOT_REPORTED"}
+        if s.upper() == "NOT_APPLICABLE":
+            return {"status": "NOT_APPLICABLE", "is_missing": False, "value": "NOT_APPLICABLE"}
+        if s.upper() == "UNKNOWN":
+            return {"status": "UNKNOWN", "is_missing": False, "value": "UNKNOWN"}
+        return {"status": "VALID_DATA", "is_missing": False, "value": val}
+
+    @classmethod
+    def calculate_sample_size_plan(cls, framework_or_model: Any, stat_inputs: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Calculates study-design-aware sample size requirements with explicit parameter provenance audit (Phases 14 & 17)."""
+        if isinstance(framework_or_model, dict):
+            framework = framework_or_model.get("framework", "EXPERIMENTAL_IN_VITRO")
+            stat_inputs = framework_or_model.get("statistical_parameters", {})
+        else:
+            framework = framework_or_model or "EXPERIMENTAL_IN_VITRO"
+            stat_inputs = stat_inputs or {}
+
+        def build_param_entry(name: str, val: Any, unit: str, default_val: Any = None, default_source: str = "ASSUMED_DEFAULT", assumption_note: str = ""):
+            if val is not None:
+                return {
+                    "parameter": name,
+                    "value": val,
+                    "unit": unit,
+                    "provenance_state": "provided",
+                    "source": "USER_OR_STUDY_SPECIFICATION",
+                    "source_location": {"section": "METHODOLOGY_SECTION_13_9"},
+                    "assumption": False,
+                    "justification": "Direct protocol input parameter.",
+                    "confidence": "HIGH"
+                }
+            elif default_val is not None:
+                return {
+                    "parameter": name,
+                    "value": default_val,
+                    "unit": unit,
+                    "provenance_state": "assumed",
+                    "source": default_source,
+                    "source_location": None,
+                    "assumption": True,
+                    "justification": assumption_note or "Standard default assumption; must not be silently masqueraded as empirical data.",
+                    "confidence": "MODERATE"
+                }
+            else:
+                return {
+                    "parameter": name,
+                    "value": None,
+                    "unit": unit,
+                    "provenance_state": "missing",
+                    "source": None,
+                    "source_location": None,
+                    "assumption": False,
+                    "justification": "Required statistical parameter is unobserved in literature.",
+                    "confidence": "ZERO"
+                }
+
         param_audit = {
-            "alpha": {"value": 0.05, "status": "assumed" if "alpha" not in stat_inputs else "provided"},
-            "power": {"value": 0.80, "status": "assumed" if "power" not in stat_inputs else "provided"},
-            "effect_size": {"value": stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio"), "status": "provided" if (stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio")) is not None else "missing"},
-            "variance_or_sd": {"value": stat_inputs.get("standard_deviation"), "status": "provided" if stat_inputs.get("standard_deviation") is not None else "missing"},
-            "baseline_event_rate": {"value": stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion"), "status": "provided" if (stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion")) is not None else "missing"},
-            "attrition_rate": {"value": stat_inputs.get("attrition_rate", 0.10), "status": "provided" if "attrition_rate" in stat_inputs else "assumed"}
+            "alpha": build_param_entry("alpha", stat_inputs.get("alpha"), "probability", 0.05, "CONVENTIONAL_THRESHOLD", "Standard two-sided type I error rate alpha = 0.05"),
+            "power": build_param_entry("power", stat_inputs.get("power"), "probability", 0.80, "CONVENTIONAL_THRESHOLD", "Standard statistical power 1 - beta = 0.80"),
+            "effect_size": build_param_entry("effect_size", stat_inputs.get("expected_effect_size") or stat_inputs.get("hazard_ratio"), "standardized_metric"),
+            "variance_or_sd": build_param_entry("variance_or_sd", stat_inputs.get("standard_deviation"), "units_of_measurement"),
+            "baseline_event_rate": build_param_entry("baseline_event_rate", stat_inputs.get("baseline_event_rate") or stat_inputs.get("control_proportion"), "proportion"),
+            "attrition_rate": build_param_entry("attrition_rate", stat_inputs.get("attrition_rate"), "proportion", 0.10, "CONVENTIONAL_ATTRITION", "Standard anticipated follow-up attrition buffer (10%)")
         }
 
         if framework == "EXPERIMENTAL_IN_VITRO":
-            param_audit["biological_replicates"] = {"value": 3, "status": "literature-derived"}
-            param_audit["technical_replicates"] = {"value": 3, "status": "literature-derived"}
+            param_audit["biological_replicates"] = {
+                "parameter": "biological_replicates",
+                "value": 3,
+                "unit": "independent passages",
+                "provenance_state": "literature-derived",
+                "source": "NIH_CELL_CULTURE_REPRODUCIBILITY_GUIDELINE",
+                "source_location": {"standard": "NIH Notice NOT-OD-15-103"},
+                "assumption": False,
+                "justification": "Standard minimum threshold for biological reproducibility across separate cellular passages.",
+                "confidence": "HIGH"
+            }
+            param_audit["technical_replicates"] = {
+                "parameter": "technical_replicates",
+                "value": 3,
+                "unit": "plate wells",
+                "provenance_state": "literature-derived",
+                "source": "ASSAY_GUIDANCE_MANUAL",
+                "source_location": {"standard": "NCATS Assay Guidance"},
+                "assumption": False,
+                "justification": "Intra-plate variance reduction via technical triplicates.",
+                "confidence": "HIGH"
+            }
             return {
                 "design_type": "IN_VITRO_CELLULAR",
                 "biological_replicates": 3,
@@ -260,7 +348,17 @@ class DynamicProtocolDesigner:
                 "pilot_required": False
             }
         elif framework == "EXPERIMENTAL_ANIMAL":
-            param_audit["animals_per_group"] = {"value": 6, "status": "literature-derived"}
+            param_audit["animals_per_group"] = {
+                "parameter": "animals_per_group",
+                "value": 6,
+                "unit": "animals",
+                "provenance_state": "literature-derived",
+                "source": "ARRIVE_GUIDELINES_MEADS_RESOURCE",
+                "source_location": {"standard": "ARRIVE 2.0"},
+                "assumption": False,
+                "justification": "Mead's resource equation (10 <= E <= 20) with n=6 animals per group across 4 arms.",
+                "confidence": "HIGH"
+            }
             return {
                 "design_type": "IN_VIVO_ANIMAL",
                 "animals_per_group": 6,
@@ -299,8 +397,8 @@ class DynamicProtocolDesigner:
         elif framework == "DIAGNOSTIC":
             prev = stat_inputs.get("prevalence")
             sens = stat_inputs.get("expected_sensitivity")
-            param_audit["prevalence"] = {"value": prev, "status": "provided" if prev is not None else "missing"}
-            param_audit["expected_sensitivity"] = {"value": sens, "status": "provided" if sens is not None else "missing"}
+            param_audit["prevalence"] = build_param_entry("prevalence", prev, "proportion")
+            param_audit["expected_sensitivity"] = build_param_entry("expected_sensitivity", sens, "proportion")
             if prev is None or sens is None:
                 return {
                     "design_type": "DIAGNOSTIC_ACCURACY",
@@ -427,14 +525,16 @@ class DynamicProtocolDesigner:
 
     @classmethod
     def audit_statistical_feasibility(cls, model_dict: Dict[str, Any], proposed_test: Optional[str] = None) -> Dict[str, Any]:
-        """Statistical feasibility gate verifying variable type, distribution assumptions, and test compatibility (Phase 22)."""
+        """Statistical feasibility gate verifying design compatibility, distribution assumptions, censoring, and dependency (Phase 16)."""
         framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
         outcomes = model_dict.get("primary_outcomes", [])
         interventions = model_dict.get("interventions_or_exposures", [])
+        stat_inputs = model_dict.get("statistical_parameters", {})
 
         inconsistencies = []
+        review_required = []
 
-        # Check outcome type and appropriate test
+        # 1. Outcome Type & Design Compatibility
         for out in outcomes:
             otype = str(out.get("type", "")).upper()
             if otype in ["HAZARD_RATIO", "MORTALITY", "TIME_TO_EVENT"] and framework == "EXPERIMENTAL_IN_VITRO":
@@ -442,7 +542,21 @@ class DynamicProtocolDesigner:
             if otype in ["SENSITIVITY", "SPECIFICITY", "ROC_AUC"] and framework not in ["DIAGNOSTIC", "PROGNOSTIC"]:
                 inconsistencies.append("DIAGNOSTIC_METRIC_IN_INTERVENTIONAL_MODEL")
 
-        # Test compatibility check
+            # 2. Censoring and Model Assumptions for Survival
+            if otype in ["HAZARD_RATIO", "TIME_TO_EVENT"] or (proposed_test and "cox" in proposed_test.lower()):
+                has_censoring = bool(stat_inputs.get("censoring_specified"))
+                has_ph_check = bool(stat_inputs.get("proportional_hazards_assumed"))
+                if not (has_censoring or has_ph_check):
+                    review_required.append("SURVIVAL_MODEL_LACKS_EXPLICIT_CENSORING_OR_PROPORTIONAL_HAZARDS_SPECIFICATION")
+
+        # 3. Repeated Measures / Clustering
+        is_repeated = bool(stat_inputs.get("repeated_measures") or "longitudinal" in str(model_dict).lower())
+        if is_repeated and proposed_test:
+            p_low = proposed_test.lower()
+            if not any(k in p_low for k in ["mixed", "gee", "repeated", "rm-anova", "random effects"]):
+                review_required.append("LONGITUDINAL_OR_REPEATED_DATA_ANALYZED_WITHOUT_DEPENDENCE_ADJUSTMENT")
+
+        # 4. Multi-arm and Factorial test compatibility
         if proposed_test:
             p_lower = proposed_test.lower()
             if "t-test" in p_lower and len(interventions) > 2:
@@ -451,11 +565,22 @@ class DynamicProtocolDesigner:
                 inconsistencies.append("ONE_WAY_ANOVA_USED_FOR_FACTORIAL_COMBINATION")
 
         is_feasible = (len(inconsistencies) == 0)
+        status = "STATISTICAL_PLAN_COMPATIBLE"
+        if not is_feasible:
+            status = "STATISTICAL_PLAN_INCONSISTENT"
+        elif review_required:
+            status = "STATISTICAL_METHOD_REQUIRES_REVIEW"
+
         return {
-            "feasibility_status": "STATISTICAL_PLAN_COMPATIBLE" if is_feasible else "STATISTICAL_PLAN_INCONSISTENT",
-            "is_feasible": is_feasible,
+            "feasibility_status": status,
+            "is_feasible": is_feasible and len(review_required) == 0,
             "inconsistencies": inconsistencies,
-            "recommendation": "Statistical analysis plan conforms with experimental design and endpoint distributions." if is_feasible else f"Revise statistical plan: {', '.join(inconsistencies)}"
+            "review_required": review_required,
+            "recommendation": (
+                "Statistical analysis plan conforms with experimental design and endpoint distributions."
+                if status == "STATISTICAL_PLAN_COMPATIBLE"
+                else (f"Methodological review needed: {', '.join(review_required)}" if review_required else f"Revise statistical plan: {', '.join(inconsistencies)}")
+            )
         }
 
 if __name__ == "__main__":

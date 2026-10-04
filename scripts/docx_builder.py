@@ -394,8 +394,8 @@ class DocxBuilder:
 
     @classmethod
     def inspect_docx_file(cls, docx_path: str) -> Dict[str, Any]:
-        """Performs authentic structural and typographic inspection of a generated Word .docx file (Part 30).
-        Verifies presence of 14 sections, Section 13 subsections, tables, bidi RTL, and Dubai font.
+        """Performs authentic structural and typographic inspection of a generated Word .docx file (Phase 22).
+        Verifies presence of 14 sections, Section 13 subsections, tables, bidi RTL, Dubai font, and section ordering.
         """
         if not os.path.exists(docx_path):
             return {
@@ -404,12 +404,27 @@ class DocxBuilder:
                 "verified": False
             }
 
-        doc = Document(docx_path)
-        paragraphs_text = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
-        
+        try:
+            doc = Document(docx_path)
+        except Exception as e:
+            return {
+                "inspection_status": "MALFORMED_DOCX",
+                "verified": False,
+                "error": str(e)
+            }
+
+        if len(doc.paragraphs) == 0 and len(doc.tables) == 0:
+            return {
+                "inspection_status": "EMPTY_DOCX",
+                "verified": False,
+                "paragraphs_count": 0,
+                "tables_count": 0
+            }
+
         # Check headings
-        h1_headings = []
-        h2_headings = []
+        h1_headings: List[str] = []
+        h2_headings: List[str] = []
+        h1_numbers: List[int] = []
         has_bidi = False
         has_dubai = False
 
@@ -421,8 +436,11 @@ class DocxBuilder:
                 has_dubai = True
             
             p_text = p.text.strip()
-            if re.match(r'^(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
+            m_h1 = re.match(r'^(?:([0-9]{1,2})|[۰-۹]{1,2})\.\s+', p_text)
+            if m_h1:
                 h1_headings.append(p_text)
+                if m_h1.group(1):
+                    h1_numbers.append(int(m_h1.group(1)))
             elif re.match(r'^(?:13|۱۳)\-(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
                 h2_headings.append(p_text)
 
@@ -437,14 +455,30 @@ class DocxBuilder:
         all_14_present = len(h1_headings) >= 14
         sec_13_subsecs_present = len(h2_headings) >= 14
 
-        is_valid = bool(all_14_present and sec_13_subsecs_present and has_bidi and has_dubai and tables_count >= 2)
+        # Check order and duplicates
+        has_duplicate_h1 = len(h1_numbers) != len(set(h1_numbers))
+        is_strictly_ordered = (h1_numbers == sorted(h1_numbers)) if h1_numbers else False
+
+        is_valid = bool(all_14_present and sec_13_subsecs_present and has_bidi and has_dubai and tables_count >= 2 and not has_duplicate_h1 and is_strictly_ordered)
+
+        status = "INSPECTION_PASSED"
+        if not is_valid:
+            if has_duplicate_h1:
+                status = "DUPLICATED_SECTION_DETECTED"
+            elif not is_strictly_ordered:
+                status = "WRONG_SECTION_ORDER"
+            else:
+                status = "STRUCTURAL_DEFECT"
 
         return {
-            "inspection_status": "INSPECTION_PASSED" if is_valid else "STRUCTURAL_DEFECT",
+            "inspection_status": status,
             "verified": is_valid,
             "paragraphs_count": len(doc.paragraphs),
             "h1_headings_count": len(h1_headings),
             "h1_headings_detected": h1_headings[:15],
+            "h1_numbers": h1_numbers,
+            "has_duplicate_sections": has_duplicate_h1,
+            "is_strictly_ordered": is_strictly_ordered,
             "all_14_sections_present": all_14_present,
             "h2_subsections_count": len(h2_headings),
             "sec_13_subsections_present": sec_13_subsecs_present,

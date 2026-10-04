@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 core_policies.py - Single Source of Truth Policy & Configuration Registry
-Proposal-Nevisi Engine v8.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
 
 Centralizes all non-negotiable institutional structures, temporal constraints,
 evidence scales, search boundaries, and study-design taxonomy.
@@ -26,10 +26,26 @@ def get_project_metadata() -> Dict[str, Any]:
         if os.path.exists(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    version_path = os.path.join(os.path.dirname(p), "VERSION")
+                    if os.path.exists(version_path):
+                        with open(version_path, "r", encoding="utf-8") as vf:
+                            v_str = vf.read().strip()
+                            if v_str and data.get("engine_version") != v_str:
+                                data["engine_version"] = v_str
+                                data["version_display"] = f"v{v_str}"
+                    return data
             except Exception:
                 pass
-    return {"version_display": "v8.1.0", "engine_version": "8.1.0", "metrics": {"total_unified_tests": 153}}
+    v_val = "8.2.0"
+    for vp in [os.path.join(current_dir, "..", "VERSION"), os.path.abspath("VERSION")]:
+        if os.path.exists(vp):
+            try:
+                with open(vp, "r", encoding="utf-8") as vf:
+                    v_val = vf.read().strip() or v_val
+            except Exception:
+                pass
+    return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
 ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "8.1.0")

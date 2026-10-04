@@ -33,31 +33,155 @@ class GenericClaimEntailmentEngine:
     """Audits scientific claim entailment, overclaim risks, and numerical traceability."""
 
     INJECTION_PATTERNS = [
-        r'ignore\s+previous\s+instructions',
+        r'ignore\s+(?:all\s+)?(?:previous\s+)?instructions',
         r'system\s+prompt',
         r'override\s+all\s+rules',
         r'<script[\s>]',
         r'javascript:',
-        r'data:\s*text/html'
+        r'data:\s*text/html',
+        r'<\|im_start\|>system',
+        r'\[SYSTEM\]',
+        r'<<<SYSTEM>>>',
+        r'style\s*=\s*["\']display\s*:\s*none',
+        r'eval\s*\(\s*atob\s*\(',
+        r'base64\s*,\s*[A-Za-z0-9+/=]{10,}',
+        r'دستورات\s+قبلی\s+را\s+نادیده\s+بگیر',
+        r'قوانین\s+سیستم\s+را\s+لغو\s+کن',
+        r'پرامپت\s+(?:سیستم|قبلی)\s+را\s+(?:پاک|حذف|نادیده)'
+    ]
+
+    ZERO_WIDTH_CHARS = [
+        '\u200b', '\u200c', '\u200d', '\ufeff', '\u2060', '\u00ad'
     ]
 
     @classmethod
-    def sanitize_text(cls, text: str) -> Dict[str, Any]:
-        """Detects prompt injection or hostile payloads in raw scientific text (Part 36)."""
+    def sanitize_text(cls, text: str, trust_boundary: str = "SOURCE_DOCUMENT") -> Dict[str, Any]:
+        """Detects prompt injection or hostile payloads across trust boundaries while protecting legitimate scientific terms (Phase 15)."""
         is_suspicious = False
         flagged_patterns = []
+        
+        # Check zero-width hidden characters
+        has_zero_width = any(c in text for c in cls.ZERO_WIDTH_CHARS)
+        if has_zero_width:
+            is_suspicious = True
+            flagged_patterns.append("ZERO_WIDTH_CHARACTER_OBFUSCATION")
+
         cleaned = text
+        for c in cls.ZERO_WIDTH_CHARS:
+            cleaned = cleaned.replace(c, '')
+
         for pat in cls.INJECTION_PATTERNS:
-            if re.search(pat, text, re.IGNORECASE):
+            if re.search(pat, cleaned, re.IGNORECASE):
                 is_suspicious = True
                 flagged_patterns.append(pat)
                 cleaned = re.sub(pat, "[SANITIZED_PROMPT_INJECTION]", cleaned, flags=re.IGNORECASE)
 
         return {
+            "trust_boundary": trust_boundary,
             "is_suspicious": is_suspicious,
             "flagged_patterns": flagged_patterns,
             "sanitized_text": cleaned,
             "security_status": "POTENTIAL_INJECTION_FLAGGED" if is_suspicious else "CLEAN"
+        }
+
+    @classmethod
+    def parse_and_normalize_citations(cls, text: str) -> Dict[str, Any]:
+        """Parses citations across bracketed numbers [1], ranges [1-3], lists [1,2,5], and author-year formats (Phase 13)."""
+        citation_indices = set()
+        author_citations = []
+
+        # 1. Bracketed numerical citations: [1], [1-3], [1–3], [1, 2, 5], [1,2,5]
+        bracket_matches = re.findall(r'\[([0-9\s,\-–—]+)\]', text)
+        for bm in bracket_matches:
+            parts = [p.strip() for p in re.split(r'[,،]', bm) if p.strip()]
+            for p in parts:
+                range_match = re.match(r'^(\d+)\s*[\-–—]\s*(\d+)$', p)
+                if range_match:
+                    start_idx = int(range_match.group(1))
+                    end_idx = int(range_match.group(2))
+                    if start_idx <= end_idx and (end_idx - start_idx) <= 50:
+                        for idx in range(start_idx, end_idx + 1):
+                            citation_indices.add(idx)
+                    else:
+                        citation_indices.add(start_idx)
+                        citation_indices.add(end_idx)
+                elif p.isdigit():
+                    citation_indices.add(int(p))
+
+        # 2. Author-year citations: (Author et al., 2024) or Author et al. (2024)
+        author_matches = re.findall(r'(?:([A-Z][a-z]+(?:\s+et\s+al\.?)?)[,\s]+\(?(\d{4})\)?)', text)
+        for auth, yr in author_matches:
+            author_citations.append({"author": auth.strip(), "year": int(yr)})
+
+        sorted_indices = sorted(list(citation_indices))
+        return {
+            "raw_text": text,
+            "numerical_citations": sorted_indices,
+            "author_citations": author_citations,
+            "total_citations_found": len(sorted_indices) + len(author_citations),
+            "normalized_citation_string": f"[{','.join(str(i) for i in sorted_indices)}]" if sorted_indices else ""
+        }
+
+    @classmethod
+    def audit_numerical_provenance(
+        cls,
+        claim_val: float,
+        source_record: Dict[str, Any],
+        tolerance: float = 0.05
+    ) -> Dict[str, Any]:
+        """Audits numerical traceability from claim back to source record with formula and unit verification (Phase 12)."""
+        orig_val = source_record.get("original_value")
+        unit_source = str(source_record.get("unit", "")).strip().lower()
+        unit_claim = str(source_record.get("claim_unit", unit_source)).strip().lower()
+        formula = source_record.get("transformation_formula")
+        rounding = source_record.get("rounding_places", 2)
+        has_source = bool(source_record.get("source_location") or source_record.get("study_id"))
+
+        issues = []
+        if not has_source:
+            issues.append("MISSING_SOURCE")
+
+        if orig_val is None:
+            issues.append("MISSING_ORIGINAL_VALUE")
+            calc_val = None
+        else:
+            calc_val = float(orig_val)
+            if formula:
+                if formula == "PERCENT_TO_RATIO":
+                    calc_val = float(orig_val) / 100.0
+                elif formula == "RATIO_TO_PERCENT":
+                    calc_val = float(orig_val) * 100.0
+                elif formula == "MOLAR_TO_MICROMOLAR":
+                    calc_val = float(orig_val) * 1e6
+                elif formula == "MICROMOLAR_TO_MOLAR":
+                    calc_val = float(orig_val) / 1e6
+                elif formula == "NATURAL_LOG_TO_HR":
+                    import math
+                    calc_val = math.exp(float(orig_val))
+                elif formula == "INVALID_FORMULA":
+                    issues.append("WRONG_FORMULA")
+                else:
+                    calc_val = float(orig_val)
+
+            if unit_source != unit_claim and not formula:
+                issues.append("WRONG_UNIT")
+
+            if calc_val is not None:
+                calc_rounded = round(calc_val, rounding)
+                if abs(claim_val - calc_rounded) > tolerance and abs(claim_val - calc_val) > tolerance:
+                    issues.append("WRONG_CONVERSION_OR_ROUNDING")
+
+        is_valid = len(issues) == 0
+        return {
+            "claim_value": claim_val,
+            "original_value": orig_val,
+            "unit_source": unit_source,
+            "unit_claim": unit_claim,
+            "transformation_formula": formula,
+            "calculated_value": calc_val,
+            "is_provenance_verified": is_valid,
+            "provenance_status": "VERIFIED_NUMERICAL_PROVENANCE" if is_valid else "NUMERICAL_DISCREPANCY_FLAGGED",
+            "detected_issues": issues
         }
 
     @classmethod
@@ -208,20 +332,44 @@ class GenericClaimEntailmentEngine:
         source_study: Dict[str, Any],
         supporting_facts: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        """Evaluates 7-level entailment status for an atomic claim."""
+        """Evaluates 7-level scientific entailment while strictly separating citation linkage, source traceability, and entailment (Phase 11)."""
         study_design = source_study.get("study_design", "UNKNOWN")
         causal_check = cls.detect_causal_overclaim(claim_text, study_design)
 
+        # 1. Citation Linkage
+        has_study_id = bool(source_study.get("study_id"))
+        citation_linkage = {
+            "is_linked": has_study_id,
+            "study_id": source_study.get("study_id")
+        }
+
+        # 2. Source Traceability
+        loc = source_study.get("source_location") or next((f.get("source_location") for f in supporting_facts if f.get("source_location")), None)
+        source_traceability = {
+            "is_traceable": bool(loc),
+            "recorded_location": loc,
+            "retrieval_tier": source_study.get("retrieval_tier", "PEER_REVIEWED_DATABASE")
+        }
+
+        # 3. Scientific Entailment
         if not supporting_facts:
             entailment_status = "UNSUPPORTED"
             directness = "NO_EVIDENCE"
         else:
-            # Check fact directness
+            has_contradiction = any(
+                f.get("direction") in ["CONTRADICTS", "OPPOSING", "NEGATIVE"] or
+                f.get("directness") == "CONTRADICTED" or
+                "contradict" in str(f.get("text_or_data", "")).lower()
+                for f in supporting_facts
+            )
             has_direct = any(f.get("directness") == "DIRECT_EVIDENCE" for f in supporting_facts)
             has_indirect = any(f.get("directness") in ["INDIRECT_EVIDENCE", "INFERENCE"] for f in supporting_facts)
             has_hypothesis = any(f.get("directness") == "HYPOTHESIS" for f in supporting_facts)
 
-            if has_direct:
+            if has_contradiction:
+                entailment_status = "CONTRADICTED"
+                directness = "CONTRADICTED"
+            elif has_direct:
                 entailment_status = "DIRECTLY_SUPPORTED"
                 directness = "DIRECT"
             elif has_indirect:
@@ -251,6 +399,8 @@ class GenericClaimEntailmentEngine:
             "claim_id": claim_id,
             "claim_text": claim_text,
             "source_study_id": source_study.get("study_id"),
+            "citation_linkage": citation_linkage,
+            "source_traceability": source_traceability,
             "entailment_status": entailment_status,
             "directness": directness,
             "causal_overclaim_warning": causal_check,

@@ -1,5 +1,5 @@
 # FINAL ARCHITECTURE SPECIFICATION
-## Proposal-Nevisi v8.1: Universal Evidence-Driven Medical Research & Proposal Engine
+## Proposal-Nevisi v8.2: Universal Evidence-Driven Medical Research & Proposal Engine
 
 ---
 

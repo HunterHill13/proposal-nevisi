@@ -10,7 +10,7 @@ validates foundational justifications, and strictly detects citation padding.
 import re
 import json
 import difflib
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
 try:
     from core_policies import TemporalPolicyConfig
@@ -36,7 +36,7 @@ class GenericReferenceAuditor:
         self.cutoff_date = TemporalPolicyConfig.get_cutoff_date(self.current_date)
         self.min_required_references = min_required_references
     def audit_bibliographic_fields(self, local_ref: Dict[str, Any], verified_metadata: Dict[str, Any]) -> Dict[str, Any]:
-        """Compares local citation record with authoritative Crossref/PubMed data with normalized author identity and DOI consistency."""
+        """Compares local citation record with authoritative Crossref/PubMed data with normalized author identity, DOI consistency, and publication status (Phases 9 & 10)."""
         title_local = local_ref.get("title", "").strip().lower()
         title_verified = verified_metadata.get("title", "").strip().lower()
 
@@ -45,14 +45,45 @@ class GenericReferenceAuditor:
         year_local = local_ref.get("year")
         year_verified = verified_metadata.get("year")
         year_match = (year_local == year_verified) if (year_local and year_verified) else False
+        year_divergence = abs(int(year_local) - int(year_verified)) if (year_local and year_verified) else 0
 
-        # Normalized author matching (last name or initial tokenization)
-        authors_local = [re.sub(r'[^a-z]', '', a.lower().split()[-1]) for a in local_ref.get("authors", []) if a]
-        authors_verified = [re.sub(r'[^a-z]', '', a.lower().split()[-1]) for a in verified_metadata.get("authors", []) if a]
-        author_match = any(a in authors_verified for a in authors_local) if (authors_local and authors_verified) else False
+        # Normalized author matching (last name + initial check)
+        def parse_authors(auth_list: List[Any]) -> List[Tuple[str, str]]:
+            res = []
+            for a in auth_list:
+                if not a:
+                    continue
+                parts = str(a).strip().lower().split()
+                if parts:
+                    surname = re.sub(r'[^a-z]', '', parts[-1])
+                    initial = parts[0][0] if len(parts[0]) > 0 else ""
+                    res.append((surname, initial))
+            return res
 
-        is_retracted = verified_metadata.get("is_retracted", False) or "retracted" in verified_metadata.get("status", "").lower() or "retraction" in title_verified.lower()
-        is_corrected = verified_metadata.get("is_corrected", False) or "erratum" in title_verified.lower() or "corrigendum" in title_verified.lower()
+        authors_local = parse_authors(local_ref.get("authors", []))
+        authors_verified = parse_authors(verified_metadata.get("authors", []))
+        
+        author_surnames_local = [s for s, _ in authors_local]
+        author_surnames_ver = [s for s, _ in authors_verified]
+        author_match = any(s in author_surnames_ver for s in author_surnames_local) if (author_surnames_local and author_surnames_ver) else False
+
+        is_retracted = (
+            verified_metadata.get("is_retracted", False) or
+            "retracted" in verified_metadata.get("status", "").lower() or
+            "retraction" in title_verified.lower() or
+            "retraction notice" in title_verified.lower()
+        )
+        is_corrected = (
+            verified_metadata.get("is_corrected", False) or
+            "erratum" in title_verified.lower() or
+            "corrigendum" in title_verified.lower()
+        )
+        is_expression_of_concern = (
+            verified_metadata.get("is_expression_of_concern", False) or
+            "expression of concern" in title_verified.lower() or
+            "editorial concern" in verified_metadata.get("status", "").lower()
+        )
+        is_duplicate = verified_metadata.get("is_duplicate", False)
 
         doi_local = str(local_ref.get("doi", "")).strip().lower()
         doi_verified = str(verified_metadata.get("doi", "")).strip().lower()
@@ -60,13 +91,21 @@ class GenericReferenceAuditor:
         identity_conflict = False
         if is_retracted:
             status = "RETRACTED"
+        elif is_duplicate:
+            status = "DUPLICATE"
+        elif is_expression_of_concern:
+            status = "EXPRESSION_OF_CONCERN"
         elif is_corrected:
             status = "CORRECTED"
         elif (doi_local and doi_verified and doi_local == doi_verified and sim < 0.40):
             # Same DOI claimed, but completely different title -> IDENTITY_CONFLICT
             status = "IDENTITY_CONFLICT"
             identity_conflict = True
-        elif sim >= 0.85 and year_match:
+        elif sim >= 0.85 and year_divergence > 2 and not author_match:
+            # Same title, but different paper (mismatched years and different authors)
+            status = "IDENTITY_CONFLICT"
+            identity_conflict = True
+        elif sim >= 0.85 and year_match and (author_match or not authors_local):
             status = "EXACT_VERIFIED"
         elif sim >= 0.60:
             status = "MINOR_VARIATION"
@@ -75,6 +114,8 @@ class GenericReferenceAuditor:
             identity_conflict = True
         else:
             status = "CONFLICT_OR_UNVERIFIED"
+
+        eligible = (status in ["EXACT_VERIFIED", "MINOR_VARIATION", "CORRECTED", "EXPRESSION_OF_CONCERN"] and not identity_conflict and not is_retracted and not is_duplicate)
 
         return {
             "ref_id": local_ref.get("ref_id"),
@@ -85,12 +126,15 @@ class GenericReferenceAuditor:
             "doi": local_ref.get("doi"),
             "is_retracted": is_retracted,
             "is_corrected": is_corrected,
+            "corrected_version_available": verified_metadata.get("corrected_version_available", True) if is_corrected else None,
+            "is_expression_of_concern": is_expression_of_concern,
+            "uncertainty_flag": is_expression_of_concern,
             "identity_conflict": identity_conflict,
-            "core_evidence_eligible": (status in ["EXACT_VERIFIED", "MINOR_VARIATION", "CORRECTED"] and not identity_conflict)
+            "core_evidence_eligible": eligible
         }
 
     def audit_temporal_tier(self, ref: Dict[str, Any]) -> Dict[str, Any]:
-        """Enforces the 6-year recency rule with exact date parsing, leap-year safety, and anti-cheating foundational validation (Parts 2 & 3)."""
+        """Enforces the 6-year recency rule with calendar precision, leap-year safety, and anti-cheating foundational validation (Phases 7 & 8)."""
         import datetime
 
         pub_date_str = (
@@ -102,7 +146,7 @@ class GenericReferenceAuditor:
         )
         year = ref.get("year")
         parsed_date = None
-        date_uncertain = False
+        date_precision = "DATE_UNCERTAIN"
 
         if pub_date_str:
             str_clean = str(pub_date_str).strip()
@@ -112,41 +156,48 @@ class GenericReferenceAuditor:
                 try:
                     parsed_date = datetime.date(int(m_full.group(1)), int(m_full.group(2)), int(m_full.group(3)))
                     year = parsed_date.year
+                    date_precision = "EXACT_DATE"
                 except ValueError:
-                    date_uncertain = True
+                    date_precision = "DATE_UNCERTAIN"
             else:
                 # Try YYYY-MM
                 m_month = re.match(r'^(\d{4})-(\d{2})', str_clean)
                 if m_month:
                     try:
-                        parsed_date = datetime.date(int(m_month.group(1)), int(m_month.group(2)), 1)
-                        year = parsed_date.year
+                        y_val = int(m_month.group(1))
+                        m_val = int(m_month.group(2))
+                        if 1 <= m_val <= 12:
+                            year = y_val
+                            date_precision = "MONTH_PRECISION"
+                            parsed_date = datetime.date(y_val, m_val, 1)
+                        else:
+                            date_precision = "DATE_UNCERTAIN"
                     except ValueError:
-                        date_uncertain = True
+                        date_precision = "DATE_UNCERTAIN"
                 else:
                     # Try YYYY
                     m_year = re.match(r'^(\d{4})', str_clean)
                     if m_year:
                         year = int(m_year.group(1))
-                        # Default to mid-year or Dec 31 if only year
-                        parsed_date = datetime.date(year, 1, 1)
+                        date_precision = "YEAR_PRECISION"
+                        parsed_date = None  # Do NOT invent Jan 1
                     else:
-                        date_uncertain = True
+                        date_precision = "DATE_UNCERTAIN"
         elif year:
             try:
                 year = int(year)
-                parsed_date = datetime.date(year, 1, 1)
+                date_precision = "YEAR_PRECISION"
+                parsed_date = None  # Do NOT invent Jan 1
             except (ValueError, TypeError):
-                date_uncertain = True
-        else:
-            date_uncertain = True
+                date_precision = "DATE_UNCERTAIN"
 
-        if date_uncertain or (parsed_date is None and year is None):
+        if date_precision == "DATE_UNCERTAIN" or (parsed_date is None and year is None):
             return {
                 "ref_id": ref.get("ref_id"),
                 "year": None,
                 "publication_date": pub_date_str,
                 "parsed_date": None,
+                "date_precision": "DATE_UNCERTAIN",
                 "cutoff_date": str(self.cutoff_date),
                 "age_in_days": None,
                 "age_in_years": None,
@@ -165,12 +216,24 @@ class GenericReferenceAuditor:
                 "audit_note": "Publication date and year are completely unverified/uncertain."
             }
 
-        # Calculate exact age in days and years
-        age_days = (self.current_date - parsed_date).days
-        age_years = round(age_days / 365.25, 2)
-
-        # Check exact recency against cutoff date
-        is_recent = parsed_date >= self.cutoff_date
+        # Determine recency based on precision
+        if date_precision == "EXACT_DATE":
+            is_recent = parsed_date >= self.cutoff_date
+            age_days = (self.current_date - parsed_date).days
+            age_years = round(age_days / 365.25, 2)
+            parsed_date_str = str(parsed_date)
+        elif date_precision == "MONTH_PRECISION":
+            # Compare Year and Month
+            is_recent = (parsed_date.year > self.cutoff_date.year) or (parsed_date.year == self.cutoff_date.year and parsed_date.month >= self.cutoff_date.month)
+            age_days = (self.current_date - parsed_date).days
+            age_years = round(age_days / 365.25, 2)
+            parsed_date_str = f"{parsed_date.year:04d}-{parsed_date.month:02d}"
+        else: # YEAR_PRECISION
+            # Strictly calendar year based: does not fake exact date
+            is_recent = (year >= self.cutoff_year)
+            age_years = self.current_year - year
+            age_days = int(age_years * 365.25)
+            parsed_date_str = str(year)
 
         justification_dict = ref.get("foundational_justification") or {}
         evidence_role = ref.get("evidence_role", "PRIMARY_EVIDENCE")
@@ -186,28 +249,54 @@ class GenericReferenceAuditor:
             cat = None
             conf = "HIGH"
             source = "RECENCY_TIMELINESS_WINDOW"
-            note = f"Published on {parsed_date} ({age_years} years old; within {self.max_primary_age}-year cutoff {self.cutoff_date})."
+            note = f"Published in {parsed_date_str} ({age_years} years old; within {self.max_primary_age}-year cutoff window)."
+            provenance = None
         else:
             tier = "FOUNDATIONAL/HISTORICAL_EVIDENCE"
-            # Anti-cheating check: A valid exception requires structured justification, approved category, and substantive rationale
             has_justification = bool(justification_dict.get("is_justified"))
             cat = justification_dict.get("category")
             rationale = str(justification_dict.get("rationale", "")).strip()
-            no_modern_alt = bool(justification_dict.get("no_modern_alternative_exists", True))
+            
+            # Anti-cheating check: missing modern alternative assessment must be UNKNOWN, not defaulted to True
+            no_modern_raw = justification_dict.get("no_modern_alternative_exists")
+            if no_modern_raw is None:
+                modern_alt_assessment = "UNKNOWN"
+            else:
+                modern_alt_assessment = "TRUE" if bool(no_modern_raw) else "FALSE"
+
             intended_section = justification_dict.get("section_scope", "BACKGROUND_OR_METHODOLOGY")
+            citation_count = justification_dict.get("citation_count")
+            citation_count_source = justification_dict.get("citation_count_source") or "UNVERIFIED"
 
             is_valid_category = cat in TemporalPolicyConfig.APPROVED_FOUNDATIONAL_CATEGORIES
             is_substantive_rationale = len(rationale) >= 15
 
-            # Fake foundational justification detection:
-            # If an old paper is routine direct efficacy or observational data claiming foundational status without seminal status
+            # Verified citation count rule: landmark exceptions require >= 100 citations or canonical seminal methodology
+            has_verified_citations = (
+                (isinstance(citation_count, (int, float)) and citation_count >= 100)
+                or (citation_count is None and cat in ["FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD", "METHODOLOGICAL_LANDMARK", "CLASSICAL_STATISTICAL_METHOD"])
+                or justification_dict.get("seminal_methodology", False) is True
+            )
+
             is_fake_foundational = (
                 not is_valid_category or
                 not is_substantive_rationale or
+                not has_verified_citations or
                 evidence_role == "PRIMARY_DIRECT_EFFICACY" or
                 "routine" in rationale.lower() or
                 "standard observational" in rationale.lower()
             )
+
+            provenance = {
+                "category": cat,
+                "rationale": rationale,
+                "source": justification_dict.get("justification_source", "PEER_REVIEWED_CONSENSUS"),
+                "verification_status": "APPROVED" if (has_justification and not is_fake_foundational) else "REJECTED_UNJUSTIFIED",
+                "citation_count": citation_count,
+                "citation_count_source": citation_count_source,
+                "modern_alternative_assessment": modern_alt_assessment,
+                "reviewer_confidence": "VERIFIED_HIGH" if (has_justification and not is_fake_foundational) else "ZERO"
+            }
 
             if has_justification and not is_fake_foundational:
                 age_justification = cat
@@ -216,7 +305,6 @@ class GenericReferenceAuditor:
                 foundational_exception = True
                 conf = "VERIFIED_FOUNDATIONAL_EXCEPTION"
                 source = justification_dict.get("justification_source", "PEER_REVIEWED_CONSENSUS")
-                # Core direct claims CANNOT rely on old foundational papers for primary direct findings
                 core_eligible = (evidence_role != "PRIMARY_EVIDENCE" and intended_section != "CORE_PRIMARY_RESULTS")
 
                 if cat in ["FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD", "METHODOLOGICAL_LANDMARK"]:
@@ -237,13 +325,14 @@ class GenericReferenceAuditor:
                 foundational_exception = False
                 conf = "REJECTED_UNJUSTIFIED"
                 source = "TEMPORAL_RECENCY_BREACH"
-                note = f"Published on {parsed_date} (< cutoff {self.cutoff_date}) without verified seminal justification. Prohibited from core evidence."
+                note = f"Published in {parsed_date_str} (outside {self.max_primary_age}-year window) without verified citation/seminal justification. Prohibited from core evidence."
 
         return {
             "ref_id": ref.get("ref_id"),
             "year": year,
             "publication_date": pub_date_str,
-            "parsed_date": str(parsed_date),
+            "parsed_date": parsed_date_str,
+            "date_precision": date_precision,
             "cutoff_date": str(self.cutoff_date),
             "age_in_days": age_days,
             "age_in_years": age_years,

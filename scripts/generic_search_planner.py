@@ -16,21 +16,127 @@ except ImportError:
     from scripts.research_problem_model import ResearchProblemModel, ProblemModelBuilder
 
 class BaseSearchAdapter:
-    """Abstract database search adapter defining interface and query syntax translation."""
+    """Abstract database search adapter defining interface, query validation, translation, and error normalization."""
     database_name: str = "BASE"
 
     def translate_query(self, canonical_query: str) -> str:
         """Translates canonical query into database-specific syntax."""
         return canonical_query
 
-    def execute_query(self, query: str, filters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Dry-run default execution: returns explicit NOT_EXECUTED when network/API uncontacted."""
+    def validate_query(self, query: str) -> Dict[str, Any]:
+        """Validates query syntax, parentheses balance, and non-empty status."""
+        q = query.strip()
+        if not q:
+            return {"is_valid": False, "error": "EMPTY_QUERY", "message": "Query string cannot be empty."}
+        if q.count("(") != q.count(")"):
+            return {"is_valid": False, "error": "UNBALANCED_PARENTHESES", "message": "Query contains mismatched parentheses."}
+        if q.count('"') % 2 != 0:
+            return {"is_valid": False, "error": "UNBALANCED_QUOTES", "message": "Query contains unbalanced quotation marks."}
+        return {"is_valid": True, "error": None, "query": q}
+
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        """Maps raw API response to standardized record format."""
         return {
             "database": self.database_name,
-            "query": self.translate_query(query),
+            "pmid": str(raw_record.get("pmid", "")).strip() if raw_record.get("pmid") else None,
+            "doi": str(raw_record.get("doi", "")).strip().lower() if raw_record.get("doi") else None,
+            "openalex_id": str(raw_record.get("openalex_id", "")).strip().lower() if raw_record.get("openalex_id") else None,
+            "title": str(raw_record.get("title", "")).strip(),
+            "authors": raw_record.get("authors", []),
+            "year": int(raw_record.get("year")) if raw_record.get("year") else None,
+            "journal": str(raw_record.get("journal", "")).strip(),
+            "raw_provenance": raw_record
+        }
+
+    def normalize_error(self, error_type: str, details: Any = None) -> Dict[str, Any]:
+        """Standardizes database and network retrieval errors across adapters."""
+        known_errors = {
+            "TIMEOUT": "Connection or read timeout occurred while querying database API.",
+            "HTTP_429": "Rate limit exceeded (HTTP 429 Too Many Requests).",
+            "HTTP_500": "Remote database internal server error (HTTP 500).",
+            "MALFORMED_JSON": "Remote server returned invalid or unparseable JSON payload.",
+            "EMPTY_RESULT": "Query executed successfully but returned zero matching records.",
+            "PARTIAL_RESULT": "Query returned partial result set due to truncated response or network cut.",
+            "PAGINATION_FAILURE": "Failed to fetch subsequent result pages during cursor/offset iteration."
+        }
+        msg = known_errors.get(error_type, f"Unclassified error: {error_type}")
+        return {
+            "database": self.database_name,
+            "error_type": error_type,
+            "message": msg,
+            "details": details,
+            "is_retriable": error_type in ["TIMEOUT", "HTTP_429", "HTTP_500"]
+        }
+
+    def execute_query(
+        self,
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        mode: str = "offline",
+        fixture_records: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Executes search query supporting PLANNED, NOT_EXECUTED, and EXECUTED states with full provenance."""
+        val = self.validate_query(query)
+        if not val["is_valid"]:
+            return {
+                "database": self.database_name,
+                "query": query,
+                "status": "VALIDATION_FAILED",
+                "error": val["error"],
+                "results_count": 0,
+                "records": []
+            }
+
+        t_query = self.translate_query(query)
+
+        if mode == "planned":
+            return {
+                "database": self.database_name,
+                "query": query,
+                "translated_query": t_query,
+                "filters": filters or {},
+                "status": "PLANNED",
+                "message": "Query plan registered; pending execution.",
+                "results_count": 0,
+                "records": []
+            }
+
+        if mode == "offline":
+            return {
+                "database": self.database_name,
+                "query": query,
+                "translated_query": t_query,
+                "filters": filters or {},
+                "status": "NOT_EXECUTED",
+                "message": f"{self.database_name} API was not contacted (dry-run/offline protocol active). Prohibits fictitious execution.",
+                "results_count": 0,
+                "records": []
+            }
+
+        if mode in ["fixture", "recorded_integration_fixture"]:
+            raw_recs = fixture_records or []
+            norm_recs = [self.normalize_record(r) for r in raw_recs]
+            return {
+                "database": self.database_name,
+                "query": query,
+                "translated_query": t_query,
+                "filters": filters or {},
+                "status": "EXECUTED",
+                "execution_mode": "RECORDED_INTEGRATION_FIXTURE",
+                "results_count": len(norm_recs),
+                "returned_identifiers": [r.get("doi") or r.get("pmid") for r in norm_recs if r.get("doi") or r.get("pmid")],
+                "records": norm_recs,
+                "retrieval_errors": [],
+                "pagination": {"total_pages": 1, "page_size": len(norm_recs)}
+            }
+
+        return {
+            "database": self.database_name,
+            "query": query,
+            "translated_query": t_query,
             "filters": filters or {},
             "status": "NOT_EXECUTED",
-            "message": f"{self.database_name} API was not contacted (dry-run/offline protocol active). Prohibits fictitious execution.",
+            "message": "Live network connection not active in execution environment.",
             "results_count": 0,
             "records": []
         }
@@ -40,42 +146,60 @@ class PubMedAdapter(BaseSearchAdapter):
     database_name = "PubMed"
 
     def translate_query(self, canonical_query: str) -> str:
-        # Preserve or map [Title/Abstract], [MeSH Terms]
-        q = canonical_query
-        return q
+        return canonical_query.strip()
+
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        rec = super().normalize_record(raw_record)
+        rec["pmid"] = str(raw_record.get("uid") or raw_record.get("pmid", "")).strip() or None
+        return rec
 
 class EuropePMCAdapter(BaseSearchAdapter):
     """Adapter for Europe PMC REST query translation and execution."""
     database_name = "Europe PMC"
 
     def translate_query(self, canonical_query: str) -> str:
-        # Translate [Title/Abstract] -> (TITLE:"..." OR ABS:"...") and remove [MeSH Terms]
         q = canonical_query
         q = re.sub(r'"([^"]+)"\[Title/Abstract\]', r'(TITLE:"\1" OR ABS:"\1")', q)
         q = re.sub(r'"([^"]+)"\[MeSH Terms\]', r'KW:"\1"', q)
-        return q
+        return q.strip()
+
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        rec = super().normalize_record(raw_record)
+        rec["pmid"] = str(raw_record.get("pmid", "")).strip() or None
+        rec["doi"] = str(raw_record.get("doi", "")).strip().lower() or None
+        return rec
 
 class CrossrefAdapter(BaseSearchAdapter):
     """Adapter for Crossref Metadata REST API query translation and execution."""
     database_name = "Crossref"
 
     def translate_query(self, canonical_query: str) -> str:
-        # Crossref uses bibliographic query string without field tags
         q = canonical_query
         q = re.sub(r'\[Title/Abstract\]', '', q)
         q = re.sub(r'\[MeSH Terms\]', '', q)
         return q.strip()
+
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        rec = super().normalize_record(raw_record)
+        rec["doi"] = str(raw_record.get("DOI") or raw_record.get("doi", "")).strip().lower() or None
+        if "title" in raw_record and isinstance(raw_record["title"], list):
+            rec["title"] = raw_record["title"][0] if raw_record["title"] else ""
+        return rec
 
 class OpenAlexAdapter(BaseSearchAdapter):
     """Adapter for OpenAlex scholarly concepts and inverted index search."""
     database_name = "OpenAlex"
 
     def translate_query(self, canonical_query: str) -> str:
-        # Strip PubMed field qualifiers and format as OpenAlex search string
         q = canonical_query
         q = re.sub(r'\[Title/Abstract\]', '', q)
         q = re.sub(r'\[MeSH Terms\]', '', q)
         return q.strip()
+
+    def normalize_record(self, raw_record: Dict[str, Any]) -> Dict[str, Any]:
+        rec = super().normalize_record(raw_record)
+        rec["openalex_id"] = str(raw_record.get("id") or raw_record.get("openalex_id", "")).strip().lower() or None
+        return rec
 
 class GenericSearchPlanner:
     """Constructs dynamic, multi-database query matrices for evidence-seeking literature retrieval."""
@@ -481,42 +605,193 @@ class GenericSearchPlanner:
 
     @classmethod
     def deduplicate_records(cls, records: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Performs authentic record-level deduplication across PMID, DOI, and OpenAlex ID (Part 4)."""
-        seen_keys = set()
+        """Performs authentic record-level deduplication across PMID, DOI, and OpenAlex ID via identity graph reconciliation (Phase 6).
+        Builds connected components across shared persistent identifiers and validated title/author proximity.
+        """
+        import difflib
+        n = len(records)
+        if n <= 1:
+            return {
+                "total_input_records": n,
+                "unique_records_count": n,
+                "duplicates_removed_count": 0,
+                "unique_records": list(records),
+                "duplicate_records": [],
+                "reconciled_groups": [[r] for r in records]
+            }
+
+        # Build adjacency graph
+        adj: List[List[int]] = [[] for _ in range(n)]
+
+        def get_clean_id(rec: Dict[str, Any], key: str) -> Optional[str]:
+            val = rec.get(key)
+            if not val:
+                return None
+            s = str(val).strip().lower()
+            return s if s else None
+
+        def normalize_title(t: Any) -> str:
+            return re.sub(r'[^a-z0-9]', '', str(t).lower())
+
+        def get_author_surnames(rec: Dict[str, Any]) -> List[str]:
+            authors = rec.get("authors") or []
+            surnames = []
+            for a in authors:
+                parts = str(a).strip().split()
+                if parts:
+                    clean = re.sub(r'[^a-z]', '', parts[-1].lower())
+                    if clean:
+                        surnames.append(clean)
+            return surnames
+
+        # Index identifiers to record indices
+        doi_map: Dict[str, int] = {}
+        pmid_map: Dict[str, int] = {}
+        openalex_map: Dict[str, int] = {}
+
+        for i, rec in enumerate(records):
+            doi = get_clean_id(rec, "doi")
+            pmid = get_clean_id(rec, "pmid")
+            oaid = get_clean_id(rec, "openalex_id")
+
+            if doi:
+                if doi in doi_map:
+                    adj[i].append(doi_map[doi])
+                    adj[doi_map[doi]].append(i)
+                else:
+                    doi_map[doi] = i
+
+            if pmid:
+                if pmid in pmid_map:
+                    adj[i].append(pmid_map[pmid])
+                    adj[pmid_map[pmid]].append(i)
+                else:
+                    pmid_map[pmid] = i
+
+            if oaid:
+                if oaid in openalex_map:
+                    adj[i].append(openalex_map[oaid])
+                    adj[openalex_map[oaid]].append(i)
+                else:
+                    openalex_map[oaid] = i
+
+        # Secondary matching: title similarity + author overlap + year proximity
+        for i in range(n):
+            for j in range(i + 1, n):
+                if j in adj[i]:
+                    continue
+                t_i = normalize_title(records[i].get("title", ""))
+                t_j = normalize_title(records[j].get("title", ""))
+                if t_i and t_j and len(t_i) >= 15 and len(t_j) >= 15:
+                    sim = difflib.SequenceMatcher(None, t_i, t_j).ratio()
+                    if sim >= 0.88:
+                        y_i = records[i].get("year")
+                        y_j = records[j].get("year")
+                        year_prox = True
+                        if y_i is not None and y_j is not None:
+                            try:
+                                year_prox = abs(int(y_i) - int(y_j)) <= 1
+                            except (ValueError, TypeError):
+                                year_prox = True
+                        auth_i = get_author_surnames(records[i])
+                        auth_j = get_author_surnames(records[j])
+                        auth_overlap = True
+                        if auth_i and auth_j:
+                            auth_overlap = any(a in auth_j for a in auth_i)
+                        
+                        if year_prox and auth_overlap:
+                            adj[i].append(j)
+                            adj[j].append(i)
+
+        # Connected component traversal via BFS
+        visited = [False] * n
         unique_records = []
         duplicate_records = []
+        reconciled_groups = []
 
-        for rec in records:
-            pmid = str(rec.get("pmid", "")).strip() if rec.get("pmid") else None
-            doi = str(rec.get("doi", "")).strip().lower() if rec.get("doi") else None
-            openalex_id = str(rec.get("openalex_id", "")).strip().lower() if rec.get("openalex_id") else None
+        for i in range(n):
+            if not visited[i]:
+                component: List[int] = []
+                queue = [i]
+                visited[i] = True
+                while queue:
+                    curr = queue.pop(0)
+                    component.append(curr)
+                    for neighbor in adj[curr]:
+                        if not visited[neighbor]:
+                            visited[neighbor] = True
+                            queue.append(neighbor)
+                
+                # Elect canonical record
+                def score_record(idx: int) -> int:
+                    r = records[idx]
+                    sc = 0
+                    if r.get("doi"): sc += 4
+                    if r.get("pmid"): sc += 4
+                    if r.get("openalex_id"): sc += 2
+                    if r.get("abstract"): sc += 2
+                    if r.get("year"): sc += 1
+                    return sc
 
-            # Primary key resolution
-            key = None
-            if doi:
-                key = f"doi:{doi}"
-            elif pmid:
-                key = f"pmid:{pmid}"
-            elif openalex_id:
-                key = f"openalex:{openalex_id}"
-            else:
-                title_norm = re.sub(r'[^a-z0-9]', '', str(rec.get("title", "")).lower())
-                if title_norm:
-                    key = f"title:{title_norm[:40]}"
+                canonical_idx = max(component, key=lambda idx: (score_record(idx), -idx))
+                canonical_rec = records[canonical_idx].copy()
+                
+                # Merge missing identifiers into canonical record
+                for idx in component:
+                    if idx != canonical_idx:
+                        other = records[idx]
+                        if not canonical_rec.get("doi") and other.get("doi"):
+                            canonical_rec["doi"] = other["doi"]
+                        if not canonical_rec.get("pmid") and other.get("pmid"):
+                            canonical_rec["pmid"] = other["pmid"]
+                        if not canonical_rec.get("openalex_id") and other.get("openalex_id"):
+                            canonical_rec["openalex_id"] = other["openalex_id"]
 
-            if key and key in seen_keys:
-                duplicate_records.append(rec)
-            else:
-                if key:
-                    seen_keys.add(key)
-                unique_records.append(rec)
+                unique_records.append(canonical_rec)
+                group_recs = [records[idx] for idx in component]
+                reconciled_groups.append(group_recs)
+
+                for idx in component:
+                    if idx != canonical_idx:
+                        dup = records[idx].copy()
+                        dup["duplicate_of_canonical_id"] = canonical_rec.get("doi") or canonical_rec.get("pmid") or canonical_rec.get("title")
+                        duplicate_records.append(dup)
 
         return {
             "total_input_records": len(records),
             "unique_records_count": len(unique_records),
             "duplicates_removed_count": len(duplicate_records),
             "unique_records": unique_records,
-            "duplicate_records": duplicate_records
+            "duplicate_records": duplicate_records,
+            "reconciled_groups": reconciled_groups
+        }
+
+    @classmethod
+    def audit_search_execution_honesty(
+        cls,
+        execution_report: Dict[str, Any],
+        claimed_status: str
+    ) -> Dict[str, Any]:
+        """Audits honesty of search execution claims against actual runtime state (Points 4, 24).
+        Prohibits claiming NOT_EXECUTED searches as EXECUTED, and requires EMPTY_RETRIEVAL state when results_count == 0.
+        """
+        actual_status = execution_report.get("status", "NOT_EXECUTED")
+        results_count = execution_report.get("results_count", 0)
+        violations = []
+
+        if claimed_status == "EXECUTED" and actual_status == "NOT_EXECUTED":
+            violations.append("FALSE_EXECUTION_CLAIM: Search was not executed against database API, but falsely claimed as EXECUTED.")
+
+        if actual_status == "EXECUTED" and results_count == 0 and not execution_report.get("empty_retrieval_recorded"):
+            violations.append("EMPTY_RETRIEVAL: Query returned 0 records; must explicitly record EMPTY_RETRIEVAL state.")
+
+        is_honest = len(violations) == 0
+        return {
+            "is_honest": is_honest,
+            "actual_status": actual_status,
+            "claimed_status": claimed_status,
+            "violations": violations,
+            "verdict": "HONEST_EXECUTION_VERIFIED" if is_honest else "DISHONEST_OR_UNVERIFIED_CLAIM"
         }
 
     @classmethod
