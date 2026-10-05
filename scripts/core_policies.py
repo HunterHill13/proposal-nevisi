@@ -48,8 +48,8 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "8.4.0"
-VERSION_DISPLAY = "v8.4.0"
+ENGINE_VERSION = "8.5.0"
+VERSION_DISPLAY = "v8.5.0"
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
@@ -652,5 +652,86 @@ SELECTION_ORDER_PRIORITIES: List[str] = [
     "CONTRADICTION_LIMITATION_VALUE",# 8. Essential bounding/limiting evidence (e.g. non-cytotoxic baselines)
     "METHODOLOGICAL_NECESSITY"      # 9. Essential validated mathematical or assay benchmark (Chou, Mosmann)
 ]
+
+# ==============================================================================
+# 10. v8.5 ADVANCED RESEARCH ENGINE ONTOLOGIES & REGISTRIES
+# Adapted from AIPOCH and K-Dense Proven Architectures
+# ==============================================================================
+
+# 16 Standard Generic Search Families (v8.5 Section 5 - Topic-Agnostic Query Families)
+SEARCH_FAMILIES_ONTOLOGY: Dict[str, str] = {
+    "EXACT_CONCEPT_COMBINATION": "Boolean intersection of clean target concepts without modification",
+    "SYNONYM_EXPANDED_COMBINATION": "Cross-sectional retrieval incorporating verified biomedical synonyms",
+    "CONTROLLED_VOCABULARY_MESH": "MeSH descriptor and subject heading tree hierarchical retrieval",
+    "POPULATION_MODEL_SPECIFIC": "Targeted retrieval focusing on organism, tissue, or specific cellular lineage",
+    "INTERVENTION_SPECIFIC": "Focused retrieval on primary intervention pharmacodynamics or chemistry",
+    "OUTCOME_SPECIFIC": "Retrieval constrained to primary and secondary phenotypic/clinical outcomes",
+    "MECHANISM_SPECIFIC": "Retrieval on molecular signaling, target binding, and biochemical pathways",
+    "STUDY_DESIGN_SPECIFIC": "Filtered retrieval by methodology (RCT, cohort, in vitro replication)",
+    "METHODOLOGY_ASSAY_SPECIFIC": "Measurement standards, bioassay protocols, and validation benchmarks",
+    "NEGATIVE_NULL_RESULT": "Deliberate search for lack of effect, antagonism, inertness, or failure to replicate",
+    "HISTORICAL_FOUNDATIONAL": "Seminal origin papers and foundational mathematical/biochemical models",
+    "RECENT_EMERGING_LITERATURE": "Literature within immediate window (<3 years) capturing latest consensus",
+    "TERMINOLOGY_VARIANT": "Alternate naming conventions, historical disease designations, and synonyms",
+    "ACRONYM_ABBREVIATION": "Disambiguated acronym and abbreviated term permutations",
+    "ALTERNATIVE_SPELLING_HYPHENATION": "Spelling variants, British/American English, and hyphenation variants",
+    "CITATION_DERIVED_DISCOVERY": "Literature recovered via backward, forward, or lateral citation chasing"
+}
+
+# 7 Independent Saturation Novelty Dimensions (v8.5 Section 8 - Multi-Dimensional Saturation)
+SATURATION_DIMENSIONS: Dict[str, str] = {
+    "RECORD_NOVELTY": "Marginal discovery rate of genuinely new, unique bibliographic records",
+    "ENTITY_NOVELTY": "Discovery of previously unobserved biological entities, compounds, or cell models",
+    "EVIDENCE_NOVELTY": "Discovery of novel effect directions, quantitative effect sizes, or endpoints",
+    "CONTRADICTION_NOVELTY": "Discovery of newly identified conflicting findings or divergent parameters",
+    "CITATION_NETWORK_NOVELTY": "Discovery of relevant studies via backward, forward, or lateral citation links",
+    "DATABASE_NOVELTY": "Yield of unique eligible records contributing from distinct database engines",
+    "VOCABULARY_NOVELTY": "Discovery of previously unmapped terminology, synonyms, or MeSH descriptors"
+}
+
+# 8 High-Value Seed Paper Categories (v8.5 Section 9 - Discovery Anchors)
+SEED_PAPER_CATEGORIES: Dict[str, str] = {
+    "SYSTEMATIC_REVIEW_META_ANALYSIS": "Synthesizes evidence landscape and provides comprehensive reference network",
+    "CLINICAL_PRACTICE_GUIDELINE": "Authoritative clinical consensus defining standard-of-care benchmark",
+    "HISTORICAL_LANDMARK": "Foundational mathematical model or biological discovery origin",
+    "HIGHLY_CITED_FOUNDATIONAL": "Seminal paper establishing field parameters and initial proof-of-concept",
+    "RECENT_HIGH_IMPACT": "Recent publication establishing state-of-the-art methodology or efficacy",
+    "KEY_METHODOLOGICAL": "Canonical bioassay or analytical protocol benchmark",
+    "CONTRADICTORY_NULL_RESULT": "Definitive paper establishing boundary conditions or negative efficacy",
+    "EXPLORATORY_ANCHOR": "Initial high-scoring study selected as seed for citation chasing"
+}
+
+# Citation Chasing Directions (v8.5 Section 7)
+CITATION_CHASE_DIRECTIONS: List[str] = [
+    "BACKWARD",     # Inspecting references cited by seed paper
+    "FORWARD",      # Inspecting papers citing the seed paper
+    "LATERAL"       # Inspecting related studies by same author group or sharing key entities
+]
+
+# 6 Citation Drift & Misattribution Types (v8.5 Section 11 - AIPOCH Adapted)
+CITATION_DRIFT_TYPES: Dict[str, str] = {
+    "NO_DRIFT": "Claim accurately and conservatively reflects explicit primary evidence of cited study",
+    "OVERSTATEMENT": "Claim exaggerates effect size, certainty, or generality beyond observed data",
+    "CITATION_DRIFT": "Secondary retellings gradually altered or broadened the original author conclusion",
+    "CONTEXT_MISMATCH": "Claim transfers finding to different population, model, tissue, or endpoint",
+    "SELECTIVE_CITATION": "Claim cites positive sub-analysis while omitting primary null or adverse outcome",
+    "CORRELATION_TO_CAUSATION": "Claim asserts causal direction from purely observational or cross-sectional design"
+}
+
+# 4 Structured Paper Reading Tracks (v8.5 Section 10 - AIPOCH Literature Reader Pro Adapted)
+STRUCTURED_PAPER_READING_TRACKS: List[str] = [
+    "CLINICAL_EPIDEMIOLOGY",        # Human trials, observational cohorts, diagnostic/prognostic models
+    "COMPUTATIONAL_BIOINFORMATICS", # Omics analysis, screening pipelines, predictive algorithms
+    "BASIC_EXPERIMENTAL",           # In vitro cell cultures, in vivo animal models, molecular assays
+    "HYBRID"                        # Multi-track studies integrating computational and laboratory validation
+]
+
+# 3 Contradiction Explanation Partitions (v8.5 Section 12 - AIPOCH Contradiction Resolver Adapted)
+CONTRADICTION_EXPLANATION_LEVELS: List[str] = [
+    "DEMONSTRATED_EXPLANATION",     # Discrepancy empirically verified by direct parameter variation (e.g. dose/time)
+    "PLAUSIBLE_EXPLANATION",        # Discrepancy mechanistically substantiated by differences in model/assay
+    "UNRESOLVED_UNCERTAINTY"        # Discrepancy unexplained under available evidence; true research gap
+]
+
 
 

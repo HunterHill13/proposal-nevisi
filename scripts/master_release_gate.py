@@ -208,9 +208,53 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
     c14 = hasattr(GenericEvidenceSynthesizer, "generate_7_point_synthesis_narrative")
     checks.append(("14. 7-Point Structured Literature Synthesis Narrative Engine", c14))
 
+    # 15. SEARCH_FAMILIES_ONTOLOGY (16 Query Families) & QueryFamilySearchPlanner
+    from scripts.core_policies import SEARCH_FAMILIES_ONTOLOGY
+    from scripts.generic_search_planner import QueryFamilySearchPlanner, MeSHMapper
+    c15 = (len(SEARCH_FAMILIES_ONTOLOGY) == 16 and hasattr(QueryFamilySearchPlanner, "build_query_families") and hasattr(MeSHMapper, "map_term"))
+    checks.append(("15. SEARCH_FAMILIES_ONTOLOGY (16 Query Families) & MeSH Mapper", c15))
+
+    # 16. Citation Chasing Engine (Backward, Forward, Lateral)
+    from scripts.scientific_search_adapter import CitationChasingEngine
+    c16 = hasattr(CitationChasingEngine, "chase_citations")
+    checks.append(("16. Citation Chasing Engine (Backward, Forward, Lateral) with Provenance", c16))
+
+    # 17. Seed Paper Discovery Engine (8 Categories & Non-Automatic Inclusion Policy)
+    from scripts.scientific_search_adapter import SeedPaperDiscoveryEngine
+    from scripts.core_policies import SEED_PAPER_CATEGORIES
+    c17 = (len(SEED_PAPER_CATEGORIES) == 8 and hasattr(SeedPaperDiscoveryEngine, "categorize_seed_paper"))
+    checks.append(("17. Seed Paper Discovery Engine (8 Categories & Non-Automatic Inclusion)", c17))
+
+    # 18. Evidence-Based Saturation Tracker (7 Dimensions & False Saturation Guard)
+    from scripts.scientific_search_adapter import EvidenceBasedSaturationTracker
+    from scripts.core_policies import SATURATION_DIMENSIONS
+    c18 = (len(SATURATION_DIMENSIONS) == 7 and hasattr(EvidenceBasedSaturationTracker, "evaluate_saturation"))
+    checks.append(("18. Evidence-Based Saturation Tracker (7 Dimensions & False Saturation Guard)", c18))
+
+    # 19. Structured Paper Reader (4 Tracks & 18 Deterministic Fields)
+    from scripts.generic_reference_auditor import StructuredPaperReader
+    from scripts.core_policies import STRUCTURED_PAPER_READING_TRACKS
+    c19 = (len(STRUCTURED_PAPER_READING_TRACKS) == 4 and hasattr(StructuredPaperReader, "read_paper"))
+    checks.append(("19. Structured Paper Reader (4 Tracks & 18 Deterministic Fields)", c19))
+
+    # 20. Paper-to-Claim Verifier (6 Citation Drift Types & Entailment Verdicts)
+    from scripts.generic_reference_auditor import PaperToClaimVerifier
+    from scripts.core_policies import CITATION_DRIFT_TYPES
+    c20 = (len(CITATION_DRIFT_TYPES) == 6 and hasattr(PaperToClaimVerifier, "verify_claim"))
+    checks.append(("20. Paper-to-Claim Verifier (6 Citation Drift Types & Entailment Verdicts)", c20))
+
+    # 21. Enhanced Triple-Check Deduplication & Identifier Canonicalization
+    c21 = hasattr(GenericReferenceAuditor, "detect_duplicate_pair") and hasattr(GenericReferenceAuditor, "canonicalize_doi")
+    checks.append(("21. Enhanced Triple-Check Deduplication & Identifier Canonicalization", c21))
+
+    # 22. Reproducible Research Run Manifest & SHA-256 Checksum
+    from scripts.scientific_search_adapter import ResearchRunManifest
+    c22 = hasattr(ResearchRunManifest, "generate_manifest") and hasattr(ResearchRunManifest, "save_manifest")
+    checks.append(("22. Reproducible Research Run Manifest & SHA-256 Checksum", c22))
+
     all_passed = all(p for _, p in checks)
     return {
-        "check": "RESEARCH_ENGINE_V8_4_CRITERIA_AUDIT",
+        "check": "RESEARCH_ENGINE_V8_5_CRITERIA_AUDIT",
         "passed": all_passed,
         "total_criteria": len(checks),
         "passed_criteria": sum(1 for _, p in checks if p),
@@ -220,7 +264,7 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.4)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.5)")
     print("===========================================================================\n")
 
     # 1. Version Sync
@@ -249,10 +293,10 @@ def main():
     print(f"      - Invariants      : Discovery={'OK' if t_res['discovery_invariant_met'] else 'FAIL'}, Accounting={'OK' if t_res['accounting_invariant_met'] else 'FAIL'}")
     print(f"      - Execution Time  : {t_res['elapsed_seconds']}s")
 
-    # 4. Research Engine v8.4 Criteria Audit (14 Checks)
+    # 4. Research Engine v8.5 Criteria Audit (22 Checks)
     r_res = audit_research_engine_v8_4_criteria()
     status_icon = "[PASS]" if r_res["passed"] else "[FAIL]"
-    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (14 Criteria):")
+    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (22 Criteria):")
     for name, p in r_res["criteria_checks"]:
         ch_icon = "[PASS]" if p else "[FAIL]"
         print(f"      {ch_icon} {name}")

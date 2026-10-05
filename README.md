@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.4)
+### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.5)
 ### موتور جامع و تعمیم‌پذیر سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 267/267 Passed](https://img.shields.io/badge/Unified%20Tests-267%2F267%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 289/289 Passed](https://img.shields.io/badge/Unified%20Tests-289%2F289%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -18,9 +18,9 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi (v8.4)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH and K-Dense, v8.4 completely decouples the research and literature synthesis subsystems from any project-specific biological assumptions, entities, mechanisms, diseases, cell lines, or compounds. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
+**Proposal-Nevisi (v8.5)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH and K-Dense, v8.5 completely decouples the research and literature synthesis subsystems from any project-specific biological assumptions, entities, mechanisms, diseases, cell lines, or compounds. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
 
-> **Bifurcated Validation Architecture & Scientific Boundaries (v8.4):** Proposal-Nevisi strictly differentiates **Software Validation** (267 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`).
+> **Bifurcated Validation Architecture & Scientific Boundaries (v8.5):** Proposal-Nevisi strictly differentiates **Software Validation** (289 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`).
 
 
 ### Core Architecture & Capabilities (v8.4)
@@ -87,37 +87,22 @@ python scripts/master_release_gate.py
 <a name="فارسی"></a>
 ## مستندات فارسی
 
-مهارت **Proposal-Nevisi (نسخه v8.4)** یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
+مهارت **Proposal-Nevisi (نسخه v8.5)** یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
 
-### ویژگی‌های بنیادین نسخه v8.4:
-1. **استقلال کامل و قطعی از موضوع (Topic-Agnostic Core):** بازطراحی کامل بر مبنای الگوهای اثبات‌شده AIPOCH و K-Dense بدون هرگونه فرض پنهان در خصوص بیماری، دارو، رده سلولی یا مکانیسم.
-2. **تجزیه انطباقی مسئله و ابعاد نامرتبط:** پشتیبانی کامل از مسائل تک‌مداخله‌ای، جراحی، اپیدمیولوژیک و تشخیصی با برچسب‌گذاری صریح `NOT_APPLICABLE` بدون تحمیل ابعاد اجباری ترکیبی.
-3. **تاکسونومی جامع ۱۶ گانه انصراف PRISMA (`GENERIC_EXCLUSION_ONTOLOGY`):** تعریف ۱۶ کد عمومی بدون سوگیری همراه با نگاشت سازگار به عقب با الگوهای پیشین.
-4. **سلسله‌مراتب عمومی موجودیت‌ها و نقش‌های شواهد:** تفکیک ۱۳ موجودیت زیستی و ۱۰ نقش علمی شواهد به صورت کاملاً مستقل از قطبیت شواهد (`SUPPORTS`, `CONTRADICTS`, `LIMITS_INTERPRETATION`).
-5. **سنتز ساختارمند ۷ مرحله‌ای ادبیات پژوهش:** تدوین خودکار روایت تحلیلی و مستند مرور متون منطبق بر شواهد واقعی و وضعیت‌های محصور شکاف جستجو.
-6. **سوئیت آزمون جامع ۲۶۷ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۸ سوئیت آزمون و کشتن ۱۰/۱۰ جهش علمی با نمره جهش ۱۰۰٪.
+### ویژگی‌های بنیادین نسخه v8.5:
+1. **استقلال کامل و قطعی از موضوع (Topic-Agnostic Core):** بازطراحی و ارتقای کامل بر مبنای الگوهای اثبات‌شده AIPOCH و K-Dense بدون هرگونه فرض پنهان در خصوص بیماری، دارو، رده سلولی یا مکانیسم.
+2. **۱۶ خانواده پرس‌وجوی استاندارد و نگاشت اصطلاح‌نامه MeSH (`SEARCH_FAMILIES_ONTOLOGY`):** تلفیق جستجوی واژگان کنترل‌شده MeSH با واژگان آزاد عنوان/چکیده، همراه با مقایسه کمی بازده و پوشش اشتراکی.
+3. **تعقیب استنادی چندجهته با ردیابی مسیر اکتشاف (`CitationChasingEngine`):** پیاده‌سازی زنجیره‌سازی استنادی پس‌رو (Backward)، پیش‌رو (Forward) و هم‌عرض (Lateral) با ثبت شفاف مسیر، عمق و خاستگاه کشف.
+4. **موتور اکتشاف مقالات هسته در ۸ دسته استاندارد (`SeedPaperDiscoveryEngine`):** تعیین لنگرهای اکتشافی مستقل از سبد مراجع نهایی (عدم گنجاندن خودکار در پروپوزال بدون عبور از فیلتر غربالگری).
+5. **پایش اشباع ۷ بُعدی شواهد و گارد اشباع کاذب (`EvidenceBasedSaturationTracker`):** ارزیابی روند کاهش بازده حاشیه‌ای در ابعاد رکورد، موجودیت، شواهد، تناقض، شبکه استنادی، پایگاه و واژگان توأم با مسدودسازی اعلام اشباع در خطاهای سیستمی.
+6. **خوانش ساختاریافته ۴ تراکه متون با استخراج ۱۸ فیلد قطعی (`StructuredPaperReader`):** پوشش تراک‌های بالینی، بیوانفورماتیک، آزمایشگاهی و هیبرید با استخراج قطعی دوز، حجم نمونه، جهت اثر، نقطه پایانی و روش اندازه‌گیری.
+7. **راستی‌آزمایی انطباق مقاله با ادعا و کشف ۶ نوع انحراف استنادی (`PaperToClaimVerifier`):** تشخیص دقیق ادعای فراتر از داده (Overstatement)، انحراف متنی (Citation Drift)، عدم انطباق بافتاری (Context Mismatch)، استناد گزینشی (Selective Citation) و تبدیل همبستگی به علیت (Correlation to Causation).
+8. **تفکیک سه‌سطحی تبیین تناقضات علمی (`CONTRADICTION_EXPLANATION_LEVELS`):** دسته‌بندی تبیین‌ها به تجربیِ اثبات‌شده (Demonstrated)، مکانیسمی محتمل (Plausible) و عدم‌قطعیت تجربیِ حل‌نشده (Unresolved Uncertainty).
+9. **شناسنامه بازتولیدپذیر اجرای پژوهش (`ResearchRunManifest`):** تولید خودکار مانیفست کامل اجرای پژوهش حاوی تمام پرس‌وجوها، معیارهای تنوع پایگاهی، منحنی اشباع و چک‌سام رمزنگاری‌شده SHA-256.
+10. **سوئیت آزمون جامع ۲۸۹ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۹ سوئیت آزمون و کشتن ۱۰/۱۰ جهش علمی با نمره جهش ۱۰۰٪ و ممیزی عدم نشت در تمام ۲۲ اسکریپت هسته.
 
 > **Note on Scientific Validation vs Software Verification:**
 > Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines. They do not constitute external live laboratory experimentation or real clinical trials.
-
----
-
-<a name="فارسی"></a>
-## مستندات فارسی
-
-مهارت **Proposal-Nevisi (نسخه v8.2)** یک پلتفرم جامع، تعاملی، مستقل از موضوع و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
-
-### ویژگی‌های بنیادین نسخه v8.2:
-1. **استقلال کامل از موضوع (Topic-Agnostic Core):** حذف تمام کلیدواژه‌ها و پیش‌فرض‌های ثابت از کدهای هسته و انتقال کامل تعاریف به مدل پویای مسئله پژوهش (`ResearchProblemModel`).
-2. **گیت ۱۰ بعدی هم‌خوانی مفهومی و ۶ سطح رتبه‌بندی (10-Dimension Relevance Gate):** سنجش ۱۰ بعد زیستی و روش‌شناختی و تفکیک ۶ سطح رتبه‌بندی (`DIRECTLY_RELEVANT`, `HIGHLY_RELEVANT`, `INDIRECTLY_RELEVANT`, `METHOD_RELEVANT`, `BACKGROUND_ONLY`, `IRRELEVANT`) و ممانعت قطعی و بی‌قیدوشرط از ورود مقالات بی‌ارتباط به بافتار زیستی (نظیر انجماد اسپرم دام در انکولوژی یا پزشکی انسانی).
-3. **تفکیک بدنه جستجو از مراجع نهایی و سقف سخت ۲۵ رفرنس:** جستجوی اولیه عمیق، چندپایگاهی و اشباع‌محور، توأم با اعمال سقف قطعی حداکثر ۲۵ رفرنس در پروپوزال نهایی با رتبه‌بندی ۱۴ عاملی، توزیع متوازن در ۵ محور علمی، و الزام ثبت توجیه سه‌بخشی (`FINAL_INCLUSION_REASON`، بخش پشتیبانی‌شده در پروپوزال و دلیل ضرورت) برای تک‌تک مراجع.
-4. **مرور بر منابع تفصیلی بدون تیترهای مصنوعی:** نگارش یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع در بخش ۳ بدون هدرهای مصنوعی، همراه با سنتز نقادانه بین‌مطالعه‌ای و تحلیل شواهد متناقض.
-5. **آداپتور جستجوی علمی چندپایگاهی و گراف تجمیع هویت (`ScientificSearchAdapter`):** پیاده‌سازی معماری آداپتور (Option B + C) بر پایه کتابخانه استاندارد پایتون برای PubMed, Europe PMC, Crossref و OpenAlex با گراف همبندی تجمیع هویت شناساگرهای چندگانه (DOI, PMID, OpenAlex ID)، پایش منحنی اشباع جستجو و ثبت وضعیت صادقانه `NOT_EXECUTED` و `EMPTY_RETRIEVAL`.
-6. **دقت زمانی تقویمی و سد ضدتقلب استثناهای کلاسیک:** ارزیابی روز/ماه/سال تقویمی با پشتیبانی سال کبیسه و الزام اثبات استناد بالا ($\ge 100$) یا نقش متدولوژیک بنیادین برای مقالات قدیمی‌تر از پنجره زمانی مجاز (تعداد استناد به تنهایی برای دور زدن قانون زمانی کافی نیست).
-7. **دفتر کل خاستگاه داده‌های کمی و اعتبارسنجی عبارات علّی:** جداسازی کامل اتصال استنادی، ردیابی سند منبع و دلالت علمی ادعا، همراه با بررسی دقیق مقادیر عددی، تبدیل واحدها و مهار ادعای علیت در مطالعات مشاهده‌ای.
-8. **طراحی پروتکل پویا، سیاست داده‌های مفقوده و رهگیری پارامترهای حجم نمونه:** تضمین تمایز `0` و `False` از `MISSING` و اعلام وضعیت `SAMPLE_SIZE_REQUIRES_INPUT` در صورت غیبت پارامترهای حیاتی بدون مفروضات پنهان.
-9. **خروجی رسمی ۱۴ گانه ورد و ابزار بازرسی عمیق XML:** تدوین کامل ۱۴ بخش مصوب با فونت دبی، تگ‌های native RTL bidi XML و بازرسی ساختاری فایل docx.
-10. **سوئیت آزمون‌های هفت‌گانه ۲۱۸ تستی و لایه آزمون جهش (Mutation Testing):** پاس شدن ۱۰۰٪ آزمون‌ها در سوئیت جامع ۲۱۸ تستی با کشته شدن ۱۰/۱۰ جهش عمدی (امتیاز جهش ۱۰۰٪) و برقراری ناوردایی‌های کشف پویا و حسابداری آماری.
 
 ---
 

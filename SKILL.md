@@ -2,28 +2,35 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v8.4). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v8.5). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
   Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-source federated literature searches
-  (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA),
-  maps 22 cross-study relationship types, detects gaps across 18 universal categories, performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
+  (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), utilizes 16 generic query families (SEARCH_FAMILIES_ONTOLOGY)
+  with MeSH controlled vocabulary mapping, multi-directional citation chasing (Backward, Forward, Lateral) with complete provenance paths,
+  8-category seed paper discovery anchors (SEED_PAPER_CATEGORIES), 7-dimension evidence-based saturation tracking with false saturation guards,
+  4-track structured literature reading (Clinical, Computational, Basic Experimental, Hybrid) extracting 18 deterministic fields,
+  6-type citation drift detection and claim entailment verification (PaperToClaimVerifier),
+  produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA), maps 22 cross-study relationship types, detects gaps across 18 universal categories,
+  performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
   clusters study families, cohorts, and trial registries to prevent evidence double-counting (NON_INDEPENDENT_EVIDENCE),
-  resolves contradictions across an extensible 14-category generic root-cause taxonomy (distinguishing TRUE_CONTRADICTION from CONTEXTUAL_DISAGREEMENT),
-  builds evidence conflict matrices and evaluates alternative explanations, tracks discovery paths in citation chaining,
+  resolves contradictions across an extensible 14-category generic root-cause taxonomy with 3-tier explanation partitioning
+  (DEMONSTRATED_EXPLANATION, PLAUSIBLE_EXPLANATION, UNRESOLVED_UNCERTAINTY), builds evidence conflict matrices,
   enforces epistemic gap bounds and rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
   enforces 7-level claim entailment and causal language boundaries with sentence-level CLAIM_PROVENANCE_MAP,
   enforces 16-category generic PRISMA exclusion ontology and 10-dimension contextual relevance gate strictly dropping IRRELEVANT off-topic records,
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
-  supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
+  supports living research incremental delta reports, emits reproducible Research Run Manifests with SHA-256 checksums,
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 267-assertion test harness across 8 suites
-  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 114 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, 24 end-to-end integration tests, and 11 cross-topic adversarial tests).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 289-assertion test harness across 9 suites
+  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 114 adversarial stress tests, 60-test benchmark,
+  10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, 24 end-to-end integration tests, 11 cross-topic adversarial tests,
+  and 22 advanced v8.5 research engine integration tests).
 ---
 
-# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.4)
+# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.5)
 
-این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.4 با بازطراحی بنیادین موتور تحقیق و مرور ادبیات برگرفته از الگوهای اثبات‌شده AIPOCH و K-Dense، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، جراحی، دارویی، تشخیصی، قلبی-عروقی، عفونی، اپیدمیولوژیک و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) و بدون هرگونه وابستگی یا پیش‌فرض‌های متنی به پروژه‌های قبلی عمل می‌کند.
-> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.4):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۲۶۷ تست واحد، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
+این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.5 با ارتقای بنیادین موتور تحقیق و بازبینی متون برگرفته از الگوهای اثبات‌شده AIPOCH و K-Dense، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که مجهز به ۱۶ خانواده پرس‌وجوی استاندارد، نگاشت اصطلاح‌نامه MeSH، تعقیب استنادی چندجهته (Backward, Forward, Lateral)، لنگرهای اکتشافی هشت‌گانه مقالات هسته (Seed Papers)، پایش اشباع ۷ بُعدی با گارد محافظتی اشباع کاذب، خوانش ساختاریافته ۴ تراکه متون با استخراج ۱۸ فیلد قطعی، و شناسایی ۶ نوع انحراف استنادی (Citation Drift) است.
+> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.5):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۲۸۹ تست واحد، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
 
 
 ---

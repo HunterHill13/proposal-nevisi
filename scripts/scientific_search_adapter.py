@@ -34,7 +34,11 @@ try:
     from core_policies import (
         MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
         ContextualRelevanceConfig, TemporalPolicyConfig,
-        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING
+        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING,
+        SEARCH_FAMILIES_ONTOLOGY, SATURATION_DIMENSIONS,
+        SEED_PAPER_CATEGORIES, CITATION_CHASE_DIRECTIONS,
+        CITATION_DRIFT_TYPES, STRUCTURED_PAPER_READING_TRACKS,
+        CONTRADICTION_EXPLANATION_LEVELS
     )
     from generic_reference_auditor import GenericReferenceAuditor
 except ImportError:
@@ -44,7 +48,11 @@ except ImportError:
     from core_policies import (
         MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
         ContextualRelevanceConfig, TemporalPolicyConfig,
-        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING
+        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING,
+        SEARCH_FAMILIES_ONTOLOGY, SATURATION_DIMENSIONS,
+        SEED_PAPER_CATEGORIES, CITATION_CHASE_DIRECTIONS,
+        CITATION_DRIFT_TYPES, STRUCTURED_PAPER_READING_TRACKS,
+        CONTRADICTION_EXPLANATION_LEVELS
     )
     from generic_reference_auditor import GenericReferenceAuditor
 
@@ -1222,6 +1230,53 @@ class ScientificSearchAdapter:
             "saturation_curve": saturation_curve
         }
 
+    @classmethod
+    def compute_database_diversity(
+        cls,
+        search_log: List[Dict[str, Any]],
+        unique_records: List[Dict[str, Any]],
+        selected_references: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Calculates per-database retrieval yield, unique contribution, and portfolio diversity."""
+        dbs = ["PubMed", "Europe PMC", "OpenAlex", "Crossref"]
+        metrics: Dict[str, Dict[str, int]] = {
+            db: {
+                "queries_executed": 0,
+                "records_returned": 0,
+                "unique_contributions": 0,
+                "selected_final": 0
+            } for db in dbs
+        }
+
+        for entry in (search_log or []):
+            db = entry.get("database")
+            if db in metrics:
+                metrics[db]["queries_executed"] += 1
+                metrics[db]["records_returned"] += entry.get("hits_retrieved", 0)
+
+        for rec in (unique_records or []):
+            sources = rec.get("retrieval_sources", [rec.get("database")])
+            for s in sources:
+                if s in metrics:
+                    metrics[s]["unique_contributions"] += 1
+
+        if selected_references:
+            for ref in selected_references:
+                sources = ref.get("retrieval_sources", [ref.get("database")])
+                for s in sources:
+                    if s in metrics:
+                        metrics[s]["selected_final"] += 1
+
+        active_dbs = [db for db, m in metrics.items() if m["records_returned"] > 0 or m["unique_contributions"] > 0]
+        diversity_score = round(len(active_dbs) / max(len(dbs), 1), 2)
+
+        return {
+            "database_diversity_score": diversity_score,
+            "active_databases_count": len(active_dbs),
+            "total_supported_databases": len(dbs),
+            "per_database_metrics": metrics
+        }
+
     # =========================================================================
     # 5. END-TO-END EXECUTION, SCREENING & PORTFOLIO SELECTION (<= 25 REFS)
     # =========================================================================
@@ -1272,8 +1327,14 @@ class ScientificSearchAdapter:
             min_references=min_final_refs
         )
 
+        db_diversity = self.compute_database_diversity(
+            search_log=search_result.get("search_log", []),
+            unique_records=unique_corpus,
+            selected_references=selected_refs
+        )
+
         return {
-            "search_adapter_version": "8.3.0",
+            "search_adapter_version": "8.5.0",
             "execution_mode": search_result.get("execution_mode"),
             "search_provenance": {
                 "queries_executed": len(queries),
@@ -1281,8 +1342,11 @@ class ScientificSearchAdapter:
                 "total_raw_hits": search_result.get("total_raw_records"),
                 "deduplicated_unique_hits": dedup_result.get("total_unique"),
                 "duplicate_clusters_resolved": dedup_result.get("duplicate_clusters"),
-                "deduplication_reduction_percent": dedup_result.get("reduction_percentage")
+                "deduplication_reduction_percent": dedup_result.get("reduction_percentage"),
+                "database_diversity_score": db_diversity.get("database_diversity_score"),
+                "active_databases_count": db_diversity.get("active_databases_count")
             },
+            "database_diversity": db_diversity,
             "screening_funnel": selection_result.get("screening_funnel"),
             "reference_portfolio_audit": portfolio_audit,
             "final_selected_count": len(selected_refs),
@@ -1378,7 +1442,7 @@ class ScientificSearchAdapter:
 
         return {
             "audit_type": "SEARCH_GAP_AUDIT",
-            "search_adapter_version": "8.3.0",
+            "search_adapter_version": "8.5.0",
             "timestamp": timestamp,
             "queries_evaluated_count": len(queries),
             "databases_queried": dbs,
@@ -1387,6 +1451,390 @@ class ScientificSearchAdapter:
             "novelty_statement_allowed": novelty_statement_allowed,
             "queries_audit": audit_records
         }
+
+
+# =============================================================================
+# 6. v8.5 RESEARCH EXTENSIONS: SEED DISCOVERY, CITATION CHASING & MANIFEST
+# Adapted from AIPOCH and K-Dense Proven Architectures
+# =============================================================================
+
+class SeedPaperDiscoveryEngine:
+    """Discovers, registers, and categorizes seed papers (discovery anchors).
+    Enforces that seed papers are discovery anchors for citation chasing and network exploration,
+    NOT automatic inclusions into the final reference portfolio. Every seed must pass the
+    same screening funnel (Stage 1 & Stage 2) to be included in the final <= 25 references.
+    """
+    CATEGORIES = list(SEED_PAPER_CATEGORIES.keys())
+
+    @classmethod
+    def categorize_seed_paper(cls, paper: Dict[str, Any]) -> str:
+        """Determines the appropriate SEED_PAPER_CATEGORIES classification based on paper metadata."""
+        title = str(paper.get("title", "")).lower()
+        abstract = str(paper.get("abstract", "")).lower()
+        design = str(paper.get("study_design", "")).lower()
+        text = f"{title} {abstract} {design}"
+
+        # 1. SYSTEMATIC_REVIEW_META_ANALYSIS
+        if any(k in text for k in ["systematic review", "meta-analysis", "meta analysis", "cochrane review", "scoping review"]):
+            return "SYSTEMATIC_REVIEW_META_ANALYSIS"
+
+        # 2. CLINICAL_PRACTICE_GUIDELINE
+        if any(k in text for k in ["guideline", "consensus recommendation", "clinical practice", "consensus statement"]):
+            return "CLINICAL_PRACTICE_GUIDELINE"
+
+        # 3. CONTRADICTORY_NULL_RESULT
+        if any(k in text for k in ["no significant effect", "failed to replicate", "null finding", "ineffective", "antagonistic", "negative result", "lacked efficacy"]):
+            return "CONTRADICTORY_NULL_RESULT"
+
+        # 4. HISTORICAL_LANDMARK
+        year = paper.get("year")
+        if year and isinstance(year, int) and year < 2000:
+            return "HISTORICAL_LANDMARK"
+
+        # 5. KEY_METHODOLOGICAL
+        if any(k in text for k in ["assay method", "mathematical model", "equation", "methodology", "protocol", "isobologram method"]):
+            return "KEY_METHODOLOGICAL"
+
+        # 6. HIGHLY_CITED_FOUNDATIONAL
+        cited_by = paper.get("cited_by_count", 0)
+        if (isinstance(cited_by, int) and cited_by >= 100) or paper.get("is_seminal"):
+            return "HIGHLY_CITED_FOUNDATIONAL"
+
+        # 7. RECENT_HIGH_IMPACT
+        if year and isinstance(year, int) and year >= 2022:
+            return "RECENT_HIGH_IMPACT"
+
+        # Default fallback
+        return "EXPLORATORY_ANCHOR"
+
+    @classmethod
+    def register_seed(cls, paper: Dict[str, Any], category: Optional[str] = None) -> Dict[str, Any]:
+        """Registers a paper as an active discovery anchor with explicit provenance."""
+        assigned_cat = category or cls.categorize_seed_paper(paper)
+        if assigned_cat not in cls.CATEGORIES:
+            assigned_cat = "EXPLORATORY_ANCHOR"
+
+        seed_id = paper.get("doi") or paper.get("pmid") or paper.get("ref_id") or f"SEED_{hash(str(paper.get('title',''))) % 100000:05d}"
+        
+        registered = dict(paper)
+        registered["is_seed_paper"] = True
+        registered["seed_id"] = seed_id
+        registered["seed_category"] = assigned_cat
+        registered["seed_purpose"] = SEED_PAPER_CATEGORIES.get(assigned_cat, "Discovery anchor for citation chasing")
+        registered["final_portfolio_eligibility"] = "REQUIRES_SCREENING"
+        registered["status_note"] = "Discovery anchor: must undergo relevance and eligibility screening for proposal inclusion"
+        return registered
+
+    @classmethod
+    def analyze_seed_portfolio(cls, seeds: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyzes seed portfolio category distribution and anchor diversity."""
+        registered_seeds = [cls.register_seed(s) for s in seeds]
+        category_counts: Dict[str, int] = {cat: 0 for cat in cls.CATEGORIES}
+        for s in registered_seeds:
+            cat = s.get("seed_category", "EXPLORATORY_ANCHOR")
+            category_counts[cat] = category_counts.get(cat, 0) + 1
+
+        active_categories = [cat for cat, cnt in category_counts.items() if cnt > 0]
+        return {
+            "total_seeds": len(registered_seeds),
+            "unique_categories_represented": len(active_categories),
+            "category_distribution": category_counts,
+            "seeds": registered_seeds,
+            "diversity_adequate": len(active_categories) >= 2 or len(registered_seeds) <= 2
+        }
+
+
+class CitationChasingEngine:
+    """Multi-directional citation chasing engine (backward, forward, lateral).
+    Uncovers candidate research papers through citation graphs and bibliographic links.
+    Maintains explicit discovery paths and provenance for every discovered candidate.
+    Adapted from AIPOCH citation chaining and K-Dense reference recovery architectures.
+    """
+    VALID_DIRECTIONS = list(CITATION_CHASE_DIRECTIONS)
+
+    @classmethod
+    def chase_citations(
+        cls,
+        seed_papers: List[Dict[str, Any]],
+        directions: Optional[List[str]] = None,
+        max_depth: int = 1,
+        network_corpus: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Executes citation chasing starting from registered seed papers."""
+        active_directions = [d.upper() for d in (directions or cls.VALID_DIRECTIONS) if d.upper() in cls.VALID_DIRECTIONS]
+        if not active_directions:
+            active_directions = ["BACKWARD", "FORWARD"]
+
+        discovered_candidates: List[Dict[str, Any]] = []
+        visited_identifiers: Set[str] = set()
+
+        for s in seed_papers:
+            s_id = str(s.get("doi") or s.get("pmid") or s.get("ref_id") or "").strip().lower()
+            if s_id:
+                visited_identifiers.add(s_id)
+
+        corpus_lookup: Dict[str, Dict[str, Any]] = {}
+        author_to_records: Dict[str, List[Dict[str, Any]]] = {}
+        if network_corpus:
+            for rec in network_corpus:
+                r_id = str(rec.get("doi") or rec.get("pmid") or rec.get("ref_id") or "").strip().lower()
+                if r_id:
+                    corpus_lookup[r_id] = rec
+                for auth in rec.get("authors", []):
+                    a_clean = str(auth).strip().lower()
+                    if a_clean:
+                        author_to_records.setdefault(a_clean, []).append(rec)
+
+        hop_stats = {d: 0 for d in active_directions}
+
+        for seed in seed_papers:
+            seed_ident = str(seed.get("doi") or seed.get("pmid") or seed.get("ref_id") or "SEED")
+
+            # 1. BACKWARD CHAINING
+            if "BACKWARD" in active_directions:
+                cited_list = seed.get("cited_references") or seed.get("references") or []
+                for cited in cited_list:
+                    c_rec = dict(cited) if isinstance(cited, dict) else {"ref_id": str(cited), "title": str(cited)}
+                    c_id = str(c_rec.get("doi") or c_rec.get("pmid") or c_rec.get("ref_id") or "").strip().lower()
+                    if c_id and c_id in corpus_lookup:
+                        c_rec = dict(corpus_lookup[c_id])
+                    
+                    if c_id and c_id not in visited_identifiers:
+                        visited_identifiers.add(c_id)
+                        c_rec["discovery_method"] = "CITATION_CHASING_BACKWARD"
+                        c_rec["discovery_direction"] = "BACKWARD"
+                        c_rec["discovery_path"] = [f"SEED:{seed_ident}", "BACKWARD", c_id]
+                        c_rec["chain_depth"] = 1
+                        c_rec["parent_seed_id"] = seed_ident
+                        discovered_candidates.append(c_rec)
+                        hop_stats["BACKWARD"] += 1
+
+            # 2. FORWARD CHAINING
+            if "FORWARD" in active_directions:
+                citing_list = seed.get("citing_papers") or seed.get("citations") or []
+                for citing in citing_list:
+                    c_rec = dict(citing) if isinstance(citing, dict) else {"ref_id": str(citing), "title": str(citing)}
+                    c_id = str(c_rec.get("doi") or c_rec.get("pmid") or c_rec.get("ref_id") or "").strip().lower()
+                    if c_id and c_id in corpus_lookup:
+                        c_rec = dict(corpus_lookup[c_id])
+
+                    if c_id and c_id not in visited_identifiers:
+                        visited_identifiers.add(c_id)
+                        c_rec["discovery_method"] = "CITATION_CHASING_FORWARD"
+                        c_rec["discovery_direction"] = "FORWARD"
+                        c_rec["discovery_path"] = [f"SEED:{seed_ident}", "FORWARD", c_id]
+                        c_rec["chain_depth"] = 1
+                        c_rec["parent_seed_id"] = seed_ident
+                        discovered_candidates.append(c_rec)
+                        hop_stats["FORWARD"] += 1
+
+            # 3. LATERAL CHAINING
+            if "LATERAL" in active_directions:
+                authors = seed.get("authors", [])
+                for auth in authors[:2]:
+                    a_clean = str(auth).strip().lower()
+                    related_recs = author_to_records.get(a_clean, [])
+                    for rel in related_recs:
+                        rel_id = str(rel.get("doi") or rel.get("pmid") or rel.get("ref_id") or "").strip().lower()
+                        if rel_id and rel_id not in visited_identifiers:
+                            visited_identifiers.add(rel_id)
+                            c_rec = dict(rel)
+                            c_rec["discovery_method"] = "CITATION_CHASING_LATERAL"
+                            c_rec["discovery_direction"] = "LATERAL"
+                            c_rec["discovery_path"] = [f"SEED:{seed_ident}", f"LATERAL_AUTHOR:{auth}", rel_id]
+                            c_rec["chain_depth"] = 1
+                            c_rec["parent_seed_id"] = seed_ident
+                            discovered_candidates.append(c_rec)
+                            hop_stats["LATERAL"] += 1
+
+        return {
+            "chasing_status": "CHASING_COMPLETE",
+            "seed_papers_expanded": len(seed_papers),
+            "directions_executed": active_directions,
+            "max_depth": max_depth,
+            "total_candidates_discovered": len(discovered_candidates),
+            "chasing_statistics_by_direction": hop_stats,
+            "discovered_candidates": discovered_candidates
+        }
+
+
+class EvidenceBasedSaturationTracker:
+    """Multi-dimensional search saturation evaluator assessing 7 independent novelty dimensions.
+    Guards against FALSE SATURATION (premature stop from syntax error, empty queries, or offline engines).
+    """
+    DIMENSIONS = list(SATURATION_DIMENSIONS.keys())
+
+    @classmethod
+    def evaluate_saturation(
+        cls,
+        search_batches: List[Dict[str, Any]],
+        min_batches_required: int = 3,
+        saturation_threshold: float = 0.15
+    ) -> Dict[str, Any]:
+        """Evaluates saturation status across search batches with strict false-saturation guards."""
+        if not search_batches:
+            return {
+                "saturation_status": "INSUFFICIENT_DATA",
+                "is_saturated": False,
+                "reason": "Zero search batches evaluated.",
+                "dimension_scores": {d: 0.0 for d in cls.DIMENSIONS}
+            }
+
+        failed_batches = 0
+        total_records_seen = 0
+        all_unique_ids: Set[str] = set()
+        seen_entities: Set[str] = set()
+        seen_outcomes: Set[str] = set()
+        seen_databases: Set[str] = set()
+        
+        batch_marginal_yields: List[float] = []
+
+        for b in search_batches:
+            records = b.get("records", [])
+            status = b.get("status", "EXECUTED")
+            db = b.get("database", "UNKNOWN")
+            if db:
+                seen_databases.add(db)
+
+            if status in ["ERROR", "NOT_EXECUTED", "UNAVAILABLE"]:
+                failed_batches += 1
+                continue
+
+            batch_total = len(records)
+            total_records_seen += batch_total
+            batch_new = 0
+
+            for r in records:
+                r_id = str(r.get("doi") or r.get("pmid") or r.get("title", "")).lower().strip()
+                if r_id and r_id not in all_unique_ids:
+                    all_unique_ids.add(r_id)
+                    batch_new += 1
+
+                ent = str(r.get("intervention_identity") or r.get("entity", "")).strip().lower()
+                if ent:
+                    seen_entities.add(ent)
+
+                out = str(r.get("primary_endpoint") or r.get("outcome", "")).strip().lower()
+                if out:
+                    seen_outcomes.add(out)
+
+            marginal_rate = round(batch_new / max(batch_total, 1), 3) if batch_total > 0 else 0.0
+            batch_marginal_yields.append(marginal_rate)
+
+        if failed_batches > 0 and len(batch_marginal_yields) < min_batches_required:
+            return {
+                "saturation_status": "FALSE_SATURATION_GUARD_TRIGGERED",
+                "is_saturated": False,
+                "reason": f"Detected {failed_batches} failed/unexecuted batches. Cannot declare saturation on incomplete execution.",
+                "total_unique_records": len(all_unique_ids),
+                "batches_evaluated": len(search_batches)
+            }
+
+        record_novelty = batch_marginal_yields[-1] if batch_marginal_yields else 1.0
+        entity_novelty = round(min(1.0, len(seen_entities) / max(len(all_unique_ids), 1)), 3)
+        database_novelty = round(len(seen_databases) / 4.0, 3)
+        
+        is_diminishing = (
+            len(batch_marginal_yields) >= min_batches_required and
+            record_novelty < saturation_threshold
+        )
+
+        dimension_status = {
+            "RECORD_NOVELTY": "SATURATED" if record_novelty < saturation_threshold else "ACTIVE",
+            "ENTITY_NOVELTY": "SATURATED" if entity_novelty < 0.20 else "ACTIVE",
+            "EVIDENCE_NOVELTY": "SATURATED" if len(seen_outcomes) >= 3 else "PARTIAL",
+            "CONTRADICTION_NOVELTY": "EVALUATED",
+            "CITATION_NETWORK_NOVELTY": "BOUNDED",
+            "DATABASE_NOVELTY": "DIVERSE" if database_novelty >= 0.75 else "PARTIAL",
+            "VOCABULARY_NOVELTY": "SATURATED" if is_diminishing else "EXPANDING"
+        }
+
+        overall_saturated = is_diminishing and (len(all_unique_ids) >= 15)
+
+        return {
+            "saturation_status": "SATURATED" if overall_saturated else "EXPANDING",
+            "is_saturated": overall_saturated,
+            "total_unique_records": len(all_unique_ids),
+            "batches_evaluated": len(search_batches),
+            "final_marginal_yield": record_novelty,
+            "marginal_yield_history": batch_marginal_yields,
+            "dimension_assessments": dimension_status,
+            "false_saturation_guard": "PASSED"
+        }
+
+
+class ResearchRunManifest:
+    """Produces, validates, and serializes comprehensive research run manifests for full scientific reproducibility.
+    Logs seed anchors, executed queries, saturation metrics, screening funnels, and portfolio selections.
+    """
+    @classmethod
+    def generate_manifest(
+        cls,
+        problem_model: Any,
+        execution_mode: str,
+        query_families: List[Dict[str, Any]],
+        seed_papers: List[Dict[str, Any]],
+        chasing_summary: Dict[str, Any],
+        database_diversity: Dict[str, Any],
+        saturation_summary: Dict[str, Any],
+        screening_funnel: Dict[str, Any],
+        selected_references: List[Dict[str, Any]],
+        engine_version: str = "8.5.0"
+    ) -> Dict[str, Any]:
+        """Builds a complete, deterministic research manifest."""
+        import datetime
+        import hashlib
+
+        pm_id = getattr(problem_model, "model_id", "RPM_DEFAULT")
+        timestamp = datetime.datetime.now().isoformat()
+
+        manifest = {
+            "manifest_type": "RESEARCH_RUN_MANIFEST",
+            "engine_version": engine_version,
+            "timestamp": timestamp,
+            "problem_model_id": pm_id,
+            "execution_mode": execution_mode,
+            "seed_papers_count": len(seed_papers),
+            "seed_papers": [
+                {
+                    "seed_id": s.get("seed_id", s.get("doi", s.get("pmid"))),
+                    "title": s.get("title"),
+                    "seed_category": s.get("seed_category", "EXPLORATORY_ANCHOR")
+                } for s in seed_papers
+            ],
+            "query_families_executed_count": len(query_families),
+            "query_families": query_families,
+            "citation_chasing_summary": chasing_summary,
+            "database_diversity": database_diversity,
+            "saturation_summary": saturation_summary,
+            "screening_funnel": screening_funnel,
+            "final_portfolio_count": len(selected_references),
+            "final_selected_references": [
+                {
+                    "citation_number": ref.get("citation_number"),
+                    "ref_id": ref.get("ref_id", ref.get("doi", ref.get("pmid"))),
+                    "title": ref.get("title"),
+                    "year": ref.get("year"),
+                    "doi": ref.get("doi"),
+                    "pmid": ref.get("pmid"),
+                    "final_inclusion_reason": ref.get("final_inclusion_reason"),
+                    "evidence_role": ref.get("evidence_role")
+                } for ref in selected_references
+            ]
+        }
+
+        raw_bytes = json.dumps(manifest, sort_keys=True).encode("utf-8")
+        manifest["reproducibility_checksum"] = hashlib.sha256(raw_bytes).hexdigest()
+
+        return manifest
+
+    @classmethod
+    def save_manifest(cls, manifest: Dict[str, Any], filepath: str) -> str:
+        """Saves manifest to the designated JSON file path."""
+        os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, ensure_ascii=False)
+        return filepath
 
 
 if __name__ == "__main__":

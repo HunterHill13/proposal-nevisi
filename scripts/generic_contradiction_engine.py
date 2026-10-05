@@ -75,9 +75,24 @@ class GenericContradictionEngine:
 
         if not mismatches:
             classification = "TRUE_CONTRADICTION"
+            explanation_level = "UNRESOLVED_UNCERTAINTY"
+            demonstrated_explanation = None
+            plausible_explanation = None
+            unresolved_uncertainty = "Studies utilized ostensibly identical experimental parameters (dose, duration, model, assay) yet observed conflicting outcomes. Suggests uncharacterized biological modifiers or true empirical uncertainty."
             rationale = "Studies utilized ostensibly identical experimental parameters (dose, duration, model, assay) yet observed conflicting outcomes. Suggests uncharacterized biological modifiers or reproducibility divergence."
         else:
             classification = "CONTEXTUAL_DISAGREEMENT"
+            has_param_demo = any(k in "; ".join(mismatches).lower() for k in ["dose", "exposure_time", "concentration", "formulation", "purity"])
+            if has_param_demo:
+                explanation_level = "DEMONSTRATED_EXPLANATION"
+                demonstrated_explanation = f"Divergence directly accounted for by documented quantitative parameter variations: {'; '.join(mismatches)}."
+                plausible_explanation = None
+                unresolved_uncertainty = None
+            else:
+                explanation_level = "PLAUSIBLE_EXPLANATION"
+                demonstrated_explanation = None
+                plausible_explanation = f"Divergence mechanistically plausible given differences in biological model or analytical endpoint: {'; '.join(mismatches)}."
+                unresolved_uncertainty = None
             rationale = f"Discrepancy is functionally explained by experimental parameter variations: {'; '.join(mismatches)}."
 
         return {
@@ -86,6 +101,10 @@ class GenericContradictionEngine:
             "category_definition": EXTENSIBLE_CONTRADICTION_TAXONOMY[category],
             "contextual_divergences": mismatches,
             "scientific_rationale": rationale,
+            "explanation_level": explanation_level,
+            "demonstrated_explanation": demonstrated_explanation,
+            "plausible_explanation": plausible_explanation,
+            "unresolved_uncertainty": unresolved_uncertainty,
             "positive_study_id": positive_finding.get("study_id"),
             "negative_study_id": negative_finding.get("study_id")
         }

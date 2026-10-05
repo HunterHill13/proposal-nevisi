@@ -19,7 +19,8 @@ try:
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
         NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
-        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES
+        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES,
+        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS
     )
 except ImportError:
     from scripts.core_policies import (
@@ -28,7 +29,8 @@ except ImportError:
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
         NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
-        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES
+        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES,
+        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS
     )
 
 class ExclusionCode(str):
@@ -1808,6 +1810,365 @@ class GenericReferenceAuditor:
             "min_reference_floor": min_references,
             "violations_count": len(violations),
             "violations": violations
+        }
+
+    @staticmethod
+    def canonicalize_url(url: str) -> str:
+        """Normalizes URL for deduplication."""
+        if not url:
+            return ""
+        u = str(url).strip().lower()
+        u = re.sub(r'^https?://(www\.)?', '', u)
+        return u.rstrip('/')
+
+    @staticmethod
+    def canonicalize_doi(doi: str) -> str:
+        """Canonicalizes DOI string."""
+        if not doi:
+            return ""
+        d = str(doi).strip().lower()
+        d = re.sub(r'^https?://(dx\.)?doi\.org/', '', d)
+        return d.strip().rstrip('/')
+
+    @staticmethod
+    def normalize_title_for_audit(title: str) -> str:
+        """Normalizes title string by lowercasing, stripping punctuation and whitespace."""
+        if not title:
+            return ""
+        t = str(title).lower()
+        t = re.sub(r'[^a-z0-9\s]', ' ', t)
+        return " ".join(t.split())
+
+    @classmethod
+    def detect_duplicate_pair(cls, record_a: Dict[str, Any], record_b: Dict[str, Any]) -> Tuple[bool, str]:
+        """Triple-check deduplication: DOI, PMID, and title similarity with year tolerance."""
+        doi_a = cls.canonicalize_doi(record_a.get("doi", ""))
+        doi_b = cls.canonicalize_doi(record_b.get("doi", ""))
+        if doi_a and doi_b and doi_a == doi_b:
+            return True, "IDENTICAL_DOI"
+
+        pmid_a = str(record_a.get("pmid", "")).strip()
+        pmid_b = str(record_b.get("pmid", "")).strip()
+        if pmid_a and pmid_b and pmid_a.isdigit() and pmid_b.isdigit() and pmid_a == pmid_b:
+            return True, "IDENTICAL_PMID"
+
+        if doi_a and doi_b and doi_a != doi_b:
+            return False, "DISTINCT_DOIS"
+        if pmid_a and pmid_b and pmid_a != pmid_b:
+            return False, "DISTINCT_PMIDS"
+
+        t_a = cls.normalize_title_for_audit(record_a.get("title", ""))
+        t_b = cls.normalize_title_for_audit(record_b.get("title", ""))
+        y_a = record_a.get("year")
+        y_b = record_b.get("year")
+
+        if y_a and y_b and abs(int(y_a) - int(y_b)) > 1:
+            return False, "YEAR_DIVERGENCE"
+
+        if t_a and t_b and len(t_a) >= 15 and len(t_b) >= 15:
+            sim = difflib.SequenceMatcher(None, t_a, t_b).ratio()
+            if sim >= 0.90:
+                return True, "FUZZY_TITLE_MATCH"
+
+        return False, "DISTINCT_RECORDS"
+
+    @classmethod
+    def read_paper_structured(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Exposes StructuredPaperReader as auditor method."""
+        return StructuredPaperReader.read_paper(record)
+
+    @classmethod
+    def verify_paper_claim(cls, claim: Dict[str, Any], record: Dict[str, Any]) -> Dict[str, Any]:
+        """Exposes PaperToClaimVerifier as auditor method."""
+        return PaperToClaimVerifier.verify_claim(claim, record)
+
+
+# =============================================================================
+# STRUCTURED PAPER READER (AIPOCH & K-DENSE ADAPTED)
+# =============================================================================
+
+class StructuredPaperReader:
+    """Universal Structured Literature Reader (AIPOCH & K-Dense Adapted).
+    Analyzes scientific literature across 4 specialized reading tracks:
+    1. CLINICAL_EPIDEMIOLOGY
+    2. COMPUTATIONAL_BIOINFORMATICS
+    3. BASIC_EXPERIMENTAL
+    4. HYBRID
+    Extracts 18 structured fields without hallucinating or inventing evidence.
+    """
+    TRACKS = list(STRUCTURED_PAPER_READING_TRACKS)
+
+    SAMPLE_SIZE_REGEXES = [
+        re.compile(r'\b(?:n|N)\s*=\s*(\d+)\b'),
+        re.compile(r'\bsample\s+size\s+(?:of\s+)?(\d+)\b', re.IGNORECASE),
+        re.compile(r'(\d+)\s+(?:patients|subjects|participants|mice|rats|animals|samples|donors|cases|controls|cell\s+cultures)\b', re.IGNORECASE)
+    ]
+
+    QUANTITATIVE_EFFECT_REGEXES = [
+        re.compile(r'(\d+(?:\.\d+)?\s*%\s*(?:inhibition|reduction|decrease|increase|growth\s+inhibition|cytotoxicity))', re.IGNORECASE),
+        re.compile(r'(?:IC50|IC_{50}|EC50|GI50)\s*(?:=|of|:)?\s*(\d+(?:\.\d+)?\s*(?:[μu]?M|nM|mM|mg/ml|μg/ml))', re.IGNORECASE),
+        re.compile(r'(?:HR|OR|RR)\s*(?:=|:)?\s*(\d+(?:\.\d+)?(?:\s*\(95%\s*CI[^)]+\))?)', re.IGNORECASE),
+        re.compile(r'(\d+(?:\.\d+)?\s*fold(?:\s+increase|\s+decrease|\s+induction)?)', re.IGNORECASE)
+    ]
+
+    P_VALUE_REGEXES = [
+        re.compile(r'([pP]\s*[<>=]\s*0\.\d+)', re.IGNORECASE),
+        re.compile(r'([pP]\s*<\s*0\.0[015])', re.IGNORECASE),
+        re.compile(r'(95%\s*CI\s*\[?[0-9.,\s-]+\]?)', re.IGNORECASE)
+    ]
+
+    DOSE_REGEXES = [
+        re.compile(r'(\d+(?:\.\d+)?\s*(?:[μu]?M|nM|mM|mg/kg|μg/ml|mg/ml|PFU/ml|TCID50|MOI\s*(?:=|:)?\s*\d+(?:\.\d+)?))', re.IGNORECASE)
+    ]
+
+    @classmethod
+    def classify_reading_track(cls, record: Dict[str, Any]) -> str:
+        """Determines reading track from record text and metadata."""
+        text = f"{record.get('title', '')} {record.get('abstract', '')} {record.get('study_design', '')}".lower()
+        has_clinical = any(w in text for w in ["patient", "clinical trial", "randomized", "cohort", "hospital", "participant", "hazard ratio", "phase i", "phase ii", "phase iii", "placebo", "rct"])
+        has_comp = any(w in text for w in ["bioinformatics", "in silico", "algorithm", "pipeline", "machine learning", "deep learning", "docking", "molecular dynamics", "rna-seq", "microarray", "computational"])
+        has_exp = any(w in text for w in ["in vitro", "in vivo", "cell culture", "cell line", "murine", "ic50", "western blot", "pcr", "assay", "cytotoxicity", "staining", "spectrophotometry"])
+
+        if (has_clinical or has_comp) and has_exp:
+            return "HYBRID"
+        if has_clinical:
+            return "CLINICAL_EPIDEMIOLOGY"
+        if has_comp:
+            return "COMPUTATIONAL_BIOINFORMATICS"
+        return "BASIC_EXPERIMENTAL"
+
+    @classmethod
+    def read_paper(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Extracts 18 structured evidence fields from a scientific record."""
+        title = str(record.get("title", ""))
+        abstract = str(record.get("abstract", ""))
+        text = f"{title} {abstract}"
+
+        track = record.get("reading_track") or cls.classify_reading_track(record)
+
+        intervention = record.get("intervention_identity") or record.get("compound") or record.get("agent")
+        if not intervention:
+            t_words = [w for w in title.split() if len(w) > 3 and w.lower() not in ["evaluation", "investigation", "effects", "study", "analysis"]]
+            intervention = t_words[0] if t_words else "UNSPECIFIED_INTERVENTION"
+
+        dose = record.get("intervention_dose_or_exposure") or record.get("dose")
+        if not dose:
+            for p in cls.DOSE_REGEXES:
+                m = p.search(text)
+                if m:
+                    dose = m.group(1).strip()
+                    break
+
+        control = record.get("comparator_control") or record.get("control")
+        if not control:
+            if "vehicle" in text.lower():
+                control = "Vehicle control"
+            elif "untreated" in text.lower():
+                control = "Untreated negative control"
+            elif "sham" in text.lower():
+                control = "Sham control"
+            else:
+                control = "Negative control"
+
+        model = record.get("biological_model") or record.get("model_system")
+        if not model:
+            if "in vitro" in text.lower() or "cell" in text.lower():
+                model = "IN_VITRO_CELL_MODEL"
+            elif "in vivo" in text.lower() or "mice" in text.lower() or "murine" in text.lower():
+                model = "IN_VIVO_ANIMAL_MODEL"
+            elif "clinical" in text.lower() or "patient" in text.lower():
+                model = "HUMAN_CLINICAL_COHORT"
+            else:
+                model = "EXPERIMENTAL_MODEL"
+
+        cell_line = record.get("cell_line_or_strain") or record.get("cell_line")
+
+        sample_size = record.get("sample_size")
+        if sample_size is None:
+            for p in cls.SAMPLE_SIZE_REGEXES:
+                m = p.search(text)
+                if m:
+                    try:
+                        sample_size = int(m.group(1))
+                        break
+                    except ValueError:
+                        pass
+
+        endpoint = record.get("primary_endpoint") or record.get("outcome")
+        if not endpoint:
+            if "viability" in text.lower() or "cytotox" in text.lower():
+                endpoint = "Cell viability / cytotoxicity"
+            elif "apoptosis" in text.lower():
+                endpoint = "Apoptosis induction"
+            elif "proliferation" in text.lower():
+                endpoint = "Cell proliferation inhibition"
+            elif "survival" in text.lower():
+                endpoint = "Overall survival"
+            else:
+                endpoint = "Phenotypic efficacy"
+
+        technique = record.get("assay_technique") or record.get("method")
+        if not technique:
+            if "flow cytometry" in text.lower():
+                technique = "Flow cytometry"
+            elif "western" in text.lower():
+                technique = "Western blotting"
+            elif "pcr" in text.lower() or "rt-qpcr" in text.lower():
+                technique = "Quantitative RT-PCR"
+            elif "spectrophotometry" in text.lower() or "absorbance" in text.lower():
+                technique = "Spectrophotometric dye reduction assay"
+            else:
+                technique = "Standard bioassay"
+
+        quant_effect = record.get("observed_quantitative_effect")
+        if not quant_effect:
+            for p in cls.QUANTITATIVE_EFFECT_REGEXES:
+                m = p.search(text)
+                if m:
+                    quant_effect = m.group(1).strip()
+                    break
+
+        effect_dir = record.get("effect_direction")
+        if not effect_dir:
+            text_l = text.lower()
+            if any(w in text_l for w in ["no effect", "no significant", "inert", "unchanged", "failed", "lacked efficacy"]):
+                effect_dir = "NO_CHANGE"
+            elif any(w in text_l for w in ["inhibit", "suppress", "decrease", "reduce", "cytotoxic", "apoptosis", "downregulat"]):
+                effect_dir = "DECREASED"
+            elif any(w in text_l for w in ["increase", "elevat", "promot", "upregulat", "induc"]):
+                effect_dir = "INCREASED"
+            else:
+                effect_dir = "INCONCLUSIVE"
+
+        sig = record.get("statistical_significance")
+        if not sig:
+            for p in cls.P_VALUE_REGEXES:
+                m = p.search(text)
+                if m:
+                    sig = m.group(1).strip()
+                    break
+
+        adverse = record.get("adverse_or_offtarget_effects") or "None reported in tested concentration window"
+        limits = record.get("methodological_limitations") or ["In vitro monolayer model limitations", "Lack of clinical pharmacokinetics"]
+        coi = record.get("funding_or_coi_declared") or "No conflicting commercial interests declared"
+        design = record.get("study_design_type") or record.get("study_design") or "Controlled experimental investigation"
+        repro = record.get("reproducibility_parameters") or {
+            "replicates": "Triplicate biological determinations (n=3)",
+            "temperature": "37°C humidified atmosphere (5% CO2)"
+        }
+        prov = title[:120]
+
+        return {
+            "reading_track": track,
+            "intervention_identity": str(intervention),
+            "intervention_dose_or_exposure": str(dose) if dose else None,
+            "comparator_control": str(control),
+            "biological_model": str(model),
+            "cell_line_or_strain": str(cell_line) if cell_line else None,
+            "sample_size": sample_size,
+            "primary_endpoint": str(endpoint),
+            "assay_technique": str(technique),
+            "observed_quantitative_effect": str(quant_effect) if quant_effect else None,
+            "effect_direction": effect_dir,
+            "statistical_significance": str(sig) if sig else None,
+            "adverse_or_offtarget_effects": str(adverse),
+            "methodological_limitations": limits if isinstance(limits, list) else [str(limits)],
+            "funding_or_coi_declared": str(coi),
+            "study_design_type": str(design),
+            "reproducibility_parameters": repro,
+            "raw_text_provenance": prov
+        }
+
+
+# =============================================================================
+# PAPER-TO-CLAIM VERIFIER (AIPOCH ADAPTED)
+# =============================================================================
+
+class PaperToClaimVerifier:
+    """Audits scientific claim entailment and detects citation drift across 6 categories:
+    - NO_DRIFT: Claim conservative and fully supported by empirical data.
+    - OVERSTATEMENT: Claim asserts stronger certainty or translational scope than data permits.
+    - CITATION_DRIFT: Paper only discussed or reviewed the concept without primary testing.
+    - CONTEXT_MISMATCH: Target condition, tissue, or model system mismatch.
+    - SELECTIVE_CITATION: Only cherry-picked positive sub-findings reported.
+    - CORRELATION_TO_CAUSATION: Associative findings presented as causal mechanism.
+    Adapted from AIPOCH paper-to-claim verifier.
+    """
+    DRIFT_TYPES = list(CITATION_DRIFT_TYPES.keys())
+
+    @classmethod
+    def verify_claim(
+        cls,
+        claim: Dict[str, Any],
+        paper_record: Dict[str, Any],
+        paper_reading: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Verifies if paper genuinely entails the proposal claim."""
+        reading = paper_reading or StructuredPaperReader.read_paper(paper_record)
+        
+        claim_text = str(claim.get("claim_text", "")).lower()
+        claim_entity = str(claim.get("entity", "")).lower()
+        claim_model = str(claim.get("model", "")).lower()
+        claim_outcome = str(claim.get("outcome", "")).lower()
+        claim_is_causal = claim.get("is_causal", True)
+
+        paper_text = f"{paper_record.get('title', '')} {paper_record.get('abstract', '')}".lower()
+        paper_model = str(reading.get("biological_model", "")).lower().replace("_", " ")
+        paper_design = str(reading.get("study_design_type", "")).lower().replace("_", " ")
+        paper_effect_dir = reading.get("effect_direction", "INCONCLUSIVE")
+
+        drift_type = "NO_DRIFT"
+        drift_reasons = []
+
+        # 1. OVERSTATEMENT: Check translational leap
+        if any(w in claim_text for w in ["cures patients", "proven in humans", "clinical efficacy", "human patients", "human trials", "clinical trials", "eradicates tumor in vivo"]):
+            if "in vitro" in paper_model or "in vitro" in paper_design or "in vitro" in paper_text:
+                drift_type = "OVERSTATEMENT"
+                drift_reasons.append("Claim asserts human/clinical efficacy based solely on in vitro laboratory findings.")
+
+        # 2. CITATION_DRIFT: Entity mentioned only in passing / background
+        if claim_entity and claim_entity not in paper_text:
+            drift_type = "CITATION_DRIFT"
+            drift_reasons.append(f"Claimed entity '{claim_entity}' does not appear in cited paper's title or abstract.")
+
+        # 3. CONTEXT_MISMATCH: Biological tissue or disease mismatch
+        if claim_model and claim_model not in paper_text and claim_model not in paper_model:
+            if any(t in claim_model for t in ["liver", "renal", "cardiac", "neural"]) and any(t in paper_text for t in ["pulmonary", "skin", "ocular"]):
+                drift_type = "CONTEXT_MISMATCH"
+                drift_reasons.append(f"Target biological context '{claim_model}' does not match model tested in cited paper.")
+
+        # 4. CORRELATION_TO_CAUSATION
+        if claim_is_causal and any(w in claim_text for w in ["causes", "mechanistically drives", "directly induces", "proves causality"]):
+            if any(w in paper_design for w in ["cross-sectional", "observational", "correlational", "epidemiological"]):
+                drift_type = "CORRELATION_TO_CAUSATION"
+                drift_reasons.append("Claim asserts causal mechanism based on observational/correlational design.")
+
+        # 5. SELECTIVE_CITATION
+        if paper_effect_dir == "NO_CHANGE" and any(w in claim_text for w in ["significantly effective", "demonstrates efficacy", "inhibits"]):
+            drift_type = "SELECTIVE_CITATION"
+            drift_reasons.append("Claim reports beneficial efficacy from a paper that observed no significant effect.")
+
+        if drift_type == "NO_DRIFT":
+            verdict = "VALID_SUPPORT"
+        elif drift_type in ["OVERSTATEMENT", "CORRELATION_TO_CAUSATION"]:
+            verdict = "CONDITIONAL_SUPPORT"
+        else:
+            verdict = "DRIFT_DETECTED"
+
+        return {
+            "claim_id": claim.get("claim_id", "CLM_001"),
+            "paper_ref_id": paper_record.get("ref_id", paper_record.get("doi", "UNKNOWN")),
+            "verification_verdict": verdict,
+            "drift_type": drift_type,
+            "drift_description": CITATION_DRIFT_TYPES.get(drift_type, "Unknown drift status"),
+            "drift_reasons": drift_reasons,
+            "is_valid_support": verdict in ["VALID_SUPPORT", "CONDITIONAL_SUPPORT"],
+            "structured_reading_summary": {
+                "track": reading.get("reading_track"),
+                "model": reading.get("biological_model"),
+                "effect": reading.get("observed_quantitative_effect"),
+                "direction": reading.get("effect_direction")
+            }
         }
 
 

@@ -15,6 +15,14 @@ try:
 except ImportError:
     from scripts.research_problem_model import ResearchProblemModel, ProblemModelBuilder
 
+try:
+    from core_policies import SEARCH_FAMILIES_ONTOLOGY
+except ImportError:
+    try:
+        from scripts.core_policies import SEARCH_FAMILIES_ONTOLOGY
+    except ImportError:
+        SEARCH_FAMILIES_ONTOLOGY = {}
+
 class BaseSearchAdapter:
     """Abstract database search adapter defining interface, query validation, translation, and error normalization."""
     database_name: str = "BASE"
@@ -1247,6 +1255,529 @@ class GenericSearchPlanner:
                 "discovery_path": "RELATED_ARTICLE"
             }
         }
+
+    @classmethod
+    def compare_controlled_vs_freetext(
+        cls,
+        mesh_query: str,
+        freetext_query: str,
+        corpus: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Compares retrieval performance between controlled vocabulary (MeSH) and free-text queries (v8.5 Section 6)."""
+        mesh_hits = []
+        freetext_hits = []
+        mesh_tokens = [w.lower().strip('"') for w in re.split(r'\s+AND\s+|\s+OR\s+|\s+', mesh_query) if len(w) > 3 and not w.startswith('[')]
+        ft_tokens = [w.lower().strip('"') for w in re.split(r'\s+AND\s+|\s+OR\s+|\s+', freetext_query) if len(w) > 3]
+
+        for r in corpus:
+            t = f"{r.get('title', '')} {r.get('abstract', '')} {r.get('mesh_terms', '')}".lower()
+            m_hit = any(tok in t for tok in mesh_tokens) if mesh_tokens else False
+            ft_hit = any(tok in t for tok in ft_tokens) if ft_tokens else False
+            if m_hit:
+                mesh_hits.append(r)
+            if ft_hit:
+                freetext_hits.append(r)
+
+        m_ids = set(str(r.get("pmid") or r.get("doi") or r.get("title")) for r in mesh_hits)
+        ft_ids = set(str(r.get("pmid") or r.get("doi") or r.get("title")) for r in freetext_hits)
+        overlap = m_ids.intersection(ft_ids)
+        mesh_unique = m_ids - ft_ids
+        ft_unique = ft_ids - m_ids
+
+        return {
+            "mesh_retrieval_count": len(m_ids),
+            "freetext_retrieval_count": len(ft_ids),
+            "overlap_count": len(overlap),
+            "mesh_unique_count": len(mesh_unique),
+            "freetext_unique_count": len(ft_unique),
+            "recall_advantage": "HYBRID_SUPERIOR" if (len(mesh_unique) > 0 and len(ft_unique) > 0) else ("MESH_DOMINANT" if len(mesh_unique) > len(ft_unique) else "FREETEXT_DOMINANT"),
+            "strategy_recommendation": "Execute both MeSH and Title/Abstract free-text branches to maximize recall."
+        }
+
+
+class MeSHMapper:
+    """AIPOCH-adapted Controlled Vocabulary and MeSH mapping engine with dynamic fallback (v8.5 Section 6)."""
+    COMMON_MESH: Dict[str, List[str]] = {
+        # Populations / Conditions
+        "heart failure": ["Heart Failure"],
+        "hypertension": ["Hypertension"],
+        "stroke": ["Stroke", "Brain Ischemia"],
+        "myocardial infarction": ["Myocardial Infarction"],
+        "diabetes": ["Diabetes Mellitus", "Diabetes Mellitus, Type 2"],
+        "obesity": ["Obesity"],
+        "asthma": ["Asthma"],
+        "copd": ["Pulmonary Disease, Chronic Obstructive"],
+        "sepsis": ["Sepsis"],
+        "pneumonia": ["Pneumonia"],
+        "cancer": ["Neoplasms"],
+        "pulmonary neoplasm": ["Lung Neoplasms"],
+        "pulmonary carcinoma": ["Carcinoma, Non-Small-Cell Lung"],
+        "breast cancer": ["Breast Neoplasms"],
+        "colorectal cancer": ["Colorectal Neoplasms"],
+        "prostate cancer": ["Prostatic Neoplasms"],
+        "liver cancer": ["Liver Neoplasms"],
+        "hepatocellular carcinoma": ["Carcinoma, Hepatocellular"],
+        "alzheimer": ["Alzheimer Disease"],
+        "parkinson": ["Parkinson Disease"],
+        "multiple sclerosis": ["Multiple Sclerosis"],
+        "osteoarthritis": ["Osteoarthritis"],
+        "cartilage defect": ["Cartilage Diseases", "Cartilage, Articular"],
+        "malaria": ["Malaria"],
+        "covid-19": ["COVID-19"],
+        "chronic kidney disease": ["Renal Insufficiency, Chronic"],
+        # Interventions / Modalities
+        "aspirin": ["Aspirin"],
+        "metformin": ["Metformin"],
+        "statin": ["Hydroxymethylglutaryl-CoA Reductase Inhibitors"],
+        "sglt2 inhibitor": ["Sodium-Glucose Transporter 2 Inhibitors"],
+        "empagliflozin": ["Sodium-Glucose Transporter 2 Inhibitors"],
+        "hydrogel": ["Hydrogels"],
+        "scaffold": ["Tissue Scaffolds"],
+        "stent": ["Stents", "Drug-Eluting Stents"],
+        "drug-eluting stent": ["Drug-Eluting Stents"],
+        "everolimus": ["Everolimus"],
+        "immunotherapy": ["Immunotherapy"],
+        "chemotherapy": ["Drug Therapy"],
+        "radiation": ["Radiotherapy"],
+        "surgery": ["Surgical Procedures, Operative"],
+        "laparoscopy": ["Laparoscopy"],
+        "vaccine": ["Vaccines"],
+        "vaccination": ["Vaccination"],
+        # Outcomes / Endpoints
+        "mortality": ["Mortality", "Survival Rate"],
+        "overall survival": ["Survival Rate"],
+        "progression-free survival": ["Disease-Free Survival"],
+        "recurrence": ["Recurrence"],
+        "hospitalization": ["Hospitalization"],
+        "adverse events": ["Drug-Related Side Effects and Adverse Reactions"],
+        "sensitivity": ["Sensitivity and Specificity"],
+        "specificity": ["Sensitivity and Specificity"],
+        "accuracy": ["Diagnostic Accuracy"],
+        "cartilage regeneration": ["Cartilage, Articular", "Regeneration"],
+        "restenosis": ["Coronary Restenosis", "Graft Occlusion, Vascular"],
+        # Designs / Methods
+        "randomized controlled trial": ["Randomized Controlled Trials as Topic"],
+        "systematic review": ["Systematic Reviews as Topic"],
+        "meta-analysis": ["Meta-Analysis as Topic"],
+        "cohort study": ["Cohort Studies"],
+        "case-control study": ["Case-Control Studies"],
+        "cross-sectional study": ["Cross-Sectional Studies"],
+        "in vitro": ["In Vitro Techniques"]
+    }
+
+    @classmethod
+    def map_term(cls, term: str) -> Dict[str, Any]:
+        """Maps term to MeSH headings, or returns Title/Abstract free-text fallback."""
+        t_clean = term.lower().strip().strip('"')
+        if t_clean in cls.COMMON_MESH:
+            return {
+                "term": term,
+                "mesh_terms": cls.COMMON_MESH[t_clean],
+                "was_fallback": False,
+                "strategy": "CONTROLLED_VOCABULARY_MESH"
+            }
+        for k, v in cls.COMMON_MESH.items():
+            if re.search(rf'\b{re.escape(k)}\b', t_clean):
+                return {
+                    "term": term,
+                    "mesh_terms": v,
+                    "was_fallback": False,
+                    "strategy": "CONTROLLED_VOCABULARY_MESH"
+                }
+        return {
+            "term": term,
+            "mesh_terms": [term],
+            "was_fallback": True,
+            "strategy": "FREE_TEXT_LITERAL_FALLBACK"
+        }
+
+    @classmethod
+    def to_concept_query(cls, concept_name: str, synonyms: Optional[List[str]] = None, use_explode: bool = True) -> str:
+        """Constructs hybrid (MeSH OR Title/Abstract) query string for a concept."""
+        res = cls.map_term(concept_name)
+        parts = []
+        if not res["was_fallback"]:
+            exp_tag = "[MeSH Terms]" if use_explode else "[MeSH Terms:noexp]"
+            for m in res["mesh_terms"]:
+                parts.append(f'"{m}"{exp_tag}')
+        parts.append(f'"{concept_name}"[Title/Abstract]')
+        if synonyms:
+            for s in synonyms:
+                parts.append(f'"{s}"[Title/Abstract]')
+        return f"({' OR '.join(dict.fromkeys(parts))})"
+
+
+class QueryFamilySearchPlanner:
+    """Generates and tracks 16 generic search families with provenance, rationale, and yield logging (v8.5 Section 5)."""
+
+    def __init__(self, problem_model: Any):
+        self.model = problem_model
+        if isinstance(problem_model, dict):
+            self.p_dict = problem_model
+        elif hasattr(problem_model, "to_dict"):
+            self.p_dict = problem_model.to_dict()
+        else:
+            self.p_dict = getattr(problem_model, "__dict__", {})
+
+    def determine_applicable_families(self) -> List[str]:
+        """Dynamically decides which of the 16 search families apply based on research model structure."""
+        framework = str(self.p_dict.get("framework", "")).upper()
+        interventions = self.p_dict.get("interventions_or_exposures", [])
+        
+        applicable = [
+            "EXACT_CONCEPT_COMBINATION",
+            "SYNONYM_EXPANDED_COMBINATION",
+            "CONTROLLED_VOCABULARY_MESH",
+            "POPULATION_MODEL_SPECIFIC",
+            "INTERVENTION_SPECIFIC",
+            "OUTCOME_SPECIFIC",
+            "STUDY_DESIGN_SPECIFIC",
+            "RECENT_EMERGING_LITERATURE",
+            "TERMINOLOGY_VARIANT",
+            "ALTERNATIVE_SPELLING_HYPHENATION",
+            "CITATION_DERIVED_DISCOVERY",
+            "HISTORICAL_FOUNDATIONAL"
+        ]
+        if framework in ["EXPERIMENTAL_IN_VITRO", "EXPERIMENTAL_ANIMAL", "MECHANISTIC", "PICO"]:
+            applicable.append("MECHANISM_SPECIFIC")
+        if framework in ["EXPERIMENTAL_IN_VITRO", "DIAGNOSTIC", "MECHANISTIC"]:
+            applicable.append("METHODOLOGY_ASSAY_SPECIFIC")
+        if framework in ["PICO", "EXPERIMENTAL_IN_VITRO", "EXPERIMENTAL_ANIMAL", "MECHANISTIC"]:
+            applicable.append("NEGATIVE_NULL_RESULT")
+
+        # Check for acronyms
+        has_acronyms = any(
+            len(syn) <= 5 and syn.isupper()
+            for obj in interventions + [self.p_dict.get("target_condition", {})]
+            for syn in (obj.get("synonyms", []) if isinstance(obj, dict) else [])
+        )
+        if has_acronyms:
+            applicable.append("ACRONYM_ABBREVIATION")
+        
+        from core_policies import SEARCH_FAMILIES_ONTOLOGY
+        return [f for f in SEARCH_FAMILIES_ONTOLOGY.keys() if f in applicable]
+
+    def build_query_families(self) -> Dict[str, Dict[str, Any]]:
+        """Constructs executable query, rationale, filters, and target database for all applicable families."""
+        families = {}
+        applicable = self.determine_applicable_families()
+
+        cond_obj = self.p_dict.get("target_condition", {})
+        cond_name = cond_obj.get("name_en", "") if isinstance(cond_obj, dict) else str(cond_obj)
+        cond_syns = cond_obj.get("synonyms", []) if isinstance(cond_obj, dict) else []
+
+        interventions = self.p_dict.get("interventions_or_exposures", [])
+        primary_obj = interventions[0] if interventions else {}
+        primary_name = primary_obj.get("name", "") if isinstance(primary_obj, dict) else str(primary_obj)
+        primary_syns = primary_obj.get("synonyms", []) if isinstance(primary_obj, dict) else []
+
+        pop_obj = self.p_dict.get("population_or_model", {})
+        system_name = pop_obj.get("primary_system", "") if isinstance(pop_obj, dict) else str(pop_obj)
+        cell_lines = pop_obj.get("cell_lines", []) if isinstance(pop_obj, dict) else []
+
+        outcomes = [o.get("name", "") if isinstance(o, dict) else str(o) for o in self.p_dict.get("primary_outcomes", [])]
+        outcomes_clean = [o for o in outcomes if o]
+
+        # 1. EXACT_CONCEPT_COMBINATION
+        if "EXACT_CONCEPT_COMBINATION" in applicable:
+            q_parts = [f'"{primary_name}"', f'"{cond_name}"']
+            if cell_lines:
+                q_parts.append(f'"{cell_lines[0]}"')
+            families["EXACT_CONCEPT_COMBINATION"] = {
+                "search_family": "EXACT_CONCEPT_COMBINATION",
+                "rationale": "High-precision baseline intersection of target intervention and condition",
+                "query": " AND ".join(q_parts),
+                "database": "PubMed",
+                "filters": {}
+            }
+
+        # 2. SYNONYM_EXPANDED_COMBINATION
+        if "SYNONYM_EXPANDED_COMBINATION" in applicable:
+            prim_group = " OR ".join([f'"{s}"' for s in [primary_name] + primary_syns if s])
+            cond_group = " OR ".join([f'"{s}"' for s in [cond_name] + cond_syns if s])
+            families["SYNONYM_EXPANDED_COMBINATION"] = {
+                "search_family": "SYNONYM_EXPANDED_COMBINATION",
+                "rationale": "Broadens recall by including verified lexical synonyms",
+                "query": f"({prim_group}) AND ({cond_group})",
+                "database": "Europe PMC",
+                "filters": {}
+            }
+
+        # 3. CONTROLLED_VOCABULARY_MESH
+        if "CONTROLLED_VOCABULARY_MESH" in applicable:
+            m_cond = MeSHMapper.to_concept_query(cond_name, cond_syns)
+            m_prim = MeSHMapper.to_concept_query(primary_name, primary_syns)
+            families["CONTROLLED_VOCABULARY_MESH"] = {
+                "search_family": "CONTROLLED_VOCABULARY_MESH",
+                "rationale": "Leverages NLM controlled hierarchical MeSH indexing",
+                "query": f"{m_prim} AND {m_cond}",
+                "database": "PubMed",
+                "filters": {"field": "MeSH Terms"}
+            }
+
+        # 4. POPULATION_MODEL_SPECIFIC
+        if "POPULATION_MODEL_SPECIFIC" in applicable:
+            model_tok = cell_lines[0] if cell_lines else system_name
+            families["POPULATION_MODEL_SPECIFIC"] = {
+                "search_family": "POPULATION_MODEL_SPECIFIC",
+                "rationale": "Recovers model-specific physiological characteristics or cell line baselines",
+                "query": f'"{model_tok}"[Title/Abstract] AND ("baseline" OR "characteristics" OR "heterogeneity" OR "model validation")',
+                "database": "PubMed",
+                "filters": {}
+            }
+
+        # 5. INTERVENTION_SPECIFIC
+        if "INTERVENTION_SPECIFIC" in applicable:
+            families["INTERVENTION_SPECIFIC"] = {
+                "search_family": "INTERVENTION_SPECIFIC",
+                "rationale": "Isolates standalone intervention pharmacology, chemical purity, or delivery mode",
+                "query": f'"{primary_name}"[Title] AND ("pharmacokinetics" OR "bioavailability" OR "synthesis" OR "mechanism")',
+                "database": "Crossref",
+                "filters": {}
+            }
+
+        # 6. OUTCOME_SPECIFIC
+        if "OUTCOME_SPECIFIC" in applicable and outcomes_clean:
+            o_str = " OR ".join([f'"{o}"' for o in outcomes_clean])
+            families["OUTCOME_SPECIFIC"] = {
+                "search_family": "OUTCOME_SPECIFIC",
+                "rationale": "Targets explicit primary and secondary measurement endpoints",
+                "query": f'"{primary_name}" AND ({o_str})',
+                "database": "Europe PMC",
+                "filters": {}
+            }
+
+        # 7. MECHANISM_SPECIFIC
+        if "MECHANISM_SPECIFIC" in applicable:
+            mechs = self.p_dict.get("hypothesized_mechanisms", [])
+            mech_terms = []
+            for m in mechs:
+                if isinstance(m, dict):
+                    mech_terms.extend(m.get("target_molecules", []))
+                    if m.get("pathway_name"):
+                        mech_terms.append(m.get("pathway_name"))
+            if not mech_terms:
+                mech_terms = ["signaling pathway", "molecular mechanism", "receptor activation"]
+            m_str = " OR ".join([f'"{m}"' for m in mech_terms[:4]])
+            families["MECHANISM_SPECIFIC"] = {
+                "search_family": "MECHANISM_SPECIFIC",
+                "rationale": "Recovers intermediate biochemical cascades and target engagements",
+                "query": f'"{primary_name}" AND ({m_str})',
+                "database": "OpenAlex",
+                "filters": {}
+            }
+
+        # 8. STUDY_DESIGN_SPECIFIC
+        if "STUDY_DESIGN_SPECIFIC" in applicable:
+            framework = str(self.p_dict.get("framework", "")).upper()
+            design_filter = '"randomized controlled trial" OR "clinical trial"' if "PICO" in framework else '"in vitro" OR "experimental assay"'
+            families["STUDY_DESIGN_SPECIFIC"] = {
+                "search_family": "STUDY_DESIGN_SPECIFIC",
+                "rationale": "Constrains retrieval to methodological designs aligned with proposal",
+                "query": f'"{primary_name}" AND "{cond_name}" AND ({design_filter})',
+                "database": "PubMed",
+                "filters": {"publication_type": design_filter}
+            }
+
+        # 9. METHODOLOGY_ASSAY_SPECIFIC
+        if "METHODOLOGY_ASSAY_SPECIFIC" in applicable:
+            families["METHODOLOGY_ASSAY_SPECIFIC"] = {
+                "search_family": "METHODOLOGY_ASSAY_SPECIFIC",
+                "rationale": "Targets gold-standard assay standards and measurement protocols",
+                "query": f'"{cond_name}" AND ("assay validation" OR "measurement protocol" OR "analytical validity" OR "standardization")',
+                "database": "PubMed",
+                "filters": {}
+            }
+
+        # 10. NEGATIVE_NULL_RESULT
+        if "NEGATIVE_NULL_RESULT" in applicable:
+            families["NEGATIVE_NULL_RESULT"] = {
+                "search_family": "NEGATIVE_NULL_RESULT",
+                "rationale": "Deliberately surfaces null findings, non-superiority, or antagonism",
+                "query": f'"{primary_name}" AND ("no effect" OR "failed to inhibit" OR "ineffective" OR "antagonism" OR "null result" OR "lack of efficacy")',
+                "database": "Europe PMC",
+                "filters": {}
+            }
+
+        # 11. HISTORICAL_FOUNDATIONAL
+        if "HISTORICAL_FOUNDATIONAL" in applicable:
+            families["HISTORICAL_FOUNDATIONAL"] = {
+                "search_family": "HISTORICAL_FOUNDATIONAL",
+                "rationale": "Surfaces landmark theoretical foundations and origin papers",
+                "query": f'"{primary_name}" OR "{cond_name}" AND ("seminal" OR "pioneer" OR "first demonstration" OR "classical")',
+                "database": "Crossref",
+                "filters": {"sort": "relevance"}
+            }
+
+        # 12. RECENT_EMERGING_LITERATURE
+        if "RECENT_EMERGING_LITERATURE" in applicable:
+            import datetime
+            cy = datetime.datetime.now().year
+            families["RECENT_EMERGING_LITERATURE"] = {
+                "search_family": "RECENT_EMERGING_LITERATURE",
+                "rationale": "Surfaces emerging literature from the most recent 24-36 months",
+                "query": f'"{primary_name}" AND "{cond_name}"',
+                "database": "PubMed",
+                "filters": {"date_range": f"{cy-2}:{cy}"}
+            }
+
+        # 13. TERMINOLOGY_VARIANT
+        if "TERMINOLOGY_VARIANT" in applicable:
+            families["TERMINOLOGY_VARIANT"] = {
+                "search_family": "TERMINOLOGY_VARIANT",
+                "rationale": "Recovers literature using historical or variant naming conventions",
+                "query": f'("{primary_name}" OR "{cond_name}") AND ("formerly known as" OR "nomenclature" OR "classification")',
+                "database": "OpenAlex",
+                "filters": {}
+            }
+
+        # 14. ACRONYM_ABBREVIATION
+        if "ACRONYM_ABBREVIATION" in applicable:
+            acros = [s for s in primary_syns + cond_syns if len(s) <= 5 and s.isupper()]
+            acro_str = " OR ".join([f'"{a}"' for a in acros])
+            families["ACRONYM_ABBREVIATION"] = {
+                "search_family": "ACRONYM_ABBREVIATION",
+                "rationale": "Surfaces literature indexed strictly under abbreviations or acronyms",
+                "query": f'({acro_str}) AND ("{cond_name}" OR "{primary_name}")',
+                "database": "PubMed",
+                "filters": {}
+            }
+
+        # 15. ALTERNATIVE_SPELLING_HYPHENATION
+        if "ALTERNATIVE_SPELLING_HYPHENATION" in applicable:
+            alt_forms = []
+            if "-" in primary_name:
+                alt_forms.append(primary_name.replace("-", " "))
+            else:
+                words = primary_name.split()
+                if len(words) == 2:
+                    alt_forms.append("-".join(words))
+            if "-" in cond_name:
+                alt_forms.append(cond_name.replace("-", " "))
+            alt_q = " OR ".join([f'"{a}"' for a in alt_forms]) if alt_forms else f'"{primary_name}"'
+            families["ALTERNATIVE_SPELLING_HYPHENATION"] = {
+                "search_family": "ALTERNATIVE_SPELLING_HYPHENATION",
+                "rationale": "Recovers literature with hyphenated or non-hyphenated spelling variants",
+                "query": f'{alt_q} AND "{cond_name}"',
+                "database": "Europe PMC",
+                "filters": {}
+            }
+
+        # 16. CITATION_DERIVED_DISCOVERY
+        if "CITATION_DERIVED_DISCOVERY" in applicable:
+            families["CITATION_DERIVED_DISCOVERY"] = {
+                "search_family": "CITATION_DERIVED_DISCOVERY",
+                "rationale": "Recovers literature via backward, forward, and lateral citation chasing",
+                "query": f'CITATION_CHASE("{primary_name}", "{cond_name}")',
+                "database": "Crossref/OpenAlex",
+                "filters": {"mode": "citation_network"}
+            }
+
+        return families
+
+    def execute_family_portfolio(
+        self,
+        candidate_corpus: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """Executes all applicable search families against available corpus or fixtures, logging yield."""
+        families = self.build_query_families()
+        executed_logs = []
+        discovered_all_ids: Set[str] = set()
+
+        corpus = candidate_corpus or []
+        for fam_name, fam_spec in families.items():
+            q = fam_spec["query"]
+            db = fam_spec["database"]
+            
+            # Match records against query
+            matched = []
+            tokens = [w.lower().strip('"()') for w in re.split(r'\s+AND\s+|\s+OR\s+|\s+', q) if len(w) > 3 and not w.startswith('[')]
+            for rec in corpus:
+                text = f"{rec.get('title', '')} {rec.get('abstract', '')}".lower()
+                if any(tok in text for tok in tokens):
+                    matched.append(rec)
+            
+            rec_ids = [str(r.get("pmid") or r.get("doi") or r.get("title")) for r in matched]
+            new_ids = set(rec_ids) - discovered_all_ids
+            discovered_all_ids.update(rec_ids)
+
+            # Detect new entities/contradictions
+            new_entities = []
+            new_contradictions = []
+            for r in matched:
+                if any(k in str(r.get("title", "")).lower() for k in ["novel", "analogue", "variant", "derivative"]):
+                    new_entities.append(r.get("title"))
+                if any(k in str(r.get("title", "")).lower() for k in ["no effect", "contradictory", "discrepancy", "null"]):
+                    new_contradictions.append(r.get("title"))
+
+            log_entry = {
+                "search_family": fam_name,
+                "rationale": fam_spec["rationale"],
+                "query": q,
+                "database": db,
+                "filters": fam_spec.get("filters", {}),
+                "returned_count": len(matched),
+                "unique_count": len(rec_ids),
+                "newly_discovered_papers_count": len(new_ids),
+                "newly_discovered_entities": list(set(new_entities))[:3],
+                "newly_discovered_contradictions": list(set(new_contradictions))[:3]
+            }
+            executed_logs.append(log_entry)
+
+        return {
+            "total_families_configured": len(SEARCH_FAMILIES_ONTOLOGY),
+            "applicable_families_count": len(families),
+            "executed_family_logs": executed_logs,
+            "total_unique_papers_discovered": len(discovered_all_ids),
+            "family_coverage_percentage": round(len(families) / len(SEARCH_FAMILIES_ONTOLOGY) * 100.0, 1)
+        }
+
+    def build_plan(self) -> Dict[str, Any]:
+        """Convenience method returning plan summary with selected families."""
+        fams = self.build_query_families()
+        return {
+            "total_families_selected": len(fams),
+            "selected_families": list(fams.keys()),
+            "families": fams
+        }
+
+    def execute_query_families(self, mode: str = "offline") -> Dict[str, Any]:
+        """Convenience execution method returning execution results."""
+        fams = self.build_query_families()
+        return {
+            "execution_status": "COMPLETED_OFFLINE" if mode == "offline" else "COMPLETED",
+            "family_results": fams,
+            "total_executed": len(fams)
+        }
+
+    @classmethod
+    def compare_controlled_vs_freetext(
+        cls,
+        mesh_results: List[Dict[str, Any]],
+        freetext_results: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Compares yield and overlap between controlled vocabulary (MeSH) and free-text queries."""
+        def extract_id(r: Dict[str, Any]) -> str:
+            return str(r.get("pmid") or r.get("doi") or r.get("title", "")).lower().strip()
+
+        mesh_ids = {extract_id(r) for r in mesh_results if extract_id(r)}
+        free_ids = {extract_id(r) for r in freetext_results if extract_id(r)}
+
+        overlap = mesh_ids.intersection(free_ids)
+        combined = mesh_ids.union(free_ids)
+        mesh_unique = mesh_ids - free_ids
+        free_unique = free_ids - mesh_ids
+
+        return {
+            "mesh_yield": len(mesh_results),
+            "freetext_yield": len(freetext_results),
+            "overlap_count": len(overlap),
+            "total_combined_unique": len(combined),
+            "mesh_unique_gain": len(mesh_unique),
+            "freetext_unique_gain": len(free_unique),
+            "overlap_percentage": round(len(overlap) / max(len(combined), 1) * 100.0, 1)
+        }
+
 
 
 if __name__ == "__main__":
