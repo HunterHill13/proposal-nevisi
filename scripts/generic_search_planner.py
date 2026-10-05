@@ -464,29 +464,81 @@ class GenericSearchPlanner:
                 molecules.extend(m.get("target_molecules", []))
 
         study_type = m_dict.get("study_type", "IN_VITRO_EXPERIMENTAL")
-        comparator = "vehicle / untreated control / monotherapy"
+        
+        # Adaptive Comparator Detection
+        comp_records = m_dict.get("comparators", [])
+        comp_names = [c.get("name") if isinstance(c, dict) else str(c) for c in comp_records if c]
+        if comp_names:
+            comparator = " / ".join(comp_names)
+        elif framework == "DIAGNOSTIC":
+            comparator = "reference standard / gold standard comparator"
+        elif framework in ["SURGICAL", "SURGICAL_TECHNIQUE"] or "SURGERY" in domain.upper():
+            comparator = "standard open procedure / conventional management"
+        elif "IN_VITRO" in str(study_type).upper():
+            comparator = "vehicle / untreated control / monotherapy"
+        else:
+            comparator = "standard of care / placebo / active comparator"
 
-        # Explicit 12-component generic decomposition
+        # Adaptive Intervention B & Combination Detection
+        if adjuvant_agent:
+            intervention_b_val = adjuvant_agent
+            combination_val = f"{primary_agent} + {adjuvant_agent}"
+        else:
+            intervention_b_val = "NOT_APPLICABLE"
+            combination_val = "NOT_APPLICABLE"
+
+        # Adaptive Mechanism Detection
+        if pathways:
+            mechanism_val = pathways
+        elif framework in ["PECO", "EPIDEMIOLOGICAL", "PUBLIC_HEALTH", "SURGICAL", "DIAGNOSTIC"] and not mechs:
+            mechanism_val = "NOT_APPLICABLE"
+        else:
+            mechanism_val = "hypothesized molecular mechanism / target signaling"
+
+        # Adaptive Safety / Toxicity Detection
+        if (framework in ["DIAGNOSTIC", "EPIDEMIOLOGICAL", "PECO", "PUBLIC_HEALTH"] or "EPIDEMIOLOG" in domain.upper() or "PUBLIC_HEALTH" in domain.upper()) and not any(k in domain.lower() for k in ["pharmacolog", "drug", "toxicology"]):
+            safety_val = "NOT_APPLICABLE"
+        elif framework in ["SURGICAL", "SURGICAL_TECHNIQUE"] or "SURGERY" in domain.upper():
+            safety_val = "postoperative complications / morbidity / adverse events"
+        else:
+            safety_val = "adverse events / therapeutic window / selectivity / toxicity boundaries"
+
+        # Adaptive Methodology Detection
+        if framework == "DIAGNOSTIC" or "DIAGNOSTIC" in str(study_type).upper():
+            methodology_val = "sensitivity / specificity / ROC curve / index test vs reference standard"
+        elif framework in ["SURGICAL", "SURGICAL_TECHNIQUE"] or "SURGERY" in domain.upper():
+            methodology_val = "standardized surgical technique / clinical endpoints / follow-up assessment"
+        elif "IN_VITRO" in str(study_type).upper():
+            methodology_val = "quantitative bioassay / dose-response titration / flow cytometry"
+        else:
+            methodology_val = "controlled experimental protocol / standardized measurement assay / statistical analysis"
+
+        # Explicit 12-component adaptive generic decomposition (v8.4 Section 4)
         decomposed_components = {
             "population_or_model": system,
             "disease_or_condition": cond_en,
             "intervention_a": primary_agent,
-            "intervention_b": adjuvant_agent,
-            "combination": f"{primary_agent} + {adjuvant_agent}" if adjuvant_agent else primary_agent,
+            "intervention_b": intervention_b_val,
+            "combination": combination_val,
             "comparator": comparator,
             "outcome": outcome_names,
-            "mechanism": pathways,
+            "mechanism": mechanism_val,
             "study_type": study_type,
             "experimental_model": system,
-            "safety_toxicity": "cytotoxicity / therapeutic window / selectivity",
-            "methodology": "median-effect / cellular viability assay / flow cytometry"
+            "safety_toxicity": safety_val,
+            "methodology": methodology_val
         }
+
+        applicable_dims = [k for k, v in decomposed_components.items() if v != "NOT_APPLICABLE"]
+        not_applicable_dims = [k for k, v in decomposed_components.items() if v == "NOT_APPLICABLE"]
 
         return {
             "model_id": m_dict.get("model_id", "RPM_SEARCH_DECOMPOSED"),
             "domain": domain,
             "framework": framework,
             "decomposed_question_components": decomposed_components,
+            "applicable_dimensions": applicable_dims,
+            "not_applicable_dimensions": not_applicable_dims,
             "condition_facets": {
                 "primary_term": cond_en,
                 "mesh_term": cond_mesh,
@@ -505,9 +557,87 @@ class GenericSearchPlanner:
                 "primary_outcomes": outcome_names
             },
             "mechanistic_facets": {
-                "pathways": pathways,
+                "pathways": pathways if pathways else ("NOT_APPLICABLE" if mechanism_val == "NOT_APPLICABLE" else []),
                 "target_molecules": molecules
             }
+        }
+
+    @classmethod
+    def expand_query_terms(cls, term: str, category: str = "INTERVENTION") -> List[Dict[str, str]]:
+        """v8.4 Section 5.A: Structured query expansion with provenance tracking."""
+        clean = term.strip()
+        if not clean:
+            return []
+        expansions = [{"term": clean, "provenance": "EXACT_CANONICAL_SPECIFICATION", "type": "PRIMARY"}]
+        # Parenthetical acronym/base extraction
+        if "(" in clean and ")" in clean:
+            inner = re.findall(r'\((.*?)\)', clean)
+            base = re.sub(r'\(.*?\)', '', clean).strip()
+            if base and base != clean:
+                expansions.append({"term": base, "provenance": "BASE_FORM_EXTRACTION", "type": "SYNONYM"})
+            for inn in inner:
+                if len(inn) >= 2:
+                    expansions.append({"term": inn, "provenance": "ABBREVIATION_EXTRACTION", "type": "ABBREVIATION"})
+        # Hyphenated / space variants
+        if "-" in clean:
+            expansions.append({"term": clean.replace("-", " "), "provenance": "SPELLING_VARIANT_DEHYPHENATION", "type": "SYNONYM"})
+        elif " " in clean and len(clean.split()) == 2:
+            expansions.append({"term": clean.replace(" ", "-"), "provenance": "SPELLING_VARIANT_HYPHENATION", "type": "SYNONYM"})
+        return expansions
+
+    @classmethod
+    def track_search_saturation(cls, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """v8.4 Section 5.C: Tracks multi-dimensional search saturation across entities, mechanisms, outcomes, and designs."""
+        seen_ids = set()
+        seen_entities = set()
+        seen_mechs = set()
+        seen_outcomes = set()
+        seen_designs = set()
+        seen_contradictions = set()
+        duplicates_count = 0
+
+        for r in records:
+            rid = r.get("pmid") or r.get("doi") or r.get("title", "")
+            if rid in seen_ids:
+                duplicates_count += 1
+            else:
+                seen_ids.add(rid)
+
+            ent = r.get("universal_entity_type") or r.get("compound_identity")
+            if ent and ent not in ["UNKNOWN_IDENTITY", "NOT_APPLICABLE"]:
+                seen_entities.add(ent)
+
+            for m in r.get("mechanisms", []):
+                seen_mechs.add(str(m).lower())
+
+            for o in r.get("reported_outcomes", []):
+                seen_outcomes.add(str(o).upper())
+
+            des = r.get("study_design")
+            if des:
+                seen_designs.add(str(des).upper())
+
+            pol = r.get("evidence_polarity")
+            if pol in ["CONTRADICTS", "LIMITS_INTERPRETATION"]:
+                seen_contradictions.add(rid)
+
+        total = len(records)
+        unique_count = len(seen_ids)
+        dup_rate = (duplicates_count / total) if total > 0 else 0.0
+
+        is_saturated = (dup_rate >= 0.40 and unique_count >= 15) or (total >= 25 and len(seen_entities) >= 1)
+        return {
+            "total_records_screened": total,
+            "unique_studies_count": unique_count,
+            "duplicate_count": duplicates_count,
+            "duplicate_rate": round(dup_rate, 4),
+            "unique_entities_discovered": sorted(list(seen_entities)),
+            "unique_mechanisms_discovered": sorted(list(seen_mechs)),
+            "unique_outcomes_discovered": sorted(list(seen_outcomes)),
+            "unique_designs_discovered": sorted(list(seen_designs)),
+            "contradictory_studies_count": len(seen_contradictions),
+            "is_saturated": is_saturated,
+            "saturation_recommendation": "Search saturation reached; marginal information gain is low" if is_saturated else "Continue targeted querying for unexplored outcomes/mechanisms"
         }
 
     @classmethod

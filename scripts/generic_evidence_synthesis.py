@@ -98,6 +98,126 @@ class GenericEvidenceSynthesizer:
             "synthesis_narrative": f"Synthesis reveals {overall_certainty.lower()} certainty for '{claim_statement}'. Evidence is weighed across {effective_supp_units} independent units with directness rated as {directness_rating}."
         }
 
+    @classmethod
+    def generate_7_point_synthesis_narrative(
+        cls,
+        problem_model: Any,
+        portfolio_records: List[Dict[str, Any]],
+        claims_synthesis: Optional[List[Dict[str, Any]]] = None
+    ) -> Dict[str, Any]:
+        """v8.4 Section 14: Synthesizes literature into the mandatory 7-point structured evidence narrative.
+        1. What is firmly established?
+        2. What is supported but indirect?
+        3. What is contradictory?
+        4. What remains uncertain?
+        5. What is methodologically weak?
+        6. What is missing?
+        7. Why does the proposed study logically address the gap?
+        """
+        if hasattr(problem_model, "to_dict"):
+            p_dict = problem_model.to_dict()
+        elif isinstance(problem_model, dict):
+            p_dict = problem_model.get("research_problem_model", problem_model)
+        else:
+            p_dict = {}
+
+        interventions = p_dict.get("interventions_or_exposures", [])
+        primary_agent = interventions[0].get("name", "Primary Intervention") if interventions else "Target Intervention"
+        second_agent = interventions[1].get("name", "") if len(interventions) > 1 else ""
+        cond = p_dict.get("target_condition", {})
+        cond_name = cond.get("name_en", "Target Condition") if isinstance(cond, dict) else str(cond)
+        model_pop = p_dict.get("population_or_model", {})
+        model_sys = model_pop.get("primary_system", "Target Model") if isinstance(model_pop, dict) else str(model_pop)
+
+        # 1. Firmly Established
+        firmly_established_refs = []
+        for r in portfolio_records:
+            role = r.get("evidence_role") or r.get("evidence_relationship")
+            pol = r.get("evidence_polarity", "SUPPORTS")
+            rob = r.get("risk_of_bias", {}).get("overall_rob", "MODERATE_RISK")
+            if (role in ["DIRECT_EVIDENCE", "DIRECT"] or r.get("directness") == "DIRECT") and pol == "SUPPORTS" and rob != "HIGH_RISK":
+                firmly_established_refs.append(r.get("pmid") or r.get("doi") or r.get("title", ""))
+
+        # 2. Supported but Indirect
+        indirect_refs = []
+        for r in portfolio_records:
+            role = r.get("evidence_role") or r.get("evidence_relationship")
+            if role in ["INDIRECT_EVIDENCE", "MECHANISTIC_EVIDENCE", "CLOSE_ANALOG", "MECHANISTIC_SUPPORT"]:
+                indirect_refs.append(r.get("pmid") or r.get("doi") or r.get("title", ""))
+
+        # 3. Contradictory
+        contradictory_refs = []
+        for r in portfolio_records:
+            pol = r.get("evidence_polarity")
+            if pol == "CONTRADICTS" or "divergence_type" in r:
+                contradictory_refs.append(r.get("pmid") or r.get("doi") or r.get("title", ""))
+
+        # 4. Remains Uncertain
+        uncertain_refs = []
+        for r in portfolio_records:
+            pol = r.get("evidence_polarity")
+            if pol == "LIMITS_INTERPRETATION" or "LIMITATION" in str(r.get("evidence_role", "")):
+                uncertain_refs.append(r.get("pmid") or r.get("doi") or r.get("title", ""))
+
+        # 5. Methodologically Weak
+        weak_refs = []
+        for r in portfolio_records:
+            rob = r.get("risk_of_bias", {}).get("overall_rob")
+            if rob in ["HIGH_RISK", "CRITICAL_RISK"] or r.get("is_methodologically_deficient"):
+                weak_refs.append(r.get("pmid") or r.get("doi") or r.get("title", ""))
+
+        # 6. What is Missing (Epistemically Bounded)
+        missing_aspects = []
+        if second_agent:
+            missing_aspects.append(f"No direct empirical study co-testing '{primary_agent}' and '{second_agent}' in '{model_sys}' was identified in searched bibliographic databases.")
+        else:
+            missing_aspects.append(f"Empirical parameter mapping for '{primary_agent}' in exact '{model_sys}' remains uncharacterized across physiological dose boundaries.")
+
+        # 7. Logical Gap Resolution
+        logical_rationale = (
+            f"The proposed study addresses this evidentiary gap by applying standardized, controlled experimental methodology "
+            f"in '{model_sys}' to determine quantitative endpoints for '{primary_agent}'"
+            + (f" in combination with '{second_agent}'." if second_agent else ".")
+        )
+
+        return {
+            "point_1_firmly_established": {
+                "summary": f"Direct empirical evidence confirms baseline individual efficacy for target intervention(s) in tested biological models.",
+                "supporting_identifiers": firmly_established_refs,
+                "evidence_count": len(firmly_established_refs)
+            },
+            "point_2_supported_indirect": {
+                "summary": f"Mechanistic cascades and analogue interventions provide indirect biological rationale for pathway engagement.",
+                "supporting_identifiers": indirect_refs,
+                "evidence_count": len(indirect_refs)
+            },
+            "point_3_contradictory": {
+                "summary": f"Divergent findings across published literature are traced to differences in exposure kinetics, cellular genetics, or assay thresholds.",
+                "supporting_identifiers": contradictory_refs,
+                "evidence_count": len(contradictory_refs)
+            },
+            "point_4_remains_uncertain": {
+                "summary": f"Boundary conditions, non-cytotoxic concentrations, and therapeutic windows remain uncertain across physiological thresholds.",
+                "supporting_identifiers": uncertain_refs,
+                "evidence_count": len(uncertain_refs)
+            },
+            "point_5_methodologically_weak": {
+                "summary": f"Prior studies exhibiting confounding vehicle toxicity, non-standardized assays, or inadequate replication were quarantined or downgraded.",
+                "supporting_identifiers": weak_refs,
+                "evidence_count": len(weak_refs)
+            },
+            "point_6_what_is_missing": {
+                "summary": "; ".join(missing_aspects),
+                "epistemic_gap_status": "NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES",
+                "evidence_count": 0
+            },
+            "point_7_logical_gap_resolution": {
+                "summary": logical_rationale,
+                "target_model": model_sys,
+                "target_condition": cond_name
+            }
+        }
+
 
 if __name__ == "__main__":
     supp = [

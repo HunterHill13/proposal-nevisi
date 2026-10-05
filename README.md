@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.3)
+### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.4)
 ### موتور جامع و تعمیم‌پذیر سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 256/256 Passed](https://img.shields.io/badge/Unified%20Tests-256%2F256%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 267/267 Passed](https://img.shields.io/badge/Unified%20Tests-267%2F267%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -18,85 +18,84 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi (v8.3)** is an autonomous, publication-grade academic research proposal drafting framework and **General-Purpose Evidence-Driven Medical Research Engine**. Redesigned from the ground up to eliminate all hard-coded domain dependencies, v8.3 operates across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
-> **Bifurcated Validation Architecture & Scientific Boundaries (v8.3):** Proposal-Nevisi strictly differentiates **Software Validation** (256 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, compound identity gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED`).
+**Proposal-Nevisi (v8.4)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH and K-Dense, v8.4 completely decouples the research and literature synthesis subsystems from any project-specific biological assumptions, entities, mechanisms, diseases, cell lines, or compounds. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
+
+> **Bifurcated Validation Architecture & Scientific Boundaries (v8.4):** Proposal-Nevisi strictly differentiates **Software Validation** (267 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`).
 
 
-### Core Architecture & Capabilities (v8.2)
+### Core Architecture & Capabilities (v8.4)
 
-1. **Dynamic Research Problem Modeler (`scripts/research_problem_model.py`):**
+1. **Adaptive Research Problem Modeler & Decomposition (`scripts/research_problem_model.py`, `scripts/generic_search_planner.py`):**
    - Automatically structures questions using domain-appropriate frameworks: **PICO** (interventions), **PECO** (environmental/occupational exposures), **Diagnostic** (index test vs. reference standard), **Prognostic** (risk stratification), or **Mechanistic** (biochemical signaling cascades).
-   - Generates controlled vocabulary, MeSH indexing, explicit boundary criteria, and question decomposition.
+   - Dynamically partitions dimensions into `applicable_dimensions` and `not_applicable_dimensions` (e.g. for single-agent, surgical, or epidemiological questions).
 
-2. **12-Layer Dynamic Search Strategy & Scientific Search Adapter (`scripts/scientific_search_adapter.py`, `scripts/generic_search_planner.py`):**
-   - Option B (Adapter) + Option C (Selective Borrowing) federated search engine integrating PubMed, Europe PMC, Crossref, and OpenAlex.
+2. **12-Layer Dynamic Search Strategy & Provenance-Tracked Query Expansion (`scripts/scientific_search_adapter.py`, `scripts/generic_search_planner.py`):**
+   - Federated search engine integrating PubMed, Europe PMC, Crossref, and OpenAlex.
    - Connected-component transitive identity graph deduplication across multiple persistent IDs (PMID, DOI, OpenAlex ID) and title similarity.
-   - Marginal search yield saturation curve calculation to assess literature coverage saturation.
-   - Truthful execution status: dry-run/offline searches explicitly return `NOT_EXECUTED` without fabricating database responses; zero-result searches require `EMPTY_RETRIEVAL` state recording.
+   - Query expansion with term provenance tracking (acronyms, hyphenation variants, base lemmas) and multi-metric search saturation curve calculation.
+   - Truthful execution status: 8 standardized database statuses (`EXECUTED`, `UNAVAILABLE`, `PARTIALLY_QUERIED`, `NOT_APPLICABLE`, `NOT_SEARCHED`, `EMPTY_RETRIEVAL`, `ERROR`, `NOT_EXECUTED`).
 
-3. **Explicit Cross-Study Relationships Graph & Claim DAG (`scripts/generic_study_relationships.py`):**
-   - Maps 22 distinct cross-study relationship types (`DIRECT_REPLICATION`, `CONCEPTUAL_REPLICATION`, `EXTENSION`, `TRANSLATIONAL_EXTENSION`, `SUPPORTS`, `CONTRADICTS`, `METHODOLOGICAL_INHERITANCE`, etc.) and builds acyclic Claim Dependency DAGs.
+3. **16-Category Generic PRISMA Exclusion Ontology (`scripts/core_policies.py`, `scripts/generic_reference_auditor.py`):**
+   - 16 topic-agnostic exclusion codes (`OUT_OF_SCOPE`, `WRONG_POPULATION`, `WRONG_CONDITION`, `WRONG_INTERVENTION`, `WRONG_COMPARATOR`, `WRONG_MODEL`, `WRONG_OUTCOME`, `WRONG_STUDY_DESIGN`, `WRONG_SETTING`, `INSUFFICIENT_EVIDENCE`, `NOT_PRIMARY_RESEARCH`, `RETRACTED`, `DUPLICATE`, `OUTDATED`, `METHOD_ONLY`, `PERIPHERAL_EVIDENCE`).
+   - Seamless dual-matching backwards compatibility with earlier domain-specific aliases.
 
-4. **Evidence-Based Research Gap Detector (`scripts/generic_gap_detector.py`):**
-   - Systematically classifies research gaps across 18 universal taxonomy categories (`KNOWLEDGE_GAP`, `MECHANISTIC_GAP`, `METHODOLOGICAL_GAP`, `TRANSLATIONAL_GAP`, `POPULATION_GAP`, `COMBINATION_GAP`, etc.) with importance tiers.
+4. **Universal Entity Hierarchy & Evidence Roles (`scripts/core_policies.py`, `scripts/generic_reference_auditor.py`):**
+   - 13 universal entity types (`PARENT_ENTITY`, `DERIVATIVE`, `ANALOGUE`, `EXTRACT`, `METABOLITE`, `FORMULATION`, `RECOMBINANT_VARIANT`, `COMBINATION`, `ANALYTE_BIOMARKER`, `DEVICE_SURGICAL_TOOL`, `BEHAVIORAL_DIGITAL`, `NOT_APPLICABLE`, `UNKNOWN_ENTITY`).
+   - 10 distinct evidence roles (`DIRECT_EVIDENCE`, `INDIRECT_EVIDENCE`, `MECHANISTIC_EVIDENCE`, `METHODOLOGICAL_EVIDENCE`, `EPIDEMIOLOGICAL_EVIDENCE`, `SAFETY_EVIDENCE`, `ANALOGOUS_EVIDENCE`, `LIMITING_EVIDENCE`, `CONTRADICTORY_EVIDENCE`, `CONTEXTUAL_EVIDENCE`) decoupled from evidence polarity.
 
-5. **Study Family De-Duplication & Independent Streams (`scripts/generic_study_family_detector.py`):**
-   - Automatically detects shared trial registrations (e.g. `NCTxxxx`), multi-center cohorts (e.g. `UK Biobank`, `NHANES`), and secondary subgroup publications to calculate independent evidence streams and prevent artificial evidence double-counting.
+5. **7-Point Structured Literature Synthesis Narrative (`scripts/generic_evidence_synthesis.py`):**
+   - Generates publication-grade literature review narratives systematically covering:
+     1. Current Knowledge Base
+     2. Consistency of Evidence Across Studies
+     3. Contradictions & Divergent Findings
+     4. Biological Plausibility & Mechanistic Support
+     5. Methodological & Model Limitations
+     6. Genuine Research Gaps
+     7. Explicit Proposal Value Proposition
 
-6. **Study-Design-Aware Comparability & Bias (`scripts/generic_comparability_engine.py`):**
-   - Tailored comparability criteria for in vitro replication, animal SYRCLE standards, clinical RCT RoB2 allocation & blinding, and diagnostic QUADAS-2 standards.
+6. **14-Category Generic Contradiction Root-Cause Taxonomy (`scripts/core_policies.py`, `scripts/generic_contradiction_engine.py`):**
+   - Evaluates negative and divergent findings across 14 generic categories (`POPULATION`, `MODEL`, `INTERVENTION`, `FORMULATION`, `DOSE_EXPOSURE`, `DURATION`, `TIMING`, `COMPARATOR`, `ASSAY`, `ENDPOINT`, `STUDY_DESIGN`, `BIOLOGICAL_CONTEXT`, `STATISTICAL_POWER`, `MEASUREMENT_METHOD`).
+   - Distinguishes `TRUE_CONTRADICTION` from `CONTEXTUAL_DISAGREEMENT` and enforces "No Evidence != Evidence of No Effect".
 
-7. **Extensible 15-Category Contradiction Engine (`scripts/generic_contradiction_engine.py`):**
-   - Evaluates negative findings across 15 universal categories (`NULL_RESULT`, `ANTAGONISM`, `TOXICITY`, `RESISTANCE`, `MODEL_LIMITATION`, etc.).
-   - Distinguishes `TRUE_CONTRADICTION` from `CONTEXTUAL_DISAGREEMENT` and enforces the epistemic principle: "No Evidence != Evidence of No Effect".
-
-8. **Claim-Evidence Entailment, Sanitization & Anti-Overclaim Gate (`scripts/generic_claim_entailment_engine.py`):**
-   - Separates in-text citation linkage, source document traceability, and scientific claim entailment.
-   - Strict numerical provenance ledger auditing values, transformations, and measurement units (`WRONG_NUMERICAL_VALUE`, `WRONG_UNIT`).
-   - Flexible citation parser handling ranges `[1-3]`, lists `[1,2,5]`, and author-year citations.
-   - Prompt-injection resistance: sanitizes text against zero-width obfuscation, hidden HTML, fake system messages, base64 payloads, and hostile prompts.
-   - Flags causal overclaims (`causes`, `induces`) derived from observational designs.
-   - Enforces the `NO_SYNERGY_FALLACY` gate (`SYNERGY_NOT_ESTABLISHED` unless direct combination assays exist).
-
-9. **Dynamic Protocol Designer & Sample Size Parameter Audit (`scripts/dynamic_protocol_designer.py`):**
-   - Missing data policy: `0 != MISSING` and `False != MISSING`.
-   - Sample size parameter provenance tracking (`provided`, `literature-derived`, `pilot-derived`, `assumed`, `missing`); returns `SAMPLE_SIZE_REQUIRES_INPUT` without silent assumptions when required parameters are absent.
-   - Multi-layer statistical feasibility audit checking design compatibility, distribution assumptions, repeated measures, and censoring.
-
-10. **10-Dimension Relevance Gate, 6 Relevance Tiers & 25-Reference Ceiling (`scripts/generic_reference_auditor.py`):**
-    - Multi-stage screening funnel: `Broad Retrieval` -> `Topic Screened` -> `Study Relevant & Biological Compatibility` -> `Claim Entailed` -> `Final Top 25 Selection`.
-    - Mandatory biological compatibility gate evaluating 10 relevance dimensions (`biological_topic_alignment`, `condition_phenotype_alignment`, `primary_agent_alignment`, `comparator_second_agent_alignment`, `experimental_model_population_alignment`, `outcome_alignment`, `mechanistic_pathway_alignment`, `study_design_alignment`, `research_question_fit`, `proposal_section_utility`).
-    - 6 standard relevance tiers: `DIRECTLY_RELEVANT`, `HIGHLY_RELEVANT`, `INDIRECTLY_RELEVANT`, `METHOD_RELEVANT`, `BACKGROUND_ONLY`, `IRRELEVANT` (strictly dropping `IRRELEVANT` off-topic records like livestock reproduction or crop agronomy in human biomedical proposals).
-    - Multi-factor scoring (14 criteria) prioritizing high-yield empirical evidence.
-    - Decouples search corpus from proposal references: enforces a strict hard ceiling of **maximum 25 references** (15–25 range) balanced across 5 scientific axes.
-    - Mandatory `final_inclusion_reason` (from 5 standard tiers), `proposal_section_supported`, and explicit `why_this_paper_is_needed` justification for every reference entering the final proposal portfolio.
-
-11. **Institutional 14-Section Proposal Output & Real XML Inspection (`scripts/docx_builder.py`):**
-    - Generates publication-grade Microsoft Word files (`.docx`) matching Iranian university standards.
-    - Deep XML inspection tool (`DocxBuilder.inspect_docx_file`) verifying all 14 main sections, 14 Section 13 subsections, tables, and native Right-to-Left bidirectional XML (`<w:bidi/>`).
-    - Enforces an individual, detailed analytical paragraph per reference in Section 3 without artificial axis grouping headers.
+7. **Institutional 14-Section Word Proposal Output (`scripts/docx_builder.py`):**
+   - Generates publication-grade Microsoft Word files (`.docx`) matching Iranian university standards.
+   - Deep XML inspection tool verifying all 14 main sections, 14 Section 13 subsections, tables, and native Right-to-Left bidirectional XML (`<w:bidi/>`).
+   - Strict ceiling of maximum 25 references with `NO_QUOTA_FILLING = True` and individual, detailed paragraphs per reference.
 
 ---
 
 <a name="unified-multi-tier-test-harness"></a>
-### Unified Multi-Tier Test Harness (`tests/run_all_tests.py`)
+### Unified Multi-Tier Test Harness (`scripts/master_release_gate.py`)
 
-The engine includes a master test harness verifying 218 total software assertions across 7 independent test suites:
-- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts and verifies semantic generalization (22 tests - **PASS**).
+The engine includes a master test harness verifying 267 total software assertions across 8 independent test suites:
+- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts (22 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 86 stress tests evaluating swappable search backends, ScientificSearchAdapter deduplication, search saturation curve, 10-dimension contextual relevance gates, 6 relevance tiers, 25-reference ceiling, 14-factor scoring, screening funnels, mandatory 3-part inclusion justifications, fake citations, mismatched DOIs (`IDENTITY_CONFLICT`), retracted/corrected articles, publication status, exact calendar boundary parsing, leap-year safety, rejection of fake foundational exceptions, pseudo-replication, publication bias (<10 studies gate), causal overclaims, translational leaps, ungrounded numbers, synergy fallacies, no-evidence fallacies, structural drift, missing metadata, question-conditional hierarchy, conflict matrix, alternative explanations, evidence completeness, PRISMA record-level deduplication, decoupled database adapters, prompt injection sanitization, internal consistency directed graph, multi-pillar final scientific release gate verification (86 tests - **PASS**).
+- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 114 stress tests evaluating swappable search backends, deduplication, saturation curves, relevance gates, 25-reference ceiling, 14-factor scoring, screening funnels, DOI conflicts, retracted papers, calendar cutoffs, leap years, causal overclaims, synergy fallacies (114 tests - **PASS**).
 - **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
-- **Suite 5: Mutation Testing Layer (`test_mutations.py`):** 10 deliberate scientific defect mutations evaluating whether the auditor catches corrupted temporal cutoffs, retracted articles, mismatched DOIs, unsupported assertions, observational causal overclaims, duplicated records, assumed sample sizes, prompt injections, and missing citations (10 tests - **PASS**, 100% Mutation Score).
-- **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 (reordering stability, duplicate invariance, causal gates, unit changes), Draft-07 JSON Schema validation against SEARCH_PROVENANCE, REFERENCE_RECORD, and CLAIM_PROVENANCE, and randomized xenobiology synthetic domain benchmark (14 tests - **PASS**).
-- **Suite 7: End-to-End Pipeline & 15 Negative Adversarial Scenarios (`test_e2e_integration.py`):** 16 tests validating positive full pipeline execution and 15 adversarial negative failure/demotion scenarios (16 tests - **PASS**).
+- **Suite 5: Mutation Testing Layer (`test_mutations.py`):** 10 deliberate scientific defect mutations with 100% kill score (10 tests - **PASS**).
+- **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 and Draft-07 JSON Schemas (14 tests - **PASS**).
+- **Suite 7: End-to-End Pipeline & Integration Scenarios (`test_e2e_integration.py`):** 24 tests validating full pipeline execution and adversarial failure/demotion scenarios (24 tests - **PASS**).
+- **Suite 8: Cross-Topic Adversarial Test Suite (`test_cross_topic_adversarial.py`):** 11 tests verifying topic-agnosticism across Scenarios A through J (11 tests - **PASS**).
 
 ```bash
-# Run the complete test suite
-python tests/run_all_tests.py
-
 # Run the master production release gate
 python scripts/master_release_gate.py
 ```
+
+---
+
+<a name="فارسی"></a>
+## مستندات فارسی
+
+مهارت **Proposal-Nevisi (نسخه v8.4)** یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
+
+### ویژگی‌های بنیادین نسخه v8.4:
+1. **استقلال کامل و قطعی از موضوع (Topic-Agnostic Core):** بازطراحی کامل بر مبنای الگوهای اثبات‌شده AIPOCH و K-Dense بدون هرگونه فرض پنهان در خصوص بیماری، دارو، رده سلولی یا مکانیسم.
+2. **تجزیه انطباقی مسئله و ابعاد نامرتبط:** پشتیبانی کامل از مسائل تک‌مداخله‌ای، جراحی، اپیدمیولوژیک و تشخیصی با برچسب‌گذاری صریح `NOT_APPLICABLE` بدون تحمیل ابعاد اجباری ترکیبی.
+3. **تاکسونومی جامع ۱۶ گانه انصراف PRISMA (`GENERIC_EXCLUSION_ONTOLOGY`):** تعریف ۱۶ کد عمومی بدون سوگیری همراه با نگاشت سازگار به عقب با الگوهای پیشین.
+4. **سلسله‌مراتب عمومی موجودیت‌ها و نقش‌های شواهد:** تفکیک ۱۳ موجودیت زیستی و ۱۰ نقش علمی شواهد به صورت کاملاً مستقل از قطبیت شواهد (`SUPPORTS`, `CONTRADICTS`, `LIMITS_INTERPRETATION`).
+5. **سنتز ساختارمند ۷ مرحله‌ای ادبیات پژوهش:** تدوین خودکار روایت تحلیلی و مستند مرور متون منطبق بر شواهد واقعی و وضعیت‌های محصور شکاف جستجو.
+6. **سوئیت آزمون جامع ۲۶۷ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۸ سوئیت آزمون و کشتن ۱۰/۱۰ جهش علمی با نمره جهش ۱۰۰٪.
 
 > **Note on Scientific Validation vs Software Verification:**
 > Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines. They do not constitute external live laboratory experimentation or real clinical trials.

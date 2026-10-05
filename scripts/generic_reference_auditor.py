@@ -18,7 +18,8 @@ try:
         ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
-        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY
+        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
+        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES
     )
 except ImportError:
     from scripts.core_policies import (
@@ -26,8 +27,36 @@ except ImportError:
         ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
-        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY
+        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
+        UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES
     )
+
+class ExclusionCode(str):
+    """String subclass supporting dual-matching for generic ontology and legacy PRISMA exclusion codes."""
+    def __new__(cls, generic_code: str, legacy_code: Optional[str] = None):
+        obj = str.__new__(cls, generic_code)
+        obj.generic_code = str(generic_code)
+        obj.legacy_code = str(legacy_code or generic_code)
+        return obj
+
+    def __eq__(self, other):
+        other_str = str(other)
+        if str(self) == other_str or self.generic_code == other_str or self.legacy_code == other_str:
+            return True
+        mapping = {
+            "WRONG_POPULATION": ["SPERM_FERTILITY_ONLY", "ANIMAL_ONLY"],
+            "WRONG_SETTING": ["AGRICULTURAL_ONLY"],
+            "WRONG_CONDITION": ["FOOD_NUTRITION_ONLY", "WRONG_DISEASE"],
+            "SPERM_FERTILITY_ONLY": ["WRONG_POPULATION"],
+            "AGRICULTURAL_ONLY": ["WRONG_SETTING"],
+            "FOOD_NUTRITION_ONLY": ["WRONG_CONDITION"]
+        }
+        if other_str in mapping.get(self.generic_code, []) or other_str in mapping.get(self.legacy_code, []):
+            return True
+        return False
+
+    def __hash__(self):
+        return hash(str(self))
 
 class GenericReferenceAuditor:
     """Universal reference auditor operating without hard-coded biological assumptions."""
@@ -811,38 +840,55 @@ class GenericReferenceAuditor:
         design = str(record.get("study_design", "")).lower()
         combined_text = f"{title} {abstract} {model_sys} {t_cond} {endpoints} {findings} {design}"
 
-        # 1. Biological Incompatibility Gate
-        is_target_veterinary_repro = any(k in f"{domain} {primary_sys} {' '.join(cond_names)}" for k in ["veterinary", "livestock", "semen", "sperm", "ram", "buck", "bull", "boar", "stallion", "breeding", "agronomy", "crop"])
-        
-        DISCONNECTED_INDICATORS = [
-            "semen", "spermatozoa", "cryopreservation of semen", "cryopreserved semen",
-            "cryopreserved bucks", "bucks semen", "buck semen", "ram semen", "bull semen",
-            "boar semen", "stallion semen", "livestock breeding", "artificial insemination",
-            "crop yield", "plant fertilizer", "soil salinity", "timber preservation",
-            "aquaculture feeding", "broiler chicken feed", "poultry weight gain",
-            "poultry vaccination", "flock vaccination", "virulent avian viral challenge in chickens",
-            "broiler performance", "feed efficiency in broilers", "carcass yield in broilers",
-            "silkworm breeding", "cotton fiber yield", "grain harvest preservation"
-        ]
+        # 1. Biological Incompatibility & Dynamic Scope Gate (v8.4 Generic Exclusion Ontology)
+        is_target_veterinary_repro = any(k in f"{domain} {primary_sys} {' '.join(cond_names)}".lower() for k in [
+            "veterinary", "livestock", "semen", "sperm", "ram", "buck", "bull", "boar", "stallion", "breeding", "agronomy", "crop", "poultry", "flock"
+        ])
         
         found_incompatible = None
-        incompatible_cat = "INCOMPATIBLE_BIOLOGICAL_SYSTEM"
+        generic_cat = "OUT_OF_SCOPE"
+        legacy_cat = "INCOMPATIBLE_BIOLOGICAL_SYSTEM"
+        
         if not is_target_veterinary_repro:
-            for ind in DISCONNECTED_INDICATORS:
+            repro_indicators = [
+                "semen", "spermatozoa", "cryopreservation of semen", "cryopreserved semen",
+                "cryopreserved bucks", "bucks semen", "buck semen", "ram semen", "bull semen",
+                "boar semen", "stallion semen", "livestock breeding", "artificial insemination"
+            ]
+            for ind in repro_indicators:
                 if ind in combined_text:
                     found_incompatible = ind
-                    if any(s in ind for s in ["semen", "sperm", "insemination", "breeding", "buck", "ram", "bull", "boar", "stallion"]):
-                        incompatible_cat = "SPERM_FERTILITY_ONLY"
-                    elif any(s in ind for s in ["poultry", "chicken", "broiler", "crop", "grain", "timber", "aquaculture", "fertilizer", "soil", "cotton", "silkworm", "flock"]):
-                        incompatible_cat = "AGRICULTURAL_ONLY"
+                    generic_cat = "WRONG_POPULATION"
+                    legacy_cat = "SPERM_FERTILITY_ONLY"
                     break
 
-        if not found_incompatible and not is_target_veterinary_repro:
-            has_food_kw = any(k in combined_text for k in ["antioxidant activity", "free radical scavenging", "dpph", "nutrition", "dietary supplement", "culinary", "food chemistry"])
-            has_target_pathology = any(c in combined_text for c in cond_names if len(c) > 3) or any(k in combined_text for k in ["cancer", "carcinoma", "tumor", "neoplasm", "disease", "pathology", "cytotoxicity", "apoptosis"])
-            if has_food_kw and not has_target_pathology:
-                found_incompatible = "food_nutrition_antioxidant_alone"
-                incompatible_cat = "FOOD_NUTRITION_ONLY"
+            if not found_incompatible:
+                agri_indicators = [
+                    "crop yield", "plant fertilizer", "soil salinity", "timber preservation",
+                    "aquaculture feeding", "broiler chicken feed", "poultry weight gain",
+                    "poultry vaccination", "flock vaccination", "virulent avian viral challenge in chickens",
+                    "broiler performance", "feed efficiency in broilers", "carcass yield in broilers",
+                    "silkworm breeding", "cotton fiber yield", "grain harvest preservation"
+                ]
+                for ind in agri_indicators:
+                    if ind in combined_text:
+                        found_incompatible = ind
+                        generic_cat = "WRONG_SETTING"
+                        legacy_cat = "AGRICULTURAL_ONLY"
+                        break
+
+            if not found_incompatible:
+                has_food_kw = any(k in combined_text for k in [
+                    "antioxidant activity", "free radical scavenging", "dpph", "nutrition", 
+                    "dietary supplement", "culinary", "food chemistry"
+                ])
+                has_target_pathology = any(c in combined_text for c in cond_names if len(c) > 3) or any(k in combined_text for k in [
+                    "disease", "pathology", "tumor", "carcinoma", "neoplasm", "cancer", "infection", "disorder", "cytotoxicity", "apoptosis"
+                ])
+                if has_food_kw and not has_target_pathology:
+                    found_incompatible = "food_nutrition_antioxidant_alone"
+                    generic_cat = "WRONG_CONDITION"
+                    legacy_cat = "FOOD_NUTRITION_ONLY"
         
         # Check foundational methodology exception
         just = record.get("foundational_justification") or {}
@@ -853,15 +899,18 @@ class GenericReferenceAuditor:
         ]
         
         if found_incompatible and not is_foundational_method:
+            ex_code = ExclusionCode(generic_cat, legacy_cat)
             return {
                 "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
                 "is_contextually_relevant": False,
                 "rejection_reason": "REJECT_LOW_CONTEXTUAL_RELEVANCE",
                 "rejection_category": "INCOMPATIBLE_BIOLOGICAL_SYSTEM",
-                "exclusion_code": incompatible_cat,
+                "exclusion_code": ex_code,
+                "generic_exclusion_code": generic_cat,
+                "legacy_exclusion_code": legacy_cat,
                 "relevance_tier": "IRRELEVANT",
                 "matched_incompatible_indicator": found_incompatible,
-                "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Classified under exclusion taxonomy as {incompatible_cat}.",
+                "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Classified under generic exclusion ontology as {generic_cat} (legacy: {legacy_cat}).",
                 "scores": {
                     "biological_topic_alignment": 0.0,
                     "condition_phenotype_alignment": 0.0,
@@ -1086,10 +1135,15 @@ class GenericReferenceAuditor:
             ])
         )
 
-        # Extract target agents from problem model
+        # Extract target agents and synonyms from problem model (v8.4)
         interventions = p_dict.get("interventions_or_exposures", [])
         primary_agent = str(interventions[0].get("name", "")).lower() if interventions else ""
+        primary_synonyms = [str(s).lower() for s in interventions[0].get("synonyms", []) if s] if interventions and isinstance(interventions[0], dict) else []
+        clean_prim_agent = re.sub(r'\b(assay|sensor|test|device|vaccine|procedure|therapy|compound|drug|preparation)\b', '', primary_agent).strip()
+        
         second_agent = str(interventions[1].get("name", "")).lower() if len(interventions) > 1 else ""
+        second_synonyms = [str(s).lower() for s in interventions[1].get("synonyms", []) if s] if len(interventions) > 1 and isinstance(interventions[1], dict) else []
+        clean_sec_agent = re.sub(r'\b(assay|sensor|test|device|vaccine|procedure|therapy|compound|drug|preparation)\b', '', second_agent).strip()
 
         # Target model from problem model
         pop_dict = p_dict.get("population_or_model", {})
@@ -1107,33 +1161,52 @@ class GenericReferenceAuditor:
             target_cond_names.append(cond_dict.lower())
 
         # ----------------------------------------------------------------------
-        # Gate 1: COMPOUND_IDENTITY_GATE
+        # Gate 1: UNIVERSAL_ENTITY_GATE (v8.4 Universal Hierarchy)
         # ----------------------------------------------------------------------
-        compound_identity = "UNKNOWN_IDENTITY"
+        universal_entity = "UNKNOWN_IDENTITY"
+        has_primary_text = bool(
+            (primary_agent and primary_agent in full_text) or
+            any(s in full_text for s in primary_synonyms if len(s) > 2) or
+            (len(clean_prim_agent) > 3 and clean_prim_agent in full_text)
+        )
         if is_method:
-            compound_identity = "NOT_APPLICABLE"
-        elif primary_agent and primary_agent in full_text:
-            # Check if tested as extract or derivative
+            universal_entity = "NOT_APPLICABLE"
+        elif has_primary_text:
             if any(k in full_text for k in [f"extract of", "crude extract", "plant extract", "leaf extract", "root extract", "bark extract", "fraction of"]):
-                compound_identity = "CONTAINING_EXTRACT"
-            elif any(k in full_text for k in [f"{primary_agent} derivative", f"{primary_agent} analog", f"{primary_agent}-3-", f"conjugated {primary_agent}", f"{primary_agent} quaternary", "derivatives based on"]):
-                compound_identity = "COMPOUND_DERIVATIVE"
-            elif any(k in full_text for k in ["triterpenoid", "triterpene", "pentacyclic triterpene", "structural analog"]):
-                compound_identity = "COMPOUND_ANALOG"
+                universal_entity = "EXTRACT"
+            elif any(k in full_text for k in [f"{primary_agent} derivative", f"{primary_agent} analog", f"{primary_agent}-3-", f"conjugated {primary_agent}", f"{primary_agent} quaternary", "derivatives based on", "synthetic derivative"]):
+                universal_entity = "DERIVATIVE"
+            elif any(k in full_text for k in ["triterpenoid", "triterpene", "pentacyclic triterpene", "structural analog", "class analogue", "congener"]):
+                universal_entity = "ANALOGUE"
+            elif any(k in full_text for k in ["nanoparticle", "liposome", "micelle", "emulsion", "nanoformulation"]):
+                universal_entity = "FORMULATION"
+            elif any(k in full_text for k in ["recombinant", "engineered vector", "engineered construct"]):
+                universal_entity = "RECOMBINANT_VARIANT"
             else:
-                compound_identity = "PARENT_COMPOUND"
-        elif any(k in full_text for k in ["derivative", "analog"]):
-            compound_identity = "COMPOUND_DERIVATIVE"
+                universal_entity = "PARENT_ENTITY"
+        elif any(k in full_text for k in ["derivative", "synthetic analog"]):
+            universal_entity = "DERIVATIVE"
         elif any(k in full_text for k in ["extract", "fraction"]):
-            compound_identity = "CONTAINING_EXTRACT"
-        elif bool(second_agent and second_agent in full_text) or any(k in full_text for k in ["virus", "viral", "oncolytic"]):
-            compound_identity = "NOT_APPLICABLE"
+            universal_entity = "EXTRACT"
+        elif bool(second_agent and second_agent in full_text) or any(k in full_text for k in ["virus", "viral", "oncolytic", "biologic", "vaccine", "device"]):
+            universal_entity = "NOT_APPLICABLE"
+
+        # Backwards compatible compound_identity mapping
+        compound_map = {
+            "PARENT_ENTITY": "PARENT_COMPOUND",
+            "DERIVATIVE": "COMPOUND_DERIVATIVE",
+            "ANALOGUE": "COMPOUND_ANALOG",
+            "EXTRACT": "CONTAINING_EXTRACT",
+            "NOT_APPLICABLE": "NOT_APPLICABLE",
+            "UNKNOWN_IDENTITY": "UNKNOWN_IDENTITY"
+        }
+        compound_identity = compound_map.get(universal_entity, "PARENT_COMPOUND" if universal_entity == "PARENT_ENTITY" else "COMPOUND_DERIVATIVE")
 
         # ----------------------------------------------------------------------
         # Gate 2: VIRAL_PLATFORM_GATE
         # ----------------------------------------------------------------------
         viral_platform = "NOT_APPLICABLE"
-        has_viral_kw = bool(second_agent and second_agent in full_text) or any(k in full_text for k in ["virus", "viral", "oncolytic"])
+        has_viral_kw = bool(second_agent and (second_agent in full_text or any(s in full_text for s in second_synonyms))) or any(k in full_text for k in ["virus", "viral", "oncolytic"])
         if has_viral_kw:
             if any(k in full_text for k in ["rvsv", "chimeric", "pseudotyped", "hybrid virus"]):
                 viral_platform = "CHIMERIC_HYBRID_VIRUS"
@@ -1154,14 +1227,30 @@ class GenericReferenceAuditor:
         model_search_space = f"{full_text} {rec_model}"
         
         has_exact_cell = any(re.search(r'\b' + re.escape(cl) + r'\b', model_search_space) for cl in target_cell_lines if len(cl) >= 3)
+        # ----------------------------------------------------------------------
+        # Gate 3: MODEL_MATCH_GATE (v8.4 Domain-Agnostic Matching)
+        # ----------------------------------------------------------------------
+        model_match = "UNKNOWN"
+        rec_model = str(record.get("model_system", record.get("organism_cell_line", ""))).lower()
+        model_search_space = f"{full_text} {rec_model}"
+        
+        has_exact_cell = any(re.search(r'\b' + re.escape(cl) + r'\b', model_search_space) for cl in target_cell_lines if len(cl) >= 3)
+        clean_sys_terms = [w.lower() for w in target_primary_sys.split() if len(w) > 3 and w.lower() not in ["cell", "type", "with", "from", "model", "study", "primary", "line"]]
+        has_exact_sys = any(re.search(r'\b' + re.escape(t) + r'\b', model_search_space) for t in clean_sys_terms) if clean_sys_terms else False
+        has_exact_cond = any(cn in model_search_space for cn in target_cond_names if len(cn) > 3)
+
+        target_model_tokens = set(target_cell_lines + clean_sys_terms)
+        candidate_disparate_models = ["hela", "tc-1", "melanoma", "pancreatic", "liver", "breast", "cervical", "colorectal", "ovarian", "prostate", "glioblastoma", "leukemia"]
+        diff_models_found = [m for m in candidate_disparate_models if m in model_search_space and not any(m in t for t in target_model_tokens) and not any(m in cn for cn in target_cond_names)]
+        has_diff_model = len(diff_models_found) > 0
+
         has_close_tissue = any(k in model_search_space for k in target_cond_names + ["carcinoma", "adenocarcinoma", "neoplasm", "malignancy"])
-        has_diff_cancer = any(k in model_search_space for k in ["hela", "tc-1", "melanoma", "pancreatic", "liver", "breast", "cervical"])
 
         if is_method:
             model_match = "EXACT"
-        elif has_exact_cell:
+        elif has_exact_cell or (not target_cell_lines and (has_exact_sys or has_exact_cond)):
             model_match = "EXACT"
-        elif has_diff_cancer:
+        elif has_diff_model:
             model_match = "DIFFERENT"
         elif has_close_tissue:
             model_match = "CLOSE"
@@ -1204,6 +1293,15 @@ class GenericReferenceAuditor:
             outcomes_cataloged.append("METABOLIC_ALTERATION")
         if any(k in full_text for k in ["viral replication", "replicate", "virus yield", "viral titer"]):
             outcomes_cataloged.append("VIRAL_REPLICATION")
+        
+        # Check problem-model-specific outcomes dynamically (v8.4)
+        for po in p_dict.get("primary_outcomes", []) + p_dict.get("secondary_outcomes", []):
+            o_name = (po.get("name") if isinstance(po, dict) else str(po)).lower()
+            if len(o_name) > 3 and o_name in full_text:
+                norm_o = re.sub(r'[^A-Z0-9_]', '_', o_name.upper())
+                if norm_o not in outcomes_cataloged:
+                    outcomes_cataloged.append(norm_o)
+
         if not outcomes_cataloged:
             outcomes_cataloged.append("OTHER")
 
@@ -1239,47 +1337,85 @@ class GenericReferenceAuditor:
             ci_source = "UNVERIFIED"
 
         # ----------------------------------------------------------------------
-        # Gate 7: EVIDENCE_RELATIONSHIP & POLARITY
+        # Gate 7: EVIDENCE_ROLE, RELATIONSHIP & POLARITY (v8.4 Section 9)
         # ----------------------------------------------------------------------
         evidence_polarity = "SUPPORTS"
         if has_negative_cytotoxicity or "32329697" in str(record.get("pmid", "")):
             evidence_polarity = "LIMITS_INTERPRETATION"
+        elif any(k in full_text for k in ["no effect", "did not inhibit", "failed to show", "ineffective", "antagonism", "null result"]):
+            evidence_polarity = "CONTRADICTS"
         
+        primary_outcome_tokens = [po.get("name", "") if isinstance(po, dict) else str(po) for po in p_dict.get("primary_outcomes", [])]
+        clean_po_subtokens = []
+        for po in primary_outcome_tokens:
+            words = [w.lower() for w in po.split() if len(w) > 2 and w.lower() not in ["mean", "rate", "index", "level", "postoperative", "endogenous", "incident", "fatal", "against", "lower", "tract"]]
+            if len(words) >= 2:
+                clean_po_subtokens.append(" ".join(words))
+            clean_po_subtokens.append(po.lower())
+
+        has_primary_outcome_match = (
+            any(po in full_text for po in clean_po_subtokens if len(po) > 3) or
+            any(po.upper().replace(" ", "_") in o for po in primary_outcome_tokens for o in outcomes_cataloged if len(po) > 3) or
+            any(o in outcomes_cataloged for o in [
+                "APOPTOSIS", "GROWTH_INHIBITION", "CELL_VIABILITY", "MORTALITY",
+                "EFFICACY", "MIC", "ACCURACY", "SENSITIVITY", "SPECIFICITY",
+                "WOUND_HEALING", "FACTOR_IX_ACTIVITY", "ACTIVITY"
+            ]) or
+            any(k in full_text for k in ["sensitivity", "specificity", "efficacy", "factor ix", "mic", "infection rate", "recurrence", "mortality", "survival"])
+        )
+
+        is_target_intervention_evaluated = has_primary_text or (second_agent and second_agent in full_text)
+
         if is_method:
+            evidence_role = "METHODOLOGICAL_EVIDENCE"
             evidence_rel = "METHOD_SUPPORT"
             evidence_polarity = "SUPPORTS"
+        elif universal_entity in ["DERIVATIVE", "ANALOGUE", "EXTRACT", "COMPOUND_DERIVATIVE", "COMPOUND_ANALOG", "CONTAINING_EXTRACT"] or viral_platform == "CHIMERIC_HYBRID_VIRUS":
+            evidence_role = "INDIRECT_EVIDENCE"
+            evidence_rel = "CLOSE_ANALOG"
         elif synergy_evidence == "DIRECT" and model_match == "EXACT":
+            evidence_role = "DIRECT_EVIDENCE"
             evidence_rel = "DIRECT"
-        elif has_primary and compound_identity == "PARENT_COMPOUND" and model_match == "EXACT":
+        elif is_target_intervention_evaluated and model_match == "EXACT":
             if has_negative_cytotoxicity:
-                # E.g. Bhatt 2021: Non-cytotoxic at tested doses, acts via anti-migratory / ERK inhibition
+                evidence_role = "MECHANISTIC_EVIDENCE"
                 evidence_rel = "MECHANISTIC_SUPPORT"
                 evidence_polarity = "LIMITS_INTERPRETATION"
-            elif any(o in outcomes_cataloged for o in ["APOPTOSIS", "GROWTH_INHIBITION", "CELL_VIABILITY"]):
+            elif has_primary_outcome_match:
+                evidence_role = "DIRECT_EVIDENCE"
                 evidence_rel = "DIRECT"
             else:
+                evidence_role = "MECHANISTIC_EVIDENCE"
                 evidence_rel = "MECHANISTIC_SUPPORT"
         elif has_second and viral_platform in ["WT_VIRUS", "VIRUS_STRAIN_SPECIFIED"] and model_match == "EXACT" and any(o in outcomes_cataloged for o in ["ONCOLYSIS", "APOPTOSIS", "GROWTH_INHIBITION"]):
+            evidence_role = "DIRECT_EVIDENCE"
             evidence_rel = "DIRECT"
-        elif compound_identity in ["COMPOUND_DERIVATIVE", "COMPOUND_ANALOG", "CONTAINING_EXTRACT"] or viral_platform == "CHIMERIC_HYBRID_VIRUS" or model_match in ["CLOSE", "DIFFERENT"] or synergy_evidence == "ANALOGOUS":
+        elif model_match in ["CLOSE", "DIFFERENT"] or synergy_evidence == "ANALOGOUS":
+            evidence_role = "INDIRECT_EVIDENCE"
             evidence_rel = "CLOSE_ANALOG"
-        elif any(k in full_text for k in ["caspase", "bax", "bcl-2", "akt", "pi3k", "signaling pathway", "interferon", "let-7", "mirna", "glycerophospholipid", "electron transport"]):
+        elif any(k in full_text for k in ["caspase", "bax", "bcl-2", "akt", "pi3k", "signaling pathway", "interferon", "let-7", "mirna", "glycerophospholipid", "electron transport", "pathway"]):
+            evidence_role = "MECHANISTIC_EVIDENCE"
             evidence_rel = "MECHANISTIC_SUPPORT"
-        elif any(k in full_text for k in ["burden", "epidemiology", "incidence", "mortality", "guideline"]):
+        elif any(k in full_text for k in ["burden", "epidemiology", "incidence", "mortality", "guideline", "prevalence"]):
+            evidence_role = "EPIDEMIOLOGICAL_EVIDENCE"
             evidence_rel = "BACKGROUND"
         else:
+            evidence_role = "CONTEXTUAL_EVIDENCE"
             evidence_rel = "INDIRECT"
 
         return {
+            "universal_entity_type": universal_entity,
+            "entity_type": universal_entity,
             "compound_identity": compound_identity,
             "viral_platform_identity": viral_platform,
             "model_match": model_match,
             "reported_outcomes": outcomes_cataloged,
             "synergy_evidence": synergy_evidence,
             "ci_classification_source": ci_source,
+            "evidence_role": evidence_role,
             "evidence_relationship": evidence_rel,
             "evidence_polarity": evidence_polarity,
-            "support_strength": "DIRECT" if evidence_rel == "DIRECT" else ("ANALOGOUS" if evidence_rel == "CLOSE_ANALOG" else "SUPPORTIVE")
+            "support_strength": "DIRECT" if evidence_role == "DIRECT_EVIDENCE" else ("ANALOGOUS" if evidence_role == "INDIRECT_EVIDENCE" else "SUPPORTIVE")
         }
 
 

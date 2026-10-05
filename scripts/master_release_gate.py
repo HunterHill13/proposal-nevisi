@@ -110,16 +110,18 @@ def audit_mutation_score() -> Dict[str, Any]:
     }
 
 
-def audit_research_engine_v8_3_criteria() -> Dict[str, Any]:
-    """Phase 4: Audits 13 Research Engine & Literature Review criteria adapted from AIPOCH/K-Dense."""
+def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
+    """Phase 4: Audits Research Engine & Literature Review criteria (v8.4 Universal Biomedical Architecture)."""
     from scripts.core_policies import (
-        MAX_FINAL_REFERENCES, NO_QUOTA_FILLING, EXCLUSION_TAXONOMY,
-        SEARCH_DATABASE_STATUSES, RESEARCH_PIPELINE_STAGES,
-        CONTRADICTION_ROOT_CAUSES, HIGH_VALUE_SCORING_WEIGHTS,
-        SELECTION_ORDER_PRIORITIES, BOUNDED_SEARCH_GAP_STATUSES
+        MAX_FINAL_REFERENCES, NO_QUOTA_FILLING, GENERIC_EXCLUSION_ONTOLOGY,
+        EXCLUSION_TAXONOMY, SEARCH_DATABASE_STATUSES, RESEARCH_PIPELINE_STAGES,
+        GENERIC_CONTRADICTION_ROOT_CAUSES, CONTRADICTION_ROOT_CAUSES,
+        HIGH_VALUE_SCORING_WEIGHTS, SELECTION_ORDER_PRIORITIES,
+        BOUNDED_SEARCH_GAP_STATUSES, UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES
     )
     from scripts.scientific_search_adapter import ScientificSearchAdapter
     from scripts.generic_reference_auditor import GenericReferenceAuditor
+    from scripts.generic_evidence_synthesis import GenericEvidenceSynthesizer
     from tests.test_hard_code_leakage import TestHardCodeLeakage
 
     checks = []
@@ -132,25 +134,44 @@ def audit_research_engine_v8_3_criteria() -> Dict[str, Any]:
     c2 = (NO_QUOTA_FILLING is True)
     checks.append(("2. NO_QUOTA_FILLING == True (No Fake Reference Padding)", c2))
 
-    # 3. EXCLUSION_TAXONOMY (17 PRISMA categories)
-    c3 = (len(EXCLUSION_TAXONOMY) == 17 and "SPERM_FERTILITY_ONLY" in EXCLUSION_TAXONOMY and "AGRICULTURAL_ONLY" in EXCLUSION_TAXONOMY and "FOOD_NUTRITION_ONLY" in EXCLUSION_TAXONOMY)
-    checks.append(("3. EXCLUSION_TAXONOMY (17 PRISMA Categories)", c3))
+    # 3. GENERIC_EXCLUSION_ONTOLOGY (16 categories) & EXCLUSION_TAXONOMY backwards-compatible aliasing
+    c3 = (
+        len(GENERIC_EXCLUSION_ONTOLOGY) == 16 and
+        "WRONG_POPULATION" in GENERIC_EXCLUSION_ONTOLOGY and
+        "WRONG_CONDITION" in GENERIC_EXCLUSION_ONTOLOGY and
+        "SPERM_FERTILITY_ONLY" in EXCLUSION_TAXONOMY and
+        "AGRICULTURAL_ONLY" in EXCLUSION_TAXONOMY and
+        "FOOD_NUTRITION_ONLY" in EXCLUSION_TAXONOMY
+    )
+    checks.append(("3. GENERIC_EXCLUSION_ONTOLOGY (16 Categories + Legacy PRISMA Aliasing)", c3))
 
     # 4. Two-Stage screening logic
     c4 = hasattr(ScientificSearchAdapter, "screen_two_stage") and hasattr(ScientificSearchAdapter, "verify_citation_metadata")
     checks.append(("4. Two-Stage Screening & Citation Integrity Engine", c4))
 
-    # 5. SEARCH_DATABASE_STATUSES (4 standard statuses)
-    c5 = (len(SEARCH_DATABASE_STATUSES) == 4 and "EXECUTED" in SEARCH_DATABASE_STATUSES and "NOT_EXECUTED" in SEARCH_DATABASE_STATUSES)
-    checks.append(("5. SEARCH_DATABASE_STATUSES (4 Standard Statuses)", c5))
+    # 5. SEARCH_DATABASE_STATUSES (8 standardized statuses with EXECUTED and NOT_EXECUTED)
+    c5 = (
+        len(SEARCH_DATABASE_STATUSES) == 8 and
+        "EXECUTED" in SEARCH_DATABASE_STATUSES and
+        "NOT_EXECUTED" in SEARCH_DATABASE_STATUSES and
+        "NOT_APPLICABLE" in SEARCH_DATABASE_STATUSES and
+        "EMPTY_RETRIEVAL" in SEARCH_DATABASE_STATUSES
+    )
+    checks.append(("5. SEARCH_DATABASE_STATUSES (8 Standardized Statuses)", c5))
 
     # 6. RESEARCH_PIPELINE_STAGES (7 stages)
     c6 = (len(RESEARCH_PIPELINE_STAGES) == 7 and "PHASE_A_DECOMPOSITION" in RESEARCH_PIPELINE_STAGES and "PHASE_G_PORTFOLIO_SELECTION" in RESEARCH_PIPELINE_STAGES)
     checks.append(("6. RESEARCH_PIPELINE_STAGES (7 Standard Phases)", c6))
 
-    # 7. CONTRADICTION_ROOT_CAUSES (11 categories)
-    c7 = (len(CONTRADICTION_ROOT_CAUSES) == 11 and "CELL_LINE" in CONTRADICTION_ROOT_CAUSES and "DOSE" in CONTRADICTION_ROOT_CAUSES and "ASSAY_TYPE" in CONTRADICTION_ROOT_CAUSES)
-    checks.append(("7. CONTRADICTION_ROOT_CAUSES (11 Diagnostic Categories)", c7))
+    # 7. GENERIC_CONTRADICTION_ROOT_CAUSES (14 generic categories)
+    c7 = (
+        len(GENERIC_CONTRADICTION_ROOT_CAUSES) == 14 and
+        "POPULATION" in GENERIC_CONTRADICTION_ROOT_CAUSES and
+        "MODEL" in GENERIC_CONTRADICTION_ROOT_CAUSES and
+        "DOSE_EXPOSURE" in GENERIC_CONTRADICTION_ROOT_CAUSES and
+        "CELL_LINE" in CONTRADICTION_ROOT_CAUSES
+    )
+    checks.append(("7. GENERIC_CONTRADICTION_ROOT_CAUSES (14 Generic Diagnostic Categories)", c7))
 
     # 8. HIGH_VALUE_SCORING_WEIGHTS
     c8 = (len(HIGH_VALUE_SCORING_WEIGHTS) == 10 and abs(sum(HIGH_VALUE_SCORING_WEIGHTS.values()) - 1.0) < 0.01)
@@ -160,9 +181,13 @@ def audit_research_engine_v8_3_criteria() -> Dict[str, Any]:
     c9 = (len(SELECTION_ORDER_PRIORITIES) == 9 and SELECTION_ORDER_PRIORITIES[0] == "DIRECT_RELEVANCE")
     checks.append(("9. SELECTION_ORDER_PRIORITIES (9 Strict Tiers)", c9))
 
-    # 10. Entity-Aware Evidence Gates (Parent vs Derivative vs Analog)
-    c10 = hasattr(GenericReferenceAuditor, "audit_scientific_evidence_gates")
-    checks.append(("10. Entity-Aware Evidence Validation Gates", c10))
+    # 10. Universal Entity Hierarchy & Evidence Roles
+    c10 = (
+        len(UNIVERSAL_ENTITY_TYPES) >= 12 and
+        len(EVIDENCE_ROLES) >= 10 and
+        hasattr(GenericReferenceAuditor, "audit_scientific_evidence_gates")
+    )
+    checks.append(("10. Universal Entity Hierarchy (13 Types) & Evidence Roles (10 Roles)", c10))
 
     # 11. Bounded Search Gap Policy
     c11 = ("NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES" in BOUNDED_SEARCH_GAP_STATUSES and "NO_DIRECT_STUDY_EXISTS" not in BOUNDED_SEARCH_GAP_STATUSES)
@@ -179,9 +204,13 @@ def audit_research_engine_v8_3_criteria() -> Dict[str, Any]:
     c13 = hasattr(GenericReferenceAuditor, "audit_final_reference_portfolio")
     checks.append(("13. Portfolio Audit with Decoupled Search Pool and Ceiling Enforcement", c13))
 
+    # 14. 7-Point Structured Literature Synthesis Narrative Engine
+    c14 = hasattr(GenericEvidenceSynthesizer, "generate_7_point_synthesis_narrative")
+    checks.append(("14. 7-Point Structured Literature Synthesis Narrative Engine", c14))
+
     all_passed = all(p for _, p in checks)
     return {
-        "check": "RESEARCH_ENGINE_V8_3_CRITERIA_AUDIT",
+        "check": "RESEARCH_ENGINE_V8_4_CRITERIA_AUDIT",
         "passed": all_passed,
         "total_criteria": len(checks),
         "passed_criteria": sum(1 for _, p in checks if p),
@@ -191,7 +220,7 @@ def audit_research_engine_v8_3_criteria() -> Dict[str, Any]:
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.3)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.4)")
     print("===========================================================================\n")
 
     # 1. Version Sync
@@ -220,10 +249,10 @@ def main():
     print(f"      - Invariants      : Discovery={'OK' if t_res['discovery_invariant_met'] else 'FAIL'}, Accounting={'OK' if t_res['accounting_invariant_met'] else 'FAIL'}")
     print(f"      - Execution Time  : {t_res['elapsed_seconds']}s")
 
-    # 4. Research Engine v8.3 Criteria Audit (13 Checks)
-    r_res = audit_research_engine_v8_3_criteria()
+    # 4. Research Engine v8.4 Criteria Audit (14 Checks)
+    r_res = audit_research_engine_v8_4_criteria()
     status_icon = "[PASS]" if r_res["passed"] else "[FAIL]"
-    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (13 Criteria):")
+    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (14 Criteria):")
     for name, p in r_res["criteria_checks"]:
         ch_icon = "[PASS]" if p else "[FAIL]"
         print(f"      {ch_icon} {name}")

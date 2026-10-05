@@ -48,13 +48,44 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "8.3.0"
-VERSION_DISPLAY = "v8.3.0"
+ENGINE_VERSION = "8.4.0"
+VERSION_DISPLAY = "v8.4.0"
 
-# Scientific Evidence Relationship Taxonomy (v8.3 Section 2)
+# Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
+EVIDENCE_ROLES = [
+    "DIRECT_EVIDENCE",              # Directly evaluates target intervention on target condition/model measuring primary outcome
+    "INDIRECT_EVIDENCE",            # Evaluates related intervention or closely transferable model
+    "MECHANISTIC_EVIDENCE",         # Evaluates molecular/cellular pathway, target engagement, signaling cascade
+    "METHODOLOGICAL_EVIDENCE",      # Evaluates assay technique, mathematical formula, experimental benchmark
+    "CONTEXTUAL_EVIDENCE",          # Epidemiological burden, clinical guidelines, standard of care
+    "NEGATIVE_EVIDENCE",            # Demonstrates lack of efficacy, non-superiority, or biological inertness
+    "SAFETY_EVIDENCE",              # Evaluates toxicology, adverse events, selectivity, therapeutic window
+    "FEASIBILITY_EVIDENCE",         # Evaluates technical feasibility, formulation stability, deliverability
+    "EPIDEMIOLOGICAL_EVIDENCE",     # Population incidence, prevalence, clinical risk factors
+    "DIAGNOSTIC_EVIDENCE"           # Evaluates diagnostic accuracy, sensitivity, specificity, AUC
+]
+
+# Universal Entity Hierarchy (v8.4 Section 8 - Generic Across All Biomedical Interventions)
+UNIVERSAL_ENTITY_TYPES = [
+    "PARENT_ENTITY",        # Exact specified primary/secondary intervention entity (molecule, biologic, viral strain, technique, device, biomarker)
+    "DERIVATIVE",           # Synthesized chemical derivative, conjugate, modified peptide, or salt
+    "ANALOGUE",             # Structural analogue, class member, or related biological counterpart
+    "FORMULATION",          # Nanoparticle, liposome, emulsion, vehicle formulation, or sustained release
+    "EXTRACT",              # Whole crude botanical extract or natural fraction containing agent
+    "COMBINATION",          # Direct combination of two or more distinct interventions
+    "RECOMBINANT_VARIANT",  # Genetically modified / recombinant construct or vector
+    "ENGINEERED_VERSION",   # Engineered cell, oncolytic construct, or advanced medical device
+    "BIOSIMILAR",           # Biosimilar, bioequivalent, or generic formulation
+    "DEVICE_VARIANT",       # Medical device model, modified surgical instrument, or biomaterial
+    "DIAGNOSTIC_VARIANT",   # Modified assay probe, alternative diagnostic platform, or surrogate test
+    "NOT_APPLICABLE",       # Methodological landmark, epidemiological baseline, or unperturbed control
+    "UNKNOWN_IDENTITY"      # Ambiguous, unspecified, or unverified entity formulation
+]
+
+# Scientific Evidence Relationship Taxonomy (Backwards Compatible v8.3 Mapping)
 EVIDENCE_RELATIONSHIPS = [
     "DIRECT",               # Direct match for target intervention + model + outcome
-    "CLOSE_ANALOG",         # High relevance but differs in one key component (e.g. derivative, different cancer cell line)
+    "CLOSE_ANALOG",         # High relevance but differs in one key component (e.g. derivative, different cell line)
     "MECHANISTIC_SUPPORT",  # Molecular pathway, intracellular cascade, target signaling without direct main intervention co-testing
     "METHOD_SUPPORT",       # Canonical mathematical/assay methodology (e.g. median-effect, cytotoxicity protocol)
     "BACKGROUND",           # Epidemiological background, disease definition, clinical problem statement
@@ -512,33 +543,50 @@ def get_question_conditional_hierarchy(question_type: str, study_design: str) ->
 
 NO_QUOTA_FILLING: bool = True  # Strictly prohibits padding references to reach max quota
 
-# 17 Standardized Screening Exclusion Codes (Two-Stage PRISMA Taxonomy)
-EXCLUSION_TAXONOMY: Dict[str, str] = {
-    "OUT_OF_TOPIC": "Completely unrelated to the core biomedical problem model or clinical domain",
-    "WRONG_DISEASE": "Investigates a non-target pathology with zero translational or mechanistic relevance",
-    "WRONG_MODEL": "Utilizes an incompatible or non-transferable biological model system",
-    "WRONG_INTERVENTION": "Evaluates an unrelated drug, agent class, or therapeutic modality",
-    "WRONG_COMPOUND": "Chemical entity is distinct from target compound or its legitimate derivatives",
-    "WRONG_FORMULATION": "Formulation or vehicle artifact produces uninterpretable phenotypic outcomes",
-    "WRONG_OUTCOME": "Endpoints evaluated share zero biological or pharmacological overlap with research question",
-    "ANIMAL_ONLY": "Preclinical animal study without translational bearing on target cellular or human context",
-    "AGRICULTURAL_ONLY": "Agronomic, veterinary herd production, crop protection, or soil science study",
-    "FOOD_NUTRITION_ONLY": "General food chemistry, culinary additive, or dietary supplement study without disease focus",
-    "SPERM_FERTILITY_ONLY": "Veterinary livestock semen cryopreservation or artificial insemination study",
-    "DUPLICATE": "Identical record or multi-database duplicate cross-matched across identifiers",
-    "RETRACTED": "Article officially retracted, withdrawn, or flagged with unresolved expression of concern",
+# 16 Standard Generic Exclusion Codes (v8.4 Section 7 - Topic-Agnostic Two-Stage PRISMA Taxonomy)
+GENERIC_EXCLUSION_ONTOLOGY: Dict[str, str] = {
+    "OUT_OF_SCOPE": "Completely unrelated to the core biomedical problem model or clinical domain",
+    "WRONG_POPULATION": "Non-target organism, clinical population, demographic group, or tissue source",
+    "WRONG_CONDITION": "Investigates a non-target pathology or physiological state without translational relevance",
+    "WRONG_INTERVENTION": "Evaluates an unrelated drug, agent class, surgical technique, or therapeutic modality",
+    "WRONG_COMPARATOR": "Comparator group or control is absent, inappropriate, or non-informative",
+    "WRONG_MODEL": "Utilizes an incompatible or non-transferable experimental model system",
+    "WRONG_OUTCOME": "Endpoints evaluated share zero biological, clinical, or pharmacological overlap with research question",
+    "WRONG_STUDY_DESIGN": "Study design cannot address the research question (e.g. case report for incidence)",
+    "WRONG_SETTING": "Setting (e.g. agronomic, non-clinical environment) is disconnected from target scope",
     "INSUFFICIENT_EVIDENCE": "Methodologically deficient, lacking controls, or presenting purely speculative assertions",
     "NOT_PRIMARY_RESEARCH": "Non-systematic commentary, news, book review, or opinion piece",
-    "METHOD_ONLY": "Methodological assay description without biological evaluation and not flagged as landmark exception",
-    "PERIPHERAL_ANALOGUE": "Distant analog or unrelated natural product added without direct mechanistic rationale"
+    "RETRACTED": "Article officially retracted, withdrawn, or flagged with unresolved expression of concern",
+    "DUPLICATE": "Identical record or multi-database duplicate cross-matched across identifiers",
+    "OUTDATED": "Article exceeds temporal recency boundary without approved foundational landmark exception",
+    "METHOD_ONLY": "Methodological assay description without biological/clinical evaluation and not flagged as landmark exception",
+    "PERIPHERAL_EVIDENCE": "Distant analog, unrelated natural product, or non-transferable secondary finding"
 }
 
-# Standardized Database Execution Statuses (Zero False Execution Claims)
+# Unified Exclusion Taxonomy: Generic Ontology with Backwards-Compatible Legacy Mappings
+EXCLUSION_TAXONOMY: Dict[str, str] = {
+    **GENERIC_EXCLUSION_ONTOLOGY,
+    "OUT_OF_TOPIC": "Completely unrelated to the core biomedical problem model or clinical domain (alias for OUT_OF_SCOPE)",
+    "WRONG_DISEASE": "Investigates a non-target pathology with zero translational or mechanistic relevance (alias for WRONG_CONDITION)",
+    "WRONG_COMPOUND": "Chemical entity is distinct from target compound or its legitimate derivatives (alias for WRONG_INTERVENTION)",
+    "WRONG_FORMULATION": "Formulation or vehicle artifact produces uninterpretable phenotypic outcomes (alias for WRONG_INTERVENTION)",
+    "ANIMAL_ONLY": "Preclinical animal study without translational bearing on target cellular or human context (alias for WRONG_MODEL)",
+    "AGRICULTURAL_ONLY": "Agronomic, veterinary herd production, crop protection, or soil science study (alias for WRONG_SETTING)",
+    "FOOD_NUTRITION_ONLY": "General food chemistry, culinary additive, or dietary supplement study without disease focus (alias for WRONG_CONDITION)",
+    "SPERM_FERTILITY_ONLY": "Veterinary livestock semen cryopreservation or artificial insemination study (alias for WRONG_POPULATION)",
+    "PERIPHERAL_ANALOGUE": "Distant analog or unrelated natural product added without direct mechanistic rationale (alias for PERIPHERAL_EVIDENCE)"
+}
+
+# Standardized Database Execution Statuses (v8.4 Section 6 - Zero False Execution Claims)
 SEARCH_DATABASE_STATUSES: List[str] = [
-    "EXECUTED",         # API successfully queried and authentic records retrieved
-    "NOT_EXECUTED",     # API was not contacted (dry-run, offline mode, or missing credentials)
-    "EMPTY_RETRIEVAL",  # API queried successfully but returned zero matching records
-    "ERROR"             # Network failure, timeout, HTTP error, or unparseable response
+    "EXECUTED",             # API successfully queried and authentic records retrieved
+    "UNAVAILABLE",          # API / database endpoint unavailable or network offline
+    "PARTIALLY_QUERIED",    # Multi-source federated search executed across subset of configured engines
+    "NOT_APPLICABLE",       # Database not applicable to target scientific question
+    "NOT_SEARCHED",         # Search planned but deferred or not contacted
+    "EMPTY_RETRIEVAL",      # API queried successfully but returned zero matching records
+    "ERROR",                # Network failure, timeout, HTTP error, or unparseable response
+    "NOT_EXECUTED"          # API was not contacted (dry-run, offline mode, or missing credentials)
 ]
 
 # Standardized 7-Phase Research Pipeline
@@ -552,20 +600,31 @@ RESEARCH_PIPELINE_STAGES: List[str] = [
     "PHASE_G_PORTFOLIO_SELECTION"       # High-value scoring and selection (capped at <= 25, no padding)
 ]
 
-# 11 Contradiction Root-Cause Categories (AIPOCH Diagnostician Taxonomy)
-CONTRADICTION_ROOT_CAUSES: List[str] = [
-    "CELL_LINE",            # Divergence between p53-wild-type, mutant, or histological subtypes
-    "DOSE",                 # Discrepancy between physiological vs supra-physiological concentrations
-    "EXPOSURE_TIME",        # Acute (24h) vs extended (72h) incubation kinetics
-    "FORMULATION",          # Pure active pharmaceutical ingredient vs crude botanical matrix
-    "COMPOUND_PURITY",      # High-purity synthetic/isolated compound vs crude fractions
-    "VIRAL_STRAIN",         # Velogenic vs mesogenic vs lentogenic viral oncolytic phenotype
-    "MOI",                  # Low multiplicity of infection (replication) vs high MOI (acute lysis)
-    "ASSAY_TYPE",           # Tetrazolium / dye reduction vs crystal violet vs flow cytometry apoptosis
-    "ENDPOINT",             # Anti-migratory / motility vs direct cytocidal cell viability
-    "STUDY_DESIGN",         # 2D monolayer vs 3D spheroid vs in vivo xenograft architecture
-    "BIOLOGICAL_CONTEXT"    # Permissive vs interferon-competent normal cellular baseline
+# 14 Generic Contradiction Root-Cause Categories (v8.4 Section 10 Adaptive Diagnostic Taxonomy)
+GENERIC_CONTRADICTION_ROOT_CAUSES: List[str] = [
+    "POPULATION",           # Demographic, species, or clinical sub-population differences
+    "MODEL",                # In vitro 2D vs 3D vs in vivo organism, genetic divergence, or cellular lineage
+    "INTERVENTION",         # Specific variant, construct, strain, or synthetic purity disparity
+    "FORMULATION",          # Pure API vs complex vehicle, excipient, or delivery nanocarrier
+    "DOSE_EXPOSURE",        # Physiological vs supra-physiological exposure concentration
+    "DURATION",             # Acute vs chronic incubation kinetics / treatment window
+    "TIMING",               # Pre-treatment vs co-treatment vs post-treatment schedule
+    "COMPARATOR",           # Mismatched negative control, vehicle control, or active benchmark
+    "ASSAY",                # Different analytical principle (e.g. tetrazolium dye vs flow cytometry)
+    "ENDPOINT",             # Anti-migratory / cytostatic vs direct cytocidal cell viability
+    "STUDY_DESIGN",         # Prospective vs retrospective, unblinded vs blinded architecture
+    "BIOLOGICAL_CONTEXT",   # Basal pathway competency, receptor expression, or resistance mutations
+    "STATISTICAL_POWER",    # Small sample size, underpowered cohort, or high measurement variance
+    "MEASUREMENT_METHOD"    # Operator variability, instrument sensitivity, or calibration protocol
 ]
+
+# Legacy aliases preserved for backwards compatibility with earlier test suites
+CONTRADICTION_ROOT_CAUSES: List[str] = list(dict.fromkeys(
+    GENERIC_CONTRADICTION_ROOT_CAUSES + [
+        "CELL_LINE", "DOSE", "EXPOSURE_TIME", "COMPOUND_PURITY",
+        "VIRAL_STRAIN", "MOI", "ASSAY_TYPE"
+    ]
+))
 
 # High-Value Paper Screener Scoring Weights (AIPOCH-adapted)
 HIGH_VALUE_SCORING_WEIGHTS: Dict[str, float] = {
