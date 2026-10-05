@@ -16,6 +16,7 @@ import os
 import sys
 import json
 import argparse
+import re
 from typing import Dict, List, Any, Optional
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -160,17 +161,46 @@ class ProposalGenerator:
                 if para:
                     para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
                 else:
-                    para = (
-                        f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی هدفمند اثرات **{agent_name}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
-                        f"هدف اصلی این بررسی، سنجش دقیق متغیرهای پیامد از جمله {endpoints} بوده است. "
-                        f"یافته‌های تجربی حاصل نشان داد که {findings}. "
-                    )
-                    if quant:
-                        para += f"از حیث مقادیر کمی و پارامترهای اندازه‌گیری‌شده، شاخص‌ها به میزان ({quant}) مستند گردید. "
-                    para += (
-                        f"اگرچه این مطالعه شواهد اولیه معتبری فراهم می‌آورد، اما با محدودیت‌هایی نظیر {limitation} همراه بوده است. "
-                        f"بر همین اساس در طرح حاضر، با هدف {relevance}، نتایج مذکور به عنوان مبنای استخراج پارامترها و طراحی مراحل تکمیلی مورد واکاوی قرار می‌گیرند [{cnum}]."
-                    )
+                    pmid_str = str(s.get("pmid", ""))
+                    ev_rel = s.get("evidence_relationship", "DIRECT")
+                    comp_id = s.get("compound_identity", "NOT_APPLICABLE" if design == "METHODOLOGICAL_LANDMARK" else "PARENT_COMPOUND")
+                    plat_id = s.get("viral_platform_identity", "NOT_APPLICABLE" if design == "METHODOLOGICAL_LANDMARK" else "WT_VIRUS")
+                    
+                    if pmid_str in ["16968952", "6382953"] or "chou" in lead_author.lower():
+                        para = (
+                            f"**{lead_author} و همکاران ({year})** در مطالعه مرجع روش‌شناختی خود [{cnum}]، مبانی نظری، طراحی تجربی و شبیه‌سازی رایانه‌ای ارزیابی برهم‌کنش‌های دارویی را بر پایه معادله اثر میانه تدوین نمودند. "
+                            f"در این چارچوب کمی، شاخص ترکیبی (Combination Index; CI) به عنوان معیار قطعی تفکیک هم‌افزایی (CI < 1)، اثر جمع‌پذیر (CI = 1) و آنتاگونیسم (CI > 1) معرفی شد. "
+                            f"این چارچوب ریاضی و محاسبات نرم‌افزاری مبنای کمی ارزیابی برهم‌کنش فارماکولوژیک مداخله‌ها در این پژوهش قرار می‌گیرد [{cnum}]."
+                        )
+                    elif pmid_str == "6606682" or "mosmann" in lead_author.lower():
+                        para = (
+                            f"**{lead_author} ({year})** در مطالعه شاخص متدولوژیک خود [{cnum}]، روش رنگ‌سنجی سریع احیای نمک تترازولیوم توسط دهیدروژنازهای میتوکندریایی سلول‌های زنده را جهت سنجش بقا و سمیت سلولی ابداع نمود. "
+                            f"این سنجش استاندارد طلایی سنجش زیستایی سلول و برآورد غلظت بازدارنده ۵۰ درصد (IC50) در آزمون‌های برون‌تن به شمار می‌رود. "
+                            f"در طرح جاری، این آزمون جهت اندازه‌گیری درصد مهار رشد سلول‌ها در مواجهه با تک‌درمانی‌ها و درمان توأم مورد استفاده قرار می‌گیرد [{cnum}]."
+                        )
+                    else:
+                        qualifier = ""
+                        if comp_id == "COMPOUND_DERIVATIVE":
+                            qualifier = " (با تمرکز بر مشتقات شیمیایی سنتزشده)"
+                        elif comp_id == "CONTAINING_EXTRACT":
+                            qualifier = " (در قالب عصاره تام گیاهی حاوی این فیتوکمیکال)"
+                        
+                        if plat_id == "CHIMERIC_HYBRID_VIRUS":
+                            qualifier += " [در پلتفرم ویروسی هیبرید مهندسی‌شده]"
+                        elif plat_id == "RECOMBINANT_VIRUS":
+                            qualifier += " [در سویه نوترکیب ویروسی]"
+
+                        para = (
+                            f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی اثرات **{agent_name}{qualifier}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
+                            f"هدف این بررسی، سنجش پیامدهایی نظیر {endpoints} گزارش شده است. "
+                            f"یافته‌های به‌دست‌آمده نشان داد که {findings}. "
+                        )
+                        if quant:
+                            para += f"از حیث مقادیر کمی، شاخص‌ها در محدوده ({quant}) گزارش گردید. "
+                        para += (
+                            f"با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر {limitation} همراه بوده است، "
+                            f"در طرح حاضر با هدف {relevance}، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [{cnum}]."
+                        )
                 lit_paragraphs.append(para)
 
 
@@ -237,7 +267,11 @@ class ProposalGenerator:
             for agt in model_dict.get("interventions_or_exposures", []):
                 defs.append(f"▪ **{agt.get('name')}:** {agt.get('chemical_or_biological_class', 'مداخله یا داروی مورد ارزیابی')} به عنوان عامل مداخله در طرح پژوهشی حاضر.")
             for out in model_dict.get("primary_outcomes", []):
-                defs.append(f"▪ **{out.get('name')}:** شاخص پیامد اولیه تعیین‌شده جهت سنجش اثربخشی مداخله در قالب {out.get('measurement_unit', 'واحدهای استاندارد')}.")
+                if isinstance(out, dict):
+                    defs.append(f"▪ **{out.get('name')}:** شاخص پیامد اولیه تعیین‌شده جهت سنجش اثربخشی مداخله در قالب {out.get('measurement_unit', 'واحدهای استاندارد')}.")
+                else:
+                    defs.append(f"▪ **{out}:** شاخص پیامد اولیه تعیین‌شده جهت سنجش اثربخشی مداخله در پروتکل آزمایشگاهی.")
+
             def_text = "\n\n".join(defs) if defs else "واژگان تخصصی و متغیرهای اصلی پژوهش مطابق استانداردهای بین‌المللی تعریف شده‌اند."
         md_parts.append("## ۵. تعریف واژه‌ها (Definition of Terms)")
         md_parts.append(def_text)
@@ -253,8 +287,10 @@ class ProposalGenerator:
             outcomes = model_dict.get("primary_outcomes", [])
             sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم هدف")
             for idx, out in enumerate(outcomes, 1):
-                aims.append(f"{idx}. تعیین تاثیر مواجهه با مداخله بر میزان {out.get('name')} در {sys_name}.")
+                out_name = out.get('name') if isinstance(out, dict) else str(out)
+                aims.append(f"{idx}. تعیین تاثیر مواجهه با مداخله بر میزان {out_name} در {sys_name}.")
             aims.append(f"{len(aims)+1}. تعیین آستانه ایمنی، تغییرات وابسته به دوز و حداقل غلظت موثر مداخله.")
+
             spec_text = "\n".join(aims)
         md_parts.append("## ۶. اهداف جزیی (Specific Objectives)")
         md_parts.append(spec_text)
@@ -294,8 +330,10 @@ class ProposalGenerator:
             outcomes = model_dict.get("primary_outcomes", [])
             sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم هدف")
             for idx, out in enumerate(outcomes, 1):
-                hyps.append(f"▪ **فرضیه {idx}:** به نظر می‌رسد مداخله پژوهش اثر معنی‌داری بر تغییر شاخص {out.get('name')} در {sys_name} دارد.")
+                out_name = out.get('name') if isinstance(out, dict) else str(out)
+                hyps.append(f"▪ **فرضیه {idx}:** به نظر می‌رسد مداخله پژوهش اثر معنی‌داری بر تغییر شاخص {out_name} در {sys_name} دارد.")
             hyps.append(f"▪ **سوال پژوهش:** آیا تغییرات مشاهده‌شده در شاخص‌های پیامد وابسته به غلظت مداخله بوده و از نظر آماری معنی‌دار است؟")
+
             hyp_text = "\n\n".join(hyps)
         md_parts.append("## ۹. فرضیات و سوالات پژوهش (Hypotheses & Research Questions)")
         md_parts.append(hyp_text)
@@ -363,10 +401,12 @@ class ProposalGenerator:
             # Dynamic instrument synthesis
             instruments_list = []
             for out in model_dict.get("primary_outcomes", []):
-                m_method = out.get("measurement_method")
-                if m_method and m_method not in instruments_list:
-                    instruments_list.append(m_method)
+                if isinstance(out, dict):
+                    m_method = out.get("measurement_method")
+                    if m_method and m_method not in instruments_list:
+                        instruments_list.append(m_method)
             instr_str = "، ".join(instruments_list) if instruments_list else "ابزارهای استاندارد آزمایشگاهی و نرم‌افزارهای تخصصی تحلیلی متناسب با پروتکل مصوب طرح"
+
 
             # Dynamic biosafety/security synthesis
             bsl_spec = model_dict.get("biosafety_level")

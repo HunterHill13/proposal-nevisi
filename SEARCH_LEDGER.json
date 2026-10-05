@@ -1,0 +1,522 @@
+{
+  "ledger_metadata": {
+    "audit_type": "ADVERSARIAL_SEARCH_STRATEGY_AUDIT",
+    "timestamp": "2026-10-04T19:54:37.195447Z",
+    "target_question": "Combined and synergistic effects of Lupeol + Newcastle Disease Virus on growth inhibition of A549 lung cancer cells in vitro",
+    "databases_queried": [
+      "PubMed / NCBI E-utilities",
+      "Europe PMC REST API"
+    ],
+    "total_search_families": 14
+  },
+  "search_families_evaluated": [
+    {
+      "query_id": "QRY_01",
+      "exact_query": "Lupeol AND NDV",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 0,
+        "ids": []
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 25,
+        "sample_titles": [
+          "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+          "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+          "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+          "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+          "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": "Zero PubMed results for direct Lupeol + NDV combination."
+    },
+    {
+      "query_id": "QRY_02",
+      "exact_query": "Lupeol AND Newcastle disease virus",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 0,
+        "ids": []
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 42,
+        "sample_titles": [
+          "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+          "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+          "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+          "The Mechanisms of Lipid Vesicle Fusion Inhibition by Extracts of Chaga and Buckthorn Leaves.",
+          "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": "Zero PubMed results for direct Lupeol + NDV combination."
+    },
+    {
+      "query_id": "QRY_03",
+      "exact_query": "Lupeol AND A549",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 40,
+        "ids": [
+          "41297068",
+          "40951590",
+          "40572628",
+          "39905146",
+          "39715024",
+          "39460490",
+          "39459325",
+          "39369566",
+          "39336114",
+          "39274838",
+          "38931361",
+          "38491315",
+          "38475570",
+          "37845669",
+          "37688779",
+          "36770745",
+          "36566006",
+          "34832879",
+          "32329697",
+          "32011174"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 512,
+        "sample_titles": [
+          "Biological assessment of Coccinia grandis leaf and Lupeol against β-lactam resistant Klebsiella pneumoniae through integrated in-silico and in-vitro studies.",
+          "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+          "Lupeol- and Cis-Vaccenic Acid-Containing Bioactive Fraction of &lt;i&gt;Mondia whitei&lt;/i&gt; Induces Vacuolation-Associated Cytotoxicity Through Autophagy-Lysosome Perturbation and Caspase-Dependent Apoptosis in Human Colorectal Adenocarcinoma Cells.",
+          "Targeting BCL-XL-mediated apoptotic resistance in lung cancer: &lt;i&gt;in silico&lt;/i&gt; and &lt;i&gt;in vitro&lt;/i&gt; identification of bioactive inhibitors from &lt;i&gt;Ailanthus excelsa&lt;/i&gt; chloroform extract.",
+          "Eriosema glomeratum Possessed Interesting Bioactive Constituents and Semisynthetic Derivatives With Relevant Biosynthetic Correlation and Important Chemophenetic Significance."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_04",
+      "exact_query": "Lupeol AND lung cancer",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 45,
+        "ids": [
+          "42043592",
+          "41297068",
+          "40951590",
+          "39861671",
+          "39459325",
+          "39369566",
+          "39336114",
+          "39274838",
+          "39171593",
+          "39067743",
+          "38996388",
+          "38931361",
+          "38475570",
+          "38338342",
+          "37845669",
+          "37688779",
+          "36566006",
+          "34940064",
+          "34832879",
+          "34391861"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 1060,
+        "sample_titles": [
+          "Dietary Terpenoids in Advancing Biofilm-Mediated Cancer Prevention: Antibiofilm Cascade, Molecular Crosstalk, and Nano-Facilitated Functional Delivery.",
+          "Targeting BCL-XL-mediated apoptotic resistance in lung cancer: &lt;i&gt;in silico&lt;/i&gt; and &lt;i&gt;in vitro&lt;/i&gt; identification of bioactive inhibitors from &lt;i&gt;Ailanthus excelsa&lt;/i&gt; chloroform extract.",
+          "The phytochemistry and pharmacological activities of &lt;i&gt;Clinacanthus nutans&lt;/i&gt; (Burm. f.) Lindau: current evidence, mechanistic insights, and future therapeutic perspectives.",
+          "Signaling pathways and molecular mechanisms of lupeol in colorectal cancer: A comprehensive review.",
+          "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_05",
+      "exact_query": "NDV AND A549",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 41,
+        "ids": [
+          "42699700",
+          "41942850",
+          "41170972",
+          "40896365",
+          "39792924",
+          "39642411",
+          "39282446",
+          "39253522",
+          "38211361",
+          "36794935",
+          "35993169",
+          "35139115",
+          "33968198",
+          "32479542",
+          "32409746",
+          "31767828",
+          "31641164",
+          "31270229",
+          "31118100",
+          "30658866"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 917,
+        "sample_titles": [
+          "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+          "The K247 ubiquitination site of the Newcastle disease virus M protein enhances viral budding to facilitate rapid exploitation of host cell sphingolipid metabolites.",
+          "Oncolytic virus hijacks GOT1 and pyrimidinosomes to fuel pyrimidine synthesis for replication in tumor cells.",
+          "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+          "Newcastle disease virus hijacks mitophagy to reprogram amino acid metabolism for enhanced replication."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_06",
+      "exact_query": "NDV AND lung cancer",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 64,
+        "ids": [
+          "41674174",
+          "41322194",
+          "41271759",
+          "40896365",
+          "40713180",
+          "40456237",
+          "40382521",
+          "39642411",
+          "39624055",
+          "39122606",
+          "39066351",
+          "38328418",
+          "38172101",
+          "38100982",
+          "38069269",
+          "37863065",
+          "37051644",
+          "36738232",
+          "36581658",
+          "36044897"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 2113,
+        "sample_titles": [
+          "Next-generation oncolytic virotherapy for lung cancer: bridging innovative vector engineering with clinical immunotherapy.",
+          "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+          "Advances in oncolytic viruses immunotherapy of hepatocellular carcinoma.",
+          "Oncolytic virotherapy mobilizes tumor-resident, granzyme B-producing bystander CD4&lt;sup&gt;+&lt;/sup&gt; T cells to inhibit systemic microbial infection.",
+          "Developing an oncolytic Newcastle disease virus production process with EB66 cells."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_07",
+      "exact_query": "Lupeol AND NDV AND A549",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 0,
+        "ids": []
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 7,
+        "sample_titles": [
+          "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+          "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+          "New insights of propolis nanoformulation and its therapeutic potential in human diseases.",
+          "Antiviral Potential of Selected Medicinal Herbs and Their Isolated Natural Products.",
+          "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": "Zero PubMed results for direct Lupeol + NDV combination."
+    },
+    {
+      "query_id": "QRY_08",
+      "exact_query": "Lupeol AND Newcastle disease virus AND lung",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 0,
+        "ids": []
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 27,
+        "sample_titles": [
+          "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+          "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+          "Antiviral and Immune Enhancement Effect of &lt;i&gt;Platycodon grandiflorus&lt;/i&gt; in Viral Diseases: A Potential Broad-Spectrum Antiviral Drug.",
+          "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+          "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": "Zero PubMed results for direct Lupeol + NDV combination."
+    },
+    {
+      "query_id": "QRY_09",
+      "exact_query": "lupeol AND combination AND cancer",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 37,
+        "ids": [
+          "42189166",
+          "41223589",
+          "41062899",
+          "40908716",
+          "38943695",
+          "38047085",
+          "37777120",
+          "37011877",
+          "36072559",
+          "36063341",
+          "35113358",
+          "34906285",
+          "34536514",
+          "34157816",
+          "33984593",
+          "33496144",
+          "32617102",
+          "32011174",
+          "31969092",
+          "31108322"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 1310,
+        "sample_titles": [
+          "The synergistic efficacy of lupeol and enzalutamide potentiates anticancer activity, inducing apoptosis and cell cycle arrest in breast cancer cells.",
+          "Cytotoxic Triterpenes from Argan Pulp (&lt;i&gt;Argania spinosa&lt;/i&gt;): Isolation, In Vitro Evaluation on Cancer Cell Lines, and In Silico Studies.",
+          "Dietary Terpenoids in Advancing Biofilm-Mediated Cancer Prevention: Antibiofilm Cascade, Molecular Crosstalk, and Nano-Facilitated Functional Delivery.",
+          "The phytochemistry and pharmacological activities of &lt;i&gt;Clinacanthus nutans&lt;/i&gt; (Burm. f.) Lindau: current evidence, mechanistic insights, and future therapeutic perspectives.",
+          "Signaling pathways and molecular mechanisms of lupeol in colorectal cancer: A comprehensive review."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_10",
+      "exact_query": "NDV AND combination AND cancer",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 131,
+        "ids": [
+          "42799649",
+          "42519394",
+          "42329540",
+          "42155154",
+          "41938014",
+          "41866332",
+          "41479917",
+          "41322194",
+          "41257772",
+          "40950045",
+          "40907241",
+          "40713180",
+          "40461490",
+          "40403026",
+          "40382521",
+          "40223343",
+          "39624055",
+          "39551600",
+          "39467343",
+          "39390431"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 2530,
+        "sample_titles": [
+          "Next-generation oncolytic virotherapy for lung cancer: bridging innovative vector engineering with clinical immunotherapy.",
+          "Advances in oncolytic viruses immunotherapy of hepatocellular carcinoma.",
+          "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+          "Oncolytic virotherapy with chimeric rVSV-NDV causes tumor-specific immunity in a DC-activation-dependent manner.",
+          "Natural killer cell activated by attenuated newcastle disease virus (NDV) as anti-cancer therapy."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_11",
+      "exact_query": "lupeol AND synerg*",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 40,
+        "ids": [
+          "42458926",
+          "42283884",
+          "42189166",
+          "41970248",
+          "41767670",
+          "41303616",
+          "41062899",
+          "40472393",
+          "39582514",
+          "38842663",
+          "38047085",
+          "36138544",
+          "36063341",
+          "35138221",
+          "35113358",
+          "34930096",
+          "34777686",
+          "33002744",
+          "31631691",
+          "30954555"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 1565,
+        "sample_titles": [
+          "Cytotoxic Triterpenes from Argan Pulp (&lt;i&gt;Argania spinosa&lt;/i&gt;): Isolation, In Vitro Evaluation on Cancer Cell Lines, and In Silico Studies.",
+          "Larvicidal and Repellent Effects Against Vector Mosquitoes &lt;i&gt;Anopheles stephensi&lt;/i&gt; and &lt;i&gt;Aedes aegypti&lt;/i&gt; (Diptera: Culicidae) for &lt;i&gt;Alstonia scholaris&lt;/i&gt; Linn R Br Flower and Prospective Characterisation of Bioactive Extract.",
+          "Crateva religiosa and Allied Species in Traditional Knowledge and Modern Pharmacology: A Review.",
+          "The synergistic efficacy of lupeol and enzalutamide potentiates anticancer activity, inducing apoptosis and cell cycle arrest in breast cancer cells.",
+          "Computational identification of inhibitors from Aegle marmelos leaf extract targeting ergosterol biosynthesis ERG4/ERG24 enzyme and serine proteases for combatting mancozeb-resistant Fusarium."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_12",
+      "exact_query": "NDV AND synerg*",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 79,
+        "ids": [
+          "42799649",
+          "42317459",
+          "42069790",
+          "41938014",
+          "41893668",
+          "41438037",
+          "41322194",
+          "41257772",
+          "40907241",
+          "40713180",
+          "40543261",
+          "40403026",
+          "40101975",
+          "39708674",
+          "39624055",
+          "39467343",
+          "39342590",
+          "39141643",
+          "38682055",
+          "38199445"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 2548,
+        "sample_titles": [
+          "Stability of the two enveloped viruses NDV LaSota and YF-ZIKprM/E to support process development.",
+          "Ex vivo evaluation of Newcastle disease virus to enhance natural killer cell function against acute myeloid leukemia cells.",
+          "Transcriptome Analysis of the Effects of Compound Microecological Preparation on Chickens Challenged with Newcastle Disease Virus.",
+          "Avian paramyxovirus type 1-associated severe pneumonia in humans: Molecular characterization and zoonotic transmission risk.",
+          "Next-generation oncolytic virotherapy for lung cancer: bridging innovative vector engineering with clinical immunotherapy."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_13",
+      "exact_query": "Lupeol AND apoptosis AND A549",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 11,
+        "ids": [
+          "41297068",
+          "40951590",
+          "39460490",
+          "39459325",
+          "39369566",
+          "39274838",
+          "38931361",
+          "37845669",
+          "29343765",
+          "25434991",
+          "21939652"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 416,
+        "sample_titles": [
+          "Lupeol- and Cis-Vaccenic Acid-Containing Bioactive Fraction of &lt;i&gt;Mondia whitei&lt;/i&gt; Induces Vacuolation-Associated Cytotoxicity Through Autophagy-Lysosome Perturbation and Caspase-Dependent Apoptosis in Human Colorectal Adenocarcinoma Cells.",
+          "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+          "Targeting BCL-XL-mediated apoptotic resistance in lung cancer: &lt;i&gt;in silico&lt;/i&gt; and &lt;i&gt;in vitro&lt;/i&gt; identification of bioactive inhibitors from &lt;i&gt;Ailanthus excelsa&lt;/i&gt; chloroform extract.",
+          "Biological assessment of Coccinia grandis leaf and Lupeol against β-lactam resistant Klebsiella pneumoniae through integrated in-silico and in-vitro studies.",
+          "The phytochemistry and pharmacological activities of &lt;i&gt;Clinacanthus nutans&lt;/i&gt; (Burm. f.) Lindau: current evidence, mechanistic insights, and future therapeutic perspectives."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    },
+    {
+      "query_id": "QRY_14",
+      "exact_query": "NDV AND apoptosis AND A549",
+      "pubmed": {
+        "status": "SUCCESS",
+        "count": 19,
+        "ids": [
+          "40896365",
+          "35139115",
+          "33968198",
+          "31767828",
+          "31641164",
+          "30246439",
+          "30216776",
+          "29399179",
+          "28974241",
+          "25364430",
+          "25322856",
+          "24885546",
+          "24796735",
+          "22095029",
+          "21936402",
+          "21865658",
+          "21625975",
+          "21471241",
+          "19621640"
+        ]
+      },
+      "europe_pmc": {
+        "status": "SUCCESS",
+        "count": 508,
+        "sample_titles": [
+          "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+          "The K247 ubiquitination site of the Newcastle disease virus M protein enhances viral budding to facilitate rapid exploitation of host cell sphingolipid metabolites.",
+          "Oncolytic Newcastle disease virus promotes tumor cell death via the anoikis effector Bit1 translocation.",
+          "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+          "Newcastle disease virus hijacks mitophagy to reprogram amino acid metabolism for enhanced replication."
+        ]
+      },
+      "direct_combination_detected": false,
+      "notes": ""
+    }
+  ]
+}

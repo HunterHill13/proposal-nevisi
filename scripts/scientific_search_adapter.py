@@ -1136,7 +1136,7 @@ class ScientificSearchAdapter:
         )
 
         return {
-            "search_adapter_version": "8.2.0",
+            "search_adapter_version": "8.3.0",
             "execution_mode": search_result.get("execution_mode"),
             "search_provenance": {
                 "queries_executed": len(queries),
@@ -1153,6 +1153,102 @@ class ScientificSearchAdapter:
             "excluded_candidates_count": selection_result.get("excluded_candidates_count"),
             "excluded_candidates": selection_result.get("excluded_candidates"),
             "axis_distribution": selection_result.get("axis_distribution")
+        }
+
+    @classmethod
+    def execute_search_gap_audit(
+        cls,
+        queries: List[str],
+        databases: Optional[List[str]] = None,
+        mode: str = "online",
+        polite_email: str = "researcher@academic-institution.edu"
+    ) -> Dict[str, Any]:
+        """v8.3 Search Gap Audit (Section 9):
+        Executes explicit combination queries across scientific databases (PubMed, Europe PMC).
+        Catalogs total_hits, candidate_records, direct_hits, and near_hits for each query.
+        Returns formal gap assessment without unverified speculation.
+        """
+        import datetime
+        adapter = cls(polite_email=polite_email)
+        dbs = databases or ["PubMed", "Europe PMC"]
+        timestamp = datetime.datetime.now().isoformat()
+        
+        audit_records = []
+        overall_direct_hits = 0
+
+        for q in queries:
+            q_clean = q.strip()
+            row = {
+                "query": q_clean,
+                "timestamp": timestamp,
+                "database_results": {}
+            }
+            total_hits_query = 0
+            direct_hits_query = 0
+            near_hits_query = 0
+
+            for db in dbs:
+                if db == "PubMed":
+                    res = adapter.query_pubmed(q_clean, max_results=10, mode=mode)
+                elif db == "Europe PMC":
+                    res = adapter.query_europe_pmc(q_clean, max_results=10, mode=mode)
+                else:
+                    res = {"results_count": 0, "records": []}
+
+                cnt = res.get("results_count", 0)
+                recs = res.get("records", [])
+                total_hits_query += cnt
+
+                # Classify direct vs near hits dynamically from query terms
+                direct_for_db = 0
+                near_for_db = 0
+                q_tokens = [w.lower().strip('"') for w in re.split(r'\s+AND\s+|\s+OR\s+|\s+', q_clean) if len(w) > 2 and w.upper() not in ["AND", "OR", "NOT"]]
+                
+                for r in recs:
+                    t_lower = str(r.get("title", "")).lower()
+                    a_lower = str(r.get("abstract", "")).lower()
+                    text = f"{t_lower} {a_lower}"
+                    
+                    matches = sum(1 for tok in q_tokens if tok in text)
+                    if matches >= min(2, len(q_tokens)):
+                        direct_for_db += 1
+                    else:
+                        near_for_db += 1
+
+                direct_hits_query += direct_for_db
+                near_hits_query += near_for_db
+
+                row["database_results"][db] = {
+                    "total_hits": cnt,
+                    "records_inspected": len(recs),
+                    "direct_combination_hits": direct_for_db,
+                    "near_hits": near_for_db,
+                    "sample_titles": [r.get("title") for r in recs[:3]]
+                }
+
+            row["total_hits"] = total_hits_query
+            row["direct_hits"] = direct_hits_query
+            row["near_hits"] = near_hits_query
+            audit_records.append(row)
+            overall_direct_hits += direct_hits_query
+
+        gap_status = "NO_DIRECT_STUDY_IDENTIFIED" if overall_direct_hits == 0 else "DIRECT_EVIDENCE_EXISTS"
+        novelty_statement_allowed = (
+            "در جست‌وجوی پایگاه‌های مورد بررسی، مطالعه‌ای که به‌طور مستقیم ترکیب عوامل مداخله هدف را در مدل سلولی ارزیابی کرده باشد شناسایی نشد."
+            if gap_status == "NO_DIRECT_STUDY_IDENTIFIED" else
+            "شواهد تجربی مستقیم در پایگاه‌های استنادی شناسایی گردید."
+        )
+
+        return {
+            "audit_type": "SEARCH_GAP_AUDIT",
+            "search_adapter_version": "8.3.0",
+            "timestamp": timestamp,
+            "queries_evaluated_count": len(queries),
+            "databases_queried": dbs,
+            "overall_direct_combination_hits": overall_direct_hits,
+            "search_gap_status": gap_status,
+            "novelty_statement_allowed": novelty_statement_allowed,
+            "queries_audit": audit_records
         }
 
 

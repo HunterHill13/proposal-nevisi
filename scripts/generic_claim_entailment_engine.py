@@ -612,6 +612,123 @@ class GenericClaimEntailmentEngine:
             "recommendation": "Text density meets scientific citation grounding standards." if is_adequate else "Text length is disproportionately large compared to cited evidence; strengthen empirical grounding."
         }
 
+    @classmethod
+    def audit_citation_to_claims(
+        cls,
+        claims: List[Dict[str, Any]],
+        reference_records: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """v8.3 Citation-to-Claim Audit (Section 10):
+        Verifies every scientific assertion against supporting references and evidence relationships.
+        Enforces that unsupported overclaims (such as direct synergy without direct combination data)
+        are flagged for REVISION or REJECTION.
+        """
+        ref_map = {}
+        for r in reference_records:
+            for field in ["ref_id", "pmid", "doi", "citation_number"]:
+                val = r.get(field)
+                if val:
+                    ref_map[str(val).strip().lower()] = r
+
+        audited_claims = []
+        rejected_claims = []
+        revised_claims = []
+        accepted_claims = []
+
+        for clm in claims:
+            cid = clm.get("claim_id", "CLM_UNKNOWN")
+            ctext = clm.get("claim_text", "")
+            supp_refs = clm.get("supporting_references", [])
+            
+            # Map supporting references to records
+            matched_records = []
+            for sr in supp_refs:
+                key = str(sr).strip().lower()
+                if key in ref_map:
+                    matched_records.append(ref_map[key])
+
+
+            # Evaluate synergy claim strictness
+            is_synergy = bool(re.search(r'\b(?:synergistic|synergy|cooperative|supra-additive)\b', ctext, re.IGNORECASE))
+            
+            support_strength = "UNSUPPORTED"
+            ev_rel = "INDIRECT"
+            status = "ACCEPT"
+            reason = "Supported by empirical reference."
+
+            if not matched_records:
+                status = "REJECT"
+                reason = "No verified supporting reference provided in portfolio."
+                support_strength = "UNSUPPORTED"
+            elif is_synergy:
+                # Synergy claim requires direct combination evidence
+                has_direct_synergy = any(r.get("synergy_evidence") == "DIRECT" for r in matched_records)
+                has_analog_synergy = any(r.get("synergy_evidence") == "ANALOGOUS" for r in matched_records)
+                
+                if has_direct_synergy:
+                    support_strength = "DIRECT"
+                    ev_rel = "DIRECT"
+                    status = "ACCEPT"
+                    reason = "Direct combination evidence with quantitative synergy assessment."
+                elif has_analog_synergy:
+                    support_strength = "ANALOGOUS"
+                    ev_rel = "CLOSE_ANALOG"
+                    status = "REVISE"
+                    reason = "Direct combination evidence not identified; claim must use cautious analogous language."
+                else:
+                    support_strength = "INSUFFICIENT"
+                    ev_rel = "INDIRECT"
+                    status = "REJECT"
+                    reason = "Synergy cannot be inferred from separate monotherapy studies."
+            else:
+                # Non-synergy claims
+                best_rel = "INDIRECT"
+                for mr in matched_records:
+                    mr_rel = mr.get("evidence_relationship", "INDIRECT")
+                    if mr_rel == "DIRECT":
+                        best_rel = "DIRECT"
+                        break
+                    elif mr_rel == "CLOSE_ANALOG" and best_rel != "DIRECT":
+                        best_rel = "CLOSE_ANALOG"
+                    elif mr_rel == "MECHANISTIC_SUPPORT" and best_rel not in ["DIRECT", "CLOSE_ANALOG"]:
+                        best_rel = "MECHANISTIC_SUPPORT"
+                    elif mr_rel == "METHOD_SUPPORT" and best_rel not in ["DIRECT", "CLOSE_ANALOG", "MECHANISTIC_SUPPORT"]:
+                        best_rel = "METHOD_SUPPORT"
+
+                ev_rel = best_rel
+                support_strength = "DIRECT" if best_rel == "DIRECT" else ("PARTIAL" if best_rel in ["CLOSE_ANALOG", "MECHANISTIC_SUPPORT"] else "INDIRECT")
+                status = "ACCEPT" if best_rel in ["DIRECT", "CLOSE_ANALOG", "MECHANISTIC_SUPPORT", "METHOD_SUPPORT"] else "REVISE"
+
+            item = {
+                "claim_id": cid,
+                "claim_text": ctext,
+                "supporting_references": supp_refs,
+                "support_strength": support_strength,
+                "evidence_relationship": ev_rel,
+                "status": status,
+                "audit_note": reason
+            }
+            audited_claims.append(item)
+            if status == "ACCEPT":
+                accepted_claims.append(item)
+            elif status == "REVISE":
+                revised_claims.append(item)
+            else:
+                rejected_claims.append(item)
+
+        return {
+            "audit_type": "CITATION_TO_CLAIM_AUDIT",
+            "total_claims_audited": len(claims),
+            "accepted_count": len(accepted_claims),
+            "revised_count": len(revised_claims),
+            "rejected_count": len(rejected_claims),
+            "all_passed": len(rejected_claims) == 0,
+            "audited_claims": audited_claims,
+            "rejected_claims": rejected_claims,
+            "revised_claims": revised_claims
+        }
+
+
 
 if __name__ == "__main__":
     study_obs = {"study_id": "STUDY_OBS_01", "study_design": "OBSERVATIONAL_COHORT_CASE_CONTROL"}

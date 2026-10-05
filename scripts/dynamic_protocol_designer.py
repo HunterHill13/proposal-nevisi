@@ -78,7 +78,7 @@ class DynamicProtocolDesigner:
         # 1. Independent Variables (Interventions)
         interventions = model_dict.get("interventions_or_exposures", [])
         for agt in interventions:
-            name = agt.get("name", "مداخله پژوهش")
+            name = agt.get("name", "مداخله پژوهش") if isinstance(agt, dict) else str(agt)
             variables.append({
                 "name": name,
                 "role": "مستقل (Independent)",
@@ -91,8 +91,8 @@ class DynamicProtocolDesigner:
         # 2. Dependent Variables (Primary Outcomes)
         outcomes = model_dict.get("primary_outcomes", [])
         for out in outcomes:
-            name = out.get("name", "پیامد اولیه")
-            unit = out.get("measurement_unit", "درصد مهار")
+            name = out.get("name", "پیامد اولیه") if isinstance(out, dict) else str(out)
+            unit = out.get("measurement_unit", "درصد مهار") if isinstance(out, dict) else "درصد مهار"
             variables.append({
                 "name": name,
                 "role": "وابسته (Dependent)",
@@ -105,7 +105,7 @@ class DynamicProtocolDesigner:
         # 3. Controls / Covariates
         comparators = model_dict.get("comparators", [])
         for comp in comparators:
-            cname = comp.get("name", "کنترل پایه")
+            cname = comp.get("name", "کنترل پایه") if isinstance(comp, dict) else str(comp)
             variables.append({
                 "name": cname,
                 "role": "کنترل پایه (Baseline Control)",
@@ -114,6 +114,7 @@ class DynamicProtocolDesigner:
                 "measurement_method": "انکوباسیون همزمان در شرایط یکسان با حلال فاقد ماده موثره",
                 "unit": "فاقد واحد (نسبت به کنترل)"
             })
+
 
         # 4. Confounders
         variables.append({

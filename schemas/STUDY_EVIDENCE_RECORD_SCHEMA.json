@@ -104,6 +104,51 @@
     "claims_supported": {
       "type": "array",
       "items": { "type": "string" }
+    },
+    "evidence_relationship": {
+      "type": "string",
+      "enum": [
+        "DIRECT",
+        "CLOSE_ANALOG",
+        "MECHANISTIC_SUPPORT",
+        "METHOD_SUPPORT",
+        "BACKGROUND",
+        "INDIRECT"
+      ]
+    },
+    "compound_identity": {
+      "type": "string",
+      "enum": [
+        "PARENT_COMPOUND",
+        "COMPOUND_DERIVATIVE",
+        "COMPOUND_ANALOG",
+        "CONTAINING_EXTRACT",
+        "UNKNOWN_IDENTITY"
+      ]
+    },
+    "viral_platform_identity": {
+      "type": "string",
+      "enum": [
+        "WT_VIRUS",
+        "VIRUS_STRAIN_SPECIFIED",
+        "RECOMBINANT_VIRUS",
+        "ENGINEERED_VIRUS",
+        "CHIMERIC_HYBRID_VIRUS",
+        "VIRUS_DERIVED_PLATFORM",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "model_match": {
+      "type": "string",
+      "enum": ["EXACT", "CLOSE", "DIFFERENT", "UNKNOWN"]
+    },
+    "synergy_evidence": {
+      "type": "string",
+      "enum": ["DIRECT", "ANALOGOUS", "MONOTHERAPY_ONLY", "NOT_FOUND", "NOT_APPLICABLE"]
+    },
+    "ci_classification_source": {
+      "type": "string",
+      "enum": ["CHOU_2006_LANDMARK", "CHOU_TALALAY_1984", "EMPIRICAL_STUDY", "UNVERIFIED"]
     }
   }
 }

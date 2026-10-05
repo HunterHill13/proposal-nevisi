@@ -1,0 +1,1161 @@
+[
+  {
+    "study_id": "PMID_39369566",
+    "doi": "10.1016/j.bmc.2024.117934",
+    "pmid": "39369566",
+    "title": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives",
+    "authors": [
+      "Chen Z",
+      "Luo R",
+      "Xu T",
+      "Wang L",
+      "Deng S",
+      "Wu J",
+      "Wang H",
+      "Lin Y",
+      "Bu M"
+    ],
+    "year": 2024,
+    "journal": "Bioorg Med Chem",
+    "study_family_id": "FAM_39369566",
+    "study_design": "PRECLINICAL_ANIMAL_XENOGRAFT",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "GROWTH_INHIBITION",
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "CELL_CYCLE",
+        "SELECTIVITY",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "COMPOUND_DERIVATIVE",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_33968198",
+    "doi": "10.3892/ol.2021.12743",
+    "pmid": "33968198",
+    "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells",
+    "authors": [
+      "Liang Y",
+      "Tian WY",
+      "Huang JJ",
+      "Gao LX",
+      "Fan XH"
+    ],
+    "year": 2021,
+    "journal": "Oncol Lett",
+    "study_family_id": "FAM_33968198",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "DIRECT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "VIRUS_STRAIN_SPECIFIED",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_39624055",
+    "doi": "10.1016/j.omton.2024.200899",
+    "pmid": "39624055",
+    "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer",
+    "authors": [
+      "Rosewell Shaw A",
+      "Morita D",
+      "Porter CE",
+      "Tu E",
+      "Biegert GW",
+      "Agrawal S",
+      "Durham N",
+      "Brenner MK",
+      "Suzuki M"
+    ],
+    "year": 2024,
+    "journal": "Mol Ther Oncol",
+    "study_family_id": "FAM_39624055",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "CHIMERIC_HYBRID_VIRUS",
+    "model_match": "CLOSE",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_41170972",
+    "doi": "10.1128/jvi.01576-25",
+    "pmid": "41170972",
+    "title": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection",
+    "authors": [
+      "Zhao C",
+      "Tang N",
+      "Wang J",
+      "Qu Y",
+      "Tan L",
+      "Song C",
+      "Qiu X",
+      "Liao Y",
+      "Luo T",
+      "Ding C",
+      "Sun Y"
+    ],
+    "year": 2025,
+    "journal": "J Virol",
+    "study_family_id": "FAM_41170972",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "DIRECT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "WT_VIRUS",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_42621169",
+    "doi": "10.1007/s10616-026-01049-w",
+    "pmid": "42621169",
+    "title": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC)",
+    "authors": [
+      "Kumar A",
+      "Bhardwaj N",
+      "Sharma R",
+      "Thakur P",
+      "Singh K",
+      "Chaudhary A",
+      "Kaur S",
+      "Arora S",
+      "Bhatia A"
+    ],
+    "year": 2026,
+    "journal": "Cytotechnology",
+    "study_family_id": "FAM_42621169",
+    "study_design": "PRECLINICAL_ANIMAL_XENOGRAFT",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "SYNERGY",
+        "CI"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "ANALOGOUS",
+    "ci_classification_source": "EMPIRICAL_STUDY"
+  },
+  {
+    "study_id": "PMID_41297068",
+    "doi": "10.1016/j.bmc.2025.118498",
+    "pmid": "41297068",
+    "title": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity",
+    "authors": [
+      "Zhao Y",
+      "Hou L",
+      "Tian S",
+      "Zhu M",
+      "Wu J",
+      "Ma Y",
+      "Bu M",
+      "Lin Y"
+    ],
+    "year": 2026,
+    "journal": "Bioorg Med Chem",
+    "study_family_id": "FAM_41297068",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "GROWTH_INHIBITION",
+        "APOPTOSIS",
+        "CELL_CYCLE",
+        "SELECTIVITY",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "COMPOUND_DERIVATIVE",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_39336114",
+    "doi": "10.3390/biology13090687",
+    "pmid": "39336114",
+    "title": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa",
+    "authors": [
+      "Seglab F",
+      "Abou Assali M",
+      "AlYafei T",
+      "Hassan H",
+      "Pinto DCGA",
+      "Baydoun S",
+      "Al Thani AA",
+      "Shaito AA"
+    ],
+    "year": 2024,
+    "journal": "Biology (Basel)",
+    "study_family_id": "FAM_39336114",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY",
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "CONTAINING_EXTRACT",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_39274838",
+    "doi": "10.3390/molecules29173990",
+    "pmid": "39274838",
+    "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents",
+    "authors": [
+      "Tian S",
+      "Zhao Y",
+      "Deng S",
+      "Hou L",
+      "Song J",
+      "Wang M",
+      "Bu M"
+    ],
+    "year": 2024,
+    "journal": "Molecules",
+    "study_family_id": "FAM_39274838",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "GROWTH_INHIBITION",
+        "APOPTOSIS",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "COMPOUND_DERIVATIVE",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_41942850",
+    "doi": "10.1186/s12864-026-12760-5",
+    "pmid": "41942850",
+    "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism",
+    "authors": [
+      "Sun Y",
+      "Fang T",
+      "Tan L",
+      "Song C",
+      "Qiu X",
+      "Liao Y",
+      "Sun Y",
+      "Liu X",
+      "Ding C",
+      "Meng C"
+    ],
+    "year": 2026,
+    "journal": "BMC Genomics",
+    "study_family_id": "FAM_41942850",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "DIRECT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "WT_VIRUS",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_37845669",
+    "doi": "10.1186/s12906-023-04201-7",
+    "pmid": "37845669",
+    "title": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line",
+    "authors": [
+      "Aborehab NM",
+      "Salama MM",
+      "Ezzat SM"
+    ],
+    "year": 2023,
+    "journal": "BMC Complement Med Ther",
+    "study_family_id": "FAM_37845669",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CELL_CYCLE"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "CONTAINING_EXTRACT",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_39459325",
+    "doi": "10.3390/molecules29204957",
+    "pmid": "39459325",
+    "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway",
+    "authors": [
+      "Deng S",
+      "Zhao Y",
+      "Guo X",
+      "Hong X",
+      "Li G",
+      "Wang Y",
+      "Li Q",
+      "Bu M",
+      "Wang M"
+    ],
+    "year": 2024,
+    "journal": "Molecules",
+    "study_family_id": "FAM_39459325",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "COMPOUND_DERIVATIVE",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_40896365",
+    "doi": "10.1016/j.omton.2025.201027",
+    "pmid": "40896365",
+    "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells",
+    "authors": [
+      "Kortum F",
+      "Hartmann N",
+      "Bryan A",
+      "Glauß S",
+      "Altomonte J"
+    ],
+    "year": 2025,
+    "journal": "Mol Ther Oncol",
+    "study_family_id": "FAM_40896365",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "CHIMERIC_HYBRID_VIRUS",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_38931361",
+    "doi": "10.3390/ph17060694",
+    "pmid": "38931361",
+    "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells",
+    "authors": [
+      "Torres-Sanchez A",
+      "Torres G",
+      "Estrada S",
+      "Perez D",
+      "Garcia C",
+      "Milian M",
+      "Velazquez E",
+      "Molina V",
+      "Delgado Y"
+    ],
+    "year": 2024,
+    "journal": "Pharmaceuticals (Basel)",
+    "study_family_id": "FAM_38931361",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "COMPOUND_ANALOG",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_41674174",
+    "doi": "10.18502/ijaai.v25i1.20440",
+    "pmid": "41674174",
+    "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line",
+    "authors": [
+      "Ali Akbar Esfahani M",
+      "Dorostkar R",
+      "Esmaeili Gouvarchin Ghaleh H",
+      "Ramezani R",
+      "Ramezani R",
+      "Mir Mohammad Sadeghi SM",
+      "Ghorbani Alvanegh A",
+      "Aghayan SK"
+    ],
+    "year": 2026,
+    "journal": "Iran J Allergy Asthma Immunol",
+    "study_family_id": "FAM_41674174",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY",
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "ONCOLYSIS",
+        "SELECTIVITY"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "WT_VIRUS",
+    "model_match": "DIFFERENT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_40382521",
+    "doi": "10.1038/s41434-025-00540-x",
+    "pmid": "40382521",
+    "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair",
+    "authors": [
+      "Liu L",
+      "Song L",
+      "Liu T",
+      "Hui K",
+      "Hu C",
+      "Yang J",
+      "Pi X",
+      "Yan Y",
+      "Liu S",
+      "Zhang Y",
+      "Chen H",
+      "Cao Y",
+      "Zhou L",
+      "Qiao Y",
+      "Yu D",
+      "Yin C",
+      "Li X",
+      "Zhang C",
+      "Li D",
+      "Wang Z",
+      "Liu Z",
+      "Jiang X"
+    ],
+    "year": 2025,
+    "journal": "Gene Ther",
+    "study_family_id": "FAM_40382521",
+    "study_design": "PRECLINICAL_ANIMAL_XENOGRAFT",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "GROWTH_INHIBITION",
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "RECOMBINANT_VIRUS",
+    "model_match": "CLOSE",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_40951590",
+    "doi": "10.1002/fsn3.70915",
+    "pmid": "40951590",
+    "title": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines",
+    "authors": [
+      "Shehzadi S",
+      "Noreen S",
+      "Imran H",
+      "Ikram A",
+      "Arshad MT",
+      "Gnedeka KT"
+    ],
+    "year": 2025,
+    "journal": "Food Sci Nutr",
+    "study_family_id": "FAM_40951590",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY",
+        "APOPTOSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_11_VARIABLE_TABLE"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "CONTAINING_EXTRACT",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_42699700",
+    "doi": "10.2147/itt.s614889",
+    "pmid": "42699700",
+    "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells",
+    "authors": [
+      "Ginting TE",
+      "Larasati YO",
+      "Cornelia V",
+      "Hidayat NR",
+      "Christian S",
+      "Zarkasie K",
+      "Yusuf I"
+    ],
+    "year": 2026,
+    "journal": "Immunotargets Ther",
+    "study_family_id": "FAM_42699700",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "SELECTIVITY"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_11_VARIABLE_TABLE"
+    ],
+    "evidence_relationship": "MECHANISTIC_SUPPORT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "VIRUS_STRAIN_SPECIFIED",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_42404852",
+    "doi": "10.1007/s10616-026-01019-2",
+    "pmid": "42404852",
+    "title": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line",
+    "authors": [
+      "Almalghooth HDM",
+      "Khalaj-Kondori M",
+      "Feizi MAH"
+    ],
+    "year": 2026,
+    "journal": "Cytotechnology",
+    "study_family_id": "FAM_42404852",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY",
+        "GROWTH_INHIBITION",
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "CELL_CYCLE",
+        "SYNERGY",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_11_VARIABLE_TABLE"
+    ],
+    "evidence_relationship": "CLOSE_ANALOG",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "ANALOGOUS",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_16968952",
+    "doi": "10.1124/pr.58.3.10",
+    "pmid": "16968952",
+    "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies",
+    "authors": [
+      "Chou TC"
+    ],
+    "year": 2006,
+    "journal": "Pharmacol Rev",
+    "study_family_id": "FAM_16968952",
+    "study_design": "METHODOLOGICAL_STANDARDIZATION",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "SYNERGY",
+        "CI"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "FOUNDATIONAL_LANDMARK",
+    "foundational_justification": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution.",
+    "claims_supported": [
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_13_METHODOLOGY"
+    ],
+    "evidence_relationship": "METHOD_SUPPORT",
+    "compound_identity": "PARENT_COMPOUND",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "NOT_APPLICABLE",
+    "ci_classification_source": "CHOU_2006_LANDMARK"
+  },
+  {
+    "study_id": "PMID_6606682",
+    "doi": "10.1016/0022-1759(83)90303-4",
+    "pmid": "6606682",
+    "title": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays",
+    "authors": [
+      "Mosmann T"
+    ],
+    "year": 1983,
+    "journal": "J Immunol Methods",
+    "study_family_id": "FAM_6606682",
+    "study_design": "METHODOLOGICAL_STANDARDIZATION",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "FOUNDATIONAL_LANDMARK",
+    "foundational_justification": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution.",
+    "claims_supported": [
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_13_METHODOLOGY"
+    ],
+    "evidence_relationship": "METHOD_SUPPORT",
+    "compound_identity": "PARENT_COMPOUND",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "NOT_APPLICABLE",
+    "ci_classification_source": "CHOU_2006_LANDMARK"
+  },
+  {
+    "study_id": "PMID_6382953",
+    "doi": "10.1016/0065-2571(84)90007-4",
+    "pmid": "6382953",
+    "title": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors",
+    "authors": [
+      "Chou TC",
+      "Talalay P"
+    ],
+    "year": 1984,
+    "journal": "Adv Enzyme Regul",
+    "study_family_id": "FAM_6382953",
+    "study_design": "METHODOLOGICAL_STANDARDIZATION",
+    "design_specific_attributes": {
+      "cell_line": "Various / NSCLC",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "SYNERGY",
+        "CI"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "FOUNDATIONAL_LANDMARK",
+    "foundational_justification": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution.",
+    "claims_supported": [
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_13_METHODOLOGY"
+    ],
+    "evidence_relationship": "METHOD_SUPPORT",
+    "compound_identity": "PARENT_COMPOUND",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "NOT_APPLICABLE",
+    "ci_classification_source": "CHOU_2006_LANDMARK"
+  },
+  {
+    "study_id": "PMID_32329697",
+    "doi": "10.2174/1871520620666200424131548",
+    "pmid": "32329697",
+    "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer",
+    "authors": [
+      "Bhatt M",
+      "Patel M",
+      "Adnan M",
+      "Reddy MN"
+    ],
+    "year": 2021,
+    "journal": "Anticancer Agents Med Chem",
+    "study_family_id": "FAM_32329697",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "OTHER"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "MECHANISTIC_SUPPORT",
+    "compound_identity": "PARENT_COMPOUND",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_42772808",
+    "doi": "10.1111/1759-7714.70393",
+    "pmid": "42772808",
+    "title": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling",
+    "authors": [
+      "Yu J",
+      "Chen S",
+      "Hou T",
+      "Weng X",
+      "Liu Y",
+      "Huang J",
+      "Yang Z",
+      "Bao J",
+      "Zhou C",
+      "Lv W",
+      "Wu Q",
+      "Xu Y",
+      "Zhou J"
+    ],
+    "year": 2026,
+    "journal": "Thorac Cancer",
+    "study_family_id": "FAM_42772808",
+    "study_design": "PRECLINICAL_ANIMAL_XENOGRAFT",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "MECHANISTIC_SUPPORT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_39792924",
+    "doi": "10.1371/journal.ppat.1012531",
+    "pmid": "39792924",
+    "title": "SLC35A2 gene product modulates paramyxovirus fusion events during infection",
+    "authors": [
+      "Yang Y",
+      "Wang Y",
+      "Campbell DE",
+      "Lee HW",
+      "Beatty W",
+      "Wang L",
+      "Baldridge M",
+      "López CB"
+    ],
+    "year": 2025,
+    "journal": "PLoS Pathog",
+    "study_family_id": "FAM_39792924",
+    "study_design": "IN_VITRO_EXPERIMENTAL",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "Bioassay"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "ONCOLYSIS"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_4_NECESSITY",
+      "SECTION_6_SPECIFIC_OBJECTIVES"
+    ],
+    "evidence_relationship": "INDIRECT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "RECOMBINANT_VIRUS",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  },
+  {
+    "study_id": "PMID_42633541",
+    "doi": "10.36721/pjps.2026.39.11.328.1",
+    "pmid": "42633541",
+    "title": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition",
+    "authors": [
+      "Sun J",
+      "Jifu C",
+      "Qiu Y",
+      "Lu L",
+      "Xu Z",
+      "He Z",
+      "Wang J"
+    ],
+    "year": 2026,
+    "journal": "Pak J Pharm Sci",
+    "study_family_id": "FAM_42633541",
+    "study_design": "PRECLINICAL_ANIMAL_XENOGRAFT",
+    "design_specific_attributes": {
+      "cell_line": "A549",
+      "assay": "MTT / Flow Cytometry / Western Blot"
+    },
+    "risk_of_bias": "LOW_ROB",
+    "quantitative_facts": {
+      "reported_effects": [
+        "CELL_VIABILITY",
+        "APOPTOSIS",
+        "CASPASE_ACTIVITY",
+        "CELL_CYCLE",
+        "IC50"
+      ]
+    },
+    "negative_or_null_findings": "None explicitly reported in published abstract.",
+    "fulltext_status": "ABSTRACT_AND_METADATA_VERIFIED",
+    "temporal_tier": "RECENT_PRIMARY",
+    "foundational_justification": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation.",
+    "claims_supported": [
+      "SECTION_2_PROBLEM_STATEMENT",
+      "SECTION_3_LITERATURE_REVIEW",
+      "SECTION_9_HYPOTHESES_QUESTIONS"
+    ],
+    "evidence_relationship": "MECHANISTIC_SUPPORT",
+    "compound_identity": "UNKNOWN_IDENTITY",
+    "viral_platform_identity": "NOT_APPLICABLE",
+    "model_match": "EXACT",
+    "synergy_evidence": "MONOTHERAPY_ONLY",
+    "ci_classification_source": "UNVERIFIED"
+  }
+]

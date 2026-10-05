@@ -1,0 +1,1070 @@
+{
+  "selection": {
+    "selection_status": "OPTIMAL_SELECTION_COMPLETE",
+    "screening_funnel": {
+      "stage_1_retrieved_broad_corpus": 27,
+      "stage_2_topic_screened": 27,
+      "stage_3_study_relevant": 27,
+      "stage_4_claim_entailed_eligible": 26,
+      "stage_5_final_proposal_selected": 25
+    },
+    "total_candidates_evaluated": 27,
+    "total_selected": 25,
+    "max_reference_ceiling": 25,
+    "min_reference_floor": 15,
+    "meets_quotas": true,
+    "selected_references": [
+      {
+        "pmid": "39369566",
+        "doi": "10.1016/j.bmc.2024.117934",
+        "title": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives",
+        "authors": [
+          "Chen Z",
+          "Luo R",
+          "Xu T",
+          "Wang L",
+          "Deng S",
+          "Wu J",
+          "Wang H",
+          "Lin Y",
+          "Bu M"
+        ],
+        "journal": "Bioorg Med Chem",
+        "year": 2024,
+        "publication_date": "2024 Nov 1",
+        "abstract": "Lupeol is a natural pentacyclic triterpenoid with a wide range of biological activities. To improve the water solubility and targeting of lupeol, in the following study, we synthesized 27 lupeol derivatives in the first series by introducing lipophilic cations with lupeol as the lead compound. Through the screening of different cancer cells, we found that some of the derivatives showed better activity than cisplatin against human non-small cell lung cancer A549 cells, among which compound 6c was found to have an IC50 value of 1.83 μM and a selectivity index of 21.02 (IC50MRC-5/IC50A549) against A549 cells. To further improve the antiproliferative activity of the compounds, we replaced the ester linkage of the linker with a carbamate linkage and synthesized a second series of five lupeol derivatives which were screened for activity, among which compound 14f was found to have an IC50 value of 1.36 μM and a selectivity index of 15.60 (IC50MRC-5/IC50A549) against A549 cells. We further evaluated the bioactivity of compounds 6c and 14f and found that both compounds induced apoptosis in A549 cells, promoted an increase in intracellular reactive oxygen species and decrease in mitochondrial membrane potential, and inhibited the cell cycle in the S phase. Of the compounds, compound 14f showed stronger bioactivity than compound 6c. We then selected compound 14f for molecular-level Western blot evaluation and in vivo evaluation in the zebrafish xenograft A549 tumor cell model. Compound 14f was found to significantly downregulate Bcl-2 protein expression and upregulate Bax, Cyt C, cleaved caspase-9, and cleaved caspase-3 protein expression, and 14f was found to be able to inhibit the proliferation of A549 cells in the zebrafish xenograft model. The above results suggest that compound 14f has great potential in the development of antitumor drugs targeting mitochondria.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "COMPOUND_DERIVATIVE",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "GROWTH_INHIBITION",
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "CELL_CYCLE",
+          "SELECTIVITY",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 1,
+        "selection_score": 83.3,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "33968198",
+        "doi": "10.3892/ol.2021.12743",
+        "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells",
+        "authors": [
+          "Liang Y",
+          "Tian WY",
+          "Huang JJ",
+          "Gao LX",
+          "Fan XH"
+        ],
+        "journal": "Oncol Lett",
+        "year": 2021,
+        "publication_date": "2021 Jun",
+        "abstract": "Tumor development and progression are closely associated with various microRNAs (miRNAs/miRs). We have previously shown that Newcastle disease virus (NDV) strain 7793 induces oncolysis in lung cancer. However, how NDV exerts its oncolytic effect on lung cancer remains to be investigated. The present study assessed the role of miR-204 in the NDV-induced oncolysis of lung cancer A549 cells by oncolysis induction in vitro. miR-204 was significantly upregulated in NDV-treated A549 cells. Overexpression or inhibition of miR-204 was significantly associated with NDV-induced oncolysis in A549 cells. Caspase-3 and Bax, major regulators of the apoptosis pathway, were regulated by miR-204, and the association between caspase-3-related apoptosis and miR-204 was identified in NDV-mediated oncolysis. These data demonstrated that miR-204 as a tumor suppressor played a role in NDV-induced oncolysis in lung cancer cells. The present study demonstrates the potential of strategies using miRs to improve oncolytic NDV potency, and highlights miR-204 as a tumor suppressor in NDV-induced oncolysis of lung cancer cells.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "VIRUS_STRAIN_SPECIFIED",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "DIRECT",
+        "support_strength": "DIRECT",
+        "citation_number": 2,
+        "selection_score": 80.7,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "39624055",
+        "doi": "10.1016/j.omton.2024.200899",
+        "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer",
+        "authors": [
+          "Rosewell Shaw A",
+          "Morita D",
+          "Porter CE",
+          "Tu E",
+          "Biegert GW",
+          "Agrawal S",
+          "Durham N",
+          "Brenner MK",
+          "Suzuki M"
+        ],
+        "journal": "Mol Ther Oncol",
+        "year": 2024,
+        "publication_date": "2024 Dec 19",
+        "abstract": "Systemic administration of oncolytic viruses (OVs) is a promising approach for targeting metastatic solid tumors, but their anti-tumor activity is limited by pre-existing neutralizing antibodies against common human viruses. Therefore, investigators have developed OVs derived from non-human host viruses. Successful implementation of this strategy requires that the viral vector selectively infects and replicates within human cancer cells. Newcastle disease virus (NDV) is an avian paramyxovirus that, as NDV-based OVs (oNDVs), has demonstrated safety and activity against multiple human tumors in clinical trials. Their use as a single agent, however, is insufficient to cure tumors. Similarly, chimeric antigen receptor-modified T cells (CAR-T cells) enable systemic targeting of cancer cells but have limited anti-tumor effects against bulky solid tumors, in part due to the immunosuppressive tumor environment. In this study, we evaluated the anti-tumor effects of combining systemic oNDV and CAR-T cell treatments. In models of non-small cell lung carcinoma (NSCLC), we found that oNDV itself and interleukin (IL)-12 derived from oNDVs enhance HER2-directed CAR-T cell anti-tumor activity and persistence in vitro and in vivo, leading to superior control of NSCLC tumors compared with either agent alone in vivo. Our data indicate that oNDV enhances the anti-tumor effects of HER2.CAR-T cells, thus controlling the growth of orthotopic NSCLC tumors.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "CHIMERIC_HYBRID_VIRUS",
+        "model_match": "CLOSE",
+        "reported_outcomes": [
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 3,
+        "selection_score": 80.0,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "41170972",
+        "doi": "10.1128/jvi.01576-25",
+        "title": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection",
+        "authors": [
+          "Zhao C",
+          "Tang N",
+          "Wang J",
+          "Qu Y",
+          "Tan L",
+          "Song C",
+          "Qiu X",
+          "Liao Y",
+          "Luo T",
+          "Ding C",
+          "Sun Y"
+        ],
+        "journal": "J Virol",
+        "year": 2025,
+        "publication_date": "2025 Nov 25",
+        "abstract": "Mitochondria and their electron transport chain (ETC) constitute the central machinery for cellular energy metabolism and biosynthetic regulation. Disruption of the ETC leads to reactive oxygen species (ROS) production and metabolic imbalance, but its precise role in viral replication and infection remains to be elucidated. In this study, we used Newcastle disease virus (NDV), an important avian pathogen and a promising oncolytic virus, as a model to explore its relationship with cellular mitochondrial metabolism. We demonstrate that NDV infection induces varying degrees of mitochondrial fragmentation, membrane potential dissipation, and ROS production, especially in p53-null H1299 cells compared to p53-wild-type A549 cells. ETC impairment restricts NDV replication primarily by limiting aspartate and pyrimidine nucleotide biosynthesis, rather than through ROS-mediated cytotoxicity or energy depletion. Notably, NDV replication in p53-null cells is highly sensitive to ETC complexes I and III inhibition, which can be rescued by exogenous aspartate or uridine supplementation. Mechanistically, p53 serves as a metabolic buffer, protecting mitochondrial function and maintaining precursor availability during viral infection. These findings elucidate the selective and differential utilization of mitochondrial ETC components by NDV and reveal that p53 status shapes cellular susceptibility to NDV-induced metabolic stress. Our work highlights mitochondrial metabolism and p53 as potential targets for antiviral and oncolytic strategies against NDV.IMPORTANCEThis study uncovers the intricate relationship between Newcastle disease virus (NDV) infection and host cell mitochondrial metabolism, with a particular emphasis on the pivotal regulatory role of p53. As both an important avian pathogen and a promising oncolytic virus, NDV disrupts mitochondrial function and the electron transport chain, leading to p53-mediated alterations in cellular energy metabolism and redox homeostasis. Our findings not only deepen the understanding of NDV-mitochondria interactions but also highlight the central role of p53 in viral infection and oncolytic mechanisms. These insights provide a theoretical foundation and novel therapeutic targets for antiviral and anticancer strategies based on p53 or mitochondrial pathways.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "WT_VIRUS",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "DIRECT",
+        "support_strength": "DIRECT",
+        "citation_number": 4,
+        "selection_score": 78.7,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "42621169",
+        "doi": "10.1007/s10616-026-01049-w",
+        "title": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC)",
+        "authors": [
+          "Kumar A",
+          "Bhardwaj N",
+          "Sharma R",
+          "Thakur P",
+          "Singh K",
+          "Chaudhary A",
+          "Kaur S",
+          "Arora S",
+          "Bhatia A"
+        ],
+        "journal": "Cytotechnology",
+        "year": 2026,
+        "publication_date": "2026 Oct",
+        "abstract": "Dietary phytochemicals exhibit anticancer activity, and increasing evidence suggests that the combinations of co-occurring compounds may provide greater therapeutic efficacy than individual compounds. Eruca sativa Mill. (rocket salad) contains both erucin and kaempferol; however, their synergistic anticancer activity against non-small cell lung cancer (NSCLC) has not been systematically investigated. Network pharmacology, molecular docking, and molecular dynamics (MD) simulations were performed to identify molecular targets of erucin and kaempferol. Their synergistic anticancer activity was subsequently evaluated in A549 (NSCLC) cells using the MTT assay and the combination index (CI) analysis, followed by a cell migration assay, fluorescence microscopy, flow cytometry, biochemical assays, caspase-3/7 assay, and RT-qPCR to investigate the underlying mechanisms. The combination of erucin (20 µM) and kaempferol (40 µM) exhibited the strongest synergistic interaction (Combination Index, CI = 0.428), significantly inhibiting A549 cell growth and migration while exhibiting preferential cytotoxicity toward A549 cells with minimal effects on WI-38 lung fibroblasts. Combined treatment increased overall oxidative stress, induced mitochondrial membrane depolarisation, enhanced caspase-3/7 activity and apoptosis, and modulated Bax/Bcl-2 gene expression, indicating activation of the intrinsic mitochondrial apoptotic pathway. Computational analyses identified EGFR as a potential molecular target that may contribute to the observed anticancer effects. The erucin-kaempferol combination demonstrated synergistic anticancer activity against A549 NSCLC cells, highlighting the bioactive potential of naturally co-occurring E. sativa-derived phytochemicals. However, these findings are limited to computational and in vitro studies, and in vivo studies are required to validate their therapeutic efficacy and elucidate the underlying molecular mechanisms. The online version contains supplementary material available at 10.1007/s10616-026-01049-w.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "SYNERGY",
+          "CI"
+        ],
+        "synergy_evidence": "ANALOGOUS",
+        "ci_classification_source": "EMPIRICAL_STUDY",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 5,
+        "selection_score": 78.7,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "41297068",
+        "doi": "10.1016/j.bmc.2025.118498",
+        "title": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity",
+        "authors": [
+          "Zhao Y",
+          "Hou L",
+          "Tian S",
+          "Zhu M",
+          "Wu J",
+          "Ma Y",
+          "Bu M",
+          "Lin Y"
+        ],
+        "journal": "Bioorg Med Chem",
+        "year": 2026,
+        "publication_date": "2026 Feb",
+        "abstract": "Lupeol is a natural pentacyclic triterpenoid compound and exhibits great potential as a lead compound for the development of novel antitumor drugs. To further enhance its antitumor activity and targeting ability, two series of new lupeol derivatives were designed and synthesized in this study, and their antiproliferative activities against three human cancer cell lines (A549, HepG2, and MCF-7) were evaluated. Among these derivatives, compound 5l exhibited more potent in vitro antiproliferative activity against A549 cells, with a half-maximal inhibitory concentration (IC50) of 1.84 ± 0.53 μmol/L and a selectivity index (SI; IC50 of human embryonic lung fibroblast MRC-5 cells/IC50 of A549 cells) of 15.39. Mechanistic studies further revealed that compound 5l is a novel tubulin inhibitor: it can specifically bind to the colchicine-binding site of β-tubulin with a binding energy of -13.40 kcal/mol, effectively inhibit tubulin polymerization, arrest the cell cycle at the G2/M phase, and simultaneously trigger a series of apoptosis-related responses, thereby significantly inducing apoptosis of tumour cells. In the mouse lung cancer model, compound 5l demonstrated significant antitumor activity and a favorable safety profile. Based on these results, compound 5l holds promise as a new tubulin inhibitor for the treatment of non-small cell lung cancer (NSCLC).",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "COMPOUND_DERIVATIVE",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "GROWTH_INHIBITION",
+          "APOPTOSIS",
+          "CELL_CYCLE",
+          "SELECTIVITY",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 6,
+        "selection_score": 77.3,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "39336114",
+        "doi": "10.3390/biology13090687",
+        "title": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa",
+        "authors": [
+          "Seglab F",
+          "Abou Assali M",
+          "AlYafei T",
+          "Hassan H",
+          "Pinto DCGA",
+          "Baydoun S",
+          "Al Thani AA",
+          "Shaito AA"
+        ],
+        "journal": "Biology (Basel)",
+        "year": 2024,
+        "publication_date": "2024 Sep 2",
+        "abstract": "Inula viscosa is a widely used plant in traditional Mediterranean and Middle Eastern medicine for various illnesses. I. viscosa has been shown to have anticancer effects against various cancers, but its effects against lung cancer have been under limited investigation. At the same time, I. viscosa is rich in terpenoids whose anti-lung cancer effects have been poorly investigated. This study aimed to examine the potential anticancer properties of methanolic and aqueous extracts of stems and leaves of I. viscosa and its terpenoid-rich fraction against human lung cancer A549 cells. Results showed that the methanolic extracts of I. viscosa had significantly higher polyphenol and flavonoid content and radical scavenging capacity than the aqueous extracts. In addition, leaves methanolic extracts (IVLM) caused the highest reduction in viability of A549 cells among all the extracts. IVLM also reduced the viability of human ovarian SK-OV-3, breast MCF-7, liver HepG2, and colorectal HCT116 cancer cells. A terpenoid-rich I. viscosa fraction (IVL DCM), prepared by liquid-liquid separation of IVLM in dichloromethane (DCM), displayed a substantial reduction in the viability of A549 cells (IC50 = 27.8 ± 1.5 µg/mL at 48 h) and the panel of tested cancerous cell lines but was not cytotoxic to normal human embryonic fibroblasts (HDFn). The assessment of IVL DCM phytochemical constituents using GC-MS analysis revealed 21 metabolites, highlighting an enrichment in terpenoids, such as lupeol and its derivatives, caryophyllene oxide, betulin, and isopulegol, known to exhibit proapoptotic and antimetastatic functions. IVL DCM also showed robust antioxidant capacity and decent polyphenol and flavonoid contents. Furthermore, Western blotting analysis indicated that IVL DCM reduced proliferation (reduction of proliferation marker Ki67 and induction of proliferation inhibitor proteins P21 and P27), contaminant with P38 MAP kinase activation, and induced the intrinsic apoptotic pathway (P53/BCL2/BAX/Caspase3/PARP) in A549 cells. IVL DCM also reduced the migration of A549 cells, potentially by reducing FAK activation. Future identification of anticancer metabolites of IVL DCM, especially terpenoids, is recommended. These data place I. viscosa as a new resource of herbal anticancer agents.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "CONTAINING_EXTRACT",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "CELL_VIABILITY",
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 7,
+        "selection_score": 77.3,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "39274838",
+        "doi": "10.3390/molecules29173990",
+        "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents",
+        "authors": [
+          "Tian S",
+          "Zhao Y",
+          "Deng S",
+          "Hou L",
+          "Song J",
+          "Wang M",
+          "Bu M"
+        ],
+        "journal": "Molecules",
+        "year": 2024,
+        "publication_date": "2024 Aug 23",
+        "abstract": "In the following study, a series of new lupeol-3-carbamate derivatives were synthesized, and the structures of all the newly derived compounds were characterized. The new compounds were screened to determine their anti-proliferative activity against human lung cancer cell line A549, human liver cancer cell line HepG2, and human breast cancer cell line MCF-7. Most of the compounds were found to show better anti-proliferative activity in vitro than lupeol. Among them, obvious anti-proliferation activity (IC50 = 5.39~9.43 μM) was exhibited by compound 3i against all three tumor cell lines. In addition, a salt reaction was performed on compound 3k (IC50 = 13.98 μM) and it was observed that the anti-proliferative activity and water solubility of compound 3k·CH3I (IC50 = 3.13 μM), were significantly enhanced subsequent to the salt formation process. The preliminary mechanistic studies demonstrated that apoptosis in HepG2 cells was induced by compound 3k·CH3I through the inhibition of the PI3K/AKT/mTOR pathway. In conclusion, a series of new lupeol-3-carbamate derivatives were synthesized via the structural modification of the C-3 site of lupeol, thus laying a theoretical foundation for the design of this new anticancer drug.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "COMPOUND_DERIVATIVE",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "GROWTH_INHIBITION",
+          "APOPTOSIS",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 8,
+        "selection_score": 77.3,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "41942850",
+        "doi": "10.1186/s12864-026-12760-5",
+        "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism",
+        "authors": [
+          "Sun Y",
+          "Fang T",
+          "Tan L",
+          "Song C",
+          "Qiu X",
+          "Liao Y",
+          "Sun Y",
+          "Liu X",
+          "Ding C",
+          "Meng C"
+        ],
+        "journal": "BMC Genomics",
+        "year": 2026,
+        "publication_date": "2026 Apr 6",
+        "abstract": "BACKGROUND: Newcastle disease virus (NDV), a significant avian pathogen and promising oncolytic agent, relies on host metabolic pathways for replication. However, the metabolic alterations induced by NDV, particularly the connections at the gene and protein levels, remain poorly characterized. RESULTS: This study employed integrated transcriptomic, proteomic, and non-targeted metabolomic analyses to delineate the global metabolic changes in NDV-infected A549 cells. We identified 8,101 differentially expressed genes (DEGs), 1,587 differentially expressed proteins (DEPs), and 257 differentially expressed metabolites (DEMs) associated with organelle function, innate immunity, and metabolism. Crucially, our multi-omics approach revealed that NDV significantly remodels glycerophospholipid metabolism. NDV depleted Lysophosphatidylcholine (LPC) and Lysophosphatidylethanolamine (LPE), as well as specific phosphatidylcholine (PC) and phosphatidylethanolamine (PE) species, while increasing phosphatidylserine (PS) at the late stage of infection. Strikingly, exogenous supplementation of unsaturated fatty acids, choline, phosphorylcholine, ethanolamine, phosphatidylethanolamine, and inositol markedly enhanced NDV replication. Concomitantly, NDV infection upregulated the transcriptional levels of key enzymes involved in glycerophospholipid biosynthesis. CONCLUSIONS: This study demonstrates for the first time that NDV actively reprograms host glycerophospholipid metabolism to facilitate viral replication. This study uncovers a novel mechanism of NDV-host interaction and provides crucial insights for oncolytic strategies targeting this metabolic vulnerability.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "WT_VIRUS",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "DIRECT",
+        "support_strength": "DIRECT",
+        "citation_number": 9,
+        "selection_score": 76.0,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "37845669",
+        "doi": "10.1186/s12906-023-04201-7",
+        "title": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line",
+        "authors": [
+          "Aborehab NM",
+          "Salama MM",
+          "Ezzat SM"
+        ],
+        "journal": "BMC Complement Med Ther",
+        "year": 2023,
+        "publication_date": "2023 Oct 16",
+        "abstract": "Non-small-cell lung carcinoma (NSCLC) is a type of epithelial lung cancer accounting for about 85% of all lung cancers. In our research, a novel lupene derivative namely acetoxy-lup-5(6), 20(29)-diene (ALUP), as well as two known triterpenes; lupeol (LUP) and betulinic acid (BA) were isolated through the chromatographic purification of the 95% ethanolic extract of Thymus capitatus. Identification of the compounds was carried out by physicochemical properties as well as spectral 1D and 2D NMR analysis. The anti-cancer activity of the three triterpenes was assessed on non-small cell lung cancer cell line; A549 using MTT assay and cell cycle analysis using annexin V/propidium iodide. The molecular mechanism underlying anti-apoptotic effects was determined by analyzing Let-7 miRNA and miRNA-21 expression, the mRNA gene expression level of Bax, CASP-8, CD95, Bcl2, KRAS, VEGF, Cyclin D1 using qRT-PCR. Our results revealed that the three isolated compounds ALUP, LUP, and BA caused cell cycle arrest at the G2/M phase with an increase in the apoptosis which may be attributed to their significant effect on raising Bax, CASP-8, and CD95 and reducing the mRNA expression levels of Bcl-2, KRAS, VEGF, and Cyclin D1 compared to control cells. RT-PCR results showed that the ALUP, LUP, and BA significantly downregulated miRNA-21 expression. Meanwhile, the three compounds caused significant overexpression of Let-7 miRNA. This is the first report on the anti-cancer activity of acetoxy-lup-5(6), 20(29)-diene (ALUP) in reducing the proliferation and differentiation of the A549 cell line through inducing apoptosis. Finally, by targeting the Let-7 miRNA/Cyclin D1/VEGF cascade, acetoxy-lup-5(6), 20(29)-diene could be a potential therapeutic agent for lung cancer.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "CONTAINING_EXTRACT",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CELL_CYCLE"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 10,
+        "selection_score": 86.0,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "39459325",
+        "doi": "10.3390/molecules29204957",
+        "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway",
+        "authors": [
+          "Deng S",
+          "Zhao Y",
+          "Guo X",
+          "Hong X",
+          "Li G",
+          "Wang Y",
+          "Li Q",
+          "Bu M",
+          "Wang M"
+        ],
+        "journal": "Molecules",
+        "year": 2024,
+        "publication_date": "2024 Oct 20",
+        "abstract": "To improve the potential of lupeol against cancer cells, a privileged structure, thiazolidinedione, was introduced into its C-3 hydroxy group with ester, piperazine-carbamate, or ethylenediamine as a linker, and three series of thiazolidinedione-conjugated compounds (6a-i, 9a-i, and 12a-i) were prepared. The target compounds were evaluated for their cytotoxic activities against human lung cancer A549, human breast cancer MCF-7, human hepatocarcinoma HepG2, and human hepatic LO2 cell lines, and the results revealed that most of the compounds displayed improved potency over lupeol. Compound 12i exhibited significant activity against the HepG2 cell line, with an IC50 value of 4.40 μM, which is 9.9-fold more potent than lupeol (IC50 = 43.62 μM). Mechanistic studies suggested that 12i could induce HepG2 cell apoptosis, as evidenced by AO/EB staining and annexin V-FITC/propidium iodide dual staining assays. Western blot analysis suggested that compound 12i can upregulate Bax expression, downregulate Bcl-2 expression, and activate the mitochondria-mediated apoptotic pathway. Collectively, compound 12i is worthy of further investigation to support the discovery of effective agents against cancer.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "COMPOUND_DERIVATIVE",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 11,
+        "selection_score": 80.7,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "40896365",
+        "doi": "10.1016/j.omton.2025.201027",
+        "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells",
+        "authors": [
+          "Kortum F",
+          "Hartmann N",
+          "Bryan A",
+          "Glauß S",
+          "Altomonte J"
+        ],
+        "journal": "Mol Ther Oncol",
+        "year": 2025,
+        "publication_date": "2025 Sep 18",
+        "abstract": "Recent work has indicated that oncolytic virotherapy leads to immunogenic cell death (ICD) as an important mechanism of action; however, the underlying cell death pathways leading to ICD have been less explored. Our previous data demonstrated that chimeric oncolytic recombinant vesicular stomatitis virus-Newcastle disease virus (rVSV-NDV) has a strong immune-stimulating potential that seems to be mediated by immunogenic syncytial oncolysis. In this work, we aimed to investigate the role of apoptosis and necroptosis in mediating syncytial cell death. In human lung cancer cell lines (A549 and H1437), we demonstrate that fusogenic rVSV-NDV and the parental virus, rVSV, both dynamically engage apoptosis and necroptosis signaling to mediate oncolysis. Genetic deletion of key death regulators (caspase-3, caspase-8, RIPK1, RIPK3, and MLKL) by CRISPR-Cas9 further illustrated a cell line-dependent flexibility to switch to alternative, non-apoptotic or non-necroptotic pathways, while maintaining viral replication and net oncolysis. Interestingly, genetic deletion of caspase-3 prolonged the syncytial phenotype and delayed their collapse, suggesting a crucial role of caspases during syncytial death. In vitro coculture experiments further revealed that rVSV-NDV-derived oncolysates induced significantly higher levels of differentiation and activation of human monocyte-derived dendritic cells than non-fusogenic rVSV-infected oncolysates. This illustrates the superior immunogenic potential inherent in fusogenic oncolytic viruses and warrants their further preclinical evaluation as next-generation, immune-modulating oncolytic virotherapies.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "CHIMERIC_HYBRID_VIRUS",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 12,
+        "selection_score": 80.7,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "38931361",
+        "doi": "10.3390/ph17060694",
+        "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells",
+        "authors": [
+          "Torres-Sanchez A",
+          "Torres G",
+          "Estrada S",
+          "Perez D",
+          "Garcia C",
+          "Milian M",
+          "Velazquez E",
+          "Molina V",
+          "Delgado Y"
+        ],
+        "journal": "Pharmaceuticals (Basel)",
+        "year": 2024,
+        "publication_date": "2024 May 28",
+        "abstract": "Recently, there has been great interest in plant-derived compounds known as phytochemicals. The pentacyclic oleanane-, ursane-, and lupane-type triterpenes are phytochemicals that exert significant activity against diseases like cancer. Lung cancer is the leading cause of cancer-related death worldwide. Although chemotherapy is the treatment of choice for lung cancer, its effectiveness is hampered by the dose-limiting toxic effects and chemoresistance. Herein, we investigated six pentacyclic triterpenes, oleanolic acid, ursolic acid, asiatic acid, betulinic acid, betulin, and lupeol, on NSCLC A549 cells. These triterpenes have several structural variations that can influence the activation/inactivation of key cellular pathways. From our results, we determined that most of these triterpenes induced apoptosis, S-phase and G2/M-phase cycle arrest, the downregulation of ribonucleotide reductase (RR), reactive oxygen species, and caspase 3 activation. For chemoresistance markers, we found that most triterpenes downregulated the expression of MAPK/PI3K, STAT3, and PDL1. In contrast, UrA and AsA also induced DNA damage and autophagy. Then, we theoretically determined other possible molecular targets of these triterpenes using the online database ChEMBL. The results showed that even slight structural changes in these triterpenes can influence the cellular response. This study opens up promising perspectives for further research on the pharmaceutical role of phytochemical triterpenoids.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "COMPOUND_ANALOG",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 13,
+        "selection_score": 80.0,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "41674174",
+        "doi": "10.18502/ijaai.v25i1.20440",
+        "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line",
+        "authors": [
+          "Ali Akbar Esfahani M",
+          "Dorostkar R",
+          "Esmaeili Gouvarchin Ghaleh H",
+          "Ramezani R",
+          "Ramezani R",
+          "Mir Mohammad Sadeghi SM",
+          "Ghorbani Alvanegh A",
+          "Aghayan SK"
+        ],
+        "journal": "Iran J Allergy Asthma Immunol",
+        "year": 2026,
+        "publication_date": "2026 Jan 1",
+        "abstract": "TC-1 is a recognized cancer cell line derived from lung epithelial cells that have been altered using the oncogenic E6 and E7 genes of human papillomavirus (HPV). These TC-1 cells are frequently utilized in preclinical research focused on lung cancer and HPV-associated tumors. The incidence of lung cancer and HPV-related cancers is significantly increasing. Drug resistance and the lack of selectivity in current treatments reduce their effectiveness. Researchers are seeking new therapeutic methods, including targeted therapies, immunotherapy, and oncolytic virus and bacterial therapies, to improve treatment outcomes and decrease mortality associated with these diseases. In this context, the present original study aimed to evaluate the potency of wild-type Newcastle disease virus (NDV-WTS) on lactate dehydrogenase (LDH) secretion and the induction of apoptosis in TC-1 cells. In this experimental study, the TC-1 cell lines were cultured under laboratory conditions. Subsequently, they were treated with different multiplicities of infection (MOIs) of NDV-WTS (1, 2, and 4). Finally, the oncolytic effects of the virus were evaluated using laboratory assays, including MTT (cell viability), reactive oxygen species (ROS), LDH, survival rates, and the activities of Caspases 8 and 9. The results indicated that NDV-WTS significantly decreased cell viability while increasing apoptosis, ROS levels, LDH release, and Caspase 8 and 9 activities compared to the control group. Molecular analyses further revealed that treatment of TC-1 cells with NDV significantly increased the expression of Bax, Casp8, and Casp9, while significantly decreasing Bcl2 expression relative to the control group. NDV-WTS demonstrated remarkable efficacy in treating lung cancer and HPV-associated tumors. Based on the results of the present study, the use of Newcastle disease virus in the treatment of lung cancer and HPV-associated tumors may be beneficial, which requires further studies and clinical trials.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "WT_VIRUS",
+        "model_match": "DIFFERENT",
+        "reported_outcomes": [
+          "CELL_VIABILITY",
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "ONCOLYSIS",
+          "SELECTIVITY"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 14,
+        "selection_score": 80.0,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "40382521",
+        "doi": "10.1038/s41434-025-00540-x",
+        "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair",
+        "authors": [
+          "Liu L",
+          "Song L",
+          "Liu T",
+          "Hui K",
+          "Hu C",
+          "Yang J",
+          "Pi X",
+          "Yan Y",
+          "Liu S",
+          "Zhang Y",
+          "Chen H",
+          "Cao Y",
+          "Zhou L",
+          "Qiao Y",
+          "Yu D",
+          "Yin C",
+          "Li X",
+          "Zhang C",
+          "Li D",
+          "Wang Z",
+          "Liu Z",
+          "Jiang X"
+        ],
+        "journal": "Gene Ther",
+        "year": 2025,
+        "publication_date": "2025 Oct",
+        "abstract": "Resistance to radiotherapy is a significant challenge in the clinical management of non-small cell lung cancer (NSCLC). This study investigates a novel multimodal therapeutic strategy that combines oncolytic Newcastle disease virus (NDV) with an anti-VEGFR2 single-chain variable fragment (NDV-anti-VEGFR2) to enhance radiosensitivity in NSCLC. We engineered NDV-anti-VEGFR2 and assessed its efficacy in sensitizing Calu-1 cells to radiation. In vitro results demonstrated that NDV-anti-VEGFR2 significantly inhibited tumor cell proliferation when combined with radiotherapy. In vivo experiments revealed that NDV-anti-VEGFR2, combined with radiation, achieved a tumor growth inhibition rate of 86.48%, surpassing the effects of NDV or radiation alone. Mechanistic investigations indicated that NDV-anti-VEGFR2 mitigated hypoxia by downregulating HIF-1α and impaired DNA repair pathways, as evidenced by reduced levels of RAD51 and γ-H2AX. These findings suggest that NDV-anti-VEGFR2 not only normalizes tumor vasculature but also enhances the cytotoxic effects of radiation by compromising DNA repair mechanisms. Collectively, our results support the clinical potential of NDV-anti-VEGFR2 combined with radiotherapy as a promising strategy to overcome radiotherapy resistance in NSCLC. Future studies in immunocompetent models are warranted to elucidate the immune-mediated effects of this innovative therapeutic approach.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "RECOMBINANT_VIRUS",
+        "model_match": "CLOSE",
+        "reported_outcomes": [
+          "GROWTH_INHIBITION",
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 15,
+        "selection_score": 80.0,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "40951590",
+        "doi": "10.1002/fsn3.70915",
+        "title": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines",
+        "authors": [
+          "Shehzadi S",
+          "Noreen S",
+          "Imran H",
+          "Ikram A",
+          "Arshad MT",
+          "Gnedeka KT"
+        ],
+        "journal": "Food Sci Nutr",
+        "year": 2025,
+        "publication_date": "2025 Sep",
+        "abstract": "Cancer is a life-threatening disease; liver cancer, breast cancer, and lung cancer account for high prevalence worldwide. The Lantana camara (LC) plant is known for its cytotoxicity in treating certain diseases. However, the effect of leaf and root extract of LC on induction of apoptosis and lowering the proliferation of cancerous cells was estimated in the current study. Leaf and root extracts of LC were prepared using the rotary method, in which mineral analysis was done quantitatively through the spectrophotometry technique. In contrast, phytochemical composition was assessed both quantitatively and qualitatively. Fifteen bioactive compounds were detected from the LC root extract. The major compounds found were lupeol (52.94%), Lup-20(29)-en-3-one (8.231%), 9-octadecynoic acid (21%), N-hexadecenoic acid (16%), Phytol (5.842%), Hexadecenoic acid (5.301%), Caryophyllene oxide (4.772%) and 2,3-Dihydro-2,5-dihydroxy-6-methyl-4H-pyran-4-one (3.018%). Cytotoxicity was estimated through the MTT assay by using two different sourced cell lines as control (HUVECs and Vero). VEGF was done to confirm the proliferation of treated cells; apoptosis was examined by Annexin-V and Hoechst 33342 staining; cell viability was checked through the trypan blue and crystal violet staining method. Phytochemical analysis and antioxidant activities showed better results in the LCroot extract than the LCleaf extract. Similarly, DPPH measured for antioxidant analysis also confirmed the better results in LCroot (178.921 ± 0.12) (p < 0.01). In cell culture experiments, LCroot extract showed high cytotoxicity and morphological changes in MCF-7, HepG2, and A549 cancerous cell lines, but a reduced cytotoxic effect was observed in non-cancerous cell lines (HUVECs and Vero). ELISA for apoptosis and angiogenesis confirmed the significantly increased apoptosis (p < 0.0001) (Annexin-V) and reduced angiogenesis/proliferation (VEGF). Further, the Hoechst 33342 staining method also confirmed the increased apoptosis in treated cancerous cells with 50 μg/mL LCroot extract as compared to untreated groups and normal HUVECs.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "CONTAINING_EXTRACT",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "CELL_VIABILITY",
+          "APOPTOSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 16,
+        "selection_score": 77.3,
+        "final_inclusion_reason": "DIRECT_DISEASE_MODEL_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_11_VARIABLE_TABLE"
+        ],
+        "why_this_paper_is_needed": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior."
+      },
+      {
+        "pmid": "42699700",
+        "doi": "10.2147/itt.s614889",
+        "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells",
+        "authors": [
+          "Ginting TE",
+          "Larasati YO",
+          "Cornelia V",
+          "Hidayat NR",
+          "Christian S",
+          "Zarkasie K",
+          "Yusuf I"
+        ],
+        "journal": "Immunotargets Ther",
+        "year": 2026,
+        "publication_date": "2026",
+        "abstract": "To explore whether NDV and/or NDV-induced IFNs regulate programmed death-1 ligand (PD-L1) expression and modulate the balance between inhibitory and stimulatory immune signals. Human non-malignant (NB1RGB and HEK293) and tumor (A549 and U87MG) cell lines were used. Cells were either infected with Newcastle disease virus (NDV) LaSota strain or treated with interferons (IFNs). PD-L1 expression was analyzed by flow cytometry, Western blotting, and immunofluorescence. The relationship between PD-L1, as an immune inhibitor, and major histocompatibility complex class I polypeptide-related sequence A (MICA), as an immune activator, was evaluated using duplex chromogenic in situ hybridization. To investigate whether the NDV-induced shift in the PD-L1/MICA axis was sufficient to activate natural killer group 2 member D (NKG2D) receptor-possessing cells within peripheral blood mononuclear cells (PBMCs), IFN-γ production was measured in PBMCs following 24 hours of co-culture with tumor and normal cell lines previously infected with NDV or treated with IFN-λ. NDV infection and IFN treatment resulted in a reduction of PD-L1 expressions in specific cell types. This decrease was accompanied by a concurrent increase in MICA expression, as demonstrated by in situ hybridization. The shift in balance between PD-L1 and MICA correlated with enhanced activation of NKG2D receptor-expressing immune cells, evidenced by increased IFN-γ secretion. These findings suggest that NDV may exert antitumor effects by modulating the balance between inhibitory checkpoint molecules and stimulatory ligands, specifically through downregulation of PD-L1 and upregulation of MICA. This mechanism highlights the potential of NDV to enhance cytotoxic immune responses and supports its further development as a novel strategy in cancer immunotherapy.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "VIRUS_STRAIN_SPECIFIED",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "SELECTIVITY"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "MECHANISTIC_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 17,
+        "selection_score": 76.7,
+        "final_inclusion_reason": "DIRECT_DISEASE_MODEL_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_11_VARIABLE_TABLE"
+        ],
+        "why_this_paper_is_needed": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior."
+      },
+      {
+        "pmid": "42404852",
+        "doi": "10.1007/s10616-026-01019-2",
+        "title": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line",
+        "authors": [
+          "Almalghooth HDM",
+          "Khalaj-Kondori M",
+          "Feizi MAH"
+        ],
+        "journal": "Cytotechnology",
+        "year": 2026,
+        "publication_date": "2026 Aug",
+        "abstract": "Lung cancer, primarily non-small cell lung cancer (NSCLC), is a leading global cause of cancer mortality, driven by late diagnosis, drug resistance, and chemotherapy toxicity. Paclitaxel, a standard agent, stabilizes microtubules to induce G2/M arrest and apoptosis, but is limited by side effects such as neurotoxicity and resistance. Eugenol, derived from clove oil, offers anticancer benefits, including the induction of apoptosis and inhibition of metastasis. This study investigated the synergistic effects of Paclitaxel and Eugenol on A549 NSCLC cells, evaluating antiproliferative, pro-apoptotic, and anti-metastatic activities via cellular and molecular assays. A549 cells were cultured and MTT assay measured viability after Eugenol, Paclitaxel, and their combinations. Apoptosis was assessed by Annexin V-FITC/PI staining and flow cytometry. Cell cycle analyzed by PI staining and flow cytometry. qRT-PCR quantified Bax, Bcl-2, Caspase-3, MMP-2, MMP-9 expression, and data analyzed by t-test/ANOVA. The MTT assay revealed Eugenol's IC50 to be 257.9 µM and Paclitaxel's IC50 to be 8.485 µM after 24 h of incubation. Combination treatment with 100 µM Eugenol and 4 µM Paclitaxel synergistically enhanced cytotoxicity compared to individual agents. Flow cytometry demonstrated a significant increase in apoptosis with the combination and synergistic use of components. Cell cycle analysis revealed elevated sub-G1 populations at 11.8% for Eugenol, 20.3% for Paclitaxel, and 36.6% for the combination, which was prominent in the single treatments but reduced in the combination. qRT-PCR demonstrated downregulated anti-apoptotic Bcl-2, upregulated pro-apoptotic Bax and Caspase-3, and suppressed metastasis-related MMP-2 and MMP-9, with effects most pronounced in the combination group. Eugenol enhances the efficacy of Paclitaxel on A549 cells by inducing superior apoptosis, disrupting the cell cycle, and inhibiting metastasis, suggesting potential strategies for reduced toxicity.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "CELL_VIABILITY",
+          "GROWTH_INHIBITION",
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "CELL_CYCLE",
+          "SYNERGY",
+          "IC50"
+        ],
+        "synergy_evidence": "ANALOGOUS",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "CLOSE_ANALOG",
+        "support_strength": "ANALOGOUS",
+        "citation_number": 18,
+        "selection_score": 75.3,
+        "final_inclusion_reason": "DIRECT_DISEASE_MODEL_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_11_VARIABLE_TABLE"
+        ],
+        "why_this_paper_is_needed": "Characterizes baseline disease phenotype, target tissue characteristics, and baseline experimental system behavior."
+      },
+      {
+        "pmid": "16968952",
+        "doi": "10.1124/pr.58.3.10",
+        "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies",
+        "authors": [
+          "Chou TC"
+        ],
+        "journal": "Pharmacol Rev",
+        "year": 2006,
+        "publication_date": "2006 Sep",
+        "abstract": "The median-effect equation derived from the mass-action law principle at equilibrium-steady state via mathematical induction and deduction for different reaction sequences and mechanisms and different types of inhibition has been shown to be the unified theory for the Michaelis-Menten equation, Hill equation, Henderson-Hasselbalch equation, and Scatchard equation. It is shown that dose and effect are interchangeable via defined parameters. This general equation for the single drug effect has been extended to the multiple drug effect equation for n drugs. These equations provide the theoretical basis for the combination index (CI)-isobologram equation that allows quantitative determination of drug interactions, where CI < 1, = 1, and > 1 indicate synergism, additive effect, and antagonism, respectively. Based on these algorithms, computer software has been developed to allow automated simulation of synergism and antagonism at all dose or effect levels. It displays the dose-effect curve, median-effect plot, combination index plot, isobologram, dose-reduction index plot, and polygonogram for in vitro or in vivo studies. This theoretical development, experimental design, and computerized data analysis have facilitated dose-effect analysis for single drug evaluation or carcinogen and radiation risk assessment, as well as for drug or other entity combinations in a vast field of disciplines of biomedical sciences. In this review, selected examples of applications are given, and step-by-step examples of experimental designs and real data analysis are also illustrated. The merging of the mass-action law principle with mathematical induction-deduction has been proven to be a unique and effective scientific method for general theory development. The median-effect principle and its mass-action law based computer software are gaining increased applications in biomedical sciences, from how to effectively evaluate a single compound or entity to how to beneficially use multiple drugs or modalities in combination therapies.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "foundational_justification": {
+          "is_justified": true,
+          "category": "FOUNDATIONAL_MATHEMATICAL_MODEL",
+          "rationale": "Chou 2006 seminal methodology for median-effect equation and computerized combination index (CI) simulations."
+        },
+        "study_design": "METHODOLOGICAL_LANDMARK",
+        "compound_identity": "PARENT_COMPOUND",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "SYNERGY",
+          "CI"
+        ],
+        "synergy_evidence": "NOT_APPLICABLE",
+        "ci_classification_source": "CHOU_2006_LANDMARK",
+        "evidence_relationship": "METHOD_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 19,
+        "selection_score": 68.0,
+        "final_inclusion_reason": "METHODOLOGICAL_BENCHMARK",
+        "proposal_section_supported": [
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_13_METHODOLOGY"
+        ],
+        "why_this_paper_is_needed": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution."
+      },
+      {
+        "pmid": "6606682",
+        "doi": "10.1016/0022-1759(83)90303-4",
+        "title": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays",
+        "authors": [
+          "Mosmann T"
+        ],
+        "journal": "J Immunol Methods",
+        "year": 1983,
+        "publication_date": "1983 Dec 16",
+        "abstract": "A tetrazolium salt has been used to develop a quantitative colorimetric assay for mammalian cell survival and proliferation. The assay detects living, but not dead cells and the signal generated is dependent on the degree of activation of the cells. This method can therefore be used to measure cytotoxicity, proliferation or activation. The results can be read on a multiwell scanning spectrophotometer (ELISA reader) and show a high degree of precision. No washing steps are used in the assay. The main advantages of the colorimetric assay are its rapidity and precision, and the lack of any radioisotope. We have used the assay to measure proliferative lymphokines, mitogen stimulations and complement-mediated lysis.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "foundational_justification": {
+          "is_justified": true,
+          "category": "STANDARDIZED_ASSAY_METHOD",
+          "rationale": "Mosmann 1983 seminal colorimetric MTT tetrazolium reduction assay for cellular viability and cytotoxicity."
+        },
+        "study_design": "METHODOLOGICAL_LANDMARK",
+        "compound_identity": "PARENT_COMPOUND",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "CELL_VIABILITY"
+        ],
+        "synergy_evidence": "NOT_APPLICABLE",
+        "ci_classification_source": "CHOU_2006_LANDMARK",
+        "evidence_relationship": "METHOD_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 20,
+        "selection_score": 67.3,
+        "final_inclusion_reason": "METHODOLOGICAL_BENCHMARK",
+        "proposal_section_supported": [
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_13_METHODOLOGY"
+        ],
+        "why_this_paper_is_needed": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution."
+      },
+      {
+        "pmid": "6382953",
+        "doi": "10.1016/0065-2571(84)90007-4",
+        "title": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors",
+        "authors": [
+          "Chou TC",
+          "Talalay P"
+        ],
+        "journal": "Adv Enzyme Regul",
+        "year": 1984,
+        "publication_date": "1984",
+        "abstract": "A generalized method for analyzing the effects of multiple drugs and for determining summation, synergism and antagonism has been proposed. The derived, generalized equations are based on kinetic principles. The method is relatively simple and is not limited by whether the dose-effect relationships are hyperbolic or sigmoidal, whether the effects of the drugs are mutually exclusive or nonexclusive, whether the ligand interactions are competitive, noncompetitive or uncompetitive, whether the drugs are agonists or antagonists, or the number of drugs involved. The equations for the two most widely used methods for analyzing synergism, antagonism and summation of effects of multiple drugs, the isobologram and fractional product concepts, have been derived and been shown to have limitations in their applications. These two methods cannot be used indiscriminately. The equations underlying these two methods can be derived from a more generalized equation previously developed by us (59). It can be shown that the isobologram is valid only for drugs whose effects are mutually exclusive, whereas the fractional product method is valid only for mutually nonexclusive drugs which have hyperbolic dose-effect curves. Furthermore, in the isobol method, it is laborious to find proper combinations of drugs that would produce an iso-effective curve, and the fractional product method tends to give indication of synergism, since it underestimates the summation of the effect of mutually nonexclusive drugs that have sigmoidal dose-effect curves. The method described herein is devoid of these deficiencies and limitations. The simplified experimental design proposed for multiple drug-effect analysis has the following advantages: It provides a simple diagnostic plot (i.e., the median-effect plot) for evaluating the applicability of the data, and provides parameters that can be directly used to obtain a general equation for the dose-effect relation; the analysis which involves logarithmic conversion and linear regression can be readily carried out with a simple programmable electronic calculator and does not require special graph paper or tables; and the simplicity of the equation allows flexibility of application and the use of a minimum number of data points. This method has been used to analyze experimental data obtained from enzymatic, cellular and animal systems.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "foundational_justification": {
+          "is_justified": true,
+          "category": "FOUNDATIONAL_MATHEMATICAL_MODEL",
+          "rationale": "Chou & Talalay 1984 foundational derivation of multi-drug combined effect equations."
+        },
+        "study_design": "METHODOLOGICAL_LANDMARK",
+        "compound_identity": "PARENT_COMPOUND",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "SYNERGY",
+          "CI"
+        ],
+        "synergy_evidence": "NOT_APPLICABLE",
+        "ci_classification_source": "CHOU_2006_LANDMARK",
+        "evidence_relationship": "METHOD_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 21,
+        "selection_score": 62.0,
+        "final_inclusion_reason": "METHODOLOGICAL_BENCHMARK",
+        "proposal_section_supported": [
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_13_METHODOLOGY"
+        ],
+        "why_this_paper_is_needed": "Provides canonical assay protocol and validated mathematical/experimental formulation essential for proposal execution."
+      },
+      {
+        "pmid": "32329697",
+        "doi": "10.2174/1871520620666200424131548",
+        "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer",
+        "authors": [
+          "Bhatt M",
+          "Patel M",
+          "Adnan M",
+          "Reddy MN"
+        ],
+        "journal": "Anticancer Agents Med Chem",
+        "year": 2021,
+        "publication_date": "2021",
+        "abstract": "ERK pathway is one of the most crucial pathways in lung cancer metastasis. Targeting its pathway is decisive in lung cancer research. Thus, this study demonstrated for the first time for significant and selective anti-metastatic effects of lupeol against lung cancer A549 cells via perturbations in the ERK signaling pathway. Human protein targets of lupeol were predicted in silico. Migration and cytotoxicity assays were carried out in vitro. Expression levels of proteins Erk1/2 and pErk1/2 were ensured using Enzyme- Linked Immunosorbent Assay (ELISA). Semi-quantitative RT-PCR technique was used to estimate changes in crucial mesenchymal marker gene expression levels of N-cadherin and vimentin. Lupeol was found to target ERK and MEK proteins effectively. Despite having no cytotoxic effects, lupeol also significantly inhibited cell migration in A549 cells with decreased expression of the pErk1/2 protein along with N-cadherin and vimentin genes. Lupeol inhibits cell migration, showed no cytotoxic effects on A549 cells, decreased pErk1/2 and EMT gene expression. Thus, it can serve as a potential ERK pathway inhibitor in lung cancer therapeutics.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "PARENT_COMPOUND",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "OTHER"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "MECHANISTIC_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 22,
+        "selection_score": 75.3,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "42772808",
+        "doi": "10.1111/1759-7714.70393",
+        "title": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling",
+        "authors": [
+          "Yu J",
+          "Chen S",
+          "Hou T",
+          "Weng X",
+          "Liu Y",
+          "Huang J",
+          "Yang Z",
+          "Bao J",
+          "Zhou C",
+          "Lv W",
+          "Wu Q",
+          "Xu Y",
+          "Zhou J"
+        ],
+        "journal": "Thorac Cancer",
+        "year": 2026,
+        "publication_date": "2026 Sep",
+        "abstract": "Lung cancer remains a leading cause of cancer-related mortality worldwide, necessitating the development of novel therapeutic strategies. Matrine, a natural alkaloid derived from Sophora flavescens, has demonstrated broad antitumor properties, yet its underlying mechanisms, particularly concerning DNA damage response, remain incompletely elucidated. This study integrates network pharmacology, bioinformatics, and experimental validation to uncover a novel dual-targeting mechanism of matrine in lung cancer. Bioinformatics analysis identified CHEK1 as a key potential target. In vitro, matrine selectively inhibited proliferation, migration, invasion, and clonogenic survival of A549 and LLC cells, while reducing the G2/M phase proportion, indicating G2/M checkpoint impairment. Mechanistically, matrine concurrently downregulated CHEK1, p-PI3K, p-AKT, BCL-2, and EMT markers (Vimentin, MMP2, MMP9), and upregulated γH2AX, E-cadherin, Bax, and Cleaved Caspase-3. Crucially, siRNA experiments revealed that PI3K knockdown induced apoptosis without affecting CHEK1/γH2AX, whereas CHEK1 silencing promoted apoptosis independently of PI3K/AKT, demonstrating complementary. In vivo, matrine significantly inhibited LLC tumor growth in a xenograft model, suppressed proliferation (Ki67), and modulated the CHEK1-PI3K/AKT axis, corroborated by IHC and Western blotting. Importantly, matrine exhibited no significant systemic toxicity. Our findings unveil that matrine exerts potent antitumor effects by simultaneously inhibiting CHEK1-mediated DNA repair and PI3K/AKT survival signaling, presenting a novel dual-targeting approach for lung cancer treatment.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "MECHANISTIC_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 23,
+        "selection_score": 72.0,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      },
+      {
+        "pmid": "39792924",
+        "doi": "10.1371/journal.ppat.1012531",
+        "title": "SLC35A2 gene product modulates paramyxovirus fusion events during infection",
+        "authors": [
+          "Yang Y",
+          "Wang Y",
+          "Campbell DE",
+          "Lee HW",
+          "Beatty W",
+          "Wang L",
+          "Baldridge M",
+          "López CB"
+        ],
+        "journal": "PLoS Pathog",
+        "year": 2025,
+        "publication_date": "2025 Jan",
+        "abstract": "Paramyxoviruses are significant human and animal pathogens that include mumps virus (MuV), Newcastle disease virus (NDV) and the murine parainfluenza virus Sendai (SeV). Despite their importance, few host factors implicated in paramyxovirus infection are known. Using a recombinant SeV expressing destabilized eGFP (rSeVCdseGFP) in a loss-of-function CRISPR screen, we identified the CMP-sialic acid transporter (CST) gene SLC35A1 and the UDP-galactose transporter (UGT) gene SLC35A2 as essential for paramyxovirus infection. As expected, SLC35A1 knockout (KO) cells showed drastic reduction in infections with SeV, NDV and MuV due to the lack of cell surface sialic acids receptors. However, SLC35A2 KO cells revealed unknown critical roles for this factor in virus-cell and cell-to-cell fusion events for the different paramyxoviruses. While UGT was essential for virus-cell fusion during SeV entry to the cell, it was not required for NDV or MuV entry. Importantly, UGT promoted the formation of syncytia during MuV infection, suggesting a role in cell-to-cell virus spread. Our findings demonstrate that paramyxoviruses can bind to or enter A549 cells in the absence of canonical galactose-bound sialic-acid decorations and show that UGT facilitates paramyxovirus fusion processes involved in entry and spread.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "RECOMBINANT_VIRUS",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "ONCOLYSIS"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "INDIRECT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 24,
+        "selection_score": 71.3,
+        "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_4_NECESSITY",
+          "SECTION_6_SPECIFIC_OBJECTIVES"
+        ],
+        "why_this_paper_is_needed": "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
+      },
+      {
+        "pmid": "42633541",
+        "doi": "10.36721/pjps.2026.39.11.328.1",
+        "title": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition",
+        "authors": [
+          "Sun J",
+          "Jifu C",
+          "Qiu Y",
+          "Lu L",
+          "Xu Z",
+          "He Z",
+          "Wang J"
+        ],
+        "journal": "Pak J Pharm Sci",
+        "year": 2026,
+        "publication_date": "2026 Nov 1",
+        "abstract": "Lung cancer is the most common pulmonary malignancy. WHO data show that its incidence and mortality are rising globally, severely threatening public health. This study aims to investigate the regulatory effect of Jolkinolide B (JB) on lung cancer A549 cells and to preliminarily explore the potential molecular mechanisms underlying its anti-lung cancer effects. In this study, A549 lung adenocarcinoma cells were used to investigate the anti-lung cancer effects of JB. CCK-8 and colony formation assays were performed to evaluate cell proliferation. Molecular docking and molecular dynamics simulation were applied to verify the binding between JB and JAK2, while Western blot was used to detect the expression of JAK2/STAT3 pathway-related proteins. Flow cytometry, immunofluorescence and Western blot were employed to explore the regulatory roles of JB in cell apoptosis and cycle. In addition, a nude mouse xenograft model was established and HE staining and immunohistochemistry were used to verify the in-vivo efficacy of JB. All data were statistically analyzed using GraphPad Prism and SPSS. The results demonstrated that JB inhibited A549 cell proliferation in a dose‑dependent manner with an IC50 of 39.34 μM at 24 h. JB bound stably to JAK2 (PDB: 7RN6) with a binding free energy of -8.33 kcal/mol and suppressed the JAK2/STAT3 pathway. JB significantly promoted apoptosis and induced G1‑phase arrest via regulating P21, Cyclin D1, BAX, Caspase 3, PARP1 and Bcl‑2. In-vivo, JB reduced tumor growth in a dose‑dependent manner, induced tumor cell necrosis and downregulated p‑JAK2 and p‑STAT3 expression. Jolkinolide B can significantly inhibit the proliferation of human lung adenocarcinoma A549 cells. Its mechanism of action is closely related to inducing cell cycle arrest and promoting cell apoptosis. The above effects may be partially achieved by inhibiting the JAK2/STAT3 pathway. In animal experiments, JB also significantly inhibits the growth of lung cancer transplanted tumors.",
+        "retrieval_tier": "ABSTRACT_VERIFIED",
+        "compound_identity": "UNKNOWN_IDENTITY",
+        "viral_platform_identity": "NOT_APPLICABLE",
+        "model_match": "EXACT",
+        "reported_outcomes": [
+          "CELL_VIABILITY",
+          "APOPTOSIS",
+          "CASPASE_ACTIVITY",
+          "CELL_CYCLE",
+          "IC50"
+        ],
+        "synergy_evidence": "MONOTHERAPY_ONLY",
+        "ci_classification_source": "UNVERIFIED",
+        "evidence_relationship": "MECHANISTIC_SUPPORT",
+        "support_strength": "SUPPORTIVE",
+        "citation_number": 25,
+        "selection_score": 68.7,
+        "final_inclusion_reason": "MECHANISTIC_RATIONALE",
+        "proposal_section_supported": [
+          "SECTION_2_PROBLEM_STATEMENT",
+          "SECTION_3_LITERATURE_REVIEW",
+          "SECTION_9_HYPOTHESES_QUESTIONS"
+        ],
+        "why_this_paper_is_needed": "Provides molecular evidence for signaling pathways, apoptosis mediators, and intracellular target modulation."
+      }
+    ],
+    "excluded_candidates_count": 1,
+    "excluded_candidates": [
+      {
+        "ref_id": "10.1016/j.ejphar.2011.08.045",
+        "reason": "REJECT_TEMPORAL_BREACH",
+        "details": "Published in 2011 (outside 6-year window) without verified citation/seminal justification. Prohibited from core evidence."
+      }
+    ],
+    "axis_distribution": {
+      "core_direct": 10,
+      "mechanistic": 9,
+      "model_pathology": 3,
+      "methodological": 3,
+      "safety_null": 0
+    }
+  },
+  "portfolio_audit": {
+    "portfolio_status": "PASS",
+    "PORTFOLIO_AUDIT": "PASS",
+    "total_references": 25,
+    "max_reference_ceiling": 25,
+    "min_reference_floor": 15,
+    "violations_count": 0,
+    "violations": []
+  }
+}

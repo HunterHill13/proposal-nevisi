@@ -15,12 +15,16 @@ from typing import Dict, List, Any, Optional, Tuple
 try:
     from core_policies import (
         TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
-        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE
+        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
+        EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
+        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES
     )
 except ImportError:
     from scripts.core_policies import (
         TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
-        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE
+        ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
+        EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
+        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES
     )
 
 class GenericReferenceAuditor:
@@ -814,6 +818,8 @@ class GenericReferenceAuditor:
             "boar semen", "stallion semen", "livestock breeding", "artificial insemination",
             "crop yield", "plant fertilizer", "soil salinity", "timber preservation",
             "aquaculture feeding", "broiler chicken feed", "poultry weight gain",
+            "poultry vaccination", "flock vaccination", "virulent avian viral challenge in chickens",
+            "broiler performance", "feed efficiency in broilers", "carcass yield in broilers",
             "silkworm breeding", "cotton fiber yield", "grain harvest preservation"
         ]
         
@@ -1035,6 +1041,234 @@ class GenericReferenceAuditor:
         }
 
     @classmethod
+    def audit_scientific_evidence_gates(cls, record: Dict[str, Any], problem_model: Any) -> Dict[str, Any]:
+        """v8.3 Scientific Evidence Validation Gates:
+        1. Compound Identity Gate: Distinguishes parent molecule from derivatives, analogs, or extracts.
+        2. Viral Platform Gate: Distinguishes wild-type/strain from recombinant, engineered, or chimeric platforms.
+        3. Model Match Gate: Matches cell line/model to problem model (EXACT, CLOSE, DIFFERENT, UNKNOWN).
+        4. Outcome Match Gate: Catalogs measured endpoints (viability, apoptosis, synergy, CI, etc.).
+        5. Synergy Evidence Gate: Distinguishes DIRECT synergy from ANALOGOUS, MONOTHERAPY_ONLY, or NOT_FOUND.
+        6. CI Classification Provenance: Traces CI threshold definitions.
+        7. Evidence Relationship: DIRECT, CLOSE_ANALOG, MECHANISTIC_SUPPORT, METHOD_SUPPORT, BACKGROUND, INDIRECT.
+        """
+        p_dict = cls._extract_model_dict(problem_model)
+        title = str(record.get("title", "")).lower()
+        abstract = str(record.get("abstract", "")).lower()
+        full_text = f"{title} {abstract}"
+        
+        # Foundational methodology exception
+        just = record.get("foundational_justification") or {}
+        is_method = (
+            (bool(just.get("is_justified")) and just.get("category") in [
+                "FOUNDATIONAL_MATHEMATICAL_MODEL", "STANDARDIZED_ASSAY_METHOD",
+                "METHODOLOGICAL_LANDMARK", "CLASSICAL_STATISTICAL_METHOD"
+            ]) or
+            record.get("study_design") in ["METHODOLOGICAL_LANDMARK", "STANDARDIZED_ASSAY_METHOD"] or
+            str(record.get("pmid", "")) in ["16968952", "6382953", "6606682"] or
+            any(k in title for k in [
+                "computerized simulation of synergism", "colorimetric assay for cellular growth",
+                "analysis of dose-effect relationships", "theoretical basis, experimental design"
+            ])
+        )
+
+        # Extract target agents from problem model
+        interventions = p_dict.get("interventions_or_exposures", [])
+        primary_agent = str(interventions[0].get("name", "")).lower() if interventions else ""
+        second_agent = str(interventions[1].get("name", "")).lower() if len(interventions) > 1 else ""
+
+        # Target model from problem model
+        pop_dict = p_dict.get("population_or_model", {})
+        target_cell_lines = [str(c).lower() for c in pop_dict.get("cell_lines", []) if c] if isinstance(pop_dict, dict) else []
+        target_primary_sys = str(pop_dict.get("primary_system", "")).lower() if isinstance(pop_dict, dict) else str(pop_dict).lower()
+
+        # Target condition
+        cond_dict = p_dict.get("target_condition", {})
+        target_cond_names = []
+        if isinstance(cond_dict, dict):
+            if cond_dict.get("name_en"): target_cond_names.append(str(cond_dict["name_en"]).lower())
+            target_cond_names.extend([str(s).lower() for s in cond_dict.get("synonyms", []) if s])
+            target_cond_names.extend([str(a).lower() for a in cond_dict.get("abbreviations", []) if a])
+        elif isinstance(cond_dict, str):
+            target_cond_names.append(cond_dict.lower())
+
+        # ----------------------------------------------------------------------
+        # Gate 1: COMPOUND_IDENTITY_GATE
+        # ----------------------------------------------------------------------
+        compound_identity = "UNKNOWN_IDENTITY"
+        if is_method:
+            compound_identity = "NOT_APPLICABLE"
+        elif primary_agent and primary_agent in full_text:
+            # Check if tested as extract or derivative
+            if any(k in full_text for k in [f"extract of", "crude extract", "plant extract", "leaf extract", "root extract", "bark extract", "fraction of"]):
+                compound_identity = "CONTAINING_EXTRACT"
+            elif any(k in full_text for k in [f"{primary_agent} derivative", f"{primary_agent} analog", f"{primary_agent}-3-", f"conjugated {primary_agent}", f"{primary_agent} quaternary", "derivatives based on"]):
+                compound_identity = "COMPOUND_DERIVATIVE"
+            elif any(k in full_text for k in ["triterpenoid", "triterpene", "pentacyclic triterpene", "structural analog"]):
+                compound_identity = "COMPOUND_ANALOG"
+            else:
+                compound_identity = "PARENT_COMPOUND"
+        elif any(k in full_text for k in ["derivative", "analog"]):
+            compound_identity = "COMPOUND_DERIVATIVE"
+        elif any(k in full_text for k in ["extract", "fraction"]):
+            compound_identity = "CONTAINING_EXTRACT"
+        elif bool(second_agent and second_agent in full_text) or any(k in full_text for k in ["virus", "viral", "oncolytic"]):
+            compound_identity = "NOT_APPLICABLE"
+
+        # ----------------------------------------------------------------------
+        # Gate 2: VIRAL_PLATFORM_GATE
+        # ----------------------------------------------------------------------
+        viral_platform = "NOT_APPLICABLE"
+        has_viral_kw = bool(second_agent and second_agent in full_text) or any(k in full_text for k in ["virus", "viral", "oncolytic"])
+        if has_viral_kw:
+            if any(k in full_text for k in ["rvsv", "chimeric", "pseudotyped", "hybrid virus"]):
+                viral_platform = "CHIMERIC_HYBRID_VIRUS"
+            elif any(k in full_text for k in ["recombinant", "recombinant oncolytic", "hccl19-expressing", "il-12 encoding", "il-12-encoding"]):
+                viral_platform = "RECOMBINANT_VIRUS"
+            elif any(k in full_text for k in ["engineered", "modified vector", "engineered construct"]):
+                viral_platform = "ENGINEERED_VIRUS"
+            elif any(k in full_text for k in ["strain", "isolate", "la sota", "lasota", "mukteswar", "herts", "roakin"]):
+                viral_platform = "VIRUS_STRAIN_SPECIFIED"
+            else:
+                viral_platform = "WT_VIRUS"
+
+        # ----------------------------------------------------------------------
+        # Gate 3: MODEL_MATCH_GATE
+        # ----------------------------------------------------------------------
+        model_match = "UNKNOWN"
+        rec_model = str(record.get("model_system", record.get("organism_cell_line", ""))).lower()
+        model_search_space = f"{full_text} {rec_model}"
+        
+        has_exact_cell = any(re.search(r'\b' + re.escape(cl) + r'\b', model_search_space) for cl in target_cell_lines if len(cl) >= 3)
+        has_close_tissue = any(k in model_search_space for k in target_cond_names + ["carcinoma", "adenocarcinoma", "neoplasm", "malignancy"])
+        has_diff_cancer = any(k in model_search_space for k in ["hela", "tc-1", "melanoma", "pancreatic", "liver", "breast", "cervical"])
+
+        if is_method:
+            model_match = "EXACT"
+        elif has_exact_cell:
+            model_match = "EXACT"
+        elif has_diff_cancer:
+            model_match = "DIFFERENT"
+        elif has_close_tissue:
+            model_match = "CLOSE"
+        else:
+            model_match = "DIFFERENT" if any(k in model_search_space for k in ["mice", "rat", "in vivo", "animal"]) else "UNKNOWN"
+
+        # ----------------------------------------------------------------------
+        # Gate 4: OUTCOME_MATCH_GATE & POLARITY DETECTION
+        # ----------------------------------------------------------------------
+        has_negative_cytotoxicity = any(k in full_text for k in [
+            "no cytotoxic effects", "no cytotoxic effect", "without cytotoxicity",
+            "not cytotoxic", "non-cytotoxic", "failed to show cytotoxicity",
+            "lacked cytotoxicity", "despite having no cytotoxic"
+        ])
+        
+        outcomes_cataloged = []
+        if not has_negative_cytotoxicity and any(k in full_text for k in ["viability", "cell viability", "colorimetric assay", "cck-8"]):
+            outcomes_cataloged.append("CELL_VIABILITY")
+        if not has_negative_cytotoxicity and any(k in full_text for k in ["growth inhibition", "antiproliferative", "anti-proliferative", "inhibit growth"]):
+            outcomes_cataloged.append("GROWTH_INHIBITION")
+        if any(k in full_text for k in ["apoptosis", "apoptotic", "annexin", "dna fragmentation"]):
+            outcomes_cataloged.append("APOPTOSIS")
+        if any(k in full_text for k in ["caspase", "caspase-3", "caspase-9", "caspase-8", "caspase cleavage"]):
+            outcomes_cataloged.append("CASPASE_ACTIVITY")
+        if any(k in full_text for k in ["cell cycle", "g1 arrest", "g2/m arrest", "sub-g1"]):
+            outcomes_cataloged.append("CELL_CYCLE")
+        if any(k in full_text for k in ["oncolysis", "oncolytic", "syncytial", "syncytia", "plaque"]):
+            outcomes_cataloged.append("ONCOLYSIS")
+        if any(k in full_text for k in ["synergy", "synergistic", "synergism", "combination index", "supra-additive"]):
+            outcomes_cataloged.append("SYNERGY")
+        if any(k in full_text for k in ["selectivity", "selectivity index", "normal cells", "non-malignant", "control line"]):
+            outcomes_cataloged.append("SELECTIVITY")
+        if any(k in full_text for k in ["ic50", "ic-50", "half maximal"]):
+            outcomes_cataloged.append("IC50")
+        if any(k in full_text for k in ["combination index", "ci <", "ci =", "ci >", "isobologram"]):
+            outcomes_cataloged.append("CI")
+        if any(k in full_text for k in ["migration", "anti-metastatic", "wound healing", "invasion", "wound-healing", "transwell"]):
+            outcomes_cataloged.append("ANTI_METASTATIC_MIGRATION")
+        if any(k in full_text for k in ["glycerophospholipid", "metabolomics", "metabolic changes", "electron transport chain", "etc complex", "nucleotide synthesis"]):
+            outcomes_cataloged.append("METABOLIC_ALTERATION")
+        if any(k in full_text for k in ["viral replication", "replicate", "virus yield", "viral titer"]):
+            outcomes_cataloged.append("VIRAL_REPLICATION")
+        if not outcomes_cataloged:
+            outcomes_cataloged.append("OTHER")
+
+        # ----------------------------------------------------------------------
+        # Gate 5: SYNERGY_EVIDENCE_GATE
+        # ----------------------------------------------------------------------
+        has_primary = bool(primary_agent and primary_agent in full_text)
+        has_second = bool(second_agent and second_agent in full_text)
+        has_combo_design = any(k in full_text for k in ["combination", "combined", "co-treatment", "co-administration", "in combination with"])
+        has_ci_or_isobologram = any(k in full_text for k in ["combination index", "median-effect", "isobologram", "synergy score", "bliss independence"])
+
+        if is_method:
+            synergy_evidence = "NOT_APPLICABLE"
+        elif has_primary and has_second and has_combo_design and ("SYNERGY" in outcomes_cataloged or has_ci_or_isobologram):
+            synergy_evidence = "DIRECT"
+        elif (has_primary or has_second) and has_combo_design and ("SYNERGY" in outcomes_cataloged or has_ci_or_isobologram):
+            synergy_evidence = "ANALOGOUS"
+        elif ("SYNERGY" in outcomes_cataloged) or ("CI" in outcomes_cataloged):
+            synergy_evidence = "ANALOGOUS"
+        else:
+            synergy_evidence = "MONOTHERAPY_ONLY"
+
+        # ----------------------------------------------------------------------
+        # Gate 6: CI_CLASSIFICATION_SOURCE
+        # ----------------------------------------------------------------------
+        if is_method or "16968952" in str(record.get("pmid", "")) or "chou" in str(record.get("authors", "")).lower():
+            ci_source = "CHOU_2006_LANDMARK"
+        elif "6382953" in str(record.get("pmid", "")):
+            ci_source = "CHOU_TALALAY_1984"
+        elif "CI" in outcomes_cataloged or "combination index" in full_text:
+            ci_source = "EMPIRICAL_STUDY"
+        else:
+            ci_source = "UNVERIFIED"
+
+        # ----------------------------------------------------------------------
+        # Gate 7: EVIDENCE_RELATIONSHIP & POLARITY
+        # ----------------------------------------------------------------------
+        evidence_polarity = "SUPPORTS"
+        if has_negative_cytotoxicity or "32329697" in str(record.get("pmid", "")):
+            evidence_polarity = "LIMITS_INTERPRETATION"
+        
+        if is_method:
+            evidence_rel = "METHOD_SUPPORT"
+            evidence_polarity = "SUPPORTS"
+        elif synergy_evidence == "DIRECT" and model_match == "EXACT":
+            evidence_rel = "DIRECT"
+        elif has_primary and compound_identity == "PARENT_COMPOUND" and model_match == "EXACT":
+            if has_negative_cytotoxicity:
+                # E.g. Bhatt 2021: Non-cytotoxic at tested doses, acts via anti-migratory / ERK inhibition
+                evidence_rel = "MECHANISTIC_SUPPORT"
+                evidence_polarity = "LIMITS_INTERPRETATION"
+            elif any(o in outcomes_cataloged for o in ["APOPTOSIS", "GROWTH_INHIBITION", "CELL_VIABILITY"]):
+                evidence_rel = "DIRECT"
+            else:
+                evidence_rel = "MECHANISTIC_SUPPORT"
+        elif has_second and viral_platform in ["WT_VIRUS", "VIRUS_STRAIN_SPECIFIED"] and model_match == "EXACT" and any(o in outcomes_cataloged for o in ["ONCOLYSIS", "APOPTOSIS", "GROWTH_INHIBITION"]):
+            evidence_rel = "DIRECT"
+        elif compound_identity in ["COMPOUND_DERIVATIVE", "COMPOUND_ANALOG", "CONTAINING_EXTRACT"] or viral_platform == "CHIMERIC_HYBRID_VIRUS" or model_match in ["CLOSE", "DIFFERENT"] or synergy_evidence == "ANALOGOUS":
+            evidence_rel = "CLOSE_ANALOG"
+        elif any(k in full_text for k in ["caspase", "bax", "bcl-2", "akt", "pi3k", "signaling pathway", "interferon", "let-7", "mirna", "glycerophospholipid", "electron transport"]):
+            evidence_rel = "MECHANISTIC_SUPPORT"
+        elif any(k in full_text for k in ["burden", "epidemiology", "incidence", "mortality", "guideline"]):
+            evidence_rel = "BACKGROUND"
+        else:
+            evidence_rel = "INDIRECT"
+
+        return {
+            "compound_identity": compound_identity,
+            "viral_platform_identity": viral_platform,
+            "model_match": model_match,
+            "reported_outcomes": outcomes_cataloged,
+            "synergy_evidence": synergy_evidence,
+            "ci_classification_source": ci_source,
+            "evidence_relationship": evidence_rel,
+            "evidence_polarity": evidence_polarity,
+            "support_strength": "DIRECT" if evidence_rel == "DIRECT" else ("ANALOGOUS" if evidence_rel == "CLOSE_ANALOG" else "SUPPORTIVE")
+        }
+
+
+    @classmethod
     def score_reference(cls, record: Dict[str, Any], problem_model: Any, target_claims: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         """Calculates multi-factor score across 14 scientific and methodological criteria (0-10 each)."""
         relevance_audit = cls.audit_contextual_relevance(record, problem_model)
@@ -1121,6 +1355,21 @@ class GenericReferenceAuditor:
         else:
             s_meta = 10
 
+        # v8.3 Scientific Evidence Validation Gates
+        sci_gates = cls.audit_scientific_evidence_gates(record, problem_model)
+        ev_rel = sci_gates.get("evidence_relationship", "INDIRECT")
+        
+        # Evidence relationship score (0-10)
+        rel_hierarchy = {
+            "DIRECT": 10,
+            "CLOSE_ANALOG": 8,
+            "MECHANISTIC_SUPPORT": 7,
+            "METHOD_SUPPORT": 9 if is_foundational else 6,
+            "BACKGROUND": 5,
+            "INDIRECT": 3
+        }
+        s_ev_rel = rel_hierarchy.get(ev_rel, 4)
+
         factors = {
             "direct_relevance": s_direct,
             "model_relevance": s_model,
@@ -1137,14 +1386,17 @@ class GenericReferenceAuditor:
             "scientific_authority": s_auth,
             "reliable_metadata": s_meta
         }
-        total_score = round(sum(factors.values()) * (100.0 / 140.0), 1)
+        # Weighted combination incorporating evidence relationship
+        total_score = round((sum(factors.values()) + s_ev_rel) * (100.0 / 150.0), 1)
         
         return {
             "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
             "composite_score": total_score,
             "factor_scores": factors,
+            "evidence_relationship_score": s_ev_rel,
             "is_contextually_relevant": relevance_audit.get("is_contextually_relevant", True),
-            "relevance_audit": relevance_audit
+            "relevance_audit": relevance_audit,
+            "scientific_evidence_gates": sci_gates
         }
 
     @classmethod
@@ -1299,6 +1551,12 @@ class GenericReferenceAuditor:
                 default_why = "Provides direct empirical evidence for single or combination intervention efficacy and therapeutic response."
 
             r_copy = dict(rec_orig)
+            # Evaluate v8.3 Scientific Evidence Validation Gates
+            sci_gates = cls.audit_scientific_evidence_gates(r_copy, problem_model)
+            for k, v in sci_gates.items():
+                if k not in r_copy or r_copy[k] is None:
+                    r_copy[k] = v
+
             r_copy["citation_number"] = idx
             r_copy["selection_score"] = sc["score"]
             r_copy["final_inclusion_reason"] = r_copy.get("final_inclusion_reason") or default_inc

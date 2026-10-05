@@ -62,6 +62,39 @@
         "CONFLICT_OR_UNVERIFIED",
         "UNVERIFIED"
       ]
+    },
+    "evidence_relationship": {
+      "type": "string",
+      "enum": [
+        "DIRECT",
+        "CLOSE_ANALOG",
+        "MECHANISTIC_SUPPORT",
+        "METHOD_SUPPORT",
+        "BACKGROUND",
+        "INDIRECT"
+      ]
+    },
+    "compound_identity": {
+      "type": "string",
+      "enum": [
+        "PARENT_COMPOUND",
+        "COMPOUND_DERIVATIVE",
+        "COMPOUND_ANALOG",
+        "CONTAINING_EXTRACT",
+        "UNKNOWN_IDENTITY"
+      ]
+    },
+    "viral_platform_identity": {
+      "type": "string",
+      "enum": [
+        "WT_VIRUS",
+        "VIRUS_STRAIN_SPECIFIED",
+        "RECOMBINANT_VIRUS",
+        "ENGINEERED_VIRUS",
+        "CHIMERIC_HYBRID_VIRUS",
+        "VIRUS_DERIVED_PLATFORM",
+        "NOT_APPLICABLE"
+      ]
     }
   }
 }

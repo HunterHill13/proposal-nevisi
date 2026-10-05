@@ -1,0 +1,19 @@
+{
+  "analysis_name": "CONTRADICTION_ANALYSIS",
+  "version": "8.3.0",
+  "topic": "Lupeol and NDV in A549 lung cancer",
+  "true_contradictions_identified": 0,
+  "contextual_disagreements_identified": 2,
+  "disagreement_records": [
+    {
+      "category": "DISAGREEMENT_VEHICLE_TOLERANCE_AND_POTENCY",
+      "observation": "Varying IC50 values reported for Lupeol derivatives and triterpenes across studies (1.36 uM to 40 uM).",
+      "epistemic_resolution": "Differences stem from synthetic modifications (e.g., quaternary phosphonium vs carbamate linkages) and vehicle formulation conditions. Contextual disagreement, not a biological contradiction."
+    },
+    {
+      "category": "DISAGREEMENT_ONCOLYTIC_STRAIN_KINETICS",
+      "observation": "Different oncolytic NDV strains (AF2240, LaSota, recombinant rVSV-NDV) exhibit varying syncytial kinetics and interferon-induction levels in lung cancer models.",
+      "epistemic_resolution": "Attributable to genetic divergence between velogenic, mesogenic, and lentogenic NDV backbones. Controlled in our protocol by standardizing to a defined oncolytic lab strain with predetermined MOI titration."
+    }
+  ]
+}

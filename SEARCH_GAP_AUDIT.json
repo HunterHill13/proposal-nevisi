@@ -1,0 +1,194 @@
+{
+  "audit_metadata": {
+    "version": "8.3.0",
+    "timestamp": "2026-10-04T19:54:37Z",
+    "research_topic": "Evaluation of the Combined and Synergistic Effects of Lupeol and Newcastle Disease Virus on Growth Inhibition of Lung Cancer Cell Line (A549) In Vitro",
+    "disease_focus": "Non-Small Cell Lung Cancer (NSCLC) / A549 Cell Line",
+    "agent_engine": "Proposal-Nevisi v8.3 Scientific Retrieval Auditor"
+  },
+  "search_execution_summary": {
+    "databases": [
+      "PubMed (NCBI E-utilities)",
+      "Europe PMC REST API"
+    ],
+    "search_timestamp_utc": "2026-10-04T19:54:37Z",
+    "total_adversarial_queries": 14,
+    "queries_executed": [
+      {
+        "query": "Lupeol AND \"Newcastle disease virus\"",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 30,
+          "titles": [
+            "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+            "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+            "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "The Genus <i>Diospyros</i>: A Review of Novel Insights into the Biological Activity and Species of Mozambican Flora."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND NDV",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 25,
+          "titles": [
+            "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+            "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+            "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND \"Newcastle disease virus\" AND A549",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 10,
+          "titles": [
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "Antiviral Potential of Selected Medicinal Herbs and Their Isolated Natural Products.",
+            "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+            "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND NDV AND A549",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 7,
+          "titles": [
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "New insights of propolis nanoformulation and its therapeutic potential in human diseases.",
+            "Antiviral Potential of Selected Medicinal Herbs and Their Isolated Natural Products.",
+            "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND \"Newcastle disease virus\" AND \"lung cancer\"",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 10,
+          "titles": [
+            "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+            "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND NDV AND \"lung cancer\"",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 6,
+          "titles": [
+            "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+            "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+            "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND \"Newcastle disease virus\" AND synergy",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 5,
+          "titles": [
+            "Phytochemical Profiling, In Vitro Biological Activities, and In-Silico Studies of <i>Ficus vasta Forssk.</i>: An Unexplored Plant.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "Antimicrobial and Other Pharmacological Properties of <i>Ocimum basilicum</i>, <i>Lamiaceae</i>.",
+            "Plant ingredients in Thai food: a well-rounded diet for natural bioactive associated with medicinal properties.",
+            "Posters"
+          ]
+        }
+      },
+      {
+        "query": "Lupeol AND NDV AND combination",
+        "pubmed": {
+          "count": 0,
+          "ids": []
+        },
+        "europe_pmc": {
+          "count": 14,
+          "titles": [
+            "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+            "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures.",
+            "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+            "Analytical review of <i>Tiryāq-i-Wabāī</i> - A Unani panacea for the control of COVID-19.",
+            "New insights of propolis nanoformulation and its therapeutic potential in human diseases."
+          ]
+        }
+      }
+    ],
+    "total_records_retrieved_raw": 618,
+    "total_unique_records_screened": 43,
+    "total_records_excluded": 18,
+    "exclusion_breakdown": {
+      "veterinary_poultry_vaccination": 8,
+      "livestock_semen_cryopreservation": 3,
+      "feed_additive_broiler_growth": 3,
+      "off_topic_botanical_review": 2,
+      "duplicate_records": 2
+    },
+    "final_direct_combination_study_count": 0
+  },
+  "search_gap_verdict": {
+    "direct_combination_study_identified": false,
+    "direct_study_count": 0,
+    "status": "NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES",
+    "epistemically_bounded_statement": "Within the searched databases (PubMed, Europe PMC) up to 2026-10-04 across 14 search families, no empirical study directly testing the simultaneous combination of pure Lupeol and Newcastle Disease Virus in A549 lung cancer cells was identified.",
+    "prohibited_blanket_statements": [
+      "NO_DIRECT_STUDY_EXISTS (PROHIBITED)",
+      "هیچ مطالعه‌ای تاکنون در تاریخ انجام نشده است (PROHIBITED)"
+    ]
+  },
+  "evidence_tier_availability": {
+    "A_direct_combination_a549": 0,
+    "B_direct_single_ndv_oncolysis_a549": 3,
+    "B_direct_single_pure_lupeol_a549_anti_migratory": 1,
+    "C_close_analog_lupeol_derivatives_a549": 4,
+    "C_close_analog_plant_extracts_lupeol_a549": 3,
+    "C_close_analog_chimeric_recombinant_ndv_lung": 3,
+    "C_close_analog_phytochemical_synergy_a549": 2,
+    "C_close_analog_pentacyclic_triterpenes_a549": 1,
+    "C_close_analog_ndv_tc1_lung": 1,
+    "C_close_analog_paramyxovirus_fusion": 1,
+    "D_methodological_standards": 3,
+    "D_mechanistic_signaling_a549": 3
+  },
+  "epistemic_hedging_mandate": {
+    "synergy_status": "HYPOTHESIS_ONLY",
+    "extrapolation_warning": "Separate monotherapy data (Lupeol IC50 or NDV oncolysis) cannot be asserted as proof of combination synergy. Combination Index (CI < 1.0) must be empirically determined experimentally."
+  }
+}

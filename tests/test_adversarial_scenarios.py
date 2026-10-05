@@ -1822,9 +1822,346 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(len(sel_res["selected_references"]), 0)
         self.assertEqual(sel_res["screening_funnel"]["stage_1_retrieved_broad_corpus"], 0)
 
+    def test_93_v83_direct_evidence_lupeol_a549_apoptosis(self):
+        """Test 93: Target compound + target cell line + apoptosis -> DIRECT evidence."""
+        rec = {
+            "ref_id": "P_LUPEOL_DIRECT",
+            "title": "Evaluated agent inhibits growth and triggers apoptosis in target cell line A549",
+            "abstract": "Lupeol treatment induced marked apoptosis and cell viability inhibition in A549 cells.",
+            "year": 2024
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer", "abbreviations": ["NSCLC"]},
+            "population_or_model": {"primary_system": "Lung Adenocarcinoma", "cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["model_match"], "EXACT")
+        self.assertEqual(res["evidence_relationship"], "DIRECT")
+        self.assertEqual(res["support_strength"], "DIRECT")
+
+    def test_94_v83_derivative_never_direct_parent_compound(self):
+        """Test 94: Target compound derivative + target cell line -> Never DIRECT parent compound."""
+        rec = {
+            "ref_id": "P_DERIV",
+            "title": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and antitumor activity in A549",
+            "abstract": "Synthesized novel lupeol derivatives and evaluated apoptosis induction in A549 lung cancer cells.",
+            "year": 2026
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["compound_identity"], "COMPOUND_DERIVATIVE")
+        self.assertNotEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["evidence_relationship"], "CLOSE_ANALOG")
+
+    def test_95_v83_plant_extract_containing_compound_not_direct(self):
+        """Test 95: Plant extract containing target compound + target cell line -> Never direct parent compound."""
+        rec = {
+            "ref_id": "P_EXTRACT",
+            "title": "Anti-cancer potential of crude leaf extract of Lantana camara against A549 cancer cell lines",
+            "abstract": "Extract of Lantana camara containing lupeol exhibited cytotoxicity in A549 lung adenocarcinoma cells.",
+            "year": 2025
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}],
+            "primary_outcomes": [{"name": "Cytotoxicity"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["compound_identity"], "CONTAINING_EXTRACT")
+        self.assertNotEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["evidence_relationship"], "CLOSE_ANALOG")
+
+    def test_96_v83_ndv_a549_apoptosis_direct_evidence(self):
+        """Test 96: Target virus + target cell line + apoptosis/oncolysis -> DIRECT evidence."""
+        rec = {
+            "ref_id": "P_NDV_DIRECT",
+            "title": "Newcastle disease virus induces oncolysis and apoptosis in lung cancer A549 cells",
+            "abstract": "Infection with Newcastle disease virus strain triggered caspase activation and oncolysis in human A549 cells.",
+            "year": 2021
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Oncolysis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertIn(res["viral_platform_identity"], ["WT_VIRUS", "VIRUS_STRAIN_SPECIFIED"])
+        self.assertEqual(res["model_match"], "EXACT")
+        self.assertEqual(res["evidence_relationship"], "DIRECT")
+
+    def test_97_v83_hybrid_rvsv_ndv_not_direct_wt(self):
+        """Test 97: Chimeric rVSV-NDV platform + lung cancer -> CHIMERIC_HYBRID_VIRUS and CLOSE_ANALOG, not WT."""
+        rec = {
+            "ref_id": "P_RVSV",
+            "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates apoptosis in human lung cancer cells",
+            "abstract": "Chimeric rVSV-NDV hybrid virus mediates immunogenic apoptosis in lung carcinoma lines.",
+            "year": 2025
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["viral_platform_identity"], "CHIMERIC_HYBRID_VIRUS")
+        self.assertNotEqual(res["viral_platform_identity"], "WT_VIRUS")
+        self.assertEqual(res["evidence_relationship"], "CLOSE_ANALOG")
+
+    def test_98_v83_ndv_hepg2_synergy_close_analog(self):
+        """Test 98: Virus + disparate cell line HepG2 + hydroxyurea + synergy -> CLOSE_ANALOG, not direct for target proposal."""
+        rec = {
+            "ref_id": "P_HEPG2",
+            "title": "Newcastle disease virus combined with hydroxyurea exerts synergistic cytotoxicity in HepG2 liver cancer cells",
+            "abstract": "Co-treatment of NDV and hydroxyurea resulted in combination index < 1.0 in HepG2 hepatocellular carcinoma cells.",
+            "year": 2023
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["model_match"], "DIFFERENT")
+        self.assertEqual(res["synergy_evidence"], "ANALOGOUS")
+        self.assertEqual(res["evidence_relationship"], "CLOSE_ANALOG")
+
+    def test_99_v83_ndv_poultry_vaccination_rejected_irrelevant(self):
+        """Test 99: Newcastle disease virus in poultry vaccination -> strictly rejected as IRRELEVANT."""
+        rec = {
+            "ref_id": "P_POULTRY",
+            "title": "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical poultry vaccination",
+            "abstract": "Flock vaccination against Newcastle disease virus in broiler chicken feed and carcass yield evaluation.",
+            "year": 2024
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_contextual_relevance(rec, problem_model)
+        self.assertFalse(res["is_contextually_relevant"])
+        self.assertEqual(res["relevance_tier"], "IRRELEVANT")
+
+    def test_100_v83_lupeol_livestock_semen_rejected_irrelevant(self):
+        """Test 100: Lupeol in livestock sperm cryopreservation -> strictly rejected as IRRELEVANT."""
+        rec = {
+            "ref_id": "P_SEMEN",
+            "title": "Synergistic enhancement of antioxidant levels by Vitamin A and Lupeol improves the quality of cryopreserved bucks semen",
+            "abstract": "Cryopreserved bucks semen artificial insemination and spermatozoa motility parameters.",
+            "year": 2023
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_contextual_relevance(rec, problem_model)
+        self.assertFalse(res["is_contextually_relevant"])
+        self.assertEqual(res["relevance_tier"], "IRRELEVANT")
+
+    def test_101_v83_a549_apoptosis_without_interventions_mechanistic_support(self):
+        """Test 101: Cell line apoptosis without Lupeol or NDV -> MECHANISTIC_SUPPORT."""
+        rec = {
+            "ref_id": "P_MECH_ONLY",
+            "title": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1 and Caspase-3 Activation in A549",
+            "abstract": "Caspase cleavage, Bax/Bcl-2 ratio regulation and apoptotic signaling in A549 non-small cell lung cancer.",
+            "year": 2026
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["evidence_relationship"], "MECHANISTIC_SUPPORT")
+        self.assertEqual(res["synergy_evidence"], "MONOTHERAPY_ONLY")
+
+    def test_102_v83_chou_talalay_methodology_support(self):
+        """Test 102: Chou-Talalay landmark methodology -> METHOD_SUPPORT."""
+        rec = {
+            "ref_id": "P_CHOU_2006",
+            "pmid": "16968952",
+            "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies",
+            "year": 2006,
+            "authors": ["Chou TC"],
+            "foundational_justification": {
+                "is_justified": True,
+                "category": "FOUNDATIONAL_MATHEMATICAL_MODEL",
+                "rationale": "Defines canonical Combination Index equation"
+            }
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["evidence_relationship"], "METHOD_SUPPORT")
+        self.assertEqual(res["ci_classification_source"], "CHOU_2006_LANDMARK")
+
+    def test_103_v83_apoptosis_alone_never_synergy_evidence(self):
+        """Test 103: Paper reporting single-agent apoptosis without combination design is never synergy evidence."""
+        rec = {
+            "ref_id": "P_APOP_ONLY",
+            "title": "Lupeol induces robust apoptosis and cell cycle arrest in lung carcinoma cells",
+            "abstract": "Flow cytometry showed annexin V positivity and caspase activation in A549 after lupeol monotherapy.",
+            "year": 2024
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Apoptosis"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertNotEqual(res["synergy_evidence"], "DIRECT")
+        self.assertEqual(res["synergy_evidence"], "MONOTHERAPY_ONLY")
+        self.assertNotIn("SYNERGY", res["reported_outcomes"])
+
+    def test_104_v83_direct_combination_with_ci_is_direct_synergy(self):
+        """Test 104: Paper co-testing Lupeol + NDV in A549 with quantitative CI -> DIRECT synergy evidence."""
+        rec = {
+            "ref_id": "P_SYN_DIRECT",
+            "title": "Co-treatment of Lupeol and Newcastle disease virus achieves synergistic cytotoxicity in A549 lung cancer",
+            "abstract": "Lupeol combined with Newcastle disease virus produced combination index CI < 0.8 in A549 cells, confirming synergy.",
+            "year": 2025
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Synergy"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["synergy_evidence"], "DIRECT")
+        self.assertEqual(res["model_match"], "EXACT")
+        self.assertEqual(res["evidence_relationship"], "DIRECT")
+        self.assertIn("SYNERGY", res["reported_outcomes"])
+        self.assertIn("CI", res["reported_outcomes"])
+
+    def test_105_bhatt_2021_non_cytotoxic_limits_interpretation(self):
+        """Test 105: Adversarial audit of Bhatt et al. (PMID 32329697) - non-cytotoxic in A549."""
+        rec = {
+            "ref_id": "P_BHATT_2021",
+            "pmid": "32329697",
+            "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer",
+            "abstract": "Migration and cytotoxicity assays were carried out in vitro. Despite having no cytotoxic effects, lupeol also significantly inhibited cell migration in A549 cells with decreased expression of the pErk1/2 protein. Lupeol inhibits cell migration, showed no cytotoxic effects on A549 cells.",
+            "year": 2021
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Cytotoxicity"}, {"name": "Migration"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["model_match"], "EXACT")
+        self.assertEqual(res["evidence_polarity"], "LIMITS_INTERPRETATION")
+        self.assertNotEqual(res["evidence_relationship"], "DIRECT")
+        self.assertEqual(res["evidence_relationship"], "MECHANISTIC_SUPPORT")
+        self.assertIn("ANTI_METASTATIC_MIGRATION", res["reported_outcomes"])
+        self.assertNotIn("CELL_VIABILITY", res["reported_outcomes"])
+
+    def test_106_methodological_landmark_never_compound_identity(self):
+        """Test 106: Methodological landmarks (Chou 2006, Mosmann 1983) must NEVER be classified as PARENT_COMPOUND."""
+        rec_chou = {
+            "ref_id": "P_CHOU_2006",
+            "pmid": "16968952",
+            "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies",
+            "year": 2006,
+            "authors": ["Chou TC"]
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Synergy"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec_chou, problem_model)
+        self.assertEqual(res["compound_identity"], "NOT_APPLICABLE")
+        self.assertNotEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["evidence_relationship"], "METHOD_SUPPORT")
+        self.assertEqual(res["evidence_polarity"], "SUPPORTS")
+
+    def test_107_ndv_endpoints_metabolic_and_replication_differentiation(self):
+        """Test 107: NDV multi-omics and metabolic studies catalog METABOLIC_ALTERATION and VIRAL_REPLICATION."""
+        rec_sun = {
+            "ref_id": "P_SUN_2026",
+            "pmid": "41942850",
+            "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism",
+            "abstract": "Multi-omics approach revealed NDV significantly remodels glycerophospholipid metabolism to facilitate viral replication in A549 cells.",
+            "year": 2026
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Cancer"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}],
+            "primary_outcomes": [{"name": "Metabolism"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec_sun, problem_model)
+        self.assertIn("METABOLIC_ALTERATION", res["reported_outcomes"])
+        self.assertIn("VIRAL_REPLICATION", res["reported_outcomes"])
+        self.assertEqual(res["evidence_polarity"], "SUPPORTS")
+
+    def test_108_search_gap_bounded_terminology_enforcement(self):
+        """Test 108: Search gap detector must reject un-bounded blanket claims like 'NO_DIRECT_STUDY_EXISTS'."""
+        try:
+            from core_policies import BOUNDED_SEARCH_GAP_STATUSES
+        except ImportError:
+            from scripts.core_policies import BOUNDED_SEARCH_GAP_STATUSES
+        self.assertIn("NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES", BOUNDED_SEARCH_GAP_STATUSES)
+        self.assertIn("NO_DIRECT_STUDY_IDENTIFIED_UP_TO_SEARCH_DATE", BOUNDED_SEARCH_GAP_STATUSES)
+        self.assertNotIn("NO_DIRECT_STUDY_EXISTS", BOUNDED_SEARCH_GAP_STATUSES)
+
+    def test_109_monotherapy_never_synergy_gate(self):
+        """Test 109: Synergy gate strictly fails if two monotherapies are claimed as direct synergy."""
+        supporting_facts = [{"text_or_data": "Lupeol monotherapy showed IC50 of 40 uM alone."}]
+        source_study = {"is_combination_study": False, "study_design": "MONOTHERAPY_EXPERIMENT"}
+        gate_res = GenericClaimEntailmentEngine.check_synergy_fallacy(
+            "Lupeol and NDV show powerful synergistic interaction.",
+            supporting_facts,
+            source_study
+        )
+        self.assertTrue(gate_res["is_synergy_claim"])
+        self.assertEqual(gate_res["synergy_status"], "SYNERGY_NOT_ESTABLISHED")
+        self.assertEqual(gate_res["violation"], "SYNERGY_FALLACY_MONOTHERAPY_EXTRAPOLATION")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

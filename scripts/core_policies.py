@@ -48,8 +48,100 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "8.2.0")
-VERSION_DISPLAY = PROJECT_METADATA.get("version_display", "v8.2.0")
+ENGINE_VERSION = "8.3.0"
+VERSION_DISPLAY = "v8.3.0"
+
+# Scientific Evidence Relationship Taxonomy (v8.3 Section 2)
+EVIDENCE_RELATIONSHIPS = [
+    "DIRECT",               # Direct match for target intervention + model + outcome
+    "CLOSE_ANALOG",         # High relevance but differs in one key component (e.g. derivative, different cancer cell line)
+    "MECHANISTIC_SUPPORT",  # Molecular pathway, intracellular cascade, target signaling without direct main intervention co-testing
+    "METHOD_SUPPORT",       # Canonical mathematical/assay methodology (e.g. median-effect, cytotoxicity protocol)
+    "BACKGROUND",           # Epidemiological background, disease definition, clinical problem statement
+    "INDIRECT"              # Distant or indirect conceptual support
+]
+
+# Compound Identity Taxonomy (v8.3 Section 3)
+COMPOUND_IDENTITY_TYPES = [
+    "PARENT_COMPOUND",      # Exact parent molecule tested
+    "COMPOUND_DERIVATIVE",  # Synthesized chemical derivative, conjugate, or salt
+    "COMPOUND_ANALOG",      # Structural analog or related triterpenoid
+    "CONTAINING_EXTRACT",   # Whole crude plant extract containing the target agent
+    "NOT_APPLICABLE",       # Non-compound (viral platform or methodological landmark)
+    "UNKNOWN_IDENTITY"      # Ambiguous compound formulation
+]
+
+# Evidence Polarity Taxonomy (Mandatory Epistemic Guardrail)
+EVIDENCE_POLARITY_TYPES = [
+    "SUPPORTS",                 # Finding directly confirms the directional claim
+    "NEUTRAL",                  # Finding is descriptive/characterizing without directional efficacy
+    "CONTRADICTS",              # Finding directly refutes the claim
+    "LIMITS_INTERPRETATION"     # Finding demonstrates boundary constraint (e.g. non-cytotoxic, buffered resistance)
+]
+
+# Viral Platform Identity Taxonomy (v8.3 Section 4)
+VIRAL_PLATFORM_TYPES = [
+    "WT_VIRUS",             # Wild-type / naturally occurring viral isolate
+    "VIRUS_STRAIN_SPECIFIED",# Specifically characterized biological viral strain
+    "RECOMBINANT_VIRUS",    # Genetically modified / recombinant virus
+    "ENGINEERED_VIRUS",     # Engineered oncolytic construct
+    "CHIMERIC_HYBRID_VIRUS",# Hybrid / pseudotyped platform (e.g. rVSV-hybrid)
+    "VIRUS_DERIVED_PLATFORM",# Derivative viral nanoparticle, virosome, or vector
+    "NOT_APPLICABLE"        # Non-viral study
+]
+
+# Biological Model Match Taxonomy (v8.3 Section 5)
+MODEL_MATCH_STATUSES = [
+    "EXACT",                # Target cell line / primary system exactly matching problem model
+    "CLOSE",                # Related cell line within identical disease / histology class
+    "DIFFERENT",            # Different tissue, disparate cancer type, or in vivo animal divergence
+    "UNKNOWN"               # Unspecified or unverified model system
+]
+
+# Outcome Match Taxonomy (v8.3 Section 6)
+OUTCOME_MATCH_TYPES = [
+    "CELL_VIABILITY",
+    "GROWTH_INHIBITION",
+    "APOPTOSIS",
+    "CASPASE_ACTIVITY",
+    "CELL_CYCLE",
+    "ONCOLYSIS",
+    "SYNERGY",
+    "SELECTIVITY",
+    "IC50",
+    "CI",
+    "ANTI_METASTATIC_MIGRATION",
+    "METABOLIC_ALTERATION",
+    "VIRAL_REPLICATION",
+    "OTHER"
+]
+
+# Epistemically Bounded Search Gap Statuses (Blanket claims strictly prohibited)
+BOUNDED_SEARCH_GAP_STATUSES = [
+    "NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES",
+    "NO_DIRECT_STUDY_IDENTIFIED_UP_TO_SEARCH_DATE"
+]
+
+# Strict Synergy Fallacy Invariants:
+# 1. MONOTHERAPY_A + MONOTHERAPY_B != SYNERGY
+# 2. SYNERGY = HYPOTHESIS (Untested wet-lab hypothesis unless empirical quantitative co-treatment CI data exists)
+
+# Synergy Evidence Taxonomy (v8.3 Section 7)
+SYNERGY_EVIDENCE_STATUSES = [
+    "DIRECT",               # Both interventions co-tested with quantitative CI / isobologram / formal synergy design
+    "ANALOGOUS",            # Secondary agent tested with a different drug partner or in an analogous model
+    "MONOTHERAPY_ONLY",     # Separate monotherapies only; synergy cannot be extrapolated
+    "NOT_FOUND",            # No empirical combination studies identified
+    "NOT_APPLICABLE"        # Single-agent, mechanistic, or methodological benchmark study
+]
+
+# CI Classification Provenance (v8.3 Section 12)
+CI_CLASSIFICATION_SOURCES = [
+    "CHOU_2006_LANDMARK",   # Theoretical basis, experimental design, and computerized simulation (Pharmacol Rev 2006)
+    "CHOU_TALALAY_1984",    # Quantitative analysis of dose-effect relationships (Adv Enzyme Regul 1984)
+    "EMPIRICAL_STUDY",      # Study-specific cutoff reported by authors
+    "UNVERIFIED"            # Threshold unsupported by verified methodology citation
+]
 
 FINAL_INCLUSION_REASON_CATEGORIES = [
     "DIRECT_DISEASE_MODEL_EVIDENCE",    # Direct experimental evidence on target disease/cell/animal model

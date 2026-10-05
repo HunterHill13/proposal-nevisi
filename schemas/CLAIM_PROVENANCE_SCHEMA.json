@@ -31,6 +31,14 @@
     },
     "numerical_ledger_id": { "type": ["string", "null"] },
     "has_overclaim_risk": { "type": "boolean" },
+    "support_strength": {
+      "type": "string",
+      "enum": ["DIRECT", "PARTIAL", "ANALOGOUS", "INDIRECT", "INSUFFICIENT", "UNSUPPORTED"]
+    },
+    "evidence_relationship": {
+      "type": "string",
+      "enum": ["DIRECT", "CLOSE_ANALOG", "MECHANISTIC_SUPPORT", "METHOD_SUPPORT", "BACKGROUND", "INDIRECT"]
+    },
     "flagged_issues": {
       "type": "array",
       "items": { "type": "string" }

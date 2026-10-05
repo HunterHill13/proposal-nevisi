@@ -68,9 +68,10 @@ class GenericGapDetector:
                 identified_gaps.append({
                     "gap_category": "COMBINATION_GAP",
                     "definition": UNIVERSAL_GAP_TAXONOMY["COMBINATION_GAP"],
-                    "evidence_trail": f"Zero prior studies evaluate direct simultaneous combination of: {', '.join(agent_names)}.",
+                    "evidence_trail": f"Within searched databases and specified retrieval windows, no direct empirical study evaluating the simultaneous combination of {', '.join(agent_names)} was identified.",
                     "proposed_resolution": "Execute formal multi-agent matrix titration and quantitative synergy evaluation."
                 })
+
 
         # 3. Mechanistic Gap
         mechanisms = target_model.get("hypothesized_mechanisms", [])

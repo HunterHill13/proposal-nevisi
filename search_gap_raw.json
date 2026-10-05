@@ -1,0 +1,138 @@
+[
+  {
+    "query": "Lupeol AND \"Newcastle disease virus\"",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 30,
+      "titles": [
+        "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+        "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+        "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "The Genus <i>Diospyros</i>: A Review of Novel Insights into the Biological Activity and Species of Mozambican Flora."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND NDV",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 25,
+      "titles": [
+        "Evaluating Kleinia odora leaves as a novel phytogenic feed additive to enhance early growth, feed efficiency, European performance efficiency index, and carcass yield in broilers.",
+        "Mitigating impact of Glycyrrhiza glabra on virulent Newcastle disease virus challenge in chickens: clinical studies, histopathological alterations and molecular docking.",
+        "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND \"Newcastle disease virus\" AND A549",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 10,
+      "titles": [
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "Antiviral Potential of Selected Medicinal Herbs and Their Isolated Natural Products.",
+        "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+        "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND NDV AND A549",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 7,
+      "titles": [
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "New insights of propolis nanoformulation and its therapeutic potential in human diseases.",
+        "Antiviral Potential of Selected Medicinal Herbs and Their Isolated Natural Products.",
+        "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND \"Newcastle disease virus\" AND \"lung cancer\"",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 10,
+      "titles": [
+        "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+        "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND NDV AND \"lung cancer\"",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 6,
+      "titles": [
+        "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+        "Lesser-Explored Edible Flowers as a Choice of Phytochemical Sources for Food Applications.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "Hive Products: Composition, Pharmacological Properties, and Therapeutic Applications.",
+        "A Comprehensive Review on Phytochemistry and Pharmacological Activities of <i>Clinacanthus nutans</i> (Burm.f.) Lindau."
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND \"Newcastle disease virus\" AND synergy",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 5,
+      "titles": [
+        "Phytochemical Profiling, In Vitro Biological Activities, and In-Silico Studies of <i>Ficus vasta Forssk.</i>: An Unexplored Plant.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "Antimicrobial and Other Pharmacological Properties of <i>Ocimum basilicum</i>, <i>Lamiaceae</i>.",
+        "Plant ingredients in Thai food: a well-rounded diet for natural bioactive associated with medicinal properties.",
+        "Posters"
+      ]
+    }
+  },
+  {
+    "query": "Lupeol AND NDV AND combination",
+    "pubmed": {
+      "count": 0,
+      "ids": []
+    },
+    "europe_pmc": {
+      "count": 14,
+      "titles": [
+        "Traditional Uses, Pharmacological Activities, and Phytochemical Analysis of <i>Diospyros mespiliformis</i> Hochst. ex. A. DC (Ebenaceae): A Review.",
+        "AFB1 Toxicity in Human Food and Animal Feed Consumption: A Review of Experimental Treatments and Preventive Measures.",
+        "&lt;i&gt;Moringa oleifera&lt;/i&gt; Lam.: A Nutritional Powerhouse with Multifaceted Pharmacological and Functional Applications.",
+        "Analytical review of <i>Tiryāq-i-Wabāī</i> - A Unani panacea for the control of COVID-19.",
+        "New insights of propolis nanoformulation and its therapeutic potential in human diseases."
+      ]
+    }
+  }
+]
