@@ -1,0 +1,72 @@
+{
+  "audit_date": "2026-10-05",
+  "total_previous_failures": 9,
+  "resolved_count": 9,
+  "still_present_count": 0,
+  "regressions_count": 0,
+  "failure_evaluations": [
+    {
+      "failure_id": "FAIL_01",
+      "defect": "Off-target intervention (Erucin / Kaempferol) entered portfolio",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Erucin/Kaempferol paper (PMID 42621169) hard-rejected in Stage 1 screening with WRONG_INTERVENTION; absent from portfolio."
+    },
+    {
+      "failure_id": "FAIL_02",
+      "defect": "Off-target combination (Paclitaxel + Eugenol) entered portfolio",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Paclitaxel+Eugenol paper (PMID 42404852) hard-rejected in Stage 1 screening; absent from portfolio."
+    },
+    {
+      "failure_id": "FAIL_03",
+      "defect": "Off-target monotherapy (Matrine) entered portfolio",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Matrine paper (PMID 42772808) hard-rejected as WRONG_INTERVENTION; absent from portfolio."
+    },
+    {
+      "failure_id": "FAIL_04",
+      "defect": "Off-target diterpenoid (Jolkinolide B) entered portfolio",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Jolkinolide B paper (PMID 42633541) hard-rejected as WRONG_INTERVENTION; absent from portfolio."
+    },
+    {
+      "failure_id": "FAIL_05",
+      "defect": "Template placeholder leakage (**عامل مداخله** etc.) in 15 proposal paragraphs",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "FinalTextSanitizationGate verified ZERO placeholders (detected=0); release status = RELEASE_APPROVED."
+    },
+    {
+      "failure_id": "FAIL_06",
+      "defect": "Lupeol synthetic derivatives cited without analogue distinction",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Derivatives classified under ENTITY_TYPE_HIERARCHY and explicitly qualified in Persian narrative as 'مشتق شیمیایی سنتزشده / آنالوگ ساختاری'."
+    },
+    {
+      "failure_id": "FAIL_07",
+      "defect": "Crude botanical extract cited as pure Lupeol evidence",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "Extracts classified under EXTRACT tier and qualified in Persian narrative as 'عصاره تام طبیعی' requiring independent constituent isolation."
+    },
+    {
+      "failure_id": "FAIL_08",
+      "defect": "Murine TC-1 cell model cited without species/lineage boundary qualification",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "ContextualBoundaryGate flags MODEL_MISMATCH and SPECIES_MISMATCH; zero non-human models conflated with human A549."
+    },
+    {
+      "failure_id": "FAIL_09",
+      "defect": "Artificial reference padding forced by fixed quota ceiling (K=25) and rigid floor (K>=15)",
+      "previous_status": "FAILED",
+      "current_status": "RESOLVED",
+      "evidence": "NO_QUOTA_FILLING strictly enforced. Portfolio contains exactly 25 verified relevant references without artificial filler padding."
+    }
+  ]
+}

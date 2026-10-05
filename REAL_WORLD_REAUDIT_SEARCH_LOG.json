@@ -1,0 +1,115 @@
+{
+  "search_date": "2026-10-05",
+  "database": "PubMed (NCBI E-utilities)",
+  "total_queries": 9,
+  "search_accounting": [
+    {
+      "query_id": "QUERY_A_DIRECT_COMBINATION",
+      "query": "Lupeol AND (\"Newcastle disease virus\" OR NDV)",
+      "focus": "Direct combination of primary and secondary interventions",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 0,
+      "records_screened": 0,
+      "records_excluded": 0,
+      "records_full_text_assessed": 0,
+      "records_included": 0
+    },
+    {
+      "query_id": "QUERY_B_LUPEOL_A549",
+      "query": "Lupeol AND A549",
+      "focus": "Lupeol monotherapy in target cell line A549",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 40,
+      "records_screened": 40,
+      "records_excluded": 30,
+      "records_full_text_assessed": 10,
+      "records_included": 6
+    },
+    {
+      "query_id": "QUERY_C_LUPEOL_LUNG_CANCER",
+      "query": "Lupeol AND (\"lung cancer\" OR \"lung neoplasms\")",
+      "focus": "Lupeol in pulmonary oncology",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 29,
+      "records_screened": 29,
+      "records_excluded": 14,
+      "records_full_text_assessed": 15,
+      "records_included": 9
+    },
+    {
+      "query_id": "QUERY_D_NDV_A549",
+      "query": "(\"Newcastle disease virus\" OR NDV) AND A549",
+      "focus": "Newcastle disease virus oncolytic activity in A549",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 45,
+      "records_screened": 45,
+      "records_excluded": 34,
+      "records_full_text_assessed": 11,
+      "records_included": 6
+    },
+    {
+      "query_id": "QUERY_E_NDV_LUNG_CANCER",
+      "query": "(\"Newcastle disease virus\" OR NDV) AND (\"lung cancer\" OR \"lung neoplasms\")",
+      "focus": "Newcastle disease virus in lung cancer models",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 52,
+      "records_screened": 50,
+      "records_excluded": 39,
+      "records_full_text_assessed": 11,
+      "records_included": 8
+    },
+    {
+      "query_id": "QUERY_F1_CHOU_TALALAY",
+      "query": "Chou TC AND (\"Theoretical basis\" OR \"dose-effect\")",
+      "focus": "Methodological benchmark: combination index and median-effect principle",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 25,
+      "records_screened": 25,
+      "records_excluded": 22,
+      "records_full_text_assessed": 3,
+      "records_included": 3
+    },
+    {
+      "query_id": "QUERY_F2_MOSMANN_MTT",
+      "query": "Mosmann T AND (\"Rapid colorimetric assay\" OR MTT)",
+      "focus": "Methodological benchmark: colorimetric cell viability bioassay",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 1,
+      "records_screened": 1,
+      "records_excluded": 0,
+      "records_full_text_assessed": 1,
+      "records_included": 0
+    },
+    {
+      "query_id": "QUERY_G1_FOUNDATIONAL_LUPEOL_A549",
+      "query": "Lupeol AND A549 AND (apoptosis OR proliferation OR migration)",
+      "focus": "Foundational Lupeol cellular mechanism evidence",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 19,
+      "records_screened": 19,
+      "records_excluded": 13,
+      "records_full_text_assessed": 6,
+      "records_included": 3
+    },
+    {
+      "query_id": "QUERY_G2_FOUNDATIONAL_LUPEOL_LUNG",
+      "query": "Lupeol AND (\"lung cancer\" OR \"lung neoplasms\") AND (apoptosis OR proliferation)",
+      "focus": "Foundational Lupeol anti-tumorigenic evidence",
+      "database": "PubMed (NCBI E-utilities)",
+      "search_date": "2026-10-05",
+      "total_hits": 19,
+      "records_screened": 19,
+      "records_excluded": 12,
+      "records_full_text_assessed": 7,
+      "records_included": 3
+    }
+  ]
+}
