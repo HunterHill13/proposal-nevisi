@@ -2,14 +2,20 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v8.5). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v8.6). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
   Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-source federated literature searches
   (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), utilizes 16 generic query families (SEARCH_FAMILIES_ONTOLOGY)
   with MeSH controlled vocabulary mapping, multi-directional citation chasing (Backward, Forward, Lateral) with complete provenance paths,
-  8-category seed paper discovery anchors (SEED_PAPER_CATEGORIES), 7-dimension evidence-based saturation tracking with false saturation guards,
-  4-track structured literature reading (Clinical, Computational, Basic Experimental, Hybrid) extracting 18 deterministic fields,
-  6-type citation drift detection and claim entailment verification (PaperToClaimVerifier),
+  8-category seed paper discovery anchors (SEED_PAPER_CATEGORIES), 7-dimension evidence-based saturation tracking with false saturation guards and incompleteness bounds (SATURATION_INCOMPLETE),
+  empirical Research Recall Benchmark (Recall, Precision, F1, Coverage) with 13-category search miss taxonomy (SEARCH_MISS_TAXONOMY),
+  adaptive database specialization registry (DATABASE_SPECIALIZATION_REGISTRY) with explicit blind spots and negative evidence scanning (POSITIVE_EVIDENCE_DOMINANCE),
+  5-section deep paper reading (Sections A-E: Study Identity, Methodology, Key Results, Contextual Interpretation, Provenance Integrity),
+  figure-first and table-first evidence recovery with visual discrepancy flags (PRIMARY_DATA_VISUAL_REQUIRES_REVIEW),
+  methods reverse-engineering protocol breakdown, 8-tier evidence hierarchy (DIRECT_HIGH_CONFIDENCE down to LIMITS_INTERPRETATION),
+  Paper-to-Claim Verifier 2.0 with formal 8-stage verification pipeline and 13 issue detections (CLAIM_VERIFICATION_ISSUES_V2),
+  post-research and post-writing citation auditing (POST_CITATION_AUDIT_STATUSES) preventing orphan placeholders and unverified sources,
+  thematic comparative synthesis resolving parameter-driven divergent findings,
   produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA), maps 22 cross-study relationship types, detects gaps across 18 universal categories,
   performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
   clusters study families, cohorts, and trial registries to prevent evidence double-counting (NON_INDEPENDENT_EVIDENCE),
@@ -21,17 +27,17 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, emits reproducible Research Run Manifests with SHA-256 checksums,
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 289-assertion test harness across 9 suites
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 303-assertion test harness across 10 suites and 28 release gate criteria
   (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 114 adversarial stress tests, 60-test benchmark,
   10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, 24 end-to-end integration tests, 11 cross-topic adversarial tests,
-  and 22 advanced v8.5 research engine integration tests).
+  22 advanced v8.5 research engine integration tests, and 14 deep reading and recall benchmark tests).
 ---
 
-# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.5)
+# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.6)
 
-این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.5 با ارتقای بنیادین موتور تحقیق و بازبینی متون برگرفته از الگوهای اثبات‌شده AIPOCH و K-Dense، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که مجهز به ۱۶ خانواده پرس‌وجوی استاندارد، نگاشت اصطلاح‌نامه MeSH، تعقیب استنادی چندجهته (Backward, Forward, Lateral)، لنگرهای اکتشافی هشت‌گانه مقالات هسته (Seed Papers)، پایش اشباع ۷ بُعدی با گارد محافظتی اشباع کاذب، خوانش ساختاریافته ۴ تراکه متون با استخراج ۱۸ فیلد قطعی، و شناسایی ۶ نوع انحراف استنادی (Citation Drift) است.
-> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.5):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۲۸۹ تست واحد، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
-
+این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.6 با ارتقای بنیادین موتور تحقیق و خوانش عمیق متون برگرفته از الگوهای اثبات‌شده AIPOCH و K-Dense، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که مجهز به بنچ‌مارک تجربی ریکال و تاکسونومی ۱۳ گانه تشخیص علل جا افتادن مقالات (Search Miss Diagnosis)، سیستم انتخاب انطباقی پایگاه‌ها با ثبت نقاط کور، اسکنر شواهد منفی و سوگیری انتشار، معماری خوانش عمیق ۵ بخشی (Sections A-E)، بازخوانی داده‌های اصیل تصویرمحور/جدول‌محور با پرچم مغایرت، مهندسی معکوس متدولوژی، سلسله‌مراتب ۸ سطحی شواهد، موتور اعتبارسنجی گزاره-مقاله ۲.۰ با خط لوله ۸ مرحله‌ای و ۱۳ نوع عیب استنادی، و ممیزی پس از نگارش ارجاعات جهت پیشگیری از رفرنس‌های یتیم و بررسی‌نشده است.
+> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.6):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۳۰۳ تست واحد، ۱۰ جهش کشته‌شده، ۲۸ معیار مستر گیت، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. وضعیت نهایی مهارت صراحتاً به عنوان **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED** اعلام می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
+---
 
 ---
 
@@ -208,7 +214,7 @@ description: >
 ```bash
 python scripts/master_release_gate.py
 ```
-این سیستم به صورت پویا ۸ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
+این سیستم به صورت پویا ۱۰ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
 1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته و استقلال سمانتیک کامل در ۲۲ اسکریپت (۲۲ تست).
 2. **آزمون تعمیم‌پذیری ۱۲ گانه دامنه‌ای (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۱۲ فیکسچر مستقل از رشته‌های مختلف پزشکی (۱۲ تست).
 3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۱۱۴ گانه (`test_adversarial_scenarios.py`):** ۱۱۴ آزمون چالش‌برانگیز شامل آداپتور جستجوی علمی (`ScientificSearchAdapter`)، تجمیع مؤلفه‌های همبند، منحنی اشباع جستجو، گیت ۱۰ بعدی هم‌خوانی مفهومی با ۶ سطح رتبه‌بندی، سقف ۲۵ رفرنس، امتیازدهی ۱۴ عاملی، ممانعت از دور زدن قانون زمانی، قیف غربالگری ۵ مرحله‌ای، الزام توجیه سه‌بخشی ورود، عدم تطابق DOI، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد و تبیین‌های جایگزین (۱۱۴ تست).
@@ -217,8 +223,10 @@ python scripts/master_release_gate.py
 6. **سوئیت آزمون‌های خاصیت و اسکیمای Draft-07 (`test_property_and_schemas.py`):** ممیزی ناوردایی‌ها و تطابق اسکیماها (۱۴ تست).
 7. **سوئیت آزمون‌های یکپارچگی سرتاسری E2E (`test_e2e_integration.py`):** شبیه‌سازی کامل پایپ‌لاین از مدل تا کامپایل (۲۴ تست).
 8. **سوئیت آزمون‌های خصمانه چندموضوعی دامنه‌مستقل (`test_cross_topic_adversarial.py`):** اعتبارسنجی ۱۰ سناریوی مستقل A تا J و بررسی عدم نشت پیش‌فرض‌های پروژه‌های پیشین (۱۱ تست).
+9. **سوئیت موتور پژوهش پیشرفته v8.5 (`test_advanced_research_engine.py`):** اعتبارسنجی یکپارچگی جستجوی چندپایگاهی، تعقیب استنادی، و اعتبارسنجی گزاره‌ها (۲۲ تست).
+10. **سوئیت خوانش عمیق و بنچ‌مارک ریکال v8.6 (`test_v86_deep_reading_and_recall_benchmark.py`):** آزمون بنچ‌مارک ریکال پژوهشی، تاکسونومی ۱۳ گانه جا افتادن مقالات، بخش‌های A-E خوانش عمیق، بازیابی شواهد شکل/جدول با پرچم بازبینی، مهندسی معکوس روش‌ها، رده‌بندی ۸ سطحی شواهد، وریریفایر ۲.۰ گزاره-مقاله، ممیزی ارجاعات پس از نگارش، و سنتز مقایسه‌ای مضمونی (۱۴ تست).
 
-**مجموع آزمون‌ها:** ۲۶۷ آزمون مستقل با قبولی ۱۰۰٪ (267 / 267 PASS) و نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED).
+**مجموع آزمون‌ها:** ۳۰۳ آزمون مستقل با قبولی ۱۰۰٪ (303 / 303 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در ۲۲ اسکریپت و پاس کامل ۲۸ معیار Master Release Gate.
 
 ---
 

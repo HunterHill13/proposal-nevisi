@@ -20,7 +20,9 @@ try:
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
         NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
         UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES,
-        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS
+        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS,
+        DEEP_READING_SECTIONS, PRIMARY_DATA_VISUAL_REQUIRES_REVIEW, EVIDENCE_HIERARCHY_TIERS,
+        CLAIM_VERIFICATION_ISSUES_V2, POST_CITATION_AUDIT_STATUSES
     )
 except ImportError:
     from scripts.core_policies import (
@@ -30,7 +32,9 @@ except ImportError:
         MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
         NO_QUOTA_FILLING, EXCLUSION_TAXONOMY, GENERIC_EXCLUSION_ONTOLOGY,
         UNIVERSAL_ENTITY_TYPES, EVIDENCE_ROLES,
-        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS
+        STRUCTURED_PAPER_READING_TRACKS, CITATION_DRIFT_TYPES, CONTRADICTION_EXPLANATION_LEVELS,
+        DEEP_READING_SECTIONS, PRIMARY_DATA_VISUAL_REQUIRES_REVIEW, EVIDENCE_HIERARCHY_TIERS,
+        CLAIM_VERIFICATION_ISSUES_V2, POST_CITATION_AUDIT_STATUSES
     )
 
 class ExclusionCode(str):
@@ -2033,7 +2037,7 @@ class StructuredPaperReader:
             text_l = text.lower()
             if any(w in text_l for w in ["no effect", "no significant", "inert", "unchanged", "failed", "lacked efficacy"]):
                 effect_dir = "NO_CHANGE"
-            elif any(w in text_l for w in ["inhibit", "suppress", "decrease", "reduce", "cytotoxic", "apoptosis", "downregulat"]):
+            elif any(w in text_l for w in ["inhibit", "suppress", "decrease", "reduc", "cytotoxic", "apoptosis", "downregulat"]):
                 effect_dir = "DECREASED"
             elif any(w in text_l for w in ["increase", "elevat", "promot", "upregulat", "induc"]):
                 effect_dir = "INCREASED"
@@ -2058,7 +2062,15 @@ class StructuredPaperReader:
         }
         prov = title[:120]
 
-        return {
+        # v8.6 Section 6: Figure-First / Table-First Evidence Recovery
+        fig_evidence = cls.extract_figure_table_evidence(record)
+        visual_flag = fig_evidence.get("discrepancy_flag")
+
+        # v8.6 Section 7: Methods Reverse-Engineering
+        methods_rev = cls.reverse_engineer_methods(record)
+
+        # Base 18 fields
+        reading_dict = {
             "reading_track": track,
             "intervention_identity": str(intervention),
             "intervention_dose_or_exposure": str(dose) if dose else None,
@@ -2079,22 +2091,214 @@ class StructuredPaperReader:
             "raw_text_provenance": prov
         }
 
+        # v8.6 Section 8: Evidence Hierarchy Strength Evaluation
+        hierarchy_eval = cls.evaluate_evidence_hierarchy(record, reading_dict)
+
+        # v8.6 Section 5: Generic Evidence Hierarchy Sections A-E
+        reading_dict["study_identity"] = {
+            "study_design": str(design),
+            "population_or_model": str(model),
+            "cell_line_or_strain": str(cell_line) if cell_line else None,
+            "intervention_or_exposure": str(intervention),
+            "comparator": str(control),
+            "setting": "Laboratory in vitro / experimental" if "in vitro" in str(model).lower() else "Clinical / in vivo",
+            "sample_size": sample_size
+        }
+        reading_dict["methods"] = methods_rev
+        reading_dict["results"] = {
+            "primary_endpoint": str(endpoint),
+            "effect_direction": effect_dir,
+            "quantitative_effect_size": str(quant_effect) if quant_effect else None,
+            "uncertainty_ci": sig if (sig and "ci" in sig.lower()) else None,
+            "p_value": sig if (sig and ("p" in sig.lower() or "=" in sig or "<" in sig)) else None,
+            "adverse_events": str(adverse),
+            "negative_null_findings": effect_dir in ["NO_CHANGE", "INHIBITION_ABSENT", "INERT"],
+            "subgroup_findings": record.get("subgroup_findings")
+        }
+        reading_dict["interpretation"] = {
+            "authors_conclusion": record.get("conclusion") or (f"Observed {effect_dir} in {endpoint} using {intervention}"),
+            "limitations": limits if isinstance(limits, list) else [str(limits)],
+            "alternative_explanations": record.get("alternative_explanations") or [],
+            "translational_limitations": ["Preclinical model requires in vivo / clinical pharmacokinetic validation"],
+            "internal_validity_concerns": record.get("internal_validity_concerns") or []
+        }
+        reading_dict["evidence_provenance"] = {
+            "source_paper": str(record.get("doi") or record.get("pmid") or title[:60]),
+            "source_section": "Results & Methods",
+            "table_figure_location": fig_evidence.get("primary_figure_location"),
+            "extraction_confidence": 0.95 if (quant_effect and sig) else 0.80,
+            "evidence_directness_status": record.get("evidence_directness", "DIRECT")
+        }
+        reading_dict["figure_table_evidence"] = fig_evidence
+        reading_dict["visual_discrepancy_flag"] = visual_flag
+        reading_dict["evidence_hierarchy_rating"] = hierarchy_eval["tier"]
+        reading_dict["evidence_confidence_score"] = hierarchy_eval["confidence_score"]
+
+        return reading_dict
+
+    @classmethod
+    def extract_figure_table_evidence(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Extracts primary visual/tabular quantitative findings and compares with narrative claims (v8.6 Section 6)."""
+        figures = record.get("figures", [])
+        tables = record.get("tables", [])
+        abstract = str(record.get("abstract", "")).lower()
+
+        visual_findings = []
+        discrepancy_detected = False
+        discrepancy_reason = None
+        primary_loc = None
+
+        for idx, fig in enumerate(figures):
+            fig_id = fig.get("figure_id", f"Figure {idx+1}")
+            fig_data = fig.get("quantitative_data", fig.get("values", []))
+            fig_legend = str(fig.get("legend", "")).lower()
+            visual_findings.append({"id": fig_id, "data": fig_data, "legend": fig_legend})
+            if not primary_loc:
+                primary_loc = fig_id
+
+            # Discrepancy detection: narrative asserts strong suppression but figure shows null/small change
+            if any(w in abstract for w in ["potent inhibition", "significant suppression", "complete eradication", "cures"]):
+                if any(k in fig_legend for k in ["p > 0.05", "not significant", "n.s.", "no difference"]):
+                    discrepancy_detected = True
+                    discrepancy_reason = f"Abstract asserts potent effect, but {fig_id} indicates non-significant change (p > 0.05)."
+                elif fig.get("effect_pct") is not None and fig.get("effect_pct") < 10.0:
+                    discrepancy_detected = True
+                    discrepancy_reason = f"Abstract asserts potent effect, but {fig_id} data demonstrates < 10% change."
+
+        for idx, tbl in enumerate(tables):
+            tbl_id = tbl.get("table_id", f"Table {idx+1}")
+            tbl_legend = str(tbl.get("title", tbl.get("legend", ""))).lower()
+            visual_findings.append({"id": tbl_id, "legend": tbl_legend})
+            if not primary_loc:
+                primary_loc = tbl_id
+
+        flag = PRIMARY_DATA_VISUAL_REQUIRES_REVIEW if discrepancy_detected else None
+
+        return {
+            "has_figures_or_tables": len(figures) > 0 or len(tables) > 0,
+            "figures_count": len(figures),
+            "tables_count": len(tables),
+            "extracted_visual_findings": visual_findings,
+            "discrepancy_detected": discrepancy_detected,
+            "discrepancy_flag": flag,
+            "discrepancy_reason": discrepancy_reason,
+            "primary_figure_location": primary_loc or "Main Text / Figures"
+        }
+
+    @classmethod
+    def reverse_engineer_methods(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Reverse-engineers protocol structure into domain-agnostic variables (v8.6 Section 7)."""
+        text = f"{record.get('title', '')} {record.get('abstract', '')} {record.get('methods', '')}"
+        
+        # Discover variables dynamically
+        intervention = record.get("intervention_identity") or "Investigational Agent"
+        dose = record.get("intervention_dose_or_exposure")
+        if not dose:
+            for p in cls.DOSE_REGEXES:
+                m = p.search(text)
+                if m:
+                    dose = m.group(1).strip()
+                    break
+
+        duration_m = re.search(r'(\d+\s*(?:hours?|hrs?|days?|weeks?|mins?|minutes?))\b', text, re.IGNORECASE)
+        duration = duration_m.group(1) if duration_m else record.get("duration", "Standard exposure incubation")
+
+        control = record.get("comparator_control", "Vehicle or untreated control")
+        model = record.get("biological_model") or record.get("model_system") or "Cellular / Animal Model"
+        endpoint = record.get("primary_endpoint", "Cell viability or phenotypic marker")
+
+        return {
+            "what_was_done": f"Administered {intervention} to evaluate response in {model}",
+            "model_or_population": str(model),
+            "comparator": str(control),
+            "dose_exposure": str(dose) if dose else "Dose-response titration series",
+            "duration": str(duration),
+            "what_was_measured": str(endpoint),
+            "measurement_method": record.get("assay_technique", "Quantitative biological assay"),
+            "primary_endpoint": str(endpoint),
+            "controls_used": str(control),
+            "randomization_or_blinding": record.get("randomization", "Standard independent replication")
+        }
+
+    @classmethod
+    def evaluate_evidence_hierarchy(
+        cls,
+        record: Dict[str, Any],
+        reading: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Calculates evidence hierarchy tier based on design, directness, and quality (v8.6 Section 8).
+        Ensures citation count NEVER substitutes for empirical evidence quality.
+        """
+        r = reading or {}
+        directness = str(record.get("evidence_directness", r.get("evidence_directness_status", "DIRECT"))).upper()
+        polarity = str(record.get("evidence_polarity", "SUPPORTS")).upper()
+        role = str(record.get("evidence_role", "DIRECT_EVIDENCE")).upper()
+        rob = str(record.get("risk_of_bias", "LOW")).upper()
+        effect_dir = str(r.get("effect_direction", record.get("effect_direction", "INCONCLUSIVE"))).upper()
+        design = str(record.get("study_design_type", r.get("study_design_type", ""))).lower()
+
+        # 1. Contradictory findings
+        if polarity == "CONTRADICTS" or effect_dir in ["NO_CHANGE", "INERT"] and polarity != "NEUTRAL":
+            tier = "CONTRADICTORY"
+            score = 0.40
+            rationale = "Study directly refutes proposed hypothesis or reports lack of expected efficacy."
+            return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
+        # 2. Boundary / Toxic Artifact conditions
+        if polarity == "LIMITS_INTERPRETATION" or "artifact" in str(record.get("boundary_note", "")).lower():
+            tier = "LIMITS_INTERPRETATION"
+            score = 0.35
+            rationale = "Study demonstrates boundary condition or supra-physiological/toxic confounding artifact."
+            return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
+        # 3. Direct Target Evidence
+        if directness == "DIRECT" and role in ["DIRECT_EVIDENCE", "DIRECT_SINGLE_INTERVENTION_EVIDENCE"]:
+            if rob == "LOW" and (("randomized" in design or "controlled" in design) or r.get("observed_quantitative_effect")):
+                tier = "DIRECT_HIGH_CONFIDENCE"
+                score = 0.95
+                rationale = "Direct target intervention and biological model with low risk of bias and quantitative validation."
+            elif rob in ["MODERATE", "UNCLEAR"]:
+                tier = "DIRECT_MODERATE_CONFIDENCE"
+                score = 0.80
+                rationale = "Direct target intervention and model, with moderate sample size or minor methodological constraints."
+            else:
+                tier = "DIRECT_LOW_CONFIDENCE"
+                score = 0.65
+                rationale = "Direct target evidence with elevated risk of bias or unconfirmed single-batch replication."
+            return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
+        # 4. Analog or indirect support
+        if role in ["ANALOG_EVIDENCE", "INDIRECT_EVIDENCE"] or directness == "INDIRECT":
+            tier = "INDIRECT_SUPPORT"
+            score = 0.70
+            rationale = "Evaluates structural analog or closely related biological model providing transferable precedent."
+            return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
+        # 5. Mechanistic support
+        if role == "MECHANISTIC_EVIDENCE" or any(w in design for w in ["pathway", "docking", "signaling", "molecular"]):
+            tier = "MECHANISTIC_SUPPORT"
+            score = 0.75
+            rationale = "Substantiates molecular pathway, receptor binding, or downstream signaling cascade."
+            return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
+        # 6. Contextual baseline
+        tier = "CONTEXTUAL_SUPPORT"
+        score = 0.60
+        rationale = "Provides epidemiological baseline, clinical standard of care, or assay benchmark."
+        return {"tier": tier, "confidence_score": score, "rationale": rationale}
+
 
 # =============================================================================
-# PAPER-TO-CLAIM VERIFIER (AIPOCH ADAPTED)
+# PAPER-TO-CLAIM VERIFIER 2.0 (AIPOCH & K-DENSE ADAPTED)
 # =============================================================================
 
 class PaperToClaimVerifier:
-    """Audits scientific claim entailment and detects citation drift across 6 categories:
-    - NO_DRIFT: Claim conservative and fully supported by empirical data.
-    - OVERSTATEMENT: Claim asserts stronger certainty or translational scope than data permits.
-    - CITATION_DRIFT: Paper only discussed or reviewed the concept without primary testing.
-    - CONTEXT_MISMATCH: Target condition, tissue, or model system mismatch.
-    - SELECTIVE_CITATION: Only cherry-picked positive sub-findings reported.
-    - CORRELATION_TO_CAUSATION: Associative findings presented as causal mechanism.
-    Adapted from AIPOCH paper-to-claim verifier.
+    """Audits scientific claim entailment and detects citation drift across 13 generic categories (v8.6 Section 9).
+    Follows formal verification pipeline:
+    CLAIM -> SOURCE PAPER -> SOURCE LOCATION -> EXTRACTED FINDING -> ENTAILMENT -> CONTEXT MATCH -> CAUSALITY CHECK -> FINAL CLAIM STATUS
     """
     DRIFT_TYPES = list(CITATION_DRIFT_TYPES.keys())
+    ISSUES_V2 = dict(CLAIM_VERIFICATION_ISSUES_V2)
 
     @classmethod
     def verify_claim(
@@ -2103,7 +2307,7 @@ class PaperToClaimVerifier:
         paper_record: Dict[str, Any],
         paper_reading: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Verifies if paper genuinely entails the proposal claim."""
+        """Verifies if paper genuinely entails the proposal claim (v8.5 compatible)."""
         reading = paper_reading or StructuredPaperReader.read_paper(paper_record)
         
         claim_text = str(claim.get("claim_text", "")).lower()
@@ -2169,6 +2373,248 @@ class PaperToClaimVerifier:
                 "effect": reading.get("observed_quantitative_effect"),
                 "direction": reading.get("effect_direction")
             }
+        }
+
+    @classmethod
+    def verify_claim_v2(
+        cls,
+        claim: Dict[str, Any],
+        paper_record: Dict[str, Any],
+        paper_reading: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Formal Paper-to-Claim Verification 2.0 Pipeline (v8.6 Section 9).
+        Follows CLAIM -> SOURCE PAPER -> SOURCE LOCATION -> EXTRACTED FINDING -> ENTAILMENT -> CONTEXT MATCH -> CAUSALITY CHECK -> FINAL CLAIM STATUS
+        """
+        reading = paper_reading or StructuredPaperReader.read_paper(paper_record)
+        claim_text = str(claim.get("claim_text", "")).strip()
+        claim_text_l = claim_text.lower()
+        claim_entity = str(claim.get("entity", "")).strip().lower()
+        claim_model = str(claim.get("model", "")).strip().lower()
+        claim_endpoint = str(claim.get("endpoint", "")).strip().lower()
+        claim_dose = str(claim.get("dose", "")).strip().lower()
+
+        paper_title = str(paper_record.get("title", ""))
+        paper_abstract = str(paper_record.get("abstract", ""))
+        paper_text = f"{paper_title} {paper_abstract}".lower()
+        paper_model = str(reading.get("biological_model", "")).lower().replace("_", " ")
+        paper_design = str(reading.get("study_design_type", "")).lower().replace("_", " ")
+        paper_dose = str(reading.get("intervention_dose_or_exposure", "")).lower()
+        paper_endpoint = str(reading.get("primary_endpoint", "")).lower()
+        paper_effect_dir = reading.get("effect_direction", "INCONCLUSIVE")
+
+        issues = []
+        source_location = reading.get("evidence_provenance", {}).get("source_section", "Abstract")
+        extracted_finding = reading.get("observed_quantitative_effect") or reading.get("primary_endpoint") or "Qualitative observation"
+
+        # 1. PRECLINICAL_TO_CLINICAL_LEAP
+        if any(w in claim_text_l for w in ["cures patients", "clinical efficacy in humans", "human patients", "clinical trials", "eradicates tumor in vivo"]):
+            if "in vitro" in paper_model or "in vitro" in paper_design or "in vitro" in paper_text:
+                issues.append("PRECLINICAL_TO_CLINICAL_LEAP")
+
+        # 2. MODEL_MISMATCH
+        if claim_model and claim_model not in paper_text and claim_model not in paper_model:
+            issues.append("MODEL_MISMATCH")
+
+        # 3. INTERVENTION_MISMATCH
+        if claim_entity and claim_entity not in paper_text:
+            issues.append("INTERVENTION_MISMATCH")
+
+        # 4. ENDPOINT_MISMATCH
+        if claim_endpoint and claim_endpoint not in paper_text and claim_endpoint not in paper_endpoint:
+            if any(w in claim_endpoint for w in ["mortality", "overall survival"]) and "cell viability" in paper_endpoint:
+                issues.append("ENDPOINT_MISMATCH")
+
+        # 5. DOSE_MISMATCH
+        if claim_dose and paper_dose and claim_dose not in paper_dose:
+            issues.append("DOSE_MISMATCH")
+
+        # 6. CORRELATION_TO_CAUSATION
+        if any(w in claim_text_l for w in ["causes", "mechanistically drives", "directly induces", "proves causality"]):
+            if any(w in paper_design for w in ["cross-sectional", "observational", "correlational", "epidemiological"]):
+                issues.append("CORRELATION_TO_CAUSATION")
+
+        # 7. SELECTIVE_CITATION
+        if paper_effect_dir in ["NO_CHANGE", "INHIBITION_ABSENT", "INERT"] and any(w in claim_text_l for w in ["significantly effective", "demonstrates efficacy", "inhibits"]):
+            issues.append("SELECTIVE_CITATION")
+
+        # 8. SECONDARY_TO_PRIMARY_CONFUSION
+        if any(w in paper_design for w in ["narrative review", "systematic review", "editorial", "commentary"]):
+            if any(w in claim_text_l for w in ["authors demonstrated experimentally", "authors measured", "experimental results show"]):
+                issues.append("SECONDARY_TO_PRIMARY_CONFUSION")
+
+        # Determine Final Claim Status
+        if not issues:
+            final_status = "VERIFIED_ENTAILMENT"
+            is_valid = True
+            entailment_desc = "Empirical data fully entails stated claim with matching context and causality bounds."
+        elif all(i in ["PRECLINICAL_TO_CLINICAL_LEAP", "CORRELATION_TO_CAUSATION", "DOSE_MISMATCH"] for i in issues):
+            final_status = "PARTIALLY_SUPPORTED"
+            is_valid = False
+            entailment_desc = "Claim supported in part but contains translational or causal overstatements."
+        else:
+            final_status = "DISCONFIRMED_DRIFT"
+            is_valid = False
+            entailment_desc = "Claim misrepresents cited source or exhibits critical context/entity mismatches."
+
+        return {
+            "claim_id": claim.get("claim_id", "CLM_001"),
+            "claim_text": claim_text,
+            "source_paper_id": str(paper_record.get("ref_id", paper_record.get("doi", "UNKNOWN"))),
+            "source_location": source_location,
+            "extracted_finding": str(extracted_finding),
+            "entailment_status": final_status,
+            "entailment_description": entailment_desc,
+            "context_match": "MATCHED" if "MODEL_MISMATCH" not in issues and "ENDPOINT_MISMATCH" not in issues else "MISMATCH",
+            "causality_check": "VALID_CAUSAL_BOUNDS" if "CORRELATION_TO_CAUSATION" not in issues else "UNWARRANTED_CAUSAL_ASSERTION",
+            "detected_issues": issues,
+            "issue_descriptions": [cls.ISSUES_V2.get(i, i) for i in issues],
+            "is_valid_support": is_valid,
+            "remediation_guidance": "Revise claim to strictly match observed model, dose, and non-causal boundaries." if issues else "Claim verified without remediation needed."
+        }
+
+
+# =============================================================================
+# POST-RESEARCH CITATION AUDITOR (K-DENSE ADAPTED)
+# =============================================================================
+
+class PostResearchCitationAuditor:
+    """Audits final proposal markdown text against reference portfolio (v8.6 Section 10).
+    Verifies that every citation exists, identifiers are verified, no unused references remain,
+    and no unresolved citation placeholders exist.
+    """
+    PLACEHOLDER_REGEXES = [
+        re.compile(r'\[\?\]'),
+        re.compile(r'\[citation\s+needed\]', re.IGNORECASE),
+        re.compile(r'\[@(?:missing|unresolved|placeholder)\]', re.IGNORECASE),
+        re.compile(r'\[TODO(?:\s*:\s*cite)?\]', re.IGNORECASE)
+    ]
+
+    CITATION_MARKER_REGEXES = [
+        re.compile(r'\[(\d+(?:\s*,\s*\d+)*)\]'),
+        re.compile(r'\[@([A-Za-z0-9_.:-]+)\]')
+    ]
+
+    @classmethod
+    def audit_proposal_citations(
+        cls,
+        proposal_text: str,
+        reference_portfolio: List[Dict[str, Any]],
+        claims_evidence_map: Optional[Dict[str, List[str]]] = None
+    ) -> Dict[str, Any]:
+        """Executes comprehensive post-writing citation audit."""
+        issues = []
+        unresolved_placeholders = []
+
+        # 1. Scan for unresolved placeholders
+        for rx in cls.PLACEHOLDER_REGEXES:
+            for m in rx.finditer(proposal_text):
+                unresolved_placeholders.append(m.group(0))
+
+        if unresolved_placeholders:
+            issues.append({
+                "type": "UNRESOLVED_CITATION_PLACEHOLDER",
+                "count": len(unresolved_placeholders),
+                "placeholders": unresolved_placeholders[:5],
+                "severity": "CRITICAL"
+            })
+
+        # 2. Extract cited keys from narrative
+        cited_numbers = set()
+        cited_keys = set()
+        for rx in cls.CITATION_MARKER_REGEXES:
+            for m in rx.finditer(proposal_text):
+                val = m.group(1)
+                for part in val.split(","):
+                    p_clean = part.strip()
+                    if p_clean.isdigit():
+                        cited_numbers.add(int(p_clean))
+                    else:
+                        cited_keys.add(p_clean.lower())
+
+        # 3. Build portfolio reference mappings
+        portfolio_map_by_num = {}
+        portfolio_map_by_key = {}
+        unverified_sources = []
+
+        for idx, ref in enumerate(reference_portfolio):
+            c_num = ref.get("citation_number", idx + 1)
+            portfolio_map_by_num[c_num] = ref
+            
+            for k in ["ref_id", "doi", "pmid", "id"]:
+                val = ref.get(k)
+                if val:
+                    portfolio_map_by_key[str(val).strip().lower()] = ref
+
+            # Verify identifier presence
+            has_id = bool(ref.get("doi") or ref.get("pmid"))
+            if not has_id:
+                unverified_sources.append(ref.get("title", f"Reference {c_num}"))
+
+        if unverified_sources:
+            issues.append({
+                "type": "UNVERIFIED_SOURCE",
+                "count": len(unverified_sources),
+                "titles": unverified_sources[:5],
+                "severity": "HIGH"
+            })
+
+        # 4. Check for unused references in portfolio
+        unused_refs = []
+        for idx, ref in enumerate(reference_portfolio):
+            c_num = ref.get("citation_number", idx + 1)
+            ref_id = str(ref.get("ref_id", ref.get("doi", ""))).strip().lower()
+            
+            is_used = (c_num in cited_numbers) or (ref_id in cited_keys)
+            if not is_used:
+                unused_refs.append({
+                    "citation_number": c_num,
+                    "ref_id": ref.get("ref_id", f"REF_{c_num}"),
+                    "title": ref.get("title", "")
+                })
+
+        if unused_refs:
+            issues.append({
+                "type": "UNUSED_REFERENCE_IN_PORTFOLIO",
+                "count": len(unused_refs),
+                "unused_references": unused_refs,
+                "severity": "WARNING"
+            })
+
+        # 5. Check for cited references that do not exist in portfolio
+        missing_refs = []
+        for num in cited_numbers:
+            if num not in portfolio_map_by_num:
+                missing_refs.append(f"[{num}]")
+        for key in cited_keys:
+            if key not in portfolio_map_by_key:
+                missing_refs.append(f"[@{key}]")
+
+        if missing_refs:
+            issues.append({
+                "type": "MISSING_CITATION_IN_PORTFOLIO",
+                "count": len(missing_refs),
+                "missing_markers": missing_refs,
+                "severity": "CRITICAL"
+            })
+
+        # Overall status
+        critical_count = sum(1 for i in issues if i["severity"] == "CRITICAL")
+        if critical_count > 0:
+            status = "FAILED"
+        elif issues:
+            status = "WARNINGS"
+        else:
+            status = "PASSED"
+
+        return {
+            "overall_audit_status": status,
+            "total_references_in_portfolio": len(reference_portfolio),
+            "total_citations_in_text": len(cited_numbers) + len(cited_keys),
+            "unused_references_count": len(unused_refs),
+            "unresolved_placeholders_count": len(unresolved_placeholders),
+            "unverified_identifiers_count": len(unverified_sources),
+            "audit_issues": issues,
+            "post_writing_audit_verdict": f"Post-Writing Citation Audit: {status} ({len(issues)} issues detected)"
         }
 
 

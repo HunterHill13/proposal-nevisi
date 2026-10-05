@@ -38,7 +38,9 @@ try:
         SEARCH_FAMILIES_ONTOLOGY, SATURATION_DIMENSIONS,
         SEED_PAPER_CATEGORIES, CITATION_CHASE_DIRECTIONS,
         CITATION_DRIFT_TYPES, STRUCTURED_PAPER_READING_TRACKS,
-        CONTRADICTION_EXPLANATION_LEVELS
+        CONTRADICTION_EXPLANATION_LEVELS, SEARCH_MISS_TAXONOMY,
+        RECALL_BENCHMARK_STATUSES, DATABASE_SPECIALIZATION_REGISTRY,
+        PUBLICATION_BIAS_INDICATORS, PRIMARY_DATA_VISUAL_REQUIRES_REVIEW
     )
     from generic_reference_auditor import GenericReferenceAuditor
 except ImportError:
@@ -52,7 +54,9 @@ except ImportError:
         SEARCH_FAMILIES_ONTOLOGY, SATURATION_DIMENSIONS,
         SEED_PAPER_CATEGORIES, CITATION_CHASE_DIRECTIONS,
         CITATION_DRIFT_TYPES, STRUCTURED_PAPER_READING_TRACKS,
-        CONTRADICTION_EXPLANATION_LEVELS
+        CONTRADICTION_EXPLANATION_LEVELS, SEARCH_MISS_TAXONOMY,
+        RECALL_BENCHMARK_STATUSES, DATABASE_SPECIALIZATION_REGISTRY,
+        PUBLICATION_BIAS_INDICATORS, PRIMARY_DATA_VISUAL_REQUIRES_REVIEW
     )
     from generic_reference_auditor import GenericReferenceAuditor
 
@@ -1690,11 +1694,21 @@ class EvidenceBasedSaturationTracker:
         batch_marginal_yields: List[float] = []
 
         for b in search_batches:
-            records = b.get("records", [])
-            status = b.get("status", "EXECUTED")
-            db = b.get("database", "UNKNOWN")
-            if db:
-                seen_databases.add(db)
+            if isinstance(b, dict):
+                records = b.get("records", [])
+                status = b.get("status", "EXECUTED")
+                db = b.get("database", "UNKNOWN")
+            elif isinstance(b, list):
+                records = b
+                status = "EXECUTED"
+                db = records[0].get("database", "UNKNOWN") if (records and isinstance(records[0], dict)) else "UNKNOWN"
+            else:
+                records = []
+                status = "ERROR"
+                db = "UNKNOWN"
+
+            if db and db != "UNKNOWN":
+                seen_databases.add(db.lower())
 
             if status in ["ERROR", "NOT_EXECUTED", "UNAVAILABLE"]:
                 failed_batches += 1
@@ -1739,6 +1753,12 @@ class EvidenceBasedSaturationTracker:
             record_novelty < saturation_threshold
         )
 
+        incomplete_dimensions = []
+        if len(seen_databases) < 2:
+            incomplete_dimensions.append("DATABASE_NOVELTY (less than 2 distinct database engines queried)")
+        if len(seen_outcomes) < 2:
+            incomplete_dimensions.append("EVIDENCE_NOVELTY (fewer than 2 distinct outcomes observed)")
+
         dimension_status = {
             "RECORD_NOVELTY": "SATURATED" if record_novelty < saturation_threshold else "ACTIVE",
             "ENTITY_NOVELTY": "SATURATED" if entity_novelty < 0.20 else "ACTIVE",
@@ -1749,18 +1769,33 @@ class EvidenceBasedSaturationTracker:
             "VOCABULARY_NOVELTY": "SATURATED" if is_diminishing else "EXPANDING"
         }
 
-        overall_saturated = is_diminishing and (len(all_unique_ids) >= 15)
+        if is_diminishing and (len(all_unique_ids) >= 15):
+            if incomplete_dimensions:
+                overall_saturated = False
+                saturation_status = "SATURATION_INCOMPLETE"
+                guard_note = f"Saturation incomplete: unexplored dimensions: {', '.join(incomplete_dimensions)}"
+            else:
+                overall_saturated = True
+                saturation_status = "SATURATED"
+                guard_note = "PASSED"
+        else:
+            overall_saturated = False
+            saturation_status = "EXPANDING"
+            guard_note = "ACTIVE_EXPANSION"
 
         return {
-            "saturation_status": "SATURATED" if overall_saturated else "EXPANDING",
+            "saturation_status": saturation_status,
             "is_saturated": overall_saturated,
             "total_unique_records": len(all_unique_ids),
             "batches_evaluated": len(search_batches),
             "final_marginal_yield": record_novelty,
             "marginal_yield_history": batch_marginal_yields,
             "dimension_assessments": dimension_status,
-            "false_saturation_guard": "PASSED"
+            "incomplete_dimensions": incomplete_dimensions,
+            "false_saturation_guard": guard_note
         }
+
+    check_saturation = evaluate_saturation
 
 
 class ResearchRunManifest:
@@ -1835,6 +1870,340 @@ class ResearchRunManifest:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2, ensure_ascii=False)
         return filepath
+
+
+class SearchMissAnalyzer:
+    """Diagnoses why a specific known relevant scientific paper was missed during retrieval (v8.6 Section 4).
+    Applies a 13-category generic diagnostic taxonomy without topic-specific hardcoding.
+    Answers: 'We missed this relevant paper because...'
+    """
+    TAXONOMY = dict(SEARCH_MISS_TAXONOMY)
+
+    @classmethod
+    def diagnose_miss(
+        cls,
+        target_paper: Dict[str, Any],
+        search_context: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Performs structured miss analysis for a single unretrieved relevant study."""
+        paper_id = target_paper.get("id") or target_paper.get("doi") or target_paper.get("pmid") or "UNKNOWN_ID"
+        title = target_paper.get("title", "")
+        abstract = target_paper.get("abstract", "")
+        year = target_paper.get("year")
+        target_text = f"{title} {abstract}".lower()
+
+        executed_queries = search_context.get("executed_queries", [])
+        queried_databases = [str(db).lower() for db in search_context.get("queried_databases", [])]
+        executed_families = search_context.get("executed_query_families", [])
+        date_window = search_context.get("date_window_years", 6)
+        current_year = search_context.get("current_year", 2026)
+        screened_records = search_context.get("screened_records", [])
+        citation_chased_ids = set(str(x).lower() for x in search_context.get("citation_chased_ids", []))
+        deduplicated_ids = set(str(x).lower() for x in search_context.get("deduplicated_ids", []))
+
+        # 1. Date filter failure
+        if year and (current_year - year) > date_window:
+            miss_reason = "DATE_FILTER_FAILURE"
+            explanation = f"target study published in {year}, outside the active {date_window}-year temporal retrieval window."
+            remedy = "Relax temporal boundaries or designate study as historical landmark."
+            return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 2. Database coverage failure
+        if "preprint" in target_text and not any(db in ["europe_pmc", "europe pmc", "biorxiv", "arxiv"] for db in queried_databases):
+            miss_reason = "DATABASE_COVERAGE_FAILURE"
+            explanation = f"target paper is a preprint/repository item not indexed by currently queried databases: {queried_databases}."
+            remedy = "Include Europe PMC or preprint archive in queried databases."
+            return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 3. Deduplication error
+        norm_title = re.sub(r'[^a-z0-9]', '', title.lower())
+        for d_id in deduplicated_ids:
+            if paper_id and str(paper_id).lower() in str(d_id):
+                miss_reason = "DEDUPLICATION_ERROR"
+                explanation = "target paper was erroneously flagged as a duplicate of an existing record and discarded."
+                remedy = "Verify DOI/PMID canonicalization and refine fuzzy title similarity threshold."
+                return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 4. Screening false negative
+        for sc in screened_records:
+            sc_id = str(sc.get("doi") or sc.get("pmid") or sc.get("title", "")).lower()
+            if (paper_id and str(paper_id).lower() in sc_id) or (norm_title and norm_title in re.sub(r'[^a-z0-9]', '', str(sc.get("title", "")).lower())):
+                if sc.get("screening_verdict") in ["REJECTED", "EXCLUDED"]:
+                    miss_reason = "SCREENING_FALSE_NEGATIVE"
+                    explanation = f"target paper was retrieved but excluded during screening under reason: {sc.get('exclusion_reason', 'RELEVANCE_GATE')}."
+                    remedy = "Audit screening exclusion thresholds and inspect false-positive filters."
+                    return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 5. Citation network failure
+        if target_paper.get("requires_citation_chasing"):
+            if str(paper_id).lower() not in citation_chased_ids:
+                miss_reason = "CITATION_NETWORK_FAILURE"
+                explanation = "target paper was not linked to the primary seed papers' citation graph within the allowed traversal depth."
+                remedy = "Broaden seed paper selection or increase citation chaining depth to 2 or 3."
+                return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 6. Query family failure
+        if target_paper.get("is_negative_finding") and "NEGATIVE_EVALUATION" not in executed_families and "NEGATIVE_NULL_RESULT" not in executed_families:
+            miss_reason = "QUERY_FAMILY_FAILURE"
+            explanation = "target paper reported null or adverse results, and negative query families were not executed."
+            remedy = "Execute NEGATIVE_EVALUATION and NEGATIVE_NULL_RESULT query families."
+            return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 7. MeSH mapping failure
+        target_mesh = [str(m).lower() for m in target_paper.get("mesh_terms", [])]
+        mapped_mesh = [str(m).lower() for m in search_context.get("mapped_mesh_terms", [])]
+        if target_mesh and not any(tm in mapped_mesh for tm in target_mesh):
+            miss_reason = "MESH_MAPPING_FAILURE"
+            explanation = f"target study indexed with MeSH terms {target_mesh} which were not generated by MeSH mapper."
+            remedy = "Enhance MeSH controlled vocabulary mapping for target indications and interventions."
+            return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # 8. Synonym failure
+        target_synonyms = target_paper.get("synonyms", [])
+        if target_synonyms:
+            miss_reason = "SYNONYM_FAILURE"
+            explanation = f"target study utilized alternative lexical variants or synonyms ({target_synonyms}) not captured in query expansion."
+            remedy = f"Add lexical variants: {target_synonyms} to BROAD_SYNONYM query expansion."
+            return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+        # Default: Vocabulary failure
+        miss_reason = "VOCABULARY_FAILURE"
+        explanation = "search queries did not contain specific technical keywords present in the target study title or abstract."
+        remedy = "Expand query synonyms and add domain-specific terminology variants."
+        return cls._build_result(paper_id, title, miss_reason, explanation, remedy)
+
+    @classmethod
+    def _build_result(cls, paper_id: str, title: str, reason: str, explanation: str, remedy: str) -> Dict[str, Any]:
+        return {
+            "paper_id": str(paper_id),
+            "title": title,
+            "primary_miss_reason": reason,
+            "diagnostic_explanation": f"We missed this relevant paper because {explanation}",
+            "suggested_remedy": remedy
+        }
+
+
+class ResearchRecallBenchmark:
+    """Rigorous, empirical research recall benchmark calculator (v8.6 Section 3).
+    Evaluates literature retrieval against ground-truth gold-standard datasets.
+    Calculates Recall, Precision, F1, Gold-Standard Coverage, and component contributions.
+    """
+    @classmethod
+    def evaluate_benchmark(
+        cls,
+        benchmark_spec: Dict[str, Any],
+        retrieved_records: List[Dict[str, Any]],
+        search_context: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Calculates recall metrics and diagnoses misses against ground-truth specification."""
+        topic_id = benchmark_spec.get("topic_id", "GENERIC_TOPIC")
+        research_question = benchmark_spec.get("research_question", "")
+        gold_standard_ids = [str(x).strip().lower() for x in benchmark_spec.get("gold_standard_ids", []) if str(x).strip()]
+        expected_seeds = [str(x).strip().lower() for x in benchmark_spec.get("expected_seed_papers", []) if str(x).strip()]
+
+        ctx = search_context or {}
+
+        def _canonicalize_id(raw_val: Any) -> str:
+            s = str(raw_val or "").strip().lower()
+            s = re.sub(r'^(?:doi:|pmid:|https?://(?:dx\.)?doi\.org/)', '', s)
+            return s
+
+        # Canonical map of retrieved IDs
+        retrieved_id_map: Dict[str, Dict[str, Any]] = {}
+        for r in retrieved_records:
+            for k in ["id", "doi", "pmid"]:
+                val = r.get(k)
+                if val:
+                    raw_s = str(val).strip().lower()
+                    clean_s = _canonicalize_id(raw_s)
+                    norm_s = re.sub(r'[^a-z0-9]', '', clean_s)
+                    retrieved_id_map[raw_s] = r
+                    retrieved_id_map[clean_s] = r
+                    retrieved_id_map[norm_s] = r
+            if r.get("title"):
+                norm_t = re.sub(r'[^a-z0-9]', '', str(r["title"]).lower())
+                if norm_t:
+                    retrieved_id_map[norm_t] = r
+
+        true_positives = []
+        false_negatives = []
+        for g_id in gold_standard_ids:
+            clean_g = _canonicalize_id(g_id)
+            norm_g = re.sub(r'[^a-z0-9]', '', clean_g)
+            if g_id in retrieved_id_map or clean_g in retrieved_id_map or norm_g in retrieved_id_map:
+                true_positives.append(g_id)
+            else:
+                false_negatives.append(g_id)
+
+        tp_count = len(true_positives)
+        gold_count = len(gold_standard_ids)
+        total_retrieved = len(retrieved_records)
+
+        recall = round(tp_count / max(gold_count, 1), 3) if gold_count > 0 else 0.0
+        precision = round(tp_count / max(total_retrieved, 1), 3) if total_retrieved > 0 else 0.0
+        f1 = round(2 * (precision * recall) / max(precision + recall, 1e-6), 3) if (precision + recall) > 0 else 0.0
+        coverage = recall
+
+        # Validation status categorization (v8.6 Section 3)
+        if gold_count == 0:
+            val_status = "RECALL_NOT_EMPIRICALLY_ESTABLISHED"
+        elif recall >= 0.85:
+            val_status = "EMPIRICALLY_VALIDATED_RECALL"
+        elif recall > 0.0:
+            val_status = "PARTIALLY_VALIDATED_RECALL"
+        else:
+            val_status = "UNVALIDATED_RECALL"
+
+        # Database contribution
+        db_contrib: Dict[str, int] = {}
+        for tp in true_positives:
+            rec = retrieved_id_map.get(tp) or retrieved_id_map.get(_canonicalize_id(tp), {})
+            db = str(rec.get("source_database", rec.get("database", "pubmed"))).lower()
+            db_contrib[db] = db_contrib.get(db, 0) + 1
+
+        # Query family contribution
+        qf_contrib: Dict[str, int] = {}
+        for tp in true_positives:
+            rec = retrieved_id_map.get(tp) or retrieved_id_map.get(_canonicalize_id(tp), {})
+            fam = str(rec.get("query_family", "DIRECT_CORE"))
+            qf_contrib[fam] = qf_contrib.get(fam, 0) + 1
+
+        # Chasing contribution
+        chasing_count = sum(1 for tp in true_positives if (retrieved_id_map.get(tp) or retrieved_id_map.get(_canonicalize_id(tp), {})).get("is_citation_chased"))
+
+        # Seed paper contribution
+        seed_matches = [s for s in expected_seeds if s in retrieved_id_map or _canonicalize_id(s) in retrieved_id_map or re.sub(r'[^a-z0-9]', '', _canonicalize_id(s)) in retrieved_id_map]
+
+        # Missed paper analysis
+        miss_diagnoses = []
+        target_papers_map = {str(p.get("id", p.get("doi", p.get("pmid")))).strip().lower(): p for p in benchmark_spec.get("gold_standard_details", [])}
+        for fn in false_negatives:
+            target_p = target_papers_map.get(fn, {"id": fn, "title": f"Study {fn}"})
+            diag = SearchMissAnalyzer.diagnose_miss(target_p, ctx)
+            miss_diagnoses.append(diag)
+
+        return {
+            "topic_id": topic_id,
+            "research_question": research_question,
+            "validation_status": val_status,
+            "recall": recall,
+            "precision": precision,
+            "f1_score": f1,
+            "gold_standard_coverage": coverage,
+            "gold_standard_count": gold_count,
+            "true_positive_count": tp_count,
+            "false_negative_count": len(false_negatives),
+            "total_retrieved_count": total_retrieved,
+            "database_contribution": db_contrib,
+            "query_family_contribution": qf_contrib,
+            "citation_chasing_contribution": chasing_count,
+            "seed_paper_contribution": len(seed_matches),
+            "expected_seeds_found": seed_matches,
+            "missed_paper_analysis": miss_diagnoses,
+            "reproducibility_distinction": "EMPIRICAL_BENCHMARK_RECORDED"
+        }
+
+
+class AdaptiveDatabaseSelector:
+    """Adapts scientific database selection based on research problem characteristics (v8.6 Section 14).
+    Explains WHY each database was selected and WHICH evidence it can or cannot capture.
+    """
+    REGISTRY = dict(DATABASE_SPECIALIZATION_REGISTRY)
+
+    @classmethod
+    def select_databases_for_problem(
+        cls,
+        research_problem: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        domain = str(research_problem.get("domain", "")).lower()
+        title = str(research_problem.get("title", "")).lower()
+
+        selected = ["pubmed", "europe_pmc"]  # Core biomedical baseline
+
+        # If multidisciplinary, technology, engineering, device, or computational
+        if any(w in domain or w in title for w in ["bioinformatics", "computational", "machine learning", "engineering", "device", "biomaterial", "physics"]):
+            selected.append("openalex")
+
+        # Crossref for DOI canonicalization & publisher retractions
+        selected.append("crossref")
+
+        rationales = {}
+        for db in selected:
+            info = cls.REGISTRY.get(db, {})
+            rationales[db] = {
+                "domain": info.get("domain", "GENERAL"),
+                "why_this_database_was_used": info.get("why_used", ""),
+                "can_capture": info.get("can_capture", []),
+                "cannot_capture": info.get("cannot_capture", [])
+            }
+
+        return {
+            "selected_databases": selected,
+            "database_count": len(selected),
+            "database_rationales": rationales
+        }
+
+
+class NegativeEvidenceScanner:
+    """Actively scans retrieved literature for negative, null, contradictory, or inert findings (v8.6 Section 13).
+    Identifies publication bias risk and emits POSITIVE_EVIDENCE_DOMINANCE when appropriate.
+    """
+    @classmethod
+    def scan_evidence_balance(cls, records: List[Dict[str, Any]]) -> Dict[str, Any]:
+        total = len(records)
+        if total == 0:
+            return {
+                "total_records": 0,
+                "positive_count": 0,
+                "negative_count": 0,
+                "neutral_count": 0,
+                "evidence_balance_status": "NO_EVIDENCE",
+                "publication_bias_risk": "UNASSESSED"
+            }
+
+        pos_count = 0
+        neg_count = 0
+        neu_count = 0
+
+        for r in records:
+            eff = str(r.get("effect_direction", r.get("evidence_polarity", ""))).upper()
+            text = f"{r.get('title', '')} {r.get('abstract', '')}".lower()
+            
+            if any(k in eff for k in ["NEGATIVE", "INERT", "NO_CHANGE", "INHIBITION_ABSENT", "CONTRADICTS"]) or \
+               any(w in text for w in ["no significant effect", "was inert", "failed to inhibit", "did not reduce", "non-superiority"]):
+                neg_count += 1
+            elif any(k in eff for k in ["POSITIVE", "SUPPORTS", "INCREASE", "DECREASE", "INHIBITION", "CYTOTOXIC"]):
+                pos_count += 1
+            else:
+                neu_count += 1
+
+        pos_ratio = round(pos_count / max(total, 1), 3)
+        neg_ratio = round(neg_count / max(total, 1), 3)
+
+        if pos_ratio >= 0.85 and neg_count == 0:
+            status = "POSITIVE_EVIDENCE_DOMINANCE"
+            bias_risk = "HIGH_PUBLICATION_BIAS_SUSPECTED"
+            recommendation = "Execute dedicated negative-evidence and adverse-outcome search queries to mitigate positive publication bias."
+        elif neg_count > 0:
+            status = "NEGATIVE_EVIDENCE_RECOVERED"
+            bias_risk = "LOW_OR_BALANCED"
+            recommendation = "Negative and null findings successfully recovered; boundary conditions established."
+        else:
+            status = "SYMMETRIC_EVIDENCE_DISTRIBUTION"
+            bias_risk = "MODERATE"
+            recommendation = "Continue balanced multi-family retrieval."
+
+        return {
+            "total_records": total,
+            "positive_count": pos_count,
+            "negative_count": neg_count,
+            "neutral_count": neu_count,
+            "positive_ratio": pos_ratio,
+            "negative_ratio": neg_ratio,
+            "evidence_balance_status": status,
+            "publication_bias_risk": bias_risk,
+            "recommendation": recommendation
+        }
 
 
 if __name__ == "__main__":

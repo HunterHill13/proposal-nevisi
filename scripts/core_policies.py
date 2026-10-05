@@ -48,8 +48,8 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "8.5.0"
-VERSION_DISPLAY = "v8.5.0"
+ENGINE_VERSION = "8.6.0"
+VERSION_DISPLAY = "v8.6.0"
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
@@ -732,6 +732,138 @@ CONTRADICTION_EXPLANATION_LEVELS: List[str] = [
     "PLAUSIBLE_EXPLANATION",        # Discrepancy mechanistically substantiated by differences in model/assay
     "UNRESOLVED_UNCERTAINTY"        # Discrepancy unexplained under available evidence; true research gap
 ]
+
+# ==============================================================================
+# v8.6 ADVANCED RESEARCH RECALL, DEEP READING & POST-AUDIT REGISTRIES
+# ==============================================================================
+
+# Search Miss Diagnostic Taxonomy (v8.6 Section 4)
+SEARCH_MISS_TAXONOMY: Dict[str, str] = {
+    "VOCABULARY_FAILURE": "Search query lacked specific clinical/technical terminology used in target study",
+    "SYNONYM_FAILURE": "Target study used alternative synonym or lexical variant not included in query expansion",
+    "MESH_MAPPING_FAILURE": "Controlled vocabulary indexing differed or MeSH term was not mapped/assigned",
+    "DATABASE_COVERAGE_FAILURE": "Target journal or publication not indexed in searched database endpoints",
+    "QUERY_FAMILY_FAILURE": "Applicable query family (e.g. comparator or negative result) was not executed",
+    "DATE_FILTER_FAILURE": "Publication date falls outside configured temporal search window",
+    "STUDY_DESIGN_FILTER_FAILURE": "Methodology filter excluded study design (e.g. in vitro vs in vivo)",
+    "ENTITY_RESOLUTION_FAILURE": "Intervention, target gene, or compound identifier failed to resolve or align",
+    "CITATION_NETWORK_FAILURE": "Target study was disconnected from seeds' citation paths or exceeded chase depth",
+    "DEDUPLICATION_ERROR": "Study was falsely flagged as duplicate of another record and discarded",
+    "SCREENING_FALSE_NEGATIVE": "Title/abstract screening filter erroneously rejected eligible paper",
+    "METADATA_RETRIEVAL_FAILURE": "Bibliographic metadata or abstract was incomplete or unindexed",
+    "FULL_TEXT_RETRIEVAL_FAILURE": "Full-text payload unavailable behind paywall or inaccessible format"
+}
+
+# Empirical Research Recall Benchmark Statuses (v8.6 Section 3)
+RECALL_BENCHMARK_STATUSES: List[str] = [
+    "EMPIRICALLY_VALIDATED_RECALL",       # Evaluated against explicit ground-truth gold standard (recall >= 0.85)
+    "PARTIALLY_VALIDATED_RECALL",         # Evaluated against partial gold standard (0.0 < recall < 0.85)
+    "UNVALIDATED_RECALL",                 # Evaluated against gold standard but zero targets retrieved
+    "RECALL_NOT_EMPIRICALLY_ESTABLISHED"  # No empirical gold standard provided for topic
+]
+
+# Deep Paper Reading Generic Sections (v8.6 Section 5 - AIPOCH Close-Reading Adapted)
+DEEP_READING_SECTIONS: Dict[str, List[str]] = {
+    "STUDY_IDENTITY": [
+        "study_design", "population_or_model", "intervention_or_exposure",
+        "comparator", "setting", "sample_size"
+    ],
+    "METHODS": [
+        "experimental_clinical_methodology", "primary_assay",
+        "intervention_dose_exposure", "duration", "controls",
+        "randomization_blinding", "inclusion_exclusion_criteria"
+    ],
+    "RESULTS": [
+        "primary_endpoint", "effect_direction", "quantitative_effect_size",
+        "uncertainty_ci", "p_value", "adverse_events",
+        "negative_null_findings", "subgroup_findings"
+    ],
+    "INTERPRETATION": [
+        "authors_conclusion", "limitations", "alternative_explanations",
+        "translational_limitations", "internal_validity_concerns"
+    ],
+    "EVIDENCE_PROVENANCE": [
+        "source_paper", "source_section", "table_figure_location",
+        "extraction_confidence", "evidence_directness_status"
+    ]
+}
+
+# Figure-First Visual Review Discrepancy Flag (v8.6 Section 6)
+PRIMARY_DATA_VISUAL_REQUIRES_REVIEW = "PRIMARY_DATA_VISUAL_REQUIRES_REVIEW"
+
+# Evidence Hierarchy Strength Levels (v8.6 Section 8)
+EVIDENCE_HIERARCHY_TIERS: List[str] = [
+    "DIRECT_HIGH_CONFIDENCE",       # Direct target intervention/model, rigorous design, low RoB, strong effect
+    "DIRECT_MODERATE_CONFIDENCE",   # Direct target intervention/model, moderate sample or minor methodological limits
+    "DIRECT_LOW_CONFIDENCE",        # Direct target intervention/model, high RoB or unconfirmed replication
+    "INDIRECT_SUPPORT",             # Related intervention or analog model providing transferable precedent
+    "MECHANISTIC_SUPPORT",          # Upstream/downstream biochemical pathway, receptor, or molecular cascade
+    "CONTEXTUAL_SUPPORT",           # Epidemiological baseline, clinical standard of care, or assay benchmark
+    "CONTRADICTORY",                # Directly refutes hypothesis or reports conflicting empirical direction
+    "LIMITS_INTERPRETATION"         # Boundary condition, toxic concentration artifact, or confounding factor
+]
+
+# Claim Verification 2.0 Issue Categories (v8.6 Section 9 - K-Dense & AIPOCH Adapted)
+CLAIM_VERIFICATION_ISSUES_V2: Dict[str, str] = {
+    "UNSUPPORTED_CLAIM": "No primary empirical evidence found in cited source supporting claim",
+    "PARTIALLY_SUPPORTED_CLAIM": "Evidence supports only a component or sub-phenotype of stated claim",
+    "OVERGENERALIZATION": "Claim expands specific laboratory finding to broad universal generalization",
+    "POPULATION_MISMATCH": "Claim targets clinical population while source examined different cohort",
+    "MODEL_MISMATCH": "Claim asserts cellular/organismal model distinct from experimental system tested",
+    "ENDPOINT_MISMATCH": "Claim asserts clinical/functional endpoint different from measured assay outcome",
+    "INTERVENTION_MISMATCH": "Claim references pure compound/agent while source tested conjugate/mixture/extract",
+    "DOSE_MISMATCH": "Claim quotes efficacy at standard dose while source observed effect only at supra-physiological/toxic levels",
+    "TEMPORAL_MISMATCH": "Acute short-term exposure cited as proof of durable chronic response",
+    "CORRELATION_TO_CAUSATION": "Observational correlation or association framed as definitive causal mechanism",
+    "PRECLINICAL_TO_CLINICAL_LEAP": "In vitro or murine cell line finding asserted as established human clinical efficacy",
+    "SECONDARY_TO_PRIMARY_CONFUSION": "Review article commentary cited as if it were original empirical experimentation",
+    "SELECTIVE_CITATION": "Favorable secondary metric quoted while omitting neutral or adverse primary endpoint"
+}
+
+# Post-Research Citation Audit Statuses (v8.6 Section 10 - K-Dense Adapted)
+POST_CITATION_AUDIT_STATUSES: Dict[str, str] = {
+    "VERIFIED_PRIMARY_SOURCE": "Reference verified as primary empirical study matching topic scope",
+    "VERIFIED_SECONDARY_REVIEW": "Reference verified as systematic review, guideline, or method origin",
+    "UNVERIFIED_SOURCE": "Bibliographic metadata or identifier could not be definitively resolved",
+    "UNUSED_REFERENCE_IN_PORTFOLIO": "Reference exists in bibliography pool but is nowhere cited in text",
+    "UNRESOLVED_CITATION_PLACEHOLDER": "Unresolved citation marker detected in proposal narrative (e.g. [?])",
+    "MISSING_CITATION_IN_TEXT": "Specific empirical claim asserted without mandatory literature attribution"
+}
+
+# Adaptive Database Specialization Registry (v8.6 Section 14)
+DATABASE_SPECIALIZATION_REGISTRY: Dict[str, Dict[str, Any]] = {
+    "pubmed": {
+        "domain": "BIOMEDICAL_CORE",
+        "why_used": "Canonical index of peer-reviewed biomedical, clinical, and life sciences literature with controlled MeSH indexing.",
+        "can_capture": ["Peer-reviewed clinical trials", "Mechanistic biology", "MeSH-indexed systematic reviews", "Biomedical toxicology"],
+        "cannot_capture": ["Non-biomedical engineering", "Unindexed preprint archives", "Grey literature reports", "Direct clinical trial registry records"]
+    },
+    "europe_pmc": {
+        "domain": "BIOMEDICAL_OPEN_ACCESS",
+        "why_used": "Comprehensive repository providing full-text XML access, European grant links, and life sciences preprints.",
+        "can_capture": ["Full-text open access content", "Life sciences preprints", "Direct figure/table data extraction", "European clinical registries"],
+        "cannot_capture": ["Strictly closed-access proprietary journals", "Non-biomedical physical sciences"]
+    },
+    "openalex": {
+        "domain": "INTERDISCIPLINARY_SCHOLARLY",
+        "why_used": "Global multidisciplinary graph capturing cross-disciplinary works, citation networks, and institutional linkages.",
+        "can_capture": ["Cross-disciplinary technologies", "Comprehensive citation network relationships", "Author and institution disambiguation", "Global conference proceedings"],
+        "cannot_capture": ["Deep full-text XML markup", "Detailed clinical assay parameters"]
+    },
+    "crossref": {
+        "domain": "METADATA_REGISTRY",
+        "why_used": "Authoritative DOI registration agency capturing exact publication metadata, errata, and funder acknowledgments.",
+        "can_capture": ["Canonical DOI resolution", "Publisher errata and retractions", "Funder attribution metadata", "Official publication dates"],
+        "cannot_capture": ["Detailed experimental assay protocols", "Bioinformatic sequence annotations"]
+    }
+}
+
+# Negative Evidence & Publication Bias Indicators (v8.6 Section 13)
+PUBLICATION_BIAS_INDICATORS: Dict[str, str] = {
+    "POSITIVE_EVIDENCE_DOMINANCE": "Excess of positive findings (>85%) with absence of null/negative studies indicates potential publication bias",
+    "SYMMETRIC_EVIDENCE_DISTRIBUTION": "Balanced distribution of positive, neutral, and adverse findings indicates robust reporting",
+    "NEGATIVE_EVIDENCE_RECOVERED": "Deliberate negative query families successfully identified inertness or boundary conditions"
+}
 
 
 

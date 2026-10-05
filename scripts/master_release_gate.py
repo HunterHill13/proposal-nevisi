@@ -252,9 +252,66 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
     c22 = hasattr(ResearchRunManifest, "generate_manifest") and hasattr(ResearchRunManifest, "save_manifest")
     checks.append(("22. Reproducible Research Run Manifest & SHA-256 Checksum", c22))
 
+    # 23. Research Recall Benchmark & Diagnostic Taxonomy (13 Failure Modes)
+    from scripts.scientific_search_adapter import ResearchRecallBenchmark, SearchMissAnalyzer
+    from scripts.core_policies import SEARCH_MISS_TAXONOMY, RECALL_BENCHMARK_STATUSES
+    c23 = (
+        len(SEARCH_MISS_TAXONOMY) == 13 and
+        len(RECALL_BENCHMARK_STATUSES) == 4 and
+        hasattr(ResearchRecallBenchmark, "evaluate_benchmark") and
+        hasattr(SearchMissAnalyzer, "diagnose_miss")
+    )
+    checks.append(("23. Research Recall Benchmark & Diagnostic Taxonomy (13 Failure Modes)", c23))
+
+    # 24. Deep Reading 5-Section Architecture & Figure-First Visual Review
+    from scripts.core_policies import DEEP_READING_SECTIONS, PRIMARY_DATA_VISUAL_REQUIRES_REVIEW
+    c24 = (
+        len(DEEP_READING_SECTIONS) == 5 and
+        PRIMARY_DATA_VISUAL_REQUIRES_REVIEW == "PRIMARY_DATA_VISUAL_REQUIRES_REVIEW" and
+        hasattr(StructuredPaperReader, "extract_figure_table_evidence") and
+        hasattr(StructuredPaperReader, "reverse_engineer_methods")
+    )
+    checks.append(("24. Deep Reading 5-Section Architecture & Figure-First Visual Review", c24))
+
+    # 25. 8-Tier Evidence Hierarchy & Evaluation
+    from scripts.core_policies import EVIDENCE_HIERARCHY_TIERS
+    c25 = (
+        len(EVIDENCE_HIERARCHY_TIERS) == 8 and
+        hasattr(StructuredPaperReader, "evaluate_evidence_hierarchy")
+    )
+    checks.append(("25. 8-Tier Evidence Hierarchy & Confidence Evaluation", c25))
+
+    # 26. Paper-to-Claim Verification 2.0 (8-Stage Pipeline & 13 Issues)
+    from scripts.core_policies import CLAIM_VERIFICATION_ISSUES_V2
+    c26 = (
+        len(CLAIM_VERIFICATION_ISSUES_V2) == 13 and
+        hasattr(PaperToClaimVerifier, "verify_claim_v2")
+    )
+    checks.append(("26. Paper-to-Claim Verification 2.0 (8-Stage Pipeline & 13 Issues)", c26))
+
+    # 27. Post-Research Citation Auditor (Placeholders & Unused References)
+    from scripts.generic_reference_auditor import PostResearchCitationAuditor
+    from scripts.core_policies import POST_CITATION_AUDIT_STATUSES
+    c27 = (
+        len(POST_CITATION_AUDIT_STATUSES) == 6 and
+        hasattr(PostResearchCitationAuditor, "audit_proposal_citations")
+    )
+    checks.append(("27. Post-Research Citation Auditor (Placeholders & Unused References)", c27))
+
+    # 28. Adaptive Database Selector & Negative Evidence Scanner
+    from scripts.scientific_search_adapter import AdaptiveDatabaseSelector, NegativeEvidenceScanner
+    from scripts.core_policies import DATABASE_SPECIALIZATION_REGISTRY, PUBLICATION_BIAS_INDICATORS
+    c28 = (
+        len(DATABASE_SPECIALIZATION_REGISTRY) >= 4 and
+        len(PUBLICATION_BIAS_INDICATORS) == 3 and
+        hasattr(AdaptiveDatabaseSelector, "select_databases_for_problem") and
+        hasattr(NegativeEvidenceScanner, "scan_evidence_balance")
+    )
+    checks.append(("28. Adaptive Database Selector & Negative Evidence Scanner", c28))
+
     all_passed = all(p for _, p in checks)
     return {
-        "check": "RESEARCH_ENGINE_V8_5_CRITERIA_AUDIT",
+        "check": "RESEARCH_ENGINE_V8_6_CRITERIA_AUDIT",
         "passed": all_passed,
         "total_criteria": len(checks),
         "passed_criteria": sum(1 for _, p in checks if p),
@@ -264,7 +321,7 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.5)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.6)")
     print("===========================================================================\n")
 
     # 1. Version Sync
@@ -293,10 +350,10 @@ def main():
     print(f"      - Invariants      : Discovery={'OK' if t_res['discovery_invariant_met'] else 'FAIL'}, Accounting={'OK' if t_res['accounting_invariant_met'] else 'FAIL'}")
     print(f"      - Execution Time  : {t_res['elapsed_seconds']}s")
 
-    # 4. Research Engine v8.5 Criteria Audit (22 Checks)
+    # 4. Research Engine v8.6 Criteria Audit (28 Checks)
     r_res = audit_research_engine_v8_4_criteria()
     status_icon = "[PASS]" if r_res["passed"] else "[FAIL]"
-    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (22 Criteria):")
+    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (28 Criteria):")
     for name, p in r_res["criteria_checks"]:
         ch_icon = "[PASS]" if p else "[FAIL]"
         print(f"      {ch_icon} {name}")

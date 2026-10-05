@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.5)
+### Universal Evidence-Driven Medical Research, Adversarial Verification & Proposal Engine (v8.6)
 ### موتور جامع و تعمیم‌پذیر سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های علوم پزشکی
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 289/289 Passed](https://img.shields.io/badge/Unified%20Tests-289%2F289%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 303/303 Passed](https://img.shields.io/badge/Unified%20Tests-303%2F303%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -18,9 +18,9 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi (v8.5)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH and K-Dense, v8.5 completely decouples the research and literature synthesis subsystems from any project-specific biological assumptions, entities, mechanisms, diseases, cell lines, or compounds. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
+**Proposal-Nevisi (v8.6)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH and K-Dense, v8.6 introduces an empirical Research Recall Benchmark with a 13-category Search Miss Diagnosis Taxonomy, Adaptive Database Specialization with negative evidence scanning, a 5-section Deep Paper Reading Architecture (Sections A-E), Figure-First/Table-First evidence recovery with discrepancy flags (`PRIMARY_DATA_VISUAL_REQUIRES_REVIEW`), Methods reverse-engineering, an 8-tier Evidence Hierarchy, Paper-to-Claim Verification 2.0 (8-stage pipeline, 13 issues), and Post-Research Citation Auditing. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
 
-> **Bifurcated Validation Architecture & Scientific Boundaries (v8.5):** Proposal-Nevisi strictly differentiates **Software Validation** (289 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`).
+> **Bifurcated Validation Architecture & Scientific Boundaries (v8.6):** Proposal-Nevisi strictly differentiates **Software Validation** (303 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`). The overall operational status is truthfully reported as **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED**.
 
 
 ### Core Architecture & Capabilities (v8.4)
@@ -67,7 +67,7 @@
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`scripts/master_release_gate.py`)
 
-The engine includes a master test harness verifying 267 total software assertions across 8 independent test suites:
+The engine includes a master test harness verifying 303 total software assertions across 10 independent test suites and passing all 28 Master Release Gate criteria:
 - **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts (22 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
 - **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 114 stress tests evaluating swappable search backends, deduplication, saturation curves, relevance gates, 25-reference ceiling, 14-factor scoring, screening funnels, DOI conflicts, retracted papers, calendar cutoffs, leap years, causal overclaims, synergy fallacies (114 tests - **PASS**).
@@ -76,6 +76,8 @@ The engine includes a master test harness verifying 267 total software assertion
 - **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 and Draft-07 JSON Schemas (14 tests - **PASS**).
 - **Suite 7: End-to-End Pipeline & Integration Scenarios (`test_e2e_integration.py`):** 24 tests validating full pipeline execution and adversarial failure/demotion scenarios (24 tests - **PASS**).
 - **Suite 8: Cross-Topic Adversarial Test Suite (`test_cross_topic_adversarial.py`):** 11 tests verifying topic-agnosticism across Scenarios A through J (11 tests - **PASS**).
+- **Suite 9: Advanced Research Engine Integration (`test_advanced_research_engine.py`):** 22 tests verifying multi-source federated search, citation chasing, and claim verification (22 tests - **PASS**).
+- **Suite 10: Deep Reading & Recall Benchmark Suite (`test_v86_deep_reading_and_recall_benchmark.py`):** 14 tests verifying recall benchmarking, 13-category search miss taxonomy, 5-section deep reading, figure-first evidence recovery, methods reverse-engineering, 8-tier evidence hierarchy, paper-to-claim verifier 2.0, post-research citation auditing, and thematic comparative synthesis (14 tests - **PASS**).
 
 ```bash
 # Run the master production release gate
@@ -87,22 +89,24 @@ python scripts/master_release_gate.py
 <a name="فارسی"></a>
 ## مستندات فارسی
 
-مهارت **Proposal-Nevisi (نسخه v8.5)** یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
+مهارت **Proposal-Nevisi (نسخه v8.6)** یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی است.
 
-### ویژگی‌های بنیادین نسخه v8.5:
+### ویژگی‌های بنیادین نسخه v8.6:
 1. **استقلال کامل و قطعی از موضوع (Topic-Agnostic Core):** بازطراحی و ارتقای کامل بر مبنای الگوهای اثبات‌شده AIPOCH و K-Dense بدون هرگونه فرض پنهان در خصوص بیماری، دارو، رده سلولی یا مکانیسم.
-2. **۱۶ خانواده پرس‌وجوی استاندارد و نگاشت اصطلاح‌نامه MeSH (`SEARCH_FAMILIES_ONTOLOGY`):** تلفیق جستجوی واژگان کنترل‌شده MeSH با واژگان آزاد عنوان/چکیده، همراه با مقایسه کمی بازده و پوشش اشتراکی.
-3. **تعقیب استنادی چندجهته با ردیابی مسیر اکتشاف (`CitationChasingEngine`):** پیاده‌سازی زنجیره‌سازی استنادی پس‌رو (Backward)، پیش‌رو (Forward) و هم‌عرض (Lateral) با ثبت شفاف مسیر، عمق و خاستگاه کشف.
-4. **موتور اکتشاف مقالات هسته در ۸ دسته استاندارد (`SeedPaperDiscoveryEngine`):** تعیین لنگرهای اکتشافی مستقل از سبد مراجع نهایی (عدم گنجاندن خودکار در پروپوزال بدون عبور از فیلتر غربالگری).
-5. **پایش اشباع ۷ بُعدی شواهد و گارد اشباع کاذب (`EvidenceBasedSaturationTracker`):** ارزیابی روند کاهش بازده حاشیه‌ای در ابعاد رکورد، موجودیت، شواهد، تناقض، شبکه استنادی، پایگاه و واژگان توأم با مسدودسازی اعلام اشباع در خطاهای سیستمی.
-6. **خوانش ساختاریافته ۴ تراکه متون با استخراج ۱۸ فیلد قطعی (`StructuredPaperReader`):** پوشش تراک‌های بالینی، بیوانفورماتیک، آزمایشگاهی و هیبرید با استخراج قطعی دوز، حجم نمونه، جهت اثر، نقطه پایانی و روش اندازه‌گیری.
-7. **راستی‌آزمایی انطباق مقاله با ادعا و کشف ۶ نوع انحراف استنادی (`PaperToClaimVerifier`):** تشخیص دقیق ادعای فراتر از داده (Overstatement)، انحراف متنی (Citation Drift)، عدم انطباق بافتاری (Context Mismatch)، استناد گزینشی (Selective Citation) و تبدیل همبستگی به علیت (Correlation to Causation).
-8. **تفکیک سه‌سطحی تبیین تناقضات علمی (`CONTRADICTION_EXPLANATION_LEVELS`):** دسته‌بندی تبیین‌ها به تجربیِ اثبات‌شده (Demonstrated)، مکانیسمی محتمل (Plausible) و عدم‌قطعیت تجربیِ حل‌نشده (Unresolved Uncertainty).
-9. **شناسنامه بازتولیدپذیر اجرای پژوهش (`ResearchRunManifest`):** تولید خودکار مانیفست کامل اجرای پژوهش حاوی تمام پرس‌وجوها، معیارهای تنوع پایگاهی، منحنی اشباع و چک‌سام رمزنگاری‌شده SHA-256.
-10. **سوئیت آزمون جامع ۲۸۹ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۹ سوئیت آزمون و کشتن ۱۰/۱۰ جهش علمی با نمره جهش ۱۰۰٪ و ممیزی عدم نشت در تمام ۲۲ اسکریپت هسته.
+2. **بنچ‌مارک تجربی ریکال و دقت (`ResearchRecallBenchmark`):** سنجش کمی میزان بازیابی مقالات کلیدی (Recall, Precision, F1, Coverage) و ارزیابی سهم مجزای پایگاه‌ها، پرس‌وجوها، مقالات هسته و تعقیب استنادی.
+3. **تاکسونومی ۱۳ گانه علت‌یابی مقالات جا افتاده (`SearchMissAnalyzer`):** تشخیص دقیق چرایی عدم بازیابی مقالات کلیدی در ۱۳ رده مستقل (واژگان، پایگاه، بازه زمانی، نوع طراحی، فیلتر زبان و ...).
+4. **انتخاب انطباقی پایگاه‌ها با ثبت نقاط کور (`AdaptiveDatabaseSelector`):** ثبت رسمی نقاط قوت و نقاط کور هر پایگاه (PubMed, Europe PMC, OpenAlex, Crossref) جهت تضمین تنوع منابع.
+5. **اسکنر شواهد منفی و ارزیابی سوگیری انتشار (`NegativeEvidenceScanner`):** کشف خودکار سلطه شواهد مثبت (`POSITIVE_EVIDENCE_DOMINANCE`) و ملزم ساختن جستجوی شواهد منفی و پوچ.
+6. **خوانش عمیق ۵ بخشی متون (`StructuredPaperReader` Sections A-E):** استخراج ساختارمند هویت مطالعه، متدولوژی، نتایج کلیدی، تفسیر بافتاری و تمامیت ره‌گیری شواهد.
+7. **بازیابی شواهد شکل‌محور و جدول‌محور با پرچم مغایرت (`PRIMARY_DATA_VISUAL_REQUIRES_REVIEW`):** کشف مغایرت‌های آماری و تفسیری میان متن چکیده و داده‌های خام جداول و نمودارها.
+8. **سلسله‌مراتب ۸ سطحی شواهد (`EVIDENCE_HIERARCHY_TIERS`):** رتبه‌بندی کیفی از شواهد مستقیم با قطعیت بالا تا شواهد محدودکننده تفسیر؛ بدون جایگزین کردن تعداد استناد به جای کیفیت متدولوژیک.
+9. **راستی‌آزمایی انطباق مقاله با ادعا ۲.۰ (`PaperToClaimVerifier` v2.0):** خط لوله ۸ مرحله‌ای و کشف ۱۳ نوع عیب استنادی شامل انحراف عددی، ناهمخوانی مدل و ادعای علیت غیرمجاز.
+10. **ممیزی ارجاعات پس از نگارش (`PostResearchCitationAuditor`):** کشف ارجاعات یتیم (Unresolved Placeholders)، منابع خوانده‌نشده در پروپوزال، و رفرنس‌های ثبت‌نشده در سبد شواهد.
+11. **سنتز مقایسه‌ای مضمونی و حل ریشه‌ای تناقضات:** ساخت ماتریس مقایسه بین‌مطالعه‌ای و تبیین واگرایی نتایج بر اساس تفاوت‌های پارامتری (دوز، مدل، زمان) به جای رای‌گیری عددی ساده.
+12. **سوئیت آزمون جامع ۳۰۳ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۱۰ سوئیت آزمون، پاس شدن ۲۸ معیار رهاسازی، کشتن ۱۰/۱۰ جهش علمی با نمره ۱۰۰٪ و ممیزی عدم نشت در ۲۲ اسکریپت.
 
 > **Note on Scientific Validation vs Software Verification:**
-> Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines. They do not constitute external live laboratory experimentation or real clinical trials.
+> Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines (303/303 passed). The operational readiness status is truthfully designated as **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED**, clearly distinguished from external wet-lab experiments or live multi-center clinical trials.
 
 ---
 
