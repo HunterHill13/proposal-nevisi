@@ -31,7 +31,8 @@ try:
     from generic_study_relationships import GenericStudyRelationshipEngine
     from generic_reference_auditor import (
         GenericReferenceAuditor, EvidenceDrivenParagraphBuilder,
-        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord
+        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord,
+        FinalTextSanitizationGate
     )
     from proposal_structure_validator import ProposalStructureValidator
 except ImportError:
@@ -45,7 +46,8 @@ except ImportError:
     from generic_study_relationships import GenericStudyRelationshipEngine
     from generic_reference_auditor import (
         GenericReferenceAuditor, EvidenceDrivenParagraphBuilder,
-        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord
+        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord,
+        FinalTextSanitizationGate
     )
     from proposal_structure_validator import ProposalStructureValidator
 
@@ -148,25 +150,18 @@ class ProposalGenerator:
             lit_paragraphs = []
             for idx, s in enumerate(studies, 1):
                 cnum = s.get("citation_number", idx)
-                authors = s.get("authors", [])
-                lead_author = authors[0] if authors else "محققان"
-                year = s.get("year", 2024)
-                findings = s.get("primary_findings", s.get("title", ""))
-                design = s.get("study_design", "مطالعه تجربی")
-                model_sys = s.get("model_system", s.get("organism_cell_line", "مدل بیولوژیک"))
-                agent_name = s.get("intervention_agent", "عامل مداخله")
-                quant = s.get("quantitative_parameters", "")
-                
-                comparator = s.get("comparator", "گروه کنترل استاندارد")
-                endpoints = s.get("endpoints_evaluated", "شاخص‌های عملکردی و بیوشیمیایی")
-                limitation = s.get("limitations", "محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت")
-                relevance = s.get("relevance_to_current_study", "تعیین مقادیر پایه برای طراحی مداخله در طرح جاری")
                 
                 # Check for existing curated paragraph, ensuring citation number is synchronized
+                # and verifying zero leaked template placeholders
                 para = s.get("review_paragraph") or s.get("literature_review_paragraph")
                 if para:
-                    para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
-                else:
+                    scan_para = FinalTextSanitizationGate.scan_text(para)
+                    if scan_para["is_clean"]:
+                        para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
+                    else:
+                        para = None
+
+                if not para:
                     # Dynamically construct evidence-grounded paragraph without boilerplate or numeric hallucination
                     para = EvidenceDrivenParagraphBuilder.build_literature_paragraph(
                         study_record=s,
@@ -237,7 +232,7 @@ class ProposalGenerator:
             if cond_n:
                 defs.append(f"▪ **{cond_n} ({cond_en}):** وضعیت پاتولوژیک و بالینی مشخص‌شده به عنوان اختلال هدف در پروتکل مطالعه.")
             for agt in model_dict.get("interventions_or_exposures", []):
-                defs.append(f"▪ **{agt.get('name')}:** {agt.get('chemical_or_biological_class', 'مداخله یا داروی مورد ارزیابی')} به عنوان عامل مداخله در طرح پژوهشی حاضر.")
+                defs.append(f"▪ **{agt.get('name')}:** {agt.get('chemical_or_biological_class', 'مداخله یا داروی مورد ارزیابی')} به عنوان مداخله تجربی در طرح پژوهشی حاضر.")
             for out in model_dict.get("primary_outcomes", []):
                 if isinstance(out, dict):
                     defs.append(f"▪ **{out.get('name')}:** شاخص پیامد اولیه تعیین‌شده جهت سنجش اثربخشی مداخله در قالب {out.get('measurement_unit', 'واحدهای استاندارد')}.")
@@ -439,6 +434,14 @@ class ProposalGenerator:
         """Generates proposal, validates structure, and builds DOCX."""
         md_content = cls.assemble_proposal(data)
         
+        # Scan for forbidden placeholder tokens (Fail-Closed Sanitization Gate)
+        scan_res = FinalTextSanitizationGate.scan_text(md_content)
+        if not scan_res["is_clean"]:
+            md_content = FinalTextSanitizationGate.sanitize_text(md_content)
+            scan_res = FinalTextSanitizationGate.scan_text(md_content)
+            if not scan_res["is_clean"]:
+                raise ValueError(f"Proposal text contains forbidden placeholder tokens: {scan_res['detected_placeholders']}")
+
         # Ensure directories exist
         os.makedirs(os.path.dirname(os.path.abspath(md_path)), exist_ok=True)
         os.makedirs(os.path.dirname(os.path.abspath(docx_path)), exist_ok=True)
@@ -457,7 +460,8 @@ class ProposalGenerator:
             "validation": val_result,
             "md_path": md_path,
             "docx_path": docx_path,
-            "status": val_result.get("PROPOSAL_STRUCTURE_VALIDATION", "FAIL")
+            "status": val_result.get("PROPOSAL_STRUCTURE_VALIDATION", "FAIL"),
+            "sanitization": scan_res
         }
 
 def main():

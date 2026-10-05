@@ -1111,15 +1111,37 @@ class ScientificSearchAdapter:
             rel = GenericReferenceAuditor.audit_contextual_relevance(r, problem_model)
             if not rel.get("is_contextually_relevant", True):
                 exc_code = rel.get("exclusion_code") or rel.get("rejection_category") or "OUT_OF_TOPIC"
-                if exc_code not in EXCLUSION_TAXONOMY:
+                if str(exc_code) not in EXCLUSION_TAXONOMY:
                     exc_code = "OUT_OF_TOPIC"
                 stage_1_excluded.append({
                     "ref_id": ref_id,
                     "stage": "STAGE_1_TITLE_ABSTRACT",
-                    "exclusion_code": exc_code,
+                    "exclusion_code": str(exc_code),
                     "reason": rel.get("rationale", "Failed Stage 1 Title/Abstract screening.")
                 })
                 continue
+
+            # Strict Intervention Identity Gate (FAIL_01 to FAIL_04 Hard Reject)
+            # If target interventions are defined, any candidate paper testing alternative
+            # or unrelated interventions is hard-rejected unless approved foundational method.
+            p_dict_sm = GenericReferenceAuditor._extract_model_dict(problem_model)
+            target_agents = []
+            for ag in p_dict_sm.get("interventions_or_exposures", []):
+                n = ag.get("name") if isinstance(ag, dict) else str(ag)
+                if n: target_agents.append(str(n).lower())
+
+            is_foundational_sm = bool(r.get("foundational_justification", {}).get("is_justified")) or r.get("is_methodological_landmark", False) or r.get("study_design") == "METHODOLOGICAL_LANDMARK"
+            if target_agents and not is_foundational_sm:
+                cand_text = f"{r.get('title','')} {r.get('abstract','')} {r.get('intervention_agent','')} {r.get('intervention_or_exposure','')}".lower()
+                has_target = any(ta in cand_text for ta in target_agents)
+                if not has_target:
+                    stage_1_excluded.append({
+                        "ref_id": ref_id,
+                        "stage": "STAGE_1_TITLE_ABSTRACT",
+                        "exclusion_code": "WRONG_INTERVENTION",
+                        "reason": f"Intervention mismatch: candidate evaluates alternative agent not matching target interventions (HARD_REJECT)."
+                    })
+                    continue
 
             stage_1_passed.append(r)
 
@@ -1131,16 +1153,19 @@ class ScientificSearchAdapter:
         for r in stage_1_passed:
             ref_id = r.get("ref_id", r.get("doi", r.get("pmid", "UNKNOWN")))
             
-            # Temporal Recency Gate
-            temp_audit = auditor.audit_temporal_tier(r)
-            if not temp_audit.get("is_temporally_valid", True):
-                stage_2_excluded.append({
-                    "ref_id": ref_id,
-                    "stage": "STAGE_2_FULL_TEXT_EVIDENCE",
-                    "exclusion_code": "OUTDATED_DIRECT_EVIDENCE",
-                    "reason": temp_audit.get("audit_note", "Exceeds 6-year window without foundational exception.")
-                })
-                continue
+            # Temporal Recency Gate: Layer A (Recent) vs Layer B (Foundational / Landmark)
+            # Foundational methodology and seminal landmark papers bypass the 6-year window!
+            is_landmark = bool(r.get("foundational_justification", {}).get("is_justified")) or r.get("is_methodological_landmark", False) or r.get("study_design") == "METHODOLOGICAL_LANDMARK"
+            if not is_landmark:
+                temp_audit = auditor.audit_temporal_tier(r)
+                if not temp_audit.get("is_temporally_valid", True):
+                    stage_2_excluded.append({
+                        "ref_id": ref_id,
+                        "stage": "STAGE_2_FULL_TEXT_EVIDENCE",
+                        "exclusion_code": "OUTDATED_DIRECT_EVIDENCE",
+                        "reason": temp_audit.get("audit_note", "Exceeds 6-year window without foundational exception.")
+                    })
+                    continue
 
             # Metadata integrity check
             meta_audit = cls.verify_citation_metadata(r)
@@ -1328,7 +1353,8 @@ class ScientificSearchAdapter:
         portfolio_audit = GenericReferenceAuditor.audit_final_reference_portfolio(
             references=selected_refs,
             max_references=max_final_refs,
-            min_references=min_final_refs
+            min_references=min_final_refs,
+            allow_under_quota_if_justified=True
         )
 
         db_diversity = self.compute_database_diversity(

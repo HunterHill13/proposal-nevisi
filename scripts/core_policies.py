@@ -910,6 +910,14 @@ NUMERIC_PROVENANCE_STATUSES: Dict[str, str] = {
     "NOT_REPORTED": "Source paper does not report this numeric parameter; must never be hallucinated or filled with generic defaults"
 }
 
+# Numeric Provenance Categories (v8.7 Remediation - W3C PROV-O & Protocol Boundary)
+NUMERIC_PROVENANCE_CATEGORIES: Dict[str, str] = {
+    "SOURCE_DERIVED": "Value extracted directly from cited empirical literature source",
+    "CALCULATED_FROM_SOURCE": "Value mathematically calculated from source-reported parameters (e.g. CI from Fa)",
+    "USER_PROVIDED": "Value specified by research investigator in proposal problem model or prompt",
+    "PROTOCOL_DESIGN": "Value designated as prospective experimental design parameter (e.g. planned treatment doses, incubation times, sample sizes) - never cited as empirical finding"
+}
+
 # Contextual Boundary Mismatches (v8.7 Section 8 - Dynamic Topic-Agnostic Taxonomies)
 CONTEXTUAL_BOUNDARY_MISMATCHES: Dict[str, str] = {
     "MODEL_MISMATCH": "Claim asserts a model/tissue distinct from the biological system evaluated in source",
@@ -936,6 +944,49 @@ FORMULATION_ENTITY_DISTINCTIONS: Dict[str, str] = {
     "METABOLITE": "In vivo biological breakdown product or biotransformed intermediate",
     "ANALOGUE": "Structural congener or bioisostere possessing distinct pharmacokinetic properties",
     "NOT_APPLICABLE": "Methodological, diagnostic, or computational landmark not involving physical agents"
+}
+
+# Entity Type Hierarchy & Formulation Rules (v8.7 Remediation)
+ENTITY_TYPE_HIERARCHY: Dict[str, Dict[str, Any]] = {
+    "PURE_CONSTITUENT": {
+        "tier": 1,
+        "can_substantiate_pure": True,
+        "can_substantiate_extract": False,
+        "requires_qualification": False,
+        "description": "Purified active substance (>95% purity)"
+    },
+    "EXTRACT": {
+        "tier": 2,
+        "can_substantiate_pure": False,
+        "can_substantiate_extract": True,
+        "requires_qualification": True,
+        "evidence_role": "EXTRACT_EVIDENCE",
+        "description": "Botanical or crude natural mixture containing agent"
+    },
+    "DERIVATIVE": {
+        "tier": 3,
+        "can_substantiate_pure": False,
+        "can_substantiate_derivative": True,
+        "requires_qualification": True,
+        "evidence_role": "DERIVATIVE_ANALOGUE_EVIDENCE",
+        "description": "Semi-synthetic or synthetic chemical analogue"
+    },
+    "FORMULATION": {
+        "tier": 4,
+        "can_substantiate_pure": False,
+        "can_substantiate_formulation": True,
+        "requires_qualification": True,
+        "evidence_role": "FORMULATION_EVIDENCE",
+        "description": "Nanoparticle, liposome, or delivery vehicle"
+    },
+    "COMBINATION": {
+        "tier": 5,
+        "can_substantiate_pure": False,
+        "can_substantiate_combination": True,
+        "requires_qualification": True,
+        "evidence_role": "COMBINATION_EVIDENCE",
+        "description": "Multi-agent concomitant intervention"
+    }
 }
 
 # SciFact-Aligned Claim-Evidence Verdicts (v8.7 Section 5)

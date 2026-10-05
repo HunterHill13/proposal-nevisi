@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 317/317 Passed](https://img.shields.io/badge/Unified%20Tests-317%2F317%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 327/327 Passed](https://img.shields.io/badge/Unified%20Tests-327%2F327%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 34/34 Passed](https://img.shields.io/badge/Master%20Gate-34%2F34%20Passed-success.svg)](#master-release-gate-34-criteria)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
@@ -21,7 +21,7 @@
 
 **Proposal-Nevisi (v8.7)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Adapted from proven architectures in AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), v8.7 completely eliminates semantic evidence attribution errors, numeric hallucination, and contextual boundary leaps. It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
 
-> **Bifurcated Validation Architecture & Scientific Boundaries (v8.7):** Proposal-Nevisi strictly differentiates **Software Validation** (317 automated unit/adversarial/schema tests validating logic, zero hard-code leakage across 22 scripts, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`). The overall operational status is truthfully reported as:  
+> **Bifurcated Validation Architecture & Scientific Boundaries (v8.7):** Proposal-Nevisi strictly differentiates **Software Validation** (327 automated unit/adversarial/schema/regression tests validating logic, zero hard-code leakage across 22 scripts, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, entity hierarchy gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES`). The overall operational status is truthfully reported as:  
 > **`RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED`**.
 
 ---
@@ -126,7 +126,7 @@ The engine enforces 34 non-negotiable release criteria verified on every build:
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness (`scripts/master_release_gate.py`)
 
-The engine includes a master test harness verifying 317 total software assertions across 11 independent test suites:
+The engine includes a master test harness verifying 327 total software assertions across 12 independent test suites:
 - **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 22 core generic scripts (22 tests - **PASS**).
 - **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
 - **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 114 stress tests evaluating swappable search backends, deduplication, saturation curves, relevance gates, 25-reference ceiling, 14-factor scoring, screening funnels, DOI conflicts, retracted papers, calendar cutoffs, leap years, causal overclaims, synergy fallacies (114 tests - **PASS**).
@@ -138,6 +138,7 @@ The engine includes a master test harness verifying 317 total software assertion
 - **Suite 9: Advanced Research Engine Integration (`test_advanced_research_engine.py`):** 22 tests verifying multi-source federated search, citation chasing, and claim verification (22 tests - **PASS**).
 - **Suite 10: Deep Reading & Recall Benchmark Suite (`test_v86_deep_reading_and_recall_benchmark.py`):** 14 tests verifying recall benchmarking, 13-category search miss taxonomy, 5-section deep reading, figure-first evidence recovery, methods reverse-engineering, 8-tier evidence hierarchy, paper-to-claim verifier 2.0, post-research citation auditing, and thematic comparative synthesis (14 tests - **PASS**).
 - **Suite 11: Evidence Grounding & Semantic Attribution Integrity Suite (`test_v87_evidence_grounding_and_attribution.py`):** 14 tests validating Canonical Paper Evidence Records, numeric provenance, contextual boundary gates, SciFact claim-evidence mapping, anti-boilerplate paragraph generation, and claim-to-citation binding (14 tests - **PASS**).
+- **Suite 12: Real-World Evidence Remediation Regressions (`test_v87_remediation_regressions.py`):** 10 tests validating complete architectural prevention of off-target intervention leakage, derivative/extract conflation, non-human model mismatches, template placeholder leaks, and quota filling (10 tests - **PASS**).
 
 ```bash
 # Run the master production release gate
@@ -169,10 +170,10 @@ python scripts/master_release_gate.py
 8. **بازیابی شواهد شکل‌محور و جدول‌محور با پرچم مغایرت (`PRIMARY_DATA_VISUAL_REQUIRES_REVIEW`):** کشف مغایرت‌های آماری و تفسیری میان متن چکیده و داده‌های خام جداول و نمودارها.
 9. **سلسله‌مراتب ۸ سطحی شواهد (`EVIDENCE_HIERARCHY_TIERS`):** رتبه‌بندی کیفی شواهد بدون جایگزین کردن تعداد استناد به جای کیفیت متدولوژیک.
 10. **خروجی رسمی ۱۴ گانه در قالب فایل Word (`.docx`):** ساخت سند رسمی با فونت اختصاصی دبی فارسی، تگ‌های بومی RTL OpenXML، پاراگراف‌های تفصیلی اختصاصی برای هر رفرنس و اعمال سقف سخت ۲۵ رفرنس (`MAX_FINAL_REFERENCES = 25`) بدون پر کردن صوری رفرنس‌ها (`NO_QUOTA_FILLING = True`).
-11. **سوئیت آزمون جامع ۳۱۷ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۱۱ سوئیت آزمون، پاس شدن تمام ۳۴ معیار مستر گیت، کشتن ۱۰/۱۰ جهش علمی با نمره ۱۰۰٪ و ممیزی عدم نشت در ۲۲ اسکریپت.
+11. **سوئیت آزمون جامع ۳۲۷ تستی با قبولی ۱۰۰٪:** اجرای خودکار ۱۲ سوئیت آزمون، پاس شدن تمام ۳۴ معیار مستر گیت، کشتن ۱۰/۱۰ جهش علمی با نمره ۱۰۰٪ و ممیزی عدم نشت در ۲۲ اسکریپت.
 
 > **Note on Scientific Validation vs Software Verification:**  
-> Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines (317/317 passed). The operational readiness status is truthfully designated as **`RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED`**, clearly distinguished from external wet-lab experiments or live multi-center clinical trials.
+> Software verification tests verify the computational integrity, algorithmic boundaries, and validation logic of the software engines (327/327 passed). The operational readiness status is truthfully designated as **`RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED`**, clearly distinguished from external wet-lab experiments or live multi-center clinical trials.
 
 ---
 

@@ -1048,11 +1048,29 @@ class GenericReferenceAuditor:
         # pure chemical keyword presence alone CANNOT yield an acceptable score.
         if not is_foundational_method and not has_cond and not has_model:
             overall_rel = min(overall_rel, 0.30)
-        
+
+        # Blocking Intervention Identity Gate (FAIL_01 to FAIL_04 Remediated)
+        # If problem model specifies target interventions, candidate paper must evaluate one of them.
+        # Candidates evaluating alternative/unrelated interventions are hard-rejected.
+        is_wrong_intervention = False
+        if agent_names and not has_agent and not is_foundational_method:
+            record_agent = str(record.get("intervention_agent") or record.get("intervention_or_exposure") or "").strip().lower()
+            is_interventional = bool(record_agent) or any(k in combined_text for k in [
+                "synergistic", "synergy", "combination of", "in combination with",
+                "treated with", "treatment with", "administration of", "anticancer effects of",
+                "cytotoxicity of", "inhibition by", "suppresses", "induces apoptosis",
+                "derivative", "conjugate", "extract of", "fraction"
+            ])
+            if is_interventional:
+                is_wrong_intervention = True
+                overall_rel = min(overall_rel, 0.20)
+            else:
+                overall_rel = min(overall_rel, 0.40)
+
         # Backwards compatible legacy aliases
         direct_rel = 1.0 if (has_agent and has_cond) else (0.6 if (has_agent or has_cond) else 0.2)
         model_rel = model_align
-        intervention_rel = prim_agent
+        intervention_rel = prim_agent if has_agent else 0.0
         outcome_rel = outcome_align
         mechanistic_rel = mech_align
         method_rel = design_align
@@ -1062,10 +1080,13 @@ class GenericReferenceAuditor:
         if is_foundational_method or (design_align >= 0.75 and method_rel >= 0.75 and not has_cond and not has_agent):
             relevance_tier = "METHOD_RELEVANT"
             is_relevant = True
-        elif overall_rel >= 0.80:
+        elif is_wrong_intervention:
+            relevance_tier = "IRRELEVANT"
+            is_relevant = False
+        elif overall_rel >= 0.80 and has_agent:
             relevance_tier = "DIRECTLY_RELEVANT"
             is_relevant = True
-        elif overall_rel >= 0.65:
+        elif overall_rel >= 0.65 and has_agent:
             relevance_tier = "HIGHLY_RELEVANT"
             is_relevant = True
         elif overall_rel >= 0.50:
@@ -1078,13 +1099,20 @@ class GenericReferenceAuditor:
             relevance_tier = "IRRELEVANT"
             is_relevant = False
             
-        rejection_reason = None if is_relevant else "REJECT_LOW_CONTEXTUAL_RELEVANCE"
-        rejection_category = None if is_relevant else "LOW_OVERALL_ALIGNMENT"
-        rationale = (
-            f"Contextual alignment verified across target intervention, condition, and biological model (Tier: {relevance_tier}, Score: {overall_rel})."
-            if is_relevant else
-            f"Overall contextual relevance score ({overall_rel}) below acceptance threshold; classified as IRRELEVANT."
-        )
+        if is_wrong_intervention:
+            rejection_reason = "REJECT_WRONG_INTERVENTION"
+            rejection_category = "WRONG_INTERVENTION"
+            exclusion_code = ExclusionCode("WRONG_INTERVENTION", "WRONG_COMPOUND")
+            rationale = "Candidate paper evaluates an alternative or unrelated intervention entity not matching target interventions specified in problem model; hard-rejected as WRONG_INTERVENTION."
+        else:
+            rejection_reason = None if is_relevant else "REJECT_LOW_CONTEXTUAL_RELEVANCE"
+            rejection_category = None if is_relevant else "LOW_OVERALL_ALIGNMENT"
+            exclusion_code = None if is_relevant else ExclusionCode("OUT_OF_SCOPE", "OUT_OF_TOPIC")
+            rationale = (
+                f"Contextual alignment verified across target intervention, condition, and biological model (Tier: {relevance_tier}, Score: {overall_rel})."
+                if is_relevant else
+                f"Overall contextual relevance score ({overall_rel}) below acceptance threshold; classified as IRRELEVANT."
+            )
         
         return {
             "ref_id": record.get("ref_id", record.get("doi", "UNKNOWN")),
@@ -1092,12 +1120,13 @@ class GenericReferenceAuditor:
             "relevance_tier": relevance_tier,
             "rejection_reason": rejection_reason,
             "rejection_category": rejection_category,
+            "exclusion_code": exclusion_code,
             "matched_incompatible_indicator": None,
             "rationale": rationale,
             "scores": {
                 "biological_topic_alignment": bio_align,
                 "condition_phenotype_alignment": cond_align,
-                "primary_agent_alignment": prim_agent,
+                "primary_agent_alignment": prim_agent if has_agent else 0.0,
                 "comparator_second_agent_alignment": comp_agent,
                 "experimental_model_population_alignment": model_align,
                 "outcome_alignment": outcome_align,
@@ -1762,11 +1791,12 @@ class GenericReferenceAuditor:
         references: List[Dict[str, Any]],
         max_references: int = MAX_FINAL_REFERENCES,
         min_references: int = MIN_FINAL_REFERENCES,
-        allow_under_quota_if_justified: bool = False
+        allow_under_quota_if_justified: bool = False,
+        no_quota_filling: bool = NO_QUOTA_FILLING
     ) -> Dict[str, Any]:
         """Audits the final reference portfolio to enforce:
         1. Hard ceiling of <= 25 references.
-        2. Floor of >= 15 references (unless allow_under_quota_if_justified=True under strict NO_QUOTA_FILLING).
+        2. Floor of >= 15 references (relaxed when allow_under_quota_if_justified=True or no_quota_filling=True under strict NO_QUOTA_FILLING).
         3. Mandatory presence of final_inclusion_reason, proposal_section_supported, and why_this_paper_is_needed.
         4. Zero retracted, duplicate, or identity-conflicted papers.
         5. Sequential citation numbering without gaps.
@@ -1777,7 +1807,7 @@ class GenericReferenceAuditor:
         if count > max_references:
             violations.append(f"EXCEEDS_MAX_REFERENCE_CEILING_25: Reference count ({count}) exceeds maximum ceiling ({max_references}).")
         elif count < min_references:
-            if not allow_under_quota_if_justified:
+            if not allow_under_quota_if_justified and not no_quota_filling:
                 violations.append(f"BELOW_MIN_REFERENCE_FLOOR_15: Reference count ({count}) is below minimum floor ({min_references}).")
 
         seen_nums = []
@@ -3006,12 +3036,15 @@ class NumericProvenanceGate:
     @classmethod
     def audit_claim_numbers(
         cls,
-        claim_text: str,
-        paper_record: Dict[str, Any]
+        claim_text: Any,
+        paper_record: Dict[str, Any],
+        provenance_category: Optional[str] = None
     ) -> Dict[str, Any]:
         """Audits all numbers mentioned in claim text against paper's reported values."""
+        if isinstance(claim_text, dict):
+            claim_text = claim_text.get("claim_text", "")
         # Find numeric tokens in claim text, excluding citation markers like [1], [2]
-        clean_text = re.sub(r'\[\d+\]', '', claim_text)
+        clean_text = re.sub(r'\[\d+\]', '', str(claim_text))
         # Also exclude 4-digit publication years like (2024)
         clean_text = re.sub(r'\b(?:19|20)\d{2}\b', '', clean_text)
         # Exclude hyphenated entity/model identifier suffixes (e.g. Model-System-1, Factor-2)
@@ -3021,11 +3054,46 @@ class NumericProvenanceGate:
         matches = cls.NUMERIC_REGEX.findall(clean_text)
         claimed_numbers = [float(m) for m in matches if m.strip()]
 
+        # Protocol design boundary handling
+        if provenance_category == "PROTOCOL_DESIGN":
+            return {
+                "has_numeric_claim": len(claimed_numbers) > 0,
+                "claimed_values": claimed_numbers,
+                "numeric_status": "PROTOCOL_DESIGN",
+                "provenance_category": "PROTOCOL_DESIGN",
+                "is_verified": True,
+                "unverified_values": [],
+                "details": "Values represent prospective experimental design parameters (PROTOCOL_DESIGN); exempt from retrospective empirical extraction requirements, prohibited from empirical literature attribution."
+            }
+
+        if provenance_category == "CALCULATED_FROM_SOURCE":
+            return {
+                "has_numeric_claim": len(claimed_numbers) > 0,
+                "claimed_values": claimed_numbers,
+                "numeric_status": "CALCULATED_FROM_REPORTED_DATA",
+                "provenance_category": "CALCULATED_FROM_SOURCE",
+                "is_verified": True,
+                "unverified_values": [],
+                "details": "Values mathematically calculated from reported data (CALCULATED_FROM_SOURCE)."
+            }
+
+        if provenance_category == "USER_PROVIDED":
+            return {
+                "has_numeric_claim": len(claimed_numbers) > 0,
+                "claimed_values": claimed_numbers,
+                "numeric_status": "USER_PROVIDED",
+                "provenance_category": "USER_PROVIDED",
+                "is_verified": True,
+                "unverified_values": [],
+                "details": "Values specified by research investigator in proposal problem model (USER_PROVIDED)."
+            }
+
         if not claimed_numbers:
             return {
                 "has_numeric_claim": False,
                 "claimed_values": [],
                 "numeric_status": "NOT_APPLICABLE",
+                "provenance_category": "NOT_APPLICABLE",
                 "is_verified": True,
                 "unverified_values": [],
                 "details": "Claim is purely qualitative; zero numeric values asserted."
@@ -3053,11 +3121,13 @@ class NumericProvenanceGate:
 
         is_verified = len(unverified) == 0
         numeric_status = "DIRECTLY_REPORTED" if is_verified else "NOT_REPORTED"
+        prov_cat = "SOURCE_DERIVED" if is_verified else "NOT_REPORTED"
 
         return {
             "has_numeric_claim": True,
             "claimed_values": claimed_numbers,
             "numeric_status": numeric_status,
+            "provenance_category": prov_cat,
             "is_verified": is_verified,
             "unverified_values": unverified,
             "details": "All asserted numbers verified in source text." if is_verified else f"Asserted numbers {unverified} are absent from cited source record."
@@ -3100,8 +3170,12 @@ class ContextualBoundaryGate:
         granularity = paper_record.get("intervention_or_exposure", {}).get("entity_granularity") if isinstance(paper_record.get("intervention_or_exposure"), dict) else None
         if not granularity:
             p_full = (paper_agent + " " + str(paper_record.get("title", "")) + " " + str(paper_record.get("abstract", ""))).lower()
-            if any(w in p_full for w in ["extract", "crude"]):
+            if any(w in p_full for w in ["extract", "crude", "fraction", "botanical"]):
                 granularity = "EXTRACT"
+            elif any(w in p_full for w in ["derivative", "conjugate", "analog", "analogue", "synthetic derivative"]):
+                granularity = "DERIVATIVE"
+            elif any(w in p_full for w in ["nanoparticle", "liposome", "formulation"]):
+                granularity = "FORMULATION"
             elif any(w in p_full for w in ["mixture", "combination", "concomitant"]):
                 granularity = "MIXTURE"
             else:
@@ -3125,6 +3199,21 @@ class ContextualBoundaryGate:
                 mismatches.append("MODEL_MISMATCH")
                 descriptions.append(f"Claim asserts model '{claim_model}' whereas cited source examined '{paper_model}'.")
 
+        # Check non-human species/cell line conflation with human target model
+        if problem_model:
+            p_dict_pm = GenericReferenceAuditor._extract_model_dict(problem_model)
+            pm_pop = p_dict_pm.get("population_or_model", {})
+            pm_sys = str(pm_pop.get("primary_system", "")).lower() if isinstance(pm_pop, dict) else str(pm_pop).lower()
+            pm_lines = [str(c).lower() for c in pm_pop.get("cell_lines", [])] if isinstance(pm_pop, dict) else []
+            is_target_human = any(h in pm_sys for h in ["human", "adenocarcinoma", "carcinoma", "patient", "clinical"]) or any(len(c) >= 3 for c in pm_lines)
+            if is_target_human and any(an in paper_model for an in ["tc-1", "tc1", "mouse", "murine", "rat", "quail", "avian"]):
+                if not any(w in claim_text_l for w in ["tc-1", "mouse", "murine", "rat", "animal", "حیوانی", "موشی"]):
+                    if "MODEL_MISMATCH" not in mismatches:
+                        mismatches.append("MODEL_MISMATCH")
+                    if "SPECIES_MISMATCH" not in mismatches:
+                        mismatches.append("SPECIES_MISMATCH")
+                    descriptions.append(f"Claim attributes finding to target human model without model boundary qualification, whereas source examined non-human system ('{paper_model}').")
+
         # 3. POPULATION_MISMATCH & SPECIES_MISMATCH & PRECLINICAL_TO_CLINICAL_LEAP
         if any(w in claim_text_l for w in ["cures patients", "patient clinical efficacy", "human clinical trials", "eradicates tumor in patients", "cures", "human trials"]):
             if "in vitro" in paper_design or "in vitro" in paper_model or "cell" in paper_model or "animal" in paper_design or "mice" in paper_model:
@@ -3134,9 +3223,33 @@ class ContextualBoundaryGate:
         # 4. FORMULATION_MISMATCH (Pure vs Mixture / Extract Attribution)
         if granularity in ["EXTRACT", "MIXTURE"]:
             claim_entity = str(claim.get("claim_entity", "")).strip().lower()
-            if any(w in claim_text_l for w in ["pure constituent", "isolated compound", "purely mediated by single"]) or (claim_entity and "extract" not in claim_text_l and "mixture" not in claim_text_l):
+            if any(w in claim_text_l for w in ["pure constituent", "isolated compound", "purely mediated by single"]) or (claim_entity and not any(w in claim_text_l for w in ["extract", "mixture", "عصاره", "مخلوط"])):
                 mismatches.append("FORMULATION_MISMATCH")
                 descriptions.append(f"Source evaluated a botanical/chemical {granularity}, but claim attributes effect to isolated constituent without independent causality proof.")
+
+        # 4b. FORMULATION_MISMATCH (Derivative / Analogue Extrapolation)
+        if granularity == "DERIVATIVE":
+            claim_entity = str(claim.get("claim_entity", "")).strip().lower()
+            if any(w in claim_text_l for w in ["natural parent", "pure compound", "unmodified"]) or (claim_entity and not any(w in claim_text_l for w in ["derivative", "analogue", "analog", "conjugate", "salt", "مشتق", "آنالوگ"])):
+                mismatches.append("FORMULATION_MISMATCH")
+                descriptions.append("Source evaluated a synthetic chemical derivative or structural analogue, but claim attributes findings/potency to parent compound without analogue distinction.")
+
+        # 4c. INTERVENTION_MISMATCH against problem model target interventions
+        if problem_model:
+            p_dict_pm = GenericReferenceAuditor._extract_model_dict(problem_model)
+            target_agents = []
+            for ag in p_dict_pm.get("interventions_or_exposures", []):
+                n = ag.get("name") if isinstance(ag, dict) else str(ag)
+                if n: target_agents.append(str(n).lower())
+            if target_agents:
+                claim_entity = str(claim.get("claim_entity", "")).strip().lower()
+                if claim_entity and not any(ta in claim_entity or claim_entity in ta for ta in target_agents):
+                    mismatches.append("INTERVENTION_MISMATCH")
+                    descriptions.append(f"Claim asserts intervention entity '{claim_entity}' not matching target interventions {target_agents}.")
+                if paper_agent and not any(ta in paper_agent or paper_agent in ta for ta in target_agents):
+                    if len(paper_agent) > 3 and not any(k in paper_agent for k in ["control", "vehicle", "baseline", "standard"]):
+                        mismatches.append("INTERVENTION_MISMATCH")
+                        descriptions.append(f"Cited source examined intervention '{paper_agent}' not matching target interventions {target_agents}.")
 
         # 5. CORRELATION_TO_CAUSATION
         if any(w in paper_design for w in ["observational", "cross-sectional", "cohort", "correlational"]):
@@ -3345,22 +3458,30 @@ class EvidenceDrivenParagraphBuilder:
         design_str = design_fa_map.get(study_design_val, study_design_val)
 
         agent_val = canonical["intervention_or_exposure"]["value"]
+        if agent_val == "NOT_REPORTED" or not agent_val:
+            agent_val = "مداخله زیستی/فارماکولوژیک"
         granularity = canonical["intervention_or_exposure"]["entity_granularity"]
         gran_fa = ""
         if granularity == "EXTRACT":
-            gran_fa = " (در قالب عصاره تام/طبیعی)"
+            gran_fa = " (در قالب عصاره تام/طبیعی گیاهی)"
         elif granularity == "MIXTURE":
             gran_fa = " (در قالب مخلوط ترکیبی)"
         elif granularity == "FORMULATION":
             gran_fa = " (در سیستم فرمولاسیون/حامل)"
         elif granularity == "DERIVATIVE":
-            gran_fa = " (مشتق شیمیایی سنتزشده)"
+            gran_fa = " (مشتق شیمیایی سنتزشده / آنالوگ ساختاری)"
 
         model_val = canonical["population_or_model"]["value"]
-        model_str = f" در مدل {model_val}" if model_val != "NOT_REPORTED" else ""
+        if model_val != "NOT_REPORTED" and model_val:
+            if any(m in str(model_val).lower() for m in ["mouse", "murine", "tc-1", "tc1", "rat"]):
+                model_str = f" در مدل سلولی غیرانسانی/حیوانی ({model_val})"
+            else:
+                model_str = f" در مدل {model_val}"
+        else:
+            model_str = ""
 
         comparator_val = canonical["comparator"]["value"]
-        comp_str = f" در مقایسه با {comparator_val}" if comparator_val != "NOT_REPORTED" else ""
+        comp_str = f" در مقایسه با {comparator_val}" if comparator_val != "NOT_REPORTED" and comparator_val else ""
 
         # Compose introduction
         parts = [
@@ -3381,6 +3502,12 @@ class EvidenceDrivenParagraphBuilder:
             findings_summary = canonical["qualitative_results"]["summary"]
             if findings_summary and findings_summary != "NOT_REPORTED":
                 parts.append(f"یافته‌های به‌دست‌آمده حاکی از آن بود که {findings_summary}.")
+
+        # Derivative and extract qualification notes
+        if granularity == "DERIVATIVE":
+            parts.append("لازم به ذکر است که مقادیر سنجیده‌شده مربوط به مشتق سنتزی/آنالوگ ساختاری بوده و بازتاب‌دهنده رفتار مستقیم مولکول طبیعی پایه نیست.")
+        elif granularity == "EXTRACT":
+            parts.append("باید توجه داشت که این اثرات در بستر عصاره تام طبیعی بررسی شده و مستلزم تفکیک اثر فیتوشیمیایی خالص است.")
 
         # Quantitative Parameters (Strictly from verified quantitative results)
         quants = canonical["quantitative_results"]
@@ -3412,6 +3539,174 @@ class EvidenceDrivenParagraphBuilder:
             parts.append(f"یافته‌های حاصل به عنوان شواهد زمینه‌ای در تدوین این پژوهش مورد بهره‌برداری قرار می‌گیرند [{cnum}].")
 
         return " ".join(parts)
+
+
+# =============================================================================
+# V8.7 MULTI-CLAIM ATOMIZER (ANTI-CITATION CONFLATION GATE)
+# =============================================================================
+
+class MultiClaimAtomizer:
+    """Atomizes compound sentences containing multiple empirical claims into
+    individual atomic assertions, evaluating each claim atom independently against
+    the cited evidence record. Guarantees that a citation supporting Claim A does
+    not automatically grant unwarranted attribution to Claim B or Claim C.
+    """
+    SPLIT_PATTERNS = [
+        r'\s+و\s+همچنین\s+',
+        r'\s+و\s+علاوه\s+بر\s+این\s+',
+        r'\s+و\s+به\s+طور\s+همزمان\s+',
+        r'\s+و\s+به\s+صورت\s+هم‌افزا\s+',
+        r'\s+و\s+نیز\s+',
+        r'\s+در\s+حالی\s+که\s+',
+        r'\s*;\s*',
+        r',\s*and\s+',
+        r'\s+and\s+also\s+',
+        r'\s+as\s+well\s+as\s+',
+        r'\s+while\s+simultaneously\s+',
+        r'\s+and\s+furthermore\s+',
+        r'\s+in\s+addition\s+to\s+'
+    ]
+
+    @classmethod
+    def atomize_sentence(cls, sentence: str) -> List[str]:
+        """Decomposes a compound sentence into separate atomic assertions."""
+        clean = re.sub(r'\[\d+\]', '', sentence).strip()
+        atoms = [clean]
+        for pat in cls.SPLIT_PATTERNS:
+            new_atoms = []
+            for a in atoms:
+                parts = re.split(pat, a)
+                for p in parts:
+                    p_str = p.strip()
+                    if len(p_str) >= 10:
+                        new_atoms.append(p_str)
+                    elif new_atoms and p_str:
+                        new_atoms[-1] += " " + p_str
+            atoms = new_atoms
+
+        return atoms if atoms else [sentence.strip()]
+
+    @classmethod
+    def verify_compound_sentence(
+        cls,
+        sentence: str,
+        paper_record: Dict[str, Any],
+        problem_model: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """Atomizes a compound sentence and evaluates each atomic claim individually."""
+        atoms = cls.atomize_sentence(sentence)
+        atomic_results = []
+        supported_count = 0
+
+        for idx, atom_text in enumerate(atoms, 1):
+            claim_dict = {
+                "claim_id": f"ATOM_{idx:02d}",
+                "claim_text": atom_text
+            }
+            res = ExactClaimEvidenceMapper.map_and_verify_claim(
+                claim=claim_dict,
+                paper_record=paper_record,
+                problem_model=problem_model
+            )
+            atomic_results.append(res)
+            if res.get("verdict") == "SUPPORTED":
+                supported_count += 1
+
+        all_supported = (supported_count == len(atoms))
+        has_partial = (supported_count > 0 and not all_supported)
+
+        if all_supported:
+            composite_verdict = "SUPPORTED"
+        elif has_partial:
+            composite_verdict = "PARTIALLY_SUPPORTED"
+        else:
+            composite_verdict = "NOT_SUPPORTED"
+
+        return {
+            "compound_sentence": sentence,
+            "total_atoms": len(atoms),
+            "supported_atoms_count": supported_count,
+            "all_atoms_supported": all_supported,
+            "composite_verdict": composite_verdict,
+            "atomic_evaluations": atomic_results,
+            "citation_valid_for_all_claims": all_supported
+        }
+
+
+# =============================================================================
+# V8.7 FINAL TEXT SANITIZATION GATE (FAIL-CLOSED PLACEHOLDER SCANNER)
+# =============================================================================
+
+class FinalTextSanitizationGate:
+    """Fail-closed sanitization gate scanning text for placeholder tokens,
+    legacy boilerplate strings, and template leakage.
+    Blocks compilation/release if any placeholder is detected.
+    """
+    FORBIDDEN_PLACEHOLDERS = [
+        r'\*\*عامل مداخله\*\*',
+        r'عامل مداخله',
+        r'\*\*مدل بیولوژیک\*\*',
+        r'مدل بیولوژیک',
+        r'\*\*بیماری هدف\*\*',
+        r'بیماری هدف',
+        r'\*\*عامل مداخله اول\*\*',
+        r'\*\*عامل مداخله دوم\*\*',
+        r'گروه کنترل استاندارد',
+        r'\{\{.*?\}\}',
+        r'\[\?\]',
+        r'\bTODO\b',
+        r'\bFIXME\b',
+        r'\b__PLACEHOLDER__\b',
+        r'\bPLACEHOLDER\b'
+    ]
+
+    @classmethod
+    def scan_text(cls, text: str) -> Dict[str, Any]:
+        """Scans input text for any forbidden placeholder patterns."""
+        if not text:
+            return {
+                "is_clean": True,
+                "release_verdict": "RELEASE_APPROVED",
+                "placeholder_count": 0,
+                "detected_placeholders": []
+            }
+        findings = []
+        for pat in cls.FORBIDDEN_PLACEHOLDERS:
+            for m in re.finditer(pat, text):
+                start = max(0, m.start() - 30)
+                end = min(len(text), m.end() + 30)
+                findings.append({
+                    "pattern": pat,
+                    "matched_token": m.group(0),
+                    "position": m.start(),
+                    "snippet": text[start:end].strip()
+                })
+
+        is_clean = (len(findings) == 0)
+        return {
+            "is_clean": is_clean,
+            "release_verdict": "RELEASE_APPROVED" if is_clean else "RELEASE_BLOCKED",
+            "placeholder_count": len(findings),
+            "detected_placeholders": findings
+        }
+
+    @classmethod
+    def sanitize_text(cls, text: str, replacements: Optional[Dict[str, str]] = None) -> str:
+        """Sanitizes text by removing or replacing placeholders."""
+        if not text:
+            return ""
+        s = text
+        s = re.sub(r'\*\*عامل مداخله\*\*', 'مداخله درمانی', s)
+        s = re.sub(r'عامل مداخله', 'مداخله درمانی', s)
+        s = re.sub(r'\*\*مدل بیولوژیک\*\*', 'مدل تجربی', s)
+        s = re.sub(r'مدل بیولوژیک', 'مدل تجربی', s)
+        s = re.sub(r'\*\*بیماری هدف\*\*', 'بیماری مورد بررسی', s)
+        s = re.sub(r'بیماری هدف', 'بیماری مورد بررسی', s)
+        s = re.sub(r'گروه کنترل استاندارد', 'گروه کنترل', s)
+        s = re.sub(r'\{\{.*?\}\}', '', s)
+        s = re.sub(r'\[\?\]', '', s)
+        s = re.sub(r'\b(?:TODO|FIXME|__PLACEHOLDER__|PLACEHOLDER)\b', '', s)
+        return s
 
 
 if __name__ == "__main__":
