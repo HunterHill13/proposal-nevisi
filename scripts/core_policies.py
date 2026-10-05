@@ -504,3 +504,94 @@ def get_question_conditional_hierarchy(question_type: str, study_design: str) ->
         "is_primary_evidence": base_record.get("is_primary", True)
     }
 
+
+# ==============================================================================
+# 9. ADVANCED RESEARCH & SCREENING ENGINE POLICIES (v8.3 ENHANCED)
+# Cross-Audited & Adapted from AIPOCH and K-Dense Architectures
+# ==============================================================================
+
+NO_QUOTA_FILLING: bool = True  # Strictly prohibits padding references to reach max quota
+
+# 17 Standardized Screening Exclusion Codes (Two-Stage PRISMA Taxonomy)
+EXCLUSION_TAXONOMY: Dict[str, str] = {
+    "OUT_OF_TOPIC": "Completely unrelated to the core biomedical problem model or clinical domain",
+    "WRONG_DISEASE": "Investigates a non-target pathology with zero translational or mechanistic relevance",
+    "WRONG_MODEL": "Utilizes an incompatible or non-transferable biological model system",
+    "WRONG_INTERVENTION": "Evaluates an unrelated drug, agent class, or therapeutic modality",
+    "WRONG_COMPOUND": "Chemical entity is distinct from target compound or its legitimate derivatives",
+    "WRONG_FORMULATION": "Formulation or vehicle artifact produces uninterpretable phenotypic outcomes",
+    "WRONG_OUTCOME": "Endpoints evaluated share zero biological or pharmacological overlap with research question",
+    "ANIMAL_ONLY": "Preclinical animal study without translational bearing on target cellular or human context",
+    "AGRICULTURAL_ONLY": "Agronomic, veterinary herd production, crop protection, or soil science study",
+    "FOOD_NUTRITION_ONLY": "General food chemistry, culinary additive, or dietary supplement study without disease focus",
+    "SPERM_FERTILITY_ONLY": "Veterinary livestock semen cryopreservation or artificial insemination study",
+    "DUPLICATE": "Identical record or multi-database duplicate cross-matched across identifiers",
+    "RETRACTED": "Article officially retracted, withdrawn, or flagged with unresolved expression of concern",
+    "INSUFFICIENT_EVIDENCE": "Methodologically deficient, lacking controls, or presenting purely speculative assertions",
+    "NOT_PRIMARY_RESEARCH": "Non-systematic commentary, news, book review, or opinion piece",
+    "METHOD_ONLY": "Methodological assay description without biological evaluation and not flagged as landmark exception",
+    "PERIPHERAL_ANALOGUE": "Distant analog or unrelated natural product added without direct mechanistic rationale"
+}
+
+# Standardized Database Execution Statuses (Zero False Execution Claims)
+SEARCH_DATABASE_STATUSES: List[str] = [
+    "EXECUTED",         # API successfully queried and authentic records retrieved
+    "NOT_EXECUTED",     # API was not contacted (dry-run, offline mode, or missing credentials)
+    "EMPTY_RETRIEVAL",  # API queried successfully but returned zero matching records
+    "ERROR"             # Network failure, timeout, HTTP error, or unparseable response
+]
+
+# Standardized 7-Phase Research Pipeline
+RESEARCH_PIPELINE_STAGES: List[str] = [
+    "PHASE_A_DECOMPOSITION",            # Generic research question decomposition into search components
+    "PHASE_B_MULTI_LAYER_SEARCH",       # 9-Layer adaptive multi-source query execution
+    "PHASE_C_TWO_STAGE_SCREENING",      # Title/Abstract (Stage 1) and Full-Text/Evidence (Stage 2)
+    "PHASE_D_EVIDENCE_EVALUATION",      # Identity, directness, and polarity categorization
+    "PHASE_E_CONTRADICTION_RESOLUTION", # Root-cause analysis across divergent findings
+    "PHASE_F_CLAIM_MAPPING",            # Atomic claim entailment and provenance tracing
+    "PHASE_G_PORTFOLIO_SELECTION"       # High-value scoring and selection (capped at <= 25, no padding)
+]
+
+# 11 Contradiction Root-Cause Categories (AIPOCH Diagnostician Taxonomy)
+CONTRADICTION_ROOT_CAUSES: List[str] = [
+    "CELL_LINE",            # Divergence between p53-wild-type, mutant, or histological subtypes
+    "DOSE",                 # Discrepancy between physiological vs supra-physiological concentrations
+    "EXPOSURE_TIME",        # Acute (24h) vs extended (72h) incubation kinetics
+    "FORMULATION",          # Pure active pharmaceutical ingredient vs crude botanical matrix
+    "COMPOUND_PURITY",      # High-purity synthetic/isolated compound vs crude fractions
+    "VIRAL_STRAIN",         # Velogenic vs mesogenic vs lentogenic viral oncolytic phenotype
+    "MOI",                  # Low multiplicity of infection (replication) vs high MOI (acute lysis)
+    "ASSAY_TYPE",           # Tetrazolium / dye reduction vs crystal violet vs flow cytometry apoptosis
+    "ENDPOINT",             # Anti-migratory / motility vs direct cytocidal cell viability
+    "STUDY_DESIGN",         # 2D monolayer vs 3D spheroid vs in vivo xenograft architecture
+    "BIOLOGICAL_CONTEXT"    # Permissive vs interferon-competent normal cellular baseline
+]
+
+# High-Value Paper Screener Scoring Weights (AIPOCH-adapted)
+HIGH_VALUE_SCORING_WEIGHTS: Dict[str, float] = {
+    "topical_relevance": 0.20,
+    "model_relevance": 0.15,
+    "intervention_identity_match": 0.15,
+    "outcome_relevance": 0.10,
+    "study_design_quality": 0.10,
+    "methodological_quality": 0.05,
+    "recency": 0.10,
+    "directness": 0.05,
+    "quantitative_usefulness": 0.05,
+    "contradiction_value": 0.05
+}
+
+# Strict 9-Step Selection Priority Ordering (No Quota-Filling Rule)
+SELECTION_ORDER_PRIORITIES: List[str] = [
+    "DIRECT_RELEVANCE",             # 1. Target intervention on exact target model/condition
+    "SCIENTIFIC_QUALITY",           # 2. Peer-reviewed rigor, proper controls, sample size
+    "EVIDENCE_STRENGTH",            # 3. High quantitative effect size, statistical significance
+    "MODEL_RELEVANCE",              # 4. Exact or closely transferable cellular/organism system
+    "OUTCOME_RELEVANCE",            # 5. Direct viability, cytotoxicity, or synergistic index
+    "RECENCY",                      # 6. Published within last 6 years (unless landmark exception)
+    "COMPLEMENTARITY",              # 7. Covers orthogonal biological axes (mechanistic, safety, model)
+    "CONTRADICTION_LIMITATION_VALUE",# 8. Essential bounding/limiting evidence (e.g. non-cytotoxic baselines)
+    "METHODOLOGICAL_NECESSITY"      # 9. Essential validated mathematical or assay benchmark (Chou, Mosmann)
+]
+
+

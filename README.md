@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 236/236 Passed](https://img.shields.io/badge/Unified%20Tests-236%2F236%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 256/256 Passed](https://img.shields.io/badge/Unified%20Tests-256%2F256%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![PRISMA 2020 Compliant](https://img.shields.io/badge/PRISMA-2020%20Compliant-orange.svg)](#prisma-2020-search-accounting)
 [![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
@@ -19,7 +19,7 @@
 ## English Documentation
 
 **Proposal-Nevisi (v8.3)** is an autonomous, publication-grade academic research proposal drafting framework and **General-Purpose Evidence-Driven Medical Research Engine**. Redesigned from the ground up to eliminate all hard-coded domain dependencies, v8.3 operates across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
-> **Bifurcated Validation Architecture & Scientific Boundaries (v8.3):** Proposal-Nevisi strictly differentiates **Software Validation** (236 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, compound identity gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED`).
+> **Bifurcated Validation Architecture & Scientific Boundaries (v8.3):** Proposal-Nevisi strictly differentiates **Software Validation** (256 automated unit/adversarial/schema tests validating logic, zero hard-code leakage, and document compilation) from **Scientific Evidence Validation** (empirical grounding, biological incompatibility filtering, compound identity gating, viral platform gating, and search gap auditing). All findings are explicitly qualified: separate monotherapies are never asserted as proof of combination synergy, and unstudied combinations are honestly reported as authentic empirical research gaps (`NO_DIRECT_STUDY_IDENTIFIED`).
 
 
 ### Core Architecture & Capabilities (v8.2)

@@ -17,14 +17,16 @@ try:
         TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
         ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
-        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES
+        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
+        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY
     )
 except ImportError:
     from scripts.core_policies import (
         TemporalPolicyConfig, MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
         ContextualRelevanceConfig, FINAL_INCLUSION_REASON_CATEGORIES, PROPOSAL_SECTIONS_FOR_EVIDENCE,
         EVIDENCE_RELATIONSHIPS, COMPOUND_IDENTITY_TYPES, VIRAL_PLATFORM_TYPES,
-        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES
+        MODEL_MATCH_STATUSES, OUTCOME_MATCH_TYPES, SYNERGY_EVIDENCE_STATUSES, CI_CLASSIFICATION_SOURCES,
+        NO_QUOTA_FILLING, EXCLUSION_TAXONOMY
     )
 
 class GenericReferenceAuditor:
@@ -824,11 +826,23 @@ class GenericReferenceAuditor:
         ]
         
         found_incompatible = None
+        incompatible_cat = "INCOMPATIBLE_BIOLOGICAL_SYSTEM"
         if not is_target_veterinary_repro:
             for ind in DISCONNECTED_INDICATORS:
                 if ind in combined_text:
                     found_incompatible = ind
+                    if any(s in ind for s in ["semen", "sperm", "insemination", "breeding", "buck", "ram", "bull", "boar", "stallion"]):
+                        incompatible_cat = "SPERM_FERTILITY_ONLY"
+                    elif any(s in ind for s in ["poultry", "chicken", "broiler", "crop", "grain", "timber", "aquaculture", "fertilizer", "soil", "cotton", "silkworm", "flock"]):
+                        incompatible_cat = "AGRICULTURAL_ONLY"
                     break
+
+        if not found_incompatible and not is_target_veterinary_repro:
+            has_food_kw = any(k in combined_text for k in ["antioxidant activity", "free radical scavenging", "dpph", "nutrition", "dietary supplement", "culinary", "food chemistry"])
+            has_target_pathology = any(c in combined_text for c in cond_names if len(c) > 3) or any(k in combined_text for k in ["cancer", "carcinoma", "tumor", "neoplasm", "disease", "pathology", "cytotoxicity", "apoptosis"])
+            if has_food_kw and not has_target_pathology:
+                found_incompatible = "food_nutrition_antioxidant_alone"
+                incompatible_cat = "FOOD_NUTRITION_ONLY"
         
         # Check foundational methodology exception
         just = record.get("foundational_justification") or {}
@@ -844,9 +858,10 @@ class GenericReferenceAuditor:
                 "is_contextually_relevant": False,
                 "rejection_reason": "REJECT_LOW_CONTEXTUAL_RELEVANCE",
                 "rejection_category": "INCOMPATIBLE_BIOLOGICAL_SYSTEM",
+                "exclusion_code": incompatible_cat,
                 "relevance_tier": "IRRELEVANT",
                 "matched_incompatible_indicator": found_incompatible,
-                "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Pure chemical keyword match without contextual relevance is prohibited.",
+                "rationale": f"Evaluated biological context ('{found_incompatible}') is disparate from target research problem model ({domain}). Classified under exclusion taxonomy as {incompatible_cat}.",
                 "scores": {
                     "biological_topic_alignment": 0.0,
                     "condition_phenotype_alignment": 0.0,
@@ -1406,7 +1421,8 @@ class GenericReferenceAuditor:
         problem_model: Any,
         max_references: int = MAX_FINAL_REFERENCES,
         min_references: int = MIN_FINAL_REFERENCES,
-        total_retrieved_in_corpus: Optional[int] = None
+        total_retrieved_in_corpus: Optional[int] = None,
+        no_quota_filling: bool = NO_QUOTA_FILLING
     ) -> Dict[str, Any]:
         """Filters, audits, ranks, and selects the optimal balanced reference portfolio
         under a strict hard ceiling of maximum 25 references.
@@ -1420,7 +1436,7 @@ class GenericReferenceAuditor:
             ref_id = r.get("ref_id", r.get("doi", r.get("title", "UNKNOWN")))
             
             # 1. Retraction / Conflict check
-            if r.get("is_retracted"):
+            if r.get("is_retracted") or "retracted" in str(r.get("status", "")).lower() or "retraction" in str(r.get("title", "")).lower():
                 excluded.append({"ref_id": ref_id, "reason": "REJECT_RETRACTED", "details": "Article is retracted."})
                 continue
             if r.get("is_duplicate"):
@@ -1521,6 +1537,8 @@ class GenericReferenceAuditor:
                 break
             rid = sc["record"].get("ref_id", sc["record"].get("doi"))
             if rid not in selected_ids:
+                if no_quota_filling and sc.get("score", 0) < 25.0:
+                    continue
                 selected_sc.append(sc)
                 selected_ids.add(rid)
 
@@ -1577,7 +1595,7 @@ class GenericReferenceAuditor:
             "total_selected": len(final_selected_records),
             "max_reference_ceiling": max_references,
             "min_reference_floor": min_references,
-            "meets_quotas": min_references <= len(final_selected_records) <= max_references,
+            "meets_quotas": (len(final_selected_records) <= max_references) and ((len(final_selected_records) >= min_references) or no_quota_filling),
             "selected_references": final_selected_records,
             "excluded_candidates_count": len(excluded),
             "excluded_candidates": excluded,
@@ -1595,11 +1613,12 @@ class GenericReferenceAuditor:
         cls,
         references: List[Dict[str, Any]],
         max_references: int = MAX_FINAL_REFERENCES,
-        min_references: int = MIN_FINAL_REFERENCES
+        min_references: int = MIN_FINAL_REFERENCES,
+        allow_under_quota_if_justified: bool = False
     ) -> Dict[str, Any]:
         """Audits the final reference portfolio to enforce:
         1. Hard ceiling of <= 25 references.
-        2. Floor of >= 15 references.
+        2. Floor of >= 15 references (unless allow_under_quota_if_justified=True under strict NO_QUOTA_FILLING).
         3. Mandatory presence of final_inclusion_reason, proposal_section_supported, and why_this_paper_is_needed.
         4. Zero retracted, duplicate, or identity-conflicted papers.
         5. Sequential citation numbering without gaps.
@@ -1610,7 +1629,8 @@ class GenericReferenceAuditor:
         if count > max_references:
             violations.append(f"EXCEEDS_MAX_REFERENCE_CEILING_25: Reference count ({count}) exceeds maximum ceiling ({max_references}).")
         elif count < min_references:
-            violations.append(f"BELOW_MIN_REFERENCE_FLOOR_15: Reference count ({count}) is below minimum floor ({min_references}).")
+            if not allow_under_quota_if_justified:
+                violations.append(f"BELOW_MIN_REFERENCE_FLOOR_15: Reference count ({count}) is below minimum floor ({min_references}).")
 
         seen_nums = []
         for idx, ref in enumerate(references, 1):

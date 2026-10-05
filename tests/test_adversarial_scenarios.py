@@ -2158,6 +2158,308 @@ class TestAdversarialScenarios(unittest.TestCase):
         self.assertEqual(gate_res["synergy_status"], "SYNERGY_NOT_ESTABLISHED")
         self.assertEqual(gate_res["violation"], "SYNERGY_FALLACY_MONOTHERAPY_EXTRAPOLATION")
 
+    def test_110_lupeol_buck_semen_rejection(self):
+        """Test 110: Lupeol on buck semen cryopreservation is rejected as IRRELEVANT / SPERM_FERTILITY_ONLY."""
+        rec = {
+            "ref_id": "P_SEMEN_01",
+            "title": "Cryopreservation of buck semen using lupeol supplement to improve post-thaw sperm motility",
+            "abstract": "We evaluated the effect of lupeol on buck semen cryopreservation and post-thaw spermatozoa viability.",
+            "year": 2023
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}]
+        }
+        res = self.auditor.audit_contextual_relevance(rec, problem_model)
+        self.assertFalse(res["is_contextually_relevant"])
+        self.assertEqual(res["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res["exclusion_code"], "SPERM_FERTILITY_ONLY")
+
+    def test_111_lupeol_antioxidant_alone_food_nutrition(self):
+        """Test 111: Lupeol antioxidant/nutrition study without cancer focus is rejected as FOOD_NUTRITION_ONLY."""
+        rec = {
+            "ref_id": "P_FOOD_01",
+            "title": "Antioxidant activity and free radical scavenging of lupeol in dietary food chemistry",
+            "abstract": "Evaluated DPPH radical scavenging and antioxidant activity of lupeol isolated from edible plants.",
+            "year": 2024
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}]
+        }
+        res = self.auditor.audit_contextual_relevance(rec, problem_model)
+        self.assertFalse(res["is_contextually_relevant"])
+        self.assertEqual(res["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res["exclusion_code"], "FOOD_NUTRITION_ONLY")
+
+    def test_112_lupeol_derivative_close_analog_classification(self):
+        """Test 112: Lupeol derivative in A549 is classified as COMPOUND_DERIVATIVE and CLOSE_ANALOG (not PARENT_COMPOUND)."""
+        rec = {
+            "ref_id": "P_DERIV_01",
+            "title": "Synthesis and cytotoxicity of novel lupeol derivatives against A549 lung cancer cells",
+            "abstract": "Synthesized C-3 ester lupeol derivatives and evaluated antiproliferative activity in human A549 lung cells.",
+            "year": 2024
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}]
+        }
+        res = self.auditor.audit_scientific_evidence_gates(rec, problem_model)
+        self.assertEqual(res["compound_identity"], "COMPOUND_DERIVATIVE")
+        self.assertNotEqual(res["compound_identity"], "PARENT_COMPOUND")
+        self.assertEqual(res["evidence_relationship"], "CLOSE_ANALOG")
+
+    def test_113_ndv_poultry_vaccine_agricultural_rejection(self):
+        """Test 113: NDV poultry vaccine study is rejected as IRRELEVANT / AGRICULTURAL_ONLY."""
+        rec = {
+            "ref_id": "P_POULTRY_01",
+            "title": "Efficacy of live newcastle disease virus vaccine in broiler poultry flocks against virulent avian viral challenge in chickens",
+            "abstract": "Immunization of commercial broiler chickens against virulent avian viral challenge using NDV LaSota strain.",
+            "year": 2023
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Newcastle disease virus"}]
+        }
+        res = self.auditor.audit_contextual_relevance(rec, problem_model)
+        self.assertFalse(res["is_contextually_relevant"])
+        self.assertEqual(res["relevance_tier"], "IRRELEVANT")
+        self.assertEqual(res["exclusion_code"], "AGRICULTURAL_ONLY")
+
+    def test_114_monotherapy_a_plus_b_not_synergy(self):
+        """Test 114: Monotherapy A + Monotherapy B cannot establish synergy."""
+        rec_mono_a = {
+            "ref_id": "P_MONO_A",
+            "title": "Lupeol inhibits A549 cell viability as monotherapy",
+            "abstract": "Lupeol treatment alone reduced A549 viability with IC50 of 45 uM.",
+            "year": 2023
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}, {"name": "Newcastle disease virus"}]
+        }
+        gates = self.auditor.audit_scientific_evidence_gates(rec_mono_a, problem_model)
+        self.assertEqual(gates["synergy_evidence"], "MONOTHERAPY_ONLY")
+        
+        fallacy = GenericClaimEntailmentEngine.check_synergy_fallacy(
+            "Combined Lupeol and NDV show potent synergistic effect",
+            [{"text_or_data": "Lupeol alone caused 45% inhibition."}],
+            {"is_combination_study": False}
+        )
+        self.assertEqual(fallacy["synergy_status"], "SYNERGY_NOT_ESTABLISHED")
+
+    def test_115_foundational_methodology_paper_exception(self):
+        """Test 115: Landmark methodology paper (>6 years old) is permitted under foundational exception."""
+        rec_method = {
+            "ref_id": "P_CHOU_1984",
+            "title": "Quantitative analysis of dose-effect relationships: the median-effect equation",
+            "year": 1984,
+            "foundational_justification": {
+                "is_justified": True,
+                "category": "FOUNDATIONAL_MATHEMATICAL_MODEL",
+                "rationale": "Defines canonical median-effect principle and Combination Index theorem."
+            }
+        }
+        temp_audit = self.auditor.audit_temporal_tier(rec_method)
+        self.assertTrue(temp_audit["is_temporally_valid"])
+        self.assertEqual(temp_audit["temporal_class"], "FOUNDATIONAL_METHODOLOGY")
+        self.assertTrue(temp_audit["foundational_exception"])
+
+    def test_116_old_biological_paper_outdated_direct_evidence(self):
+        """Test 116: Old primary empirical paper (>6 years) without foundational exception is rejected."""
+        rec_old = {
+            "ref_id": "P_OLD_2012",
+            "title": "Evaluation of natural product cytotoxicity in lung cancer cells",
+            "year": 2012
+        }
+        temp_audit = self.auditor.audit_temporal_tier(rec_old)
+        self.assertFalse(temp_audit["is_temporally_valid"])
+        self.assertEqual(temp_audit["temporal_class"], "OUT_OF_WINDOW_NON_FOUNDATIONAL")
+        self.assertEqual(temp_audit["age_justification"], "OUTDATED_DIRECT_EVIDENCE")
+
+    def test_117_relevant_paper_negative_result_limits_interpretation(self):
+        """Test 117: Paper with negative cytotoxicity result (Bhatt 2021) is retained with LIMITS_INTERPRETATION."""
+        rec_bhatt = {
+            "ref_id": "P_BHATT_2021",
+            "pmid": "32329697",
+            "title": "Lupeol inhibits migration and suppresses ERK signaling in A549 lung cells",
+            "abstract": "Lupeol showed no cytotoxic effect in A549 cells at non-lethal concentrations but inhibited cell migration and phosphorylation.",
+            "year": 2021
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Lupeol"}]
+        }
+        gates = self.auditor.audit_scientific_evidence_gates(rec_bhatt, problem_model)
+        self.assertEqual(gates["evidence_polarity"], "LIMITS_INTERPRETATION")
+        self.assertEqual(gates["evidence_relationship"], "MECHANISTIC_SUPPORT")
+
+    def test_118_twenty_five_papers_capped_at_ceiling(self):
+        """Test 118: Candidate pool of 35 papers is strictly capped at MAX_FINAL_REFERENCES (25)."""
+        candidates = []
+        for i in range(1, 36):
+            candidates.append({
+                "ref_id": f"P_VALID_{i:02d}",
+                "title": f"Study {i} on antitumor efficacy in lung cancer cell lines",
+                "abstract": f"Significant growth inhibition and apoptosis observed in A549 cells with agent {i}.",
+                "year": 2023,
+                "study_design": "IN_VITRO_EXPERIMENTAL"
+            })
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Agent A"}]
+        }
+        sel = self.auditor.select_optimal_proposal_references(candidates, problem_model, max_references=25)
+        self.assertEqual(len(sel["selected_references"]), 25)
+        self.assertLessEqual(len(sel["selected_references"]), 25)
+        
+        audit_res = self.auditor.audit_final_reference_portfolio(sel["selected_references"])
+        self.assertEqual(audit_res["portfolio_status"], "PASS")
+
+    def test_119_twelve_papers_no_quota_filling_no_padding(self):
+        """Test 119: Only 12 eligible papers returns exactly 12 without padding (NO_QUOTA_FILLING)."""
+        candidates = []
+        for i in range(1, 13):
+            candidates.append({
+                "ref_id": f"P_ELIGIBLE_{i:02d}",
+                "title": f"Eligible study {i} on lung cancer response",
+                "abstract": f"Direct in vitro antitumor evaluation in A549 cells for study {i}.",
+                "year": 2024,
+                "study_design": "IN_VITRO_EXPERIMENTAL"
+            })
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Agent A"}]
+        }
+        sel = self.auditor.select_optimal_proposal_references(candidates, problem_model, max_references=25, no_quota_filling=True)
+        self.assertEqual(len(sel["selected_references"]), 12)
+        
+        audit_res = self.auditor.audit_final_reference_portfolio(sel["selected_references"], allow_under_quota_if_justified=True)
+        self.assertEqual(audit_res["portfolio_status"], "PASS")
+
+    def test_120_one_thousand_raw_search_pool_allowed(self):
+        """Test 120: Large raw search corpus (1000 items) is allowed in search pool, final references <= 25."""
+        simulated_corpus = []
+        for i in range(1, 1001):
+            simulated_corpus.append({
+                "ref_id": f"RAW_REC_{i:04d}",
+                "title": f"Search result {i} on therapeutic agents",
+                "abstract": f"Experimental assay data in oncology systems for result {i}." if i <= 30 else "Off-topic context.",
+                "year": 2023
+            })
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Agent A"}]
+        }
+        sel = self.auditor.select_optimal_proposal_references(simulated_corpus[:50], problem_model, max_references=25, total_retrieved_in_corpus=1000)
+        self.assertEqual(sel["screening_funnel"]["stage_1_retrieved_broad_corpus"], 1000)
+        self.assertLessEqual(len(sel["selected_references"]), 25)
+
+    def test_121_multi_database_duplicate_deduplicated(self):
+        """Test 121: Multi-database duplicate records are deduplicated into a single canonical record."""
+        try:
+            from scientific_search_adapter import ScientificSearchAdapter
+        except ImportError:
+            from scripts.scientific_search_adapter import ScientificSearchAdapter
+            
+        r_pubmed = {
+            "ref_id": "REC_PUBMED",
+            "pmid": "35001122",
+            "doi": "10.1016/j.canlet.2022.01.005",
+            "title": "Oncolytic viral therapy enhances natural triterpene efficacy in non-small cell lung cancer",
+            "year": 2022,
+            "database": "PubMed"
+        }
+        r_epmc = {
+            "ref_id": "REC_EPMC",
+            "pmid": "35001122",
+            "doi": "10.1016/j.canlet.2022.01.005",
+            "title": "Oncolytic viral therapy enhances natural triterpene efficacy in non-small cell lung cancer",
+            "year": 2022,
+            "database": "Europe PMC"
+        }
+        dedup_res = ScientificSearchAdapter.deduplicate_corpus([r_pubmed, r_epmc])
+        self.assertEqual(dedup_res["total_raw"], 2)
+        self.assertEqual(dedup_res["total_unique"], 1)
+        self.assertEqual(dedup_res["duplicate_clusters"], 1)
+        canonical = dedup_res["unique_records"][0]
+        self.assertIn("PubMed", canonical["retrieval_sources"])
+        self.assertIn("Europe PMC", canonical["retrieval_sources"])
+
+    def test_122_contradictory_papers_root_cause_analysis(self):
+        """Test 122: Contradictory findings across papers are retained with root-cause diagnostic categorization."""
+        pos_finding = {
+            "study_id": "S_POS_01",
+            "context_parameters": {"dose": "50 uM", "exposure_time": "48h", "assay": "tetrazolium cell viability"},
+            "primary_findings": "High cytotoxic response observed"
+        }
+        neg_finding = {
+            "study_id": "S_NEG_01",
+            "context_parameters": {"dose": "10 uM", "exposure_time": "24h", "assay": "crystal violet assay"},
+            "category": "CONTRADICTORY_RESULT",
+            "primary_findings": "No cytotoxic response observed"
+        }
+        res = GenericContradictionEngine.analyze_discrepancy(pos_finding, neg_finding)
+        self.assertEqual(res["contradiction_type"], "CONTEXTUAL_DISAGREEMENT")
+        self.assertTrue(len(res["contextual_divergences"]) >= 2)
+        divergences_str = " ".join(res["contextual_divergences"]).lower()
+        self.assertIn("dose", divergences_str)
+        self.assertIn("assay", divergences_str)
+
+    def test_123_retracted_paper_strictly_excluded(self):
+        """Test 123: Retracted publication is strictly excluded with REJECT_RETRACTED."""
+        rec_retracted = {
+            "ref_id": "P_RETRACTED_01",
+            "title": "Triterpenoid mechanisms in carcinoma cells",
+            "year": 2023,
+            "is_retracted": True
+        }
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "Lung Neoplasms"},
+            "population_or_model": {"cell_lines": ["A549"]},
+            "interventions_or_exposures": [{"name": "Agent A"}]
+        }
+        sel = self.auditor.select_optimal_proposal_references([rec_retracted], problem_model)
+        self.assertEqual(len(sel["selected_references"]), 0)
+        self.assertEqual(sel["excluded_candidates_count"], 1)
+        self.assertEqual(sel["excluded_candidates"][0]["reason"], "REJECT_RETRACTED")
+
+    def test_124_citation_metadata_mismatch_verification_failure(self):
+        """Test 124: Fabricated DOI or citation metadata mismatch fails verification."""
+        try:
+            from scientific_search_adapter import ScientificSearchAdapter
+        except ImportError:
+            from scripts.scientific_search_adapter import ScientificSearchAdapter
+
+        rec_fake = {
+            "ref_id": "P_FAKE_01",
+            "doi": "10.1000/fake.doi.notreal",
+            "title": "A non-existent fabricated biomedical paper",
+            "year": 2024
+        }
+        ver_res = ScientificSearchAdapter.verify_citation_metadata(rec_fake)
+        self.assertFalse(ver_res["is_verified"])
+        self.assertEqual(ver_res["metadata_status"], "FABRICATED_DOI")
+
 
 if __name__ == "__main__":
     unittest.main()

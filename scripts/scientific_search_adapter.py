@@ -33,7 +33,8 @@ from typing import Dict, List, Any, Optional, Set, Tuple
 try:
     from core_policies import (
         MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
-        ContextualRelevanceConfig, TemporalPolicyConfig
+        ContextualRelevanceConfig, TemporalPolicyConfig,
+        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING
     )
     from generic_reference_auditor import GenericReferenceAuditor
 except ImportError:
@@ -42,7 +43,8 @@ except ImportError:
         sys.path.insert(0, scripts_dir)
     from core_policies import (
         MAX_FINAL_REFERENCES, MIN_FINAL_REFERENCES,
-        ContextualRelevanceConfig, TemporalPolicyConfig
+        ContextualRelevanceConfig, TemporalPolicyConfig,
+        EXCLUSION_TAXONOMY, NO_QUOTA_FILLING
     )
     from generic_reference_auditor import GenericReferenceAuditor
 
@@ -1018,6 +1020,141 @@ class ScientificSearchAdapter:
             "duplicate_clusters": duplicate_clusters_count,
             "reduction_percentage": reduction,
             "unique_records": unique_records
+        }
+
+    # =========================================================================
+    # 3B. CITATION INTEGRITY & TWO-STAGE LITERATURE SCREENING (AIPOCH/K-DENSE)
+    # =========================================================================
+
+    @classmethod
+    def verify_citation_metadata(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Verifies DOI and PMID format and cross-record consistency without inventing synthetic metadata.
+        Adapted from AIPOCH citation verifier and K-Dense citation auditor.
+        """
+        doi = str(record.get("doi", "")).strip().lower()
+        pmid = str(record.get("pmid", "")).strip()
+        title = str(record.get("title", "")).strip()
+
+        is_valid_doi = bool(re.match(r'^10\.\d{4,9}/[-._;()/:A-Za-z0-9]+$', doi)) if doi else False
+        is_valid_pmid = bool(re.match(r'^\d{1,9}$', pmid)) if pmid else False
+
+        # Identify fabricated or placeholder DOIs
+        is_fake_doi = bool(re.search(r'fake|fabricated|test\.doi|10\.0000', doi))
+
+        if is_fake_doi:
+            status = "FABRICATED_DOI"
+            is_verified = False
+        elif doi and not is_valid_doi:
+            status = "MALFORMED_DOI"
+            is_verified = False
+        elif pmid and not is_valid_pmid:
+            status = "MALFORMED_PMID"
+            is_verified = False
+        elif (doi or pmid) and len(title) >= 10:
+            status = "VERIFIED"
+            is_verified = True
+        elif not doi and not pmid:
+            status = "UNVERIFIED_NO_IDENTIFIERS"
+            is_verified = False
+        else:
+            status = "UNVERIFIED"
+            is_verified = False
+
+        return {
+            "ref_id": record.get("ref_id", doi or pmid or "UNKNOWN"),
+            "doi": doi or None,
+            "pmid": pmid or None,
+            "is_valid_doi": is_valid_doi and not is_fake_doi,
+            "is_valid_pmid": is_valid_pmid,
+            "metadata_status": status,
+            "is_verified": is_verified
+        }
+
+    @classmethod
+    def screen_two_stage(
+        cls,
+        corpus: List[Dict[str, Any]],
+        problem_model: Any
+    ) -> Dict[str, Any]:
+        """Implements two-stage screening pipeline adapted from AIPOCH/K-Dense literature filtering:
+        Stage 1: Title/Abstract screening with 17-category PRISMA exclusion taxonomy.
+        Stage 2: Full-text / Evidence eligibility screening (study design, endpoint, quantitative data, RoB).
+        """
+        stage_1_passed = []
+        stage_1_excluded = []
+        
+        for r in corpus:
+            ref_id = r.get("ref_id", r.get("doi", r.get("pmid", "UNKNOWN")))
+            # Check Retraction
+            if r.get("is_retracted") or "retracted" in str(r.get("status", "")).lower() or "retraction" in str(r.get("title", "")).lower():
+                stage_1_excluded.append({
+                    "ref_id": ref_id,
+                    "stage": "STAGE_1_TITLE_ABSTRACT",
+                    "exclusion_code": "RETRACTED",
+                    "reason": "Article officially retracted or withdrawn."
+                })
+                continue
+
+            # Stage 1: Contextual Relevance / Topic screening
+            rel = GenericReferenceAuditor.audit_contextual_relevance(r, problem_model)
+            if not rel.get("is_contextually_relevant", True):
+                exc_code = rel.get("exclusion_code") or rel.get("rejection_category") or "OUT_OF_TOPIC"
+                if exc_code not in EXCLUSION_TAXONOMY:
+                    exc_code = "OUT_OF_TOPIC"
+                stage_1_excluded.append({
+                    "ref_id": ref_id,
+                    "stage": "STAGE_1_TITLE_ABSTRACT",
+                    "exclusion_code": exc_code,
+                    "reason": rel.get("rationale", "Failed Stage 1 Title/Abstract screening.")
+                })
+                continue
+
+            stage_1_passed.append(r)
+
+        # Stage 2: Full-Text / Evidence eligibility screening
+        stage_2_passed = []
+        stage_2_excluded = []
+        auditor = GenericReferenceAuditor(current_year=TemporalPolicyConfig.CURRENT_OPERATING_YEAR)
+
+        for r in stage_1_passed:
+            ref_id = r.get("ref_id", r.get("doi", r.get("pmid", "UNKNOWN")))
+            
+            # Temporal Recency Gate
+            temp_audit = auditor.audit_temporal_tier(r)
+            if not temp_audit.get("is_temporally_valid", True):
+                stage_2_excluded.append({
+                    "ref_id": ref_id,
+                    "stage": "STAGE_2_FULL_TEXT_EVIDENCE",
+                    "exclusion_code": "OUTDATED_DIRECT_EVIDENCE",
+                    "reason": temp_audit.get("audit_note", "Exceeds 6-year window without foundational exception.")
+                })
+                continue
+
+            # Metadata integrity check
+            meta_audit = cls.verify_citation_metadata(r)
+            if meta_audit.get("metadata_status") in ["FABRICATED_DOI", "MALFORMED_DOI"]:
+                stage_2_excluded.append({
+                    "ref_id": ref_id,
+                    "stage": "STAGE_2_FULL_TEXT_EVIDENCE",
+                    "exclusion_code": "INSUFFICIENT_EVIDENCE",
+                    "reason": f"Metadata integrity failure: {meta_audit['metadata_status']}."
+                })
+                continue
+
+            stage_2_passed.append(r)
+
+        return {
+            "screening_status": "TWO_STAGE_SCREENING_COMPLETE",
+            "total_input": len(corpus),
+            "stage_1_screened": len(corpus),
+            "stage_1_passed": len(stage_1_passed),
+            "stage_1_excluded_count": len(stage_1_excluded),
+            "stage_1_excluded": stage_1_excluded,
+            "stage_2_screened": len(stage_1_passed),
+            "stage_2_passed": len(stage_2_passed),
+            "stage_2_excluded_count": len(stage_2_excluded),
+            "stage_2_excluded": stage_2_excluded,
+            "final_eligible_records": stage_2_passed
         }
 
     # =========================================================================

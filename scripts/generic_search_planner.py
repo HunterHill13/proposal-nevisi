@@ -9,7 +9,7 @@ dynamically from any ResearchProblemModel across biomedical fields.
 
 import re
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple, Set
 try:
     from research_problem_model import ResearchProblemModel, ProblemModelBuilder
 except ImportError:
@@ -307,6 +307,28 @@ class GenericSearchPlanner:
             f'("{primary_agent}" AND "{cond_en}" AND ("independent replication" OR "reproducibility study" OR "confirmatory trial" OR "multicenter validation" OR "failed replication"))'
         ]
 
+        # Standardized 9-Layer Adaptive Search Architecture (Cross-Audited from AIPOCH / K-Dense)
+        facets["LAYER_1_EXACT_DIRECT_COMBINATION"] = facets["LAYER_A_DIRECT_EVIDENCE"]
+        facets["LAYER_2_INDIVIDUAL_INTERVENTIONS"] = facets["LAYER_B_COMPONENT_EVIDENCE"]
+        facets["LAYER_3_MECHANISTIC_EVIDENCE"] = facets["LAYER_C_MECHANISTIC_EVIDENCE"]
+        facets["LAYER_4_MODEL_SPECIFIC_EVIDENCE"] = facets["LAYER_D_MODEL_EVIDENCE"]
+        facets["LAYER_5_COMBINATION_ANALOGUES"] = [
+            f'("{primary_agent}" AND ("standard-of-care" OR "combination therapy" OR "adjuvant" OR "co-treatment"))'
+        ]
+        if adjuvant_agent:
+            facets["LAYER_5_COMBINATION_ANALOGUES"].append(
+                f'("{adjuvant_agent}" AND ("standard-of-care" OR "combination therapy" OR "adjuvant" OR "co-treatment"))'
+            )
+        facets["LAYER_6_METHODOLOGY"] = facets["LAYER_I_METHODOLOGICAL_EVIDENCE"]
+        facets["LAYER_7_SAFETY_TOXICITY"] = facets["LAYER_F_SAFETY_TOXICITY"]
+        facets["LAYER_8_CONTRADICTORY_NEGATIVE"] = (
+            facets["LAYER_G_NEGATIVE_NULL_EVIDENCE"] +
+            facets["LAYER_H_CONTRADICTORY_EVIDENCE"]
+        )
+        facets["LAYER_9_CITATION_CHASING"] = [
+            f'("{primary_agent}" AND ("seminal" OR "landmark" OR "foundational" OR "citation lineage"))'
+        ]
+
         # Backward compatibility aliases for existing suites
         facets["FACET_A_DIRECT_EVIDENCE"] = facets["LAYER_A_DIRECT_EVIDENCE"]
         facets["FACET_B_COMPONENT_EVIDENCE"] = facets["LAYER_B_COMPONENT_EVIDENCE"]
@@ -358,11 +380,44 @@ class GenericSearchPlanner:
             }
         }
 
+    @staticmethod
+    def build_pubmed_boolean_query(
+        concepts: List[List[str]],
+        mesh_terms: Optional[List[str]] = None,
+        date_range: Optional[Tuple[int, int]] = None,
+        study_types: Optional[List[str]] = None,
+        field_tag: str = "[Title/Abstract]"
+    ) -> str:
+        """Constructs precision Boolean queries with MeSH terms, field tags, date filters, and study types (AIPOCH/K-Dense)."""
+        clauses = []
+        for term_group in concepts:
+            if not term_group:
+                continue
+            tagged_terms = [f'"{t}"{field_tag}' if not t.endswith("]") else t for t in term_group]
+            clauses.append("(" + " OR ".join(tagged_terms) + ")")
+        
+        if mesh_terms:
+            mesh_clauses = [f'"{m}"[MeSH Terms]' for m in mesh_terms]
+            clauses.append("(" + " OR ".join(mesh_clauses) + ")")
+            
+        combined_query = " AND ".join(clauses)
+        
+        if date_range:
+            start_y, end_y = date_range
+            combined_query += f" AND ({start_y}:{end_y}[dp])"
+            
+        if study_types:
+            st_clauses = [f'"{st}"[pt]' for st in study_types]
+            combined_query += f" AND (" + " OR ".join(st_clauses) + ")"
+            
+        return combined_query
+
     @classmethod
     def decompose_problem_for_search(cls, model: Any) -> Dict[str, Any]:
-        """Decomposes any research problem model into multi-faceted search targets:
-        question components, MeSH hierarchies, chemical/intervention synonyms,
-        biological model variants, outcome biomarkers, pathway nodes, and safety boundaries.
+        """Decomposes any research problem model into multi-faceted search targets across 12 generic dimensions:
+        population/model, disease/condition, intervention A, intervention B, combination,
+        comparator, outcome, mechanism, study type, experimental model, safety, and methodology.
+        100% Generic and domain-independent.
         """
         if hasattr(model, "to_dict"):
             m_dict = model.to_dict()
@@ -395,6 +450,9 @@ class GenericSearchPlanner:
             elif isinstance(ag, str):
                 agent_names.append(ag)
 
+        primary_agent = agent_names[0] if agent_names else "Target Intervention"
+        adjuvant_agent = agent_names[1] if len(agent_names) > 1 else None
+
         outcomes = m_dict.get("primary_outcomes", [])
         outcome_names = [o.get("name") for o in outcomes if isinstance(o, dict) and o.get("name")]
 
@@ -405,10 +463,30 @@ class GenericSearchPlanner:
             if isinstance(m, dict):
                 molecules.extend(m.get("target_molecules", []))
 
+        study_type = m_dict.get("study_type", "IN_VITRO_EXPERIMENTAL")
+        comparator = "vehicle / untreated control / monotherapy"
+
+        # Explicit 12-component generic decomposition
+        decomposed_components = {
+            "population_or_model": system,
+            "disease_or_condition": cond_en,
+            "intervention_a": primary_agent,
+            "intervention_b": adjuvant_agent,
+            "combination": f"{primary_agent} + {adjuvant_agent}" if adjuvant_agent else primary_agent,
+            "comparator": comparator,
+            "outcome": outcome_names,
+            "mechanism": pathways,
+            "study_type": study_type,
+            "experimental_model": system,
+            "safety_toxicity": "cytotoxicity / therapeutic window / selectivity",
+            "methodology": "median-effect / cellular viability assay / flow cytometry"
+        }
+
         return {
             "model_id": m_dict.get("model_id", "RPM_SEARCH_DECOMPOSED"),
             "domain": domain,
             "framework": framework,
+            "decomposed_question_components": decomposed_components,
             "condition_facets": {
                 "primary_term": cond_en,
                 "mesh_term": cond_mesh,

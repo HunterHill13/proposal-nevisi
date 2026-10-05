@@ -16,14 +16,14 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, handles sample size uncertainty (SAMPLE_SIZE_REQUIRES_INPUT),
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 236-assertion test harness across 7 suites
-  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 104 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 256-assertion test harness across 7 suites
+  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 124 adversarial stress tests, 60-test benchmark, 10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, and 16 end-to-end integration tests).
 ---
 
 # Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.3)
 
 این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.3 با ارتقای عمیق موتور شواهد، به عنوان یک **General-Purpose Evidence-Driven Medical Research Engine** عمل می‌کند که برای تمامی حوزه‌های بالینی، پایه‌ای، دارویی، تشخیصی، قلبی-عروقی، عفونی، اپیدمیولوژیک و انکولوژی با چارچوب‌های استاندارد (PICO, PECO, Diagnostic, Prognostic, Mechanistic) قابل استفاده است.
-> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.3):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۲۳۶ تست واحد، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی (NO_DIRECT_STUDY_IDENTIFIED) گزارش می‌شود.
+> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.3):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۲۵۶ تست واحد، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی (NO_DIRECT_STUDY_IDENTIFIED) گزارش می‌شود.
 
 
 ---
