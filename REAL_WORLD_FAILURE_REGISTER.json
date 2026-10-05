@@ -1,0 +1,110 @@
+[
+  {
+    "failure_id": "FAIL_01",
+    "category": "PAPER_SELECTION_FAILURE",
+    "sub_type": "INTERVENTION_MISMATCH",
+    "severity": "CRITICAL",
+    "affected_paper_claim": "Ref [8] (PMID: 42621169 - Erucin & Kaempferol)",
+    "reproduction_evidence": "Title: 'In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells'. Neither Lupeol nor NDV studied.",
+    "root_cause": "Search query for 'synergy AND A549' retrieved general natural product synergy combinations in A549, and screening gate accepted it to satisfy MAX_FINAL_REFERENCES = 25 quota.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "Enforce strict intervention alignment in Phase 4 relevance gate; drop off-target papers rather than quota filling."
+  },
+  {
+    "failure_id": "FAIL_02",
+    "category": "PAPER_SELECTION_FAILURE",
+    "sub_type": "INTERVENTION_MISMATCH",
+    "severity": "CRITICAL",
+    "affected_paper_claim": "Ref [18] (PMID: 42404852 - Paclitaxel & Eugenol)",
+    "reproduction_evidence": "Title: 'Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line'. Neither Lupeol nor NDV studied.",
+    "root_cause": "Screening filter matched 'A549' and 'combination', failing to verify that intervention matches target agents (Lupeol / NDV).",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "ExactClaimEvidenceMapper rejects claim with NOT_SUPPORTED verdict."
+  },
+  {
+    "failure_id": "FAIL_03",
+    "category": "PAPER_SELECTION_FAILURE",
+    "sub_type": "INTERVENTION_MISMATCH",
+    "severity": "CRITICAL",
+    "affected_paper_claim": "Ref [23] (PMID: 42772808 - Matrine)",
+    "reproduction_evidence": "Title: 'Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling'. Matrine is a quinolizidine alkaloid, not Lupeol.",
+    "root_cause": "Selected because it evaluated PI3K/AKT survival signaling in lung cancer, but attributed as general background without intervention quarantine.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "Quarantine non-target single phytochemicals to background section or remove from reference portfolio."
+  },
+  {
+    "failure_id": "FAIL_04",
+    "category": "PAPER_SELECTION_FAILURE",
+    "sub_type": "INTERVENTION_MISMATCH",
+    "severity": "CRITICAL",
+    "affected_paper_claim": "Ref [24] (PMID: 42633541 - Jolkinolide B)",
+    "reproduction_evidence": "Title: 'Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition'. Jolkinolide B is an abietane diterpenoid, not Lupeol.",
+    "root_cause": "Keyword matching on 'apoptosis AND A549' accepted paper without verifying agent identity.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "Reject non-target entities in ExactClaimEvidenceMapper."
+  },
+  {
+    "failure_id": "FAIL_05",
+    "category": "STRUCTURAL_FAILURE",
+    "sub_type": "TEMPLATE_PLACEHOLDER_LEAKAGE",
+    "severity": "MAJOR",
+    "affected_paper_claim": "Section 3 Literature Review (Paragraphs 1-4, 6-7, 10-12, 14-18, 22-25)",
+    "reproduction_evidence": "Literal Persian placeholders '**عامل مداخله**' and '**مدل بیولوژیک**' appeared in 15 out of 25 paragraphs.",
+    "root_cause": "The legacy fallback paragraph builder in generate_compliant_proposal.py had hardcoded placeholder strings that were not populated when deep structured reading fields were missing.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "EvidenceDrivenParagraphBuilder introduced in v8.7 completely replaces boilerplate with dynamic evidence fields."
+  },
+  {
+    "failure_id": "FAIL_06",
+    "category": "FORMULATION_BOUNDARY_FAILURE",
+    "sub_type": "EXTRACT_CONSTITUENT_CONFLATION",
+    "severity": "MAJOR",
+    "affected_paper_claim": "Ref [3] (Inula viscosa), Ref [10] (Thymus capitatus), Ref [16] (Lantana camara)",
+    "reproduction_evidence": "Papers evaluate plant extracts containing complex mixtures of triterpenoids, but narrative text discusses them in parallel with pure Lupeol.",
+    "root_cause": "Absence of explicit formulation qualification in legacy paragraph builder.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": true,
+    "recommended_fix": "ContextualBoundaryGate requires formulation qualification (e.g. 'در قالب عصاره گیاهی'); EvidenceDrivenParagraphBuilder automatically prefixes extract nature."
+  },
+  {
+    "failure_id": "FAIL_07",
+    "category": "FORMULATION_BOUNDARY_FAILURE",
+    "sub_type": "SYNTHETIC_DERIVATIVE_EXTRAPOLATION",
+    "severity": "MODERATE",
+    "affected_paper_claim": "Ref [1] (Phosphonium salt), Ref [2] (Tubulin targeting), Ref [4] (Carbamate), Ref [12] (Thiazolidinedione)",
+    "reproduction_evidence": "Synthetic derivatives possess IC50 values (1-3 uM) over 20-fold more potent than natural Lupeol (> 50 uM in A549). Narrative did not emphasize the potency divergence.",
+    "root_cause": "Lack of quantitative potency boundary enforcement between parent phytochemical and synthetic analogues.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": true,
+    "recommended_fix": "Explicitly partition natural compound vs synthetic analogues; flag in CanonicalPaperEvidenceRecord."
+  },
+  {
+    "failure_id": "FAIL_08",
+    "category": "MODEL_BOUNDARY_FAILURE",
+    "sub_type": "SPECIES_MODEL_CONFLATION",
+    "severity": "MODERATE",
+    "affected_paper_claim": "Ref [11] (PMID: 41674174 - TC-1 cell line)",
+    "reproduction_evidence": "Study evaluated mouse TC-1 lung epithelial cells (HPV-16 E6/E7 transformed), but proposal cited it alongside human A549 cells without model distinction.",
+    "root_cause": "Coarse model matching treated all lung models equally.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": true,
+    "recommended_fix": "ContextualBoundaryGate flags MODEL_MISMATCH when animal/transformed cell lines are cited for human cancer claims."
+  },
+  {
+    "failure_id": "FAIL_09",
+    "category": "REFERENCE_OVERSELECTION",
+    "sub_type": "QUOTA_DRIVEN_PADDING",
+    "severity": "MAJOR",
+    "affected_paper_claim": "Overall Reference Set (25 references)",
+    "reproduction_evidence": "MAX_FINAL_REFERENCES = 25 and MIN_FINAL_REFERENCES = 15 caused the engine to select 4 unrelated papers (Refs 8, 18, 23, 24) when direct literature had fewer than 20 recent papers.",
+    "root_cause": "Fixed constant MAX_FINAL_REFERENCES: int = 25 in core_policies.py without dynamic relaxed floor when literature is sparse.",
+    "detected_by_v87_gate": true,
+    "detected_by_existing_test_suite": false,
+    "recommended_fix": "Allow dynamic ceiling based on verified relevant candidates; strictly enforce NO_QUOTA_FILLING over arbitrary count targets."
+  }
+]

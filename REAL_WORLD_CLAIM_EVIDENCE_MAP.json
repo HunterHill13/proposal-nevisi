@@ -1,0 +1,1013 @@
+{
+  "metadata": {
+    "engine_version": "8.7.0",
+    "audit_type": "REAL_WORLD_EVIDENCE_CLAIM_AUDIT",
+    "total_claims": 50,
+    "supported_claims": 27,
+    "partially_supported": 15,
+    "not_supported": 8,
+    "contradicted": 0
+  },
+  "claims": [
+    {
+      "claim_id": "RW_CLM_001",
+      "claim_text": "**Chen Z و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (با تمرکز بر مشتقات شیمیایی سنتزشده)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [1].",
+      "citation_numbers": [
+        1
+      ],
+      "referenced_paper": {
+        "ref_num": 1,
+        "title": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives.",
+        "pmid": "39369566",
+        "doi": "10.1016/j.bmc.2024.117934",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_002",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [1].",
+      "citation_numbers": [
+        1
+      ],
+      "referenced_paper": {
+        "ref_num": 1,
+        "title": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives.",
+        "pmid": "39369566",
+        "doi": "10.1016/j.bmc.2024.117934",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Design, synthesis and antitumor effects of lupeol quaternary phosphonium salt derivatives.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_003",
+      "claim_text": "**Zhao Y و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (با تمرکز بر مشتقات شیمیایی سنتزشده)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [2].",
+      "citation_numbers": [
+        2
+      ],
+      "referenced_paper": {
+        "ref_num": 2,
+        "title": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+        "pmid": "41297068",
+        "doi": "10.1016/j.bmc.2025.118498",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_004",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [2].",
+      "citation_numbers": [
+        2
+      ],
+      "referenced_paper": {
+        "ref_num": 2,
+        "title": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+        "pmid": "41297068",
+        "doi": "10.1016/j.bmc.2025.118498",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Development of lupeol derivatives based on tubulin-targeting strategy: structural modification and correlation analysis of antitumor activity.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_005",
+      "claim_text": "**Seglab F و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (در قالب عصاره تام گیاهی حاوی این فیتوکمیکال)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [3].",
+      "citation_numbers": [
+        3
+      ],
+      "referenced_paper": {
+        "ref_num": 3,
+        "title": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa.",
+        "pmid": "39336114",
+        "doi": "10.3390/biology13090687",
+        "actual_intervention": "Lupeol, Inula viscosa extract"
+      },
+      "evidence_summary": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_006",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [3].",
+      "citation_numbers": [
+        3
+      ],
+      "referenced_paper": {
+        "ref_num": 3,
+        "title": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa.",
+        "pmid": "39336114",
+        "doi": "10.3390/biology13090687",
+        "actual_intervention": "Lupeol, Inula viscosa extract"
+      },
+      "evidence_summary": "Chemical Composition, Antioxidant Capacity, and Anticancerous Effects against Human Lung Cancer Cells of a Terpenoid-Rich Fraction of Inula viscosa.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_007",
+      "claim_text": "**Tian S و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (با تمرکز بر مشتقات شیمیایی سنتزشده)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [4].",
+      "citation_numbers": [
+        4
+      ],
+      "referenced_paper": {
+        "ref_num": 4,
+        "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents.",
+        "pmid": "39274838",
+        "doi": "10.3390/molecules29173990",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_008",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [4].",
+      "citation_numbers": [
+        4
+      ],
+      "referenced_paper": {
+        "ref_num": 4,
+        "title": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents.",
+        "pmid": "39274838",
+        "doi": "10.3390/molecules29173990",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Lupeol-3-carbamate Derivatives: Synthesis and Biological Evaluation as Potential Antitumor Agents.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_009",
+      "claim_text": "**Zhao C و همکاران (2025)** در مطالعه‌ای پیرامون برهم‌کنش ویروس نیوکاسل و متابولیسم سلول‌های A549 [5]، نشان دادند که عفونت NDV موجب تغییرات ساختاری میتوکندری و استرس اکسیداتیو می‌گردد.",
+      "citation_numbers": [
+        5
+      ],
+      "referenced_paper": {
+        "ref_num": 5,
+        "title": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection.",
+        "pmid": "41170972",
+        "doi": "10.1128/jvi.01576-25",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_010",
+      "claim_text": "این یافته‌ها نشان‌دهنده تاب‌آوری متابولیک سلول‌های A549 در برابر انکولیز تک‌عاملی NDV بوده و نیاز به مداخله همزمان با ترکیباتی که مسیرهای بقای میتوکندریایی را مهار می‌کنند، توجیه می‌نماید [5].",
+      "citation_numbers": [
+        5
+      ],
+      "referenced_paper": {
+        "ref_num": 5,
+        "title": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection.",
+        "pmid": "41170972",
+        "doi": "10.1128/jvi.01576-25",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "p53-mediated regulation of electron transport chain and nucleotide synthesis during Newcastle disease virus infection.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_011",
+      "claim_text": "**Liang Y و همکاران (2021)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [6].",
+      "citation_numbers": [
+        6
+      ],
+      "referenced_paper": {
+        "ref_num": 6,
+        "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells.",
+        "pmid": "33968198",
+        "doi": "10.3892/ol.2021.12743",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_012",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [6].",
+      "citation_numbers": [
+        6
+      ],
+      "referenced_paper": {
+        "ref_num": 6,
+        "title": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells.",
+        "pmid": "33968198",
+        "doi": "10.3892/ol.2021.12743",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "MicroRNA-204 plays a role as a tumor suppressor in Newcastle disease virus-induced oncolysis in lung cancer A549 cells.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_013",
+      "claim_text": "**Rosewell Shaw A و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله [در پلتفرم ویروسی هیبرید مهندسی‌شده]** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [7].",
+      "citation_numbers": [
+        7
+      ],
+      "referenced_paper": {
+        "ref_num": 7,
+        "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer.",
+        "pmid": "39624055",
+        "doi": "10.1016/j.omton.2024.200899",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_014",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [7].",
+      "citation_numbers": [
+        7
+      ],
+      "referenced_paper": {
+        "ref_num": 7,
+        "title": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer.",
+        "pmid": "39624055",
+        "doi": "10.1016/j.omton.2024.200899",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "IL-12 encoding oNDV synergizes with CAR-T cells in orthotopic models of non-small cell lung cancer.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_015",
+      "claim_text": "**Kumar A و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [8].",
+      "citation_numbers": [
+        8
+      ],
+      "referenced_paper": {
+        "ref_num": 8,
+        "title": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC).",
+        "pmid": "42621169",
+        "doi": "10.1007/s10616-026-01049-w",
+        "actual_intervention": "Erucin/Kaempferol"
+      },
+      "evidence_summary": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC).",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_016",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [8].",
+      "citation_numbers": [
+        8
+      ],
+      "referenced_paper": {
+        "ref_num": 8,
+        "title": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC).",
+        "pmid": "42621169",
+        "doi": "10.1007/s10616-026-01049-w",
+        "actual_intervention": "Erucin/Kaempferol"
+      },
+      "evidence_summary": "In silico and in vitro evaluation of synergistic anticancer effects of erucin and kaempferol from Eruca sativa against human A549 non-small cell lung cancer cells (NSCLC).",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_017",
+      "claim_text": "**Sun Y و همکاران (2026)** با بهره‌گیری از آنالیز چندامیکسی یکپارچه (ترانسکریپتومیکس، پروتئومیکس و متابولومیکس) در سلول‌های A549 [9]، اثبات کردند که عفونت NDV متابولیسم گلیسروفسفولیپیدهای میزبان را بازآرایی کرده و مسیرهای بیوسنتز چربی را در جهت تسهیل همانندسازی ویروس هدایت می‌کند.",
+      "citation_numbers": [
+        9
+      ],
+      "referenced_paper": {
+        "ref_num": 9,
+        "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+        "pmid": "41942850",
+        "doi": "10.1186/s12864-026-12760-5",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_018",
+      "claim_text": "این داده‌های متابولومیک آسیب‌پذیری‌های زیستی سلول‌های آدنوکارسینوما را در مواجهه با عفونت ویروسی تبیین می‌سازند [9].",
+      "citation_numbers": [
+        9
+      ],
+      "referenced_paper": {
+        "ref_num": 9,
+        "title": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+        "pmid": "41942850",
+        "doi": "10.1186/s12864-026-12760-5",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Integrated transcriptomics, proteomics, and metabolomics analysis reveals newcastle disease virus reshapes glycerophospholipid metabolism.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_019",
+      "claim_text": "**Aborehab NM و همکاران (2023)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (در قالب عصاره تام گیاهی حاوی این فیتوکمیکال)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [10].",
+      "citation_numbers": [
+        10
+      ],
+      "referenced_paper": {
+        "ref_num": 10,
+        "title": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line.",
+        "pmid": "37845669",
+        "doi": "10.1186/s12906-023-04201-7",
+        "actual_intervention": "Lupeol, Thymus capitatus derivative"
+      },
+      "evidence_summary": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_020",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [10].",
+      "citation_numbers": [
+        10
+      ],
+      "referenced_paper": {
+        "ref_num": 10,
+        "title": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line.",
+        "pmid": "37845669",
+        "doi": "10.1186/s12906-023-04201-7",
+        "actual_intervention": "Lupeol, Thymus capitatus derivative"
+      },
+      "evidence_summary": "A novel lupene derivative from Thymus capitatus possesses an apoptosis-inducing effect via Let-7 miRNA/Cyclin D1/VEGF cascade in the A549 cell line.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_021",
+      "claim_text": "**Ali Akbar Esfahani M و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [11].",
+      "citation_numbers": [
+        11
+      ],
+      "referenced_paper": {
+        "ref_num": 11,
+        "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line.",
+        "pmid": "41674174",
+        "doi": "10.18502/ijaai.v25i1.20440",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_022",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [11].",
+      "citation_numbers": [
+        11
+      ],
+      "referenced_paper": {
+        "ref_num": 11,
+        "title": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line.",
+        "pmid": "41674174",
+        "doi": "10.18502/ijaai.v25i1.20440",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Evaluation of the Effects of Newcastle Disease Virus as an Oncolytic Virus on the Expression of Apoptosis-related Genes in TC-1 Cell Line.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_023",
+      "claim_text": "**Deng S و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (با تمرکز بر مشتقات شیمیایی سنتزشده)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [12].",
+      "citation_numbers": [
+        12
+      ],
+      "referenced_paper": {
+        "ref_num": 12,
+        "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway.",
+        "pmid": "39459325",
+        "doi": "10.3390/molecules29204957",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_024",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [12].",
+      "citation_numbers": [
+        12
+      ],
+      "referenced_paper": {
+        "ref_num": 12,
+        "title": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway.",
+        "pmid": "39459325",
+        "doi": "10.3390/molecules29204957",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Thiazolidinedione-Conjugated Lupeol Derivatives as Potent Anticancer Agents Through a Mitochondria-Mediated Apoptotic Pathway.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_025",
+      "claim_text": "**Bhatt M و همکاران (2021)** در مطالعه‌ای تجربی بر روی سلول‌های آدنوکارسینومای ریه رده A549 [13]، به ارزیابی اثرات لوپئول طبیعی خالص پرداختند.",
+      "citation_numbers": [
+        13
+      ],
+      "referenced_paper": {
+        "ref_num": 13,
+        "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer.",
+        "pmid": "32329697",
+        "doi": "10.2174/1871520620666200424131548",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_026",
+      "claim_text": "این شواهد اثبات می‌کند که لوپئول خالص در غلظت‌های فیزیولوژیک عامل کشنده مستقیم نیست و نقش آن ضد مهاجرت است؛ لذا ترکیب آن با یک عامل فعال انکولیتیک نظیر ویروس نیوکاسل برای دستیابی همزمان به مهار رشد، انکولیز و آپوپتوز، از توجیه بیولوژیک بالایی برخوردار است [13].",
+      "citation_numbers": [
+        13
+      ],
+      "referenced_paper": {
+        "ref_num": 13,
+        "title": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer.",
+        "pmid": "32329697",
+        "doi": "10.2174/1871520620666200424131548",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Anti-Metastatic Effects of Lupeol via the Inhibition of MAPK/ERK Pathway in Lung Cancer.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_027",
+      "claim_text": "**Kortum F و همکاران (2025)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله [در پلتفرم ویروسی هیبرید مهندسی‌شده]** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [14].",
+      "citation_numbers": [
+        14
+      ],
+      "referenced_paper": {
+        "ref_num": 14,
+        "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells.",
+        "pmid": "40896365",
+        "doi": "10.1016/j.omton.2025.201027",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_028",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [14].",
+      "citation_numbers": [
+        14
+      ],
+      "referenced_paper": {
+        "ref_num": 14,
+        "title": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells.",
+        "pmid": "40896365",
+        "doi": "10.1016/j.omton.2025.201027",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Syncytial death mediated by oncolytic rVSV-NDV dynamically activates immunogenic apoptosis and necroptosis in human lung cancer cells.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_029",
+      "claim_text": "**Torres-Sanchez A و همکاران (2024)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [15].",
+      "citation_numbers": [
+        15
+      ],
+      "referenced_paper": {
+        "ref_num": 15,
+        "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells.",
+        "pmid": "38931361",
+        "doi": "10.3390/ph17060694",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_030",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [15].",
+      "citation_numbers": [
+        15
+      ],
+      "referenced_paper": {
+        "ref_num": 15,
+        "title": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells.",
+        "pmid": "38931361",
+        "doi": "10.3390/ph17060694",
+        "actual_intervention": "Lupeol"
+      },
+      "evidence_summary": "Unraveling the Impact of Six Pentacyclic Triterpenes Regulating Metabolic Pathways on Lung Carcinoma Cells.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_031",
+      "claim_text": "**Shehzadi S و همکاران (2025)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله (در قالب عصاره تام گیاهی حاوی این فیتوکمیکال)** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [16].",
+      "citation_numbers": [
+        16
+      ],
+      "referenced_paper": {
+        "ref_num": 16,
+        "title": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines.",
+        "pmid": "40951590",
+        "doi": "10.1002/fsn3.70915",
+        "actual_intervention": "Lupeol, Lantana camara extract"
+      },
+      "evidence_summary": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_032",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [16].",
+      "citation_numbers": [
+        16
+      ],
+      "referenced_paper": {
+        "ref_num": 16,
+        "title": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines.",
+        "pmid": "40951590",
+        "doi": "10.1002/fsn3.70915",
+        "actual_intervention": "Lupeol, Lantana camara extract"
+      },
+      "evidence_summary": "Unveiling the Phytochemical Profile and Anti-Cancer Potential of Lantana camara Leaf and Root Extracts Against MCF-7, HepG2, and A549 Cancer Cell Lines.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_033",
+      "claim_text": "**Ginting TE و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [17].",
+      "citation_numbers": [
+        17
+      ],
+      "referenced_paper": {
+        "ref_num": 17,
+        "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+        "pmid": "42699700",
+        "doi": "10.2147/ITT.S614889",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_034",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [17].",
+      "citation_numbers": [
+        17
+      ],
+      "referenced_paper": {
+        "ref_num": 17,
+        "title": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+        "pmid": "42699700",
+        "doi": "10.2147/ITT.S614889",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Newcastle Disease Virus - Induced Interferons Regulate PD-L1 and MICA Expression in Human Tumor and Normal Cells.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_035",
+      "claim_text": "**Almalghooth HDM و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [18].",
+      "citation_numbers": [
+        18
+      ],
+      "referenced_paper": {
+        "ref_num": 18,
+        "title": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line.",
+        "pmid": "42404852",
+        "doi": "10.1007/s10616-026-01019-2",
+        "actual_intervention": "Paclitaxel/Eugenol"
+      },
+      "evidence_summary": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_036",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [18].",
+      "citation_numbers": [
+        18
+      ],
+      "referenced_paper": {
+        "ref_num": 18,
+        "title": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line.",
+        "pmid": "42404852",
+        "doi": "10.1007/s10616-026-01019-2",
+        "actual_intervention": "Paclitaxel/Eugenol"
+      },
+      "evidence_summary": "Combination of paclitaxel with eugenol effectively enhances anticancer characteristics of paclitaxel on the A549 lung cancer cell line.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_037",
+      "claim_text": "**Mosmann T (1983)** در مطالعه شاخص متدولوژیک خود [19]، روش رنگ‌سنجی سریع احیای نمک تترازولیوم توسط دهیدروژنازهای میتوکندریایی سلول‌های زنده را جهت سنجش بقا و سمیت سلولی ابداع نمود.",
+      "citation_numbers": [
+        19
+      ],
+      "referenced_paper": {
+        "ref_num": 19,
+        "title": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays.",
+        "pmid": "6606682",
+        "doi": "10.1016/0022-1759(83)90303-4",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "CONTAINS_UNGROUNDED_NUMBERS",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_038",
+      "claim_text": "در طرح جاری، این آزمون جهت اندازه‌گیری درصد مهار رشد سلول‌ها در مواجهه با تک‌درمانی‌ها و درمان توأم مورد استفاده قرار می‌گیرد [19].",
+      "citation_numbers": [
+        19
+      ],
+      "referenced_paper": {
+        "ref_num": 19,
+        "title": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays.",
+        "pmid": "6606682",
+        "doi": "10.1016/0022-1759(83)90303-4",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Rapid colorimetric assay for cellular growth and survival: application to proliferation and cytotoxicity assays.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "CONTAINS_UNGROUNDED_NUMBERS",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_039",
+      "claim_text": "**Chou TC و همکاران (2006)** در مطالعه مرجع روش‌شناختی خود [20]، مبانی نظری، طراحی تجربی و شبیه‌سازی رایانه‌ای ارزیابی برهم‌کنش‌های دارویی را بر پایه معادله اثر میانه تدوین نمودند.",
+      "citation_numbers": [
+        20
+      ],
+      "referenced_paper": {
+        "ref_num": 20,
+        "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies.",
+        "pmid": "16968952",
+        "doi": "10.1124/pr.58.3.10",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_040",
+      "claim_text": "این چارچوب ریاضی و محاسبات نرم‌افزاری مبنای کمی ارزیابی برهم‌کنش فارماکولوژیک مداخله‌ها در این پژوهش قرار می‌گیرد [20].",
+      "citation_numbers": [
+        20
+      ],
+      "referenced_paper": {
+        "ref_num": 20,
+        "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies.",
+        "pmid": "16968952",
+        "doi": "10.1124/pr.58.3.10",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_041",
+      "claim_text": "**Chou TC و همکاران (1984)** در مطالعه مرجع روش‌شناختی خود [21]، مبانی نظری، طراحی تجربی و شبیه‌سازی رایانه‌ای ارزیابی برهم‌کنش‌های دارویی را بر پایه معادله اثر میانه تدوین نمودند.",
+      "citation_numbers": [
+        21
+      ],
+      "referenced_paper": {
+        "ref_num": 21,
+        "title": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors.",
+        "pmid": "6382953",
+        "doi": "10.1016/0065-2571(84)90007-4",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "CONTAINS_UNGROUNDED_NUMBERS",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_042",
+      "claim_text": "این چارچوب ریاضی و محاسبات نرم‌افزاری مبنای کمی ارزیابی برهم‌کنش فارماکولوژیک مداخله‌ها در این پژوهش قرار می‌گیرد [21].",
+      "citation_numbers": [
+        21
+      ],
+      "referenced_paper": {
+        "ref_num": 21,
+        "title": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors.",
+        "pmid": "6382953",
+        "doi": "10.1016/0065-2571(84)90007-4",
+        "actual_intervention": "OTHER"
+      },
+      "evidence_summary": "Quantitative analysis of dose-effect relationships: the combined effects of multiple drugs or enzyme inhibitors.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "METHODS",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "CONTAINS_UNGROUNDED_NUMBERS",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_043",
+      "claim_text": "**Liu L و همکاران (2025)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله [در سویه نوترکیب ویروسی]** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [22].",
+      "citation_numbers": [
+        22
+      ],
+      "referenced_paper": {
+        "ref_num": 22,
+        "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair.",
+        "pmid": "40382521",
+        "doi": "10.1038/s41434-025-00540-x",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_044",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [22].",
+      "citation_numbers": [
+        22
+      ],
+      "referenced_paper": {
+        "ref_num": 22,
+        "title": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair.",
+        "pmid": "40382521",
+        "doi": "10.1038/s41434-025-00540-x",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "Recombinant oncolytic virus NDV-anti-VEGFR2 enhances radiotherapy sensitivity in NSCLC by targeting VEGF signaling and impairing DNA repair.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    },
+    {
+      "claim_id": "RW_CLM_045",
+      "claim_text": "**Yu J و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [23].",
+      "citation_numbers": [
+        23
+      ],
+      "referenced_paper": {
+        "ref_num": 23,
+        "title": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling.",
+        "pmid": "42772808",
+        "doi": "10.1111/1759-7714.70393",
+        "actual_intervention": "Matrine"
+      },
+      "evidence_summary": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_046",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [23].",
+      "citation_numbers": [
+        23
+      ],
+      "referenced_paper": {
+        "ref_num": 23,
+        "title": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling.",
+        "pmid": "42772808",
+        "doi": "10.1111/1759-7714.70393",
+        "actual_intervention": "Matrine"
+      },
+      "evidence_summary": "Matrine Suppresses Lung Cancer Progression via Dual Inhibition of CHEK1-Mediated DNA Damage Repair and PI3K/AKT Survival Signaling.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_047",
+      "claim_text": "**Sun J و همکاران (2026)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [24].",
+      "citation_numbers": [
+        24
+      ],
+      "referenced_paper": {
+        "ref_num": 24,
+        "title": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition.",
+        "pmid": "42633541",
+        "doi": "10.36721/PJPS.2026.39.11.328.1",
+        "actual_intervention": "Jolkinolide B"
+      },
+      "evidence_summary": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_048",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [24].",
+      "citation_numbers": [
+        24
+      ],
+      "referenced_paper": {
+        "ref_num": 24,
+        "title": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition.",
+        "pmid": "42633541",
+        "doi": "10.36721/PJPS.2026.39.11.328.1",
+        "actual_intervention": "Jolkinolide B"
+      },
+      "evidence_summary": "Jolkinolide B induces apoptosis and G1 arrest in A549 cells via JAK2/STAT3 inhibition.",
+      "verdict": "NOT_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_INTERVENTION_MISMATCH",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REJECT_UNGROUNDED"
+    },
+    {
+      "claim_id": "RW_CLM_049",
+      "claim_text": "**Yang Y و همکاران (2025)** در مطالعه‌ای با طراحی **مطالعه تجربی**، به بررسی اثرات **عامل مداخله [در سویه نوترکیب ویروسی]** در سطح **مدل بیولوژیک** در مقایسه با گروه کنترل استاندارد پرداختند [25].",
+      "citation_numbers": [
+        25
+      ],
+      "referenced_paper": {
+        "ref_num": 25,
+        "title": "SLC35A2 gene product modulates paramyxovirus fusion events during infection.",
+        "pmid": "39792924",
+        "doi": "10.1371/journal.ppat.1012531",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "SLC35A2 gene product modulates paramyxovirus fusion events during infection.",
+      "verdict": "PARTIALLY_SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "VIOLATED_TEMPLATE_PLACEHOLDER",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "REVISE_REPLACE_PLACEHOLDER"
+    },
+    {
+      "claim_id": "RW_CLM_050",
+      "claim_text": "با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر محدودیت در تنوع دوز و عدم پیگیری طولانی‌مدت همراه بوده است، در طرح حاضر با هدف تعیین مقادیر پایه برای طراحی مداخله در طرح جاری، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [25].",
+      "citation_numbers": [
+        25
+      ],
+      "referenced_paper": {
+        "ref_num": 25,
+        "title": "SLC35A2 gene product modulates paramyxovirus fusion events during infection.",
+        "pmid": "39792924",
+        "doi": "10.1371/journal.ppat.1012531",
+        "actual_intervention": "NDV"
+      },
+      "evidence_summary": "SLC35A2 gene product modulates paramyxovirus fusion events during infection.",
+      "verdict": "SUPPORTED",
+      "evidence_location": "ABSTRACT",
+      "boundary_status": "RESPECTED",
+      "numeric_provenance": "NOT_REPORTED",
+      "final_decision": "ACCEPT"
+    }
+  ]
+}
