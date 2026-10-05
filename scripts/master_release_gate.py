@@ -110,8 +110,8 @@ def audit_mutation_score() -> Dict[str, Any]:
     }
 
 
-def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
-    """Phase 4: Audits Research Engine & Literature Review criteria (v8.4 Universal Biomedical Architecture)."""
+def audit_research_engine_v8_7_criteria() -> Dict[str, Any]:
+    """Phase 4: Audits Research Engine & Literature Review criteria (v8.7 Universal Biomedical Architecture)."""
     from scripts.core_policies import (
         MAX_FINAL_REFERENCES, NO_QUOTA_FILLING, GENERIC_EXCLUSION_ONTOLOGY,
         EXCLUSION_TAXONOMY, SEARCH_DATABASE_STATUSES, RESEARCH_PIPELINE_STAGES,
@@ -309,9 +309,55 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
     )
     checks.append(("28. Adaptive Database Selector & Negative Evidence Scanner", c28))
 
+    # 29. Canonical Paper Evidence Record (16 deterministic fields & exact location provenance)
+    from scripts.core_policies import CANONICAL_EVIDENCE_RECORD_FIELDS, EXTRACTION_SOURCE_LOCATIONS
+    from scripts.generic_reference_auditor import CanonicalPaperEvidenceRecord
+    c29 = (
+        len(CANONICAL_EVIDENCE_RECORD_FIELDS) == 16 and
+        len(EXTRACTION_SOURCE_LOCATIONS) >= 8 and
+        hasattr(CanonicalPaperEvidenceRecord, "build")
+    )
+    checks.append(("29. Canonical Paper Evidence Record (16 Fields & Location Provenance)", c29))
+
+    # 30. Numeric Provenance Gate (Strict Extraction vs. Calculation vs. Derived; Anti-Numeric Hallucination)
+    from scripts.core_policies import NUMERIC_PROVENANCE_STATUSES
+    from scripts.generic_reference_auditor import NumericProvenanceGate
+    c30 = (
+        len(NUMERIC_PROVENANCE_STATUSES) == 5 and
+        hasattr(NumericProvenanceGate, "audit_claim_numbers")
+    )
+    checks.append(("30. Numeric Provenance Gate (Anti-Numeric Hallucination & Exact Extraction)", c30))
+
+    # 31. Contextual Boundary Gate (11 Mismatch Categories & In Silico / Preclinical Leap Enforcers)
+    from scripts.core_policies import CONTEXTUAL_BOUNDARY_MISMATCHES
+    from scripts.generic_reference_auditor import ContextualBoundaryGate
+    c31 = (
+        len(CONTEXTUAL_BOUNDARY_MISMATCHES) == 11 and
+        hasattr(ContextualBoundaryGate, "audit_context_boundaries")
+    )
+    checks.append(("31. Contextual Boundary Gate (11 Boundary Mismatches & Leap Prevention)", c31))
+
+    # 32. Exact Claim-to-Evidence Mapper (SciFact-Aligned 5-Tier Claim Verdicts)
+    from scripts.core_policies import CLAIM_EVIDENCE_VERDICTS
+    from scripts.generic_reference_auditor import ExactClaimEvidenceMapper
+    c32 = (
+        len(CLAIM_EVIDENCE_VERDICTS) == 5 and
+        hasattr(ExactClaimEvidenceMapper, "map_and_verify_claim")
+    )
+    checks.append(("32. Exact Claim-to-Evidence Mapper (SciFact-Aligned 5-Tier Claim Verdicts)", c32))
+
+    # 33. Evidence-Driven Variable Paragraph Builder (Anti-Boilerplate & Null/Negative Result Surfacing)
+    from scripts.generic_reference_auditor import EvidenceDrivenParagraphBuilder
+    c33 = hasattr(EvidenceDrivenParagraphBuilder, "build_literature_paragraph")
+    checks.append(("33. Evidence-Driven Paragraph Builder (Anti-Boilerplate & Null/Negative Surfacing)", c33))
+
+    # 34. Strict Claim-to-Citation Binding & Literature Review Gate
+    c34 = hasattr(PostResearchCitationAuditor, "audit_claim_citations")
+    checks.append(("34. Strict Claim-to-Citation Binding & Literature Review Gate", c34))
+
     all_passed = all(p for _, p in checks)
     return {
-        "check": "RESEARCH_ENGINE_V8_6_CRITERIA_AUDIT",
+        "check": "RESEARCH_ENGINE_V8_7_CRITERIA_AUDIT",
         "passed": all_passed,
         "total_criteria": len(checks),
         "passed_criteria": sum(1 for _, p in checks if p),
@@ -321,7 +367,7 @@ def audit_research_engine_v8_4_criteria() -> Dict[str, Any]:
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.6)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.7)")
     print("===========================================================================\n")
 
     # 1. Version Sync
@@ -350,10 +396,10 @@ def main():
     print(f"      - Invariants      : Discovery={'OK' if t_res['discovery_invariant_met'] else 'FAIL'}, Accounting={'OK' if t_res['accounting_invariant_met'] else 'FAIL'}")
     print(f"      - Execution Time  : {t_res['elapsed_seconds']}s")
 
-    # 4. Research Engine v8.6 Criteria Audit (28 Checks)
-    r_res = audit_research_engine_v8_4_criteria()
+    # 4. Research Engine v8.7 Criteria Audit (34 Checks)
+    r_res = audit_research_engine_v8_7_criteria()
     status_icon = "[PASS]" if r_res["passed"] else "[FAIL]"
-    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (28 Criteria):")
+    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (34 Criteria):")
     for name, p in r_res["criteria_checks"]:
         ch_icon = "[PASS]" if p else "[FAIL]"
         print(f"      {ch_icon} {name}")
@@ -374,3 +420,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

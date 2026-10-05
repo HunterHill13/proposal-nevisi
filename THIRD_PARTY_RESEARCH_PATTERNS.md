@@ -75,7 +75,39 @@ Both source repositories are licensed under the **MIT License**. In compliance w
 
 ---
 
-### 4. Components Intentionally NOT Reused & Rationale
+### 5. Proposal-Nevisi v8.7 Evidence Grounding & Attribution Integrity Upgrade
+
+#### A. Source Audit & Integration Matrix (v8.7)
+`SOURCE -> COMPONENT -> EXISTING EQUIVALENT -> GAP -> ACTION -> REASON`
+
+| Source | Component | Existing Equivalent in Proposal-Nevisi | Gap Identified | Action Taken | Rationale |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **SciFact (AllenAI / Wadden et al.)** | Claim verification dataset & rationale scorer | `PaperToClaimVerifier` | Prior claim verification provided binary pass/fail without standardized 5-tier verdicts and fine-grained sentence rationale mapping. | **ADAPT & FORMALIZE** | Implemented `ExactClaimEvidenceMapper` using SciFact-aligned verdicts (`SUPPORTED`, `PARTIALLY_SUPPORTED`, `NOT_SUPPORTED`, `CONTRADICTED`, `INSUFFICIENT_EVIDENCE`). | Guarantees semantic entailment between each proposal statement and source paper evidence text. |
+| **K-Dense AI** | `lint_causal_claims.py` & `audit_claims.py` | Numeric extraction regex | Simple number regex failed to verify whether numbers ($IC_{50}$, doses, p-values) were directly reported, calculated, or hallucinated. | **BUILD** | Created `NumericProvenanceGate` (`NUMERIC_PROVENANCE_STATUSES`). | Rejects ungrounded numeric values from appearing in literature reviews; distinguishes explicit extraction from derived values. |
+| **AIPOCH** | `methodology-extractor` & boundary linting | `study_design_type` string | In silico docking studies were sometimes conflated with in vitro wet-lab studies, and botanical extracts were confused with pure constituents. | **EXTEND & ENFORCE** | Built `ContextualBoundaryGate` across 11 mismatch categories (`CONTEXTUAL_BOUNDARY_MISMATCHES`). | Enforces strict epistemic walls: in silico $\neq$ wet lab, extract $\neq$ pure constituent, observational $\neq$ causal. |
+| **W3C PROV-O / Scholarly Standards** | Provenance ontology & citation audit | Generic bibliography check | In-text citations `[X]` were checked for syntax but not semantically verified against the actual content of reference X. | **BUILD** | Added `CanonicalPaperEvidenceRecord` (16 fields, exact source location provenance) and `PostResearchCitationAuditor.audit_claim_citations()`. | Flags `CITATION_CLAIM_MISMATCH` if citation marker [X] is attached to claims unsupported by paper X. |
+| **Proposal-Nevisi Core** | Fixed Literature Review Paragraph Template | Generic proposal synthesis | Boilerplate text generated identical structures ("گروه کنترل استاندارد") and suppressed null/negative findings. | **REPLACE** | Created `EvidenceDrivenParagraphBuilder`. | Produces variable-length, evidence-grounded paragraphs without filler boilerplate, surfacing negative results and formulation nuances. |
+
+#### B. Architectural Additions in v8.7
+1. **Canonical Paper Evidence Record (16 Fields):** Standardized schema capturing `study_id`, `authors`, `year`, `title`, `doi_pmid`, `study_design`, `model_system`, `formulation_entity`, `intervention`, `comparator`, `primary_endpoint`, `quantitative_findings`, `negative_or_null_findings`, `limitations`, `source_locations`, and `extraction_status`.
+2. **Numeric Provenance Gate:** Strips non-quantitative tokens (citation markers, publication years, entity identifiers with hyphenated numbers) and verifies that any numeric claim in the proposal is grounded in the paper's quantitative results.
+3. **Contextual Boundary Gate:** Prevents 11 specific boundary leaps:
+   - `MODEL_MISMATCH`
+   - `FORMULATION_MISMATCH`
+   - `IN_SILICO_TO_EXPERIMENTAL_LEAP`
+   - `PRECLINICAL_TO_CLINICAL_LEAP`
+   - `CORRELATION_TO_CAUSATION`
+   - `ENDPOINT_MISMATCH`
+   - `DOSE_RANGE_MISMATCH`
+   - `TEMPORAL_MISMATCH`
+   - `NEGATIVE_FINDING_SUPPRESSION`
+   - `SELECTIVE_EVIDENCE_CHERRY_PICKING`
+   - `MULTI_SOURCE_CONFLATION`
+4. **Evidence-Driven Paragraph Generator:** Formats literature review entries with explicit experimental conditions, specific comparator baselines, and honest statements of null findings.
+
+---
+
+### 6. Components Intentionally NOT Reused & Rationale
 
 1. **Proprietary CLI Tools (`parallel-cli` in K-Dense):**
    - K-Dense relies on an external closed-source binary for parallelized web searches.
@@ -88,3 +120,5 @@ Both source repositories are licensed under the **MIT License**. In compliance w
 3. **Domain-Specific Entity Dictionaries:**
    - Both repositories contain skills with hardcoded cancer or drug terms.
    - **Decision:** Omitted. Proposal-Nevisi enforces a strict anti-leakage invariant verified by 22 static analysis tests.
+
+

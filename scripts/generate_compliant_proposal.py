@@ -29,7 +29,10 @@ try:
     from generic_contradiction_engine import GenericContradictionEngine
     from generic_claim_entailment_engine import GenericClaimEntailmentEngine
     from generic_study_relationships import GenericStudyRelationshipEngine
-    from generic_reference_auditor import GenericReferenceAuditor
+    from generic_reference_auditor import (
+        GenericReferenceAuditor, EvidenceDrivenParagraphBuilder,
+        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord
+    )
     from proposal_structure_validator import ProposalStructureValidator
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
@@ -40,7 +43,10 @@ except ImportError:
     from generic_contradiction_engine import GenericContradictionEngine
     from generic_claim_entailment_engine import GenericClaimEntailmentEngine
     from generic_study_relationships import GenericStudyRelationshipEngine
-    from generic_reference_auditor import GenericReferenceAuditor
+    from generic_reference_auditor import (
+        GenericReferenceAuditor, EvidenceDrivenParagraphBuilder,
+        ExactClaimEvidenceMapper, PostResearchCitationAuditor, CanonicalPaperEvidenceRecord
+    )
     from proposal_structure_validator import ProposalStructureValidator
 
 class ProposalGenerator:
@@ -161,46 +167,12 @@ class ProposalGenerator:
                 if para:
                     para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
                 else:
-                    pmid_str = str(s.get("pmid", ""))
-                    ev_rel = s.get("evidence_relationship", "DIRECT")
-                    comp_id = s.get("compound_identity", "NOT_APPLICABLE" if design == "METHODOLOGICAL_LANDMARK" else "PARENT_COMPOUND")
-                    plat_id = s.get("viral_platform_identity", "NOT_APPLICABLE" if design == "METHODOLOGICAL_LANDMARK" else "WT_VIRUS")
-                    
-                    if pmid_str in ["16968952", "6382953"] or "chou" in lead_author.lower():
-                        para = (
-                            f"**{lead_author} و همکاران ({year})** در مطالعه مرجع روش‌شناختی خود [{cnum}]، مبانی نظری، طراحی تجربی و شبیه‌سازی رایانه‌ای ارزیابی برهم‌کنش‌های دارویی را بر پایه معادله اثر میانه تدوین نمودند. "
-                            f"در این چارچوب کمی، شاخص ترکیبی (Combination Index; CI) به عنوان معیار قطعی تفکیک هم‌افزایی (CI < 1)، اثر جمع‌پذیر (CI = 1) و آنتاگونیسم (CI > 1) معرفی شد. "
-                            f"این چارچوب ریاضی و محاسبات نرم‌افزاری مبنای کمی ارزیابی برهم‌کنش فارماکولوژیک مداخله‌ها در این پژوهش قرار می‌گیرد [{cnum}]."
-                        )
-                    elif pmid_str == "6606682" or "mosmann" in lead_author.lower():
-                        para = (
-                            f"**{lead_author} ({year})** در مطالعه شاخص متدولوژیک خود [{cnum}]، روش رنگ‌سنجی سریع احیای نمک تترازولیوم توسط دهیدروژنازهای میتوکندریایی سلول‌های زنده را جهت سنجش بقا و سمیت سلولی ابداع نمود. "
-                            f"این سنجش استاندارد طلایی سنجش زیستایی سلول و برآورد غلظت بازدارنده ۵۰ درصد (IC50) در آزمون‌های برون‌تن به شمار می‌رود. "
-                            f"در طرح جاری، این آزمون جهت اندازه‌گیری درصد مهار رشد سلول‌ها در مواجهه با تک‌درمانی‌ها و درمان توأم مورد استفاده قرار می‌گیرد [{cnum}]."
-                        )
-                    else:
-                        qualifier = ""
-                        if comp_id == "COMPOUND_DERIVATIVE":
-                            qualifier = " (با تمرکز بر مشتقات شیمیایی سنتزشده)"
-                        elif comp_id == "CONTAINING_EXTRACT":
-                            qualifier = " (در قالب عصاره تام گیاهی حاوی این فیتوکمیکال)"
-                        
-                        if plat_id == "CHIMERIC_HYBRID_VIRUS":
-                            qualifier += " [در پلتفرم ویروسی هیبرید مهندسی‌شده]"
-                        elif plat_id == "RECOMBINANT_VIRUS":
-                            qualifier += " [در سویه نوترکیب ویروسی]"
-
-                        para = (
-                            f"**{lead_author} و همکاران ({year})** در مطالعه‌ای با طراحی **{design}**، به بررسی اثرات **{agent_name}{qualifier}** در سطح **{model_sys}** در مقایسه با {comparator} پرداختند [{cnum}]. "
-                            f"هدف این بررسی، سنجش پیامدهایی نظیر {endpoints} گزارش شده است. "
-                            f"یافته‌های به‌دست‌آمده نشان داد که {findings}. "
-                        )
-                        if quant:
-                            para += f"از حیث مقادیر کمی، شاخص‌ها در محدوده ({quant}) گزارش گردید. "
-                        para += (
-                            f"با توجه به اینکه این مطالعه با محدودیت‌هایی نظیر {limitation} همراه بوده است، "
-                            f"در طرح حاضر با هدف {relevance}، داده‌های حاصل به‌عنوان شواهد پایه و مقایسه‌ای مورد بهره‌برداری قرار می‌گیرند [{cnum}]."
-                        )
+                    # Dynamically construct evidence-grounded paragraph without boilerplate or numeric hallucination
+                    para = EvidenceDrivenParagraphBuilder.build_literature_paragraph(
+                        study_record=s,
+                        citation_number=cnum,
+                        problem_model=model_dict
+                    )
                 lit_paragraphs.append(para)
 
 

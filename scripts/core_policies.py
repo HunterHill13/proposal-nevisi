@@ -48,8 +48,8 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "8.6.0"
-VERSION_DISPLAY = "v8.6.0"
+ENGINE_VERSION = "8.7.0"
+VERSION_DISPLAY = "v8.7.0"
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
@@ -864,6 +864,117 @@ PUBLICATION_BIAS_INDICATORS: Dict[str, str] = {
     "SYMMETRIC_EVIDENCE_DISTRIBUTION": "Balanced distribution of positive, neutral, and adverse findings indicates robust reporting",
     "NEGATIVE_EVIDENCE_RECOVERED": "Deliberate negative query families successfully identified inertness or boundary conditions"
 }
+
+# ==============================================================================
+# 29. CANONICAL PAPER EVIDENCE RECORD FIELDS (v8.7 - Provenance & Traceability)
+# ==============================================================================
+
+CANONICAL_EVIDENCE_RECORD_FIELDS: List[str] = [
+    "bibliographic_identity",
+    "study_design",
+    "population_or_model",
+    "intervention_or_exposure",
+    "comparator",
+    "outcomes",
+    "measurements",
+    "quantitative_results",
+    "qualitative_results",
+    "negative_or_null_results",
+    "limitations",
+    "funding_or_coi",
+    "evidence_directness",
+    "evidence_quality",
+    "source_locations",
+    "provenance"
+]
+
+# Standardized Extraction Source Locations (v8.7 Section 6 - SciFact & RefVerifier Adapted)
+EXTRACTION_SOURCE_LOCATIONS: Dict[str, str] = {
+    "ABSTRACT": "Reported in Abstract text",
+    "INTRODUCTION": "Reported in Introduction background / hypothesis",
+    "METHODS": "Reported in Methods / Experimental Design section",
+    "RESULTS": "Reported in primary Results narrative",
+    "DISCUSSION": "Reported in Discussion / Authors' Interpretation",
+    "TABLE": "Extracted directly from structured Data Table",
+    "FIGURE": "Extracted directly from Data Chart / Image / Graph",
+    "SUPPLEMENTARY": "Extracted from Supplementary Online Materials / Appendix",
+    "NOT_AVAILABLE": "Source location cannot be definitively resolved from available text"
+}
+
+# Numeric Provenance Statuses (v8.7 Section 7 - W3C PROV-O Adapted)
+NUMERIC_PROVENANCE_STATUSES: Dict[str, str] = {
+    "DIRECTLY_REPORTED": "Value is verbatim extracted from primary text, table, or figure in the cited source",
+    "CALCULATED_FROM_REPORTED_DATA": "Value is deterministically computed via transparent, verified transformation from reported raw data",
+    "DERIVED": "Value is derived through validated secondary modeling explicitly documented in source",
+    "INFERRED": "Value was inferred by synthesis model (strictly prohibited in primary quantitative claims)",
+    "NOT_REPORTED": "Source paper does not report this numeric parameter; must never be hallucinated or filled with generic defaults"
+}
+
+# Contextual Boundary Mismatches (v8.7 Section 8 - Dynamic Topic-Agnostic Taxonomies)
+CONTEXTUAL_BOUNDARY_MISMATCHES: Dict[str, str] = {
+    "MODEL_MISMATCH": "Claim asserts a model/tissue distinct from the biological system evaluated in source",
+    "POPULATION_MISMATCH": "Claim targets a clinical/demographic population distinct from the studied cohort",
+    "SPECIES_MISMATCH": "Claim transfers non-human animal findings directly to human physiology without translational qualification",
+    "CELL_MODEL_MISMATCH": "Claim attributes finding to specific cell lineage absent from source experimental design",
+    "INTERVENTION_MISMATCH": "Claim asserts target intervention while source examined an alternative agent",
+    "FORMULATION_MISMATCH": "Claim attributes mixture/extract/formulation effect to pure single constituent without isolation proof",
+    "OUTCOME_MISMATCH": "Claim asserts clinical/functional endpoint different from measured assay parameter",
+    "STUDY_DESIGN_MISMATCH": "Claim presents computational/in silico analysis as empirical wet-lab experimentation",
+    "TIMEPOINT_MISMATCH": "Claim extrapolates acute short-term response to long-term chronic durability",
+    "DOSE_EXPOSURE_MISMATCH": "Claim asserts physiological efficacy when effect occurred strictly at supra-physiological/toxic levels",
+    "IN_SILICO_TO_EXPERIMENTAL_LEAP": "Computational binding/docking/prediction asserted as physical in vitro or in vivo efficacy"
+}
+
+# Formulation & Entity Granularity Distinctions (v8.7 Section 9 - Generic Pure vs Mixture Policy)
+FORMULATION_ENTITY_DISTINCTIONS: Dict[str, str] = {
+    "PURE_CONSTITUENT": "Isolated, purified single active chemical or biological molecule (>95% purity)",
+    "EXTRACT": "Crude or semi-purified natural product/botanical extract containing heterogeneous phytochemicals",
+    "MIXTURE": "Defined or undefined combination of multiple independent chemical or biological entities",
+    "FORMULATION": "Active agent incorporated into nano-carriers, liposomes, excipients, or delivery vehicles",
+    "COMBINATION": "Concomitant multi-agent intervention administered simultaneously or sequentially",
+    "DERIVATIVE": "Chemically modified synthetic or semi-synthetic analog of parent scaffold",
+    "METABOLITE": "In vivo biological breakdown product or biotransformed intermediate",
+    "ANALOGUE": "Structural congener or bioisostere possessing distinct pharmacokinetic properties",
+    "NOT_APPLICABLE": "Methodological, diagnostic, or computational landmark not involving physical agents"
+}
+
+# SciFact-Aligned Claim-Evidence Verdicts (v8.7 Section 5)
+CLAIM_EVIDENCE_VERDICTS: Dict[str, str] = {
+    "SUPPORTED": "Primary source evidence fully entails the claim with matching model, dose, and causality bounds",
+    "PARTIALLY_SUPPORTED": "Evidence supports claim direction or sub-phenotype but contains translational, dose, or model disparities",
+    "NOT_SUPPORTED": "Cited source contains zero empirical evidence or text supporting the asserted claim",
+    "CONTRADICTED": "Primary source evidence directly refutes or reports contrary outcome to asserted claim",
+    "INSUFFICIENT_EVIDENCE": "Source evidence is equivocal, underpowered, or missing critical parameters to establish claim"
+}
+
+# Evidence Status Per Paper (v8.7 Section 15)
+EVIDENCE_STATUS_PER_PAPER: Dict[str, str] = {
+    "DIRECT_EVIDENCE": "Direct evaluation of target problem model intervention and outcome under matching conditions",
+    "INDIRECT_SUPPORT": "Transferable precedent from related entity or closely analogous model system",
+    "BACKGROUND_ONLY": "General epidemiology, disease pathology, standard of care, or clinical guidelines",
+    "CONTEXTUAL_EVIDENCE": "Methodological landmark, assay validation, or baseline comparison data",
+    "CONTRADICTORY_EVIDENCE": "Empirical evidence demonstrating antagonism, toxicity, null response, or boundary limit",
+    "INSUFFICIENT_EVIDENCE": "Inconclusive, unverified, or critically underreported experimental record",
+    "REJECTED": "Excluded on scope, severe bias, retraction, or irreconcilable biological incompatibility"
+}
+
+# Linguistic Certainty Calibration Levels (v8.7 Section 12)
+CLAIM_CERTAINTY_LEVELS: Dict[str, Dict[str, Any]] = {
+    "DEMONSTRATES": {"tier": 1, "allowed_designs": ["RANDOMIZED_CONTROLLED_TRIAL", "IN_VIVO_ANIMAL", "IN_VITRO_EXPERIMENTAL"], "requires_repetition": True},
+    "SUPPORTS": {"tier": 2, "allowed_designs": ["IN_VIVO_ANIMAL", "IN_VITRO_EXPERIMENTAL", "CONTROLLED_CLINICAL_STUDY"], "requires_repetition": False},
+    "SUGGESTS": {"tier": 3, "allowed_designs": ["OBSERVATIONAL_COHORT_CASE_CONTROL", "IN_VITRO_EXPERIMENTAL", "COMPUTATIONAL_IN_SILICO"], "requires_repetition": False},
+    "ASSOCIATED_WITH": {"tier": 4, "allowed_designs": ["OBSERVATIONAL_COHORT_CASE_CONTROL", "CROSS_SECTIONAL", "ECOLOGICAL_STUDY"], "strictly_non_causal": True},
+    "OBSERVED": {"tier": 5, "allowed_designs": ["CASE_SERIES", "PRELIMINARY_SCREENING"], "strictly_descriptive": True},
+    "MAY_INDICATE": {"tier": 6, "allowed_designs": ["COMPUTATIONAL_IN_SILICO", "IN_VITRO_EXPERIMENTAL"], "exploratory": True},
+    "HYPOTHESIZED": {"tier": 7, "allowed_designs": ["NARRATIVE_REVIEW", "EDITORIAL", "THEORETICAL"], "non_empirical": True}
+}
+
+# Negative Search Claim Boundaries (v8.7 Section 17)
+NEGATIVE_SEARCH_CLAIM_BOUNDS: Dict[str, str] = {
+    "SCOPE_BOUNDED_NEGATIVE": "No eligible study was identified within the defined search perimeter ({databases}, {dates}, {languages})",
+    "UNWARRANTED_ABSOLUTE_NEGATIVE": "Prohibited leap from search retrieval absence to global non-existence ('it does not exist')"
+}
+
 
 
 

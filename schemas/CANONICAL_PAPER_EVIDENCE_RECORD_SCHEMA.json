@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CanonicalPaperEvidenceRecordSchema",
+  "description": "Universal Draft-07 schema for canonical paper evidence records with exact location provenance, numeric traceability, and zero-hallucination bounds.",
+  "type": "object",
+  "required": [
+    "bibliographic_identity",
+    "study_design",
+    "population_or_model",
+    "intervention_or_exposure",
+    "comparator",
+    "outcomes",
+    "measurements",
+    "quantitative_results",
+    "qualitative_results",
+    "negative_or_null_results",
+    "limitations",
+    "funding_or_coi",
+    "evidence_directness",
+    "evidence_quality",
+    "source_locations",
+    "provenance"
+  ],
+  "properties": {
+    "bibliographic_identity": {
+      "type": "object",
+      "required": ["title", "authors", "year"],
+      "properties": {
+        "title": { "type": "string" },
+        "authors": { "type": "array", "items": { "type": "string" } },
+        "year": { "type": "integer" },
+        "journal": { "type": ["string", "null"] },
+        "doi": { "type": ["string", "null"] },
+        "pmid": { "type": ["string", "null"] },
+        "ref_id": { "type": "string" }
+      }
+    },
+    "study_design": {
+      "type": "object",
+      "required": ["value", "source_location", "status"],
+      "properties": {
+        "value": { "type": "string" },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "population_or_model": {
+      "type": "object",
+      "required": ["value", "source_location", "status"],
+      "properties": {
+        "value": { "type": "string" },
+        "model_type": { "type": "string" },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "intervention_or_exposure": {
+      "type": "object",
+      "required": ["value", "entity_granularity", "source_location", "status"],
+      "properties": {
+        "value": { "type": "string" },
+        "entity_granularity": {
+          "type": "string",
+          "enum": [
+            "PURE_CONSTITUENT",
+            "EXTRACT",
+            "MIXTURE",
+            "FORMULATION",
+            "COMBINATION",
+            "DERIVATIVE",
+            "METABOLITE",
+            "ANALOGUE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "comparator": {
+      "type": "object",
+      "required": ["value", "source_location", "status"],
+      "properties": {
+        "value": { "type": "string" },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "outcomes": {
+      "type": "object",
+      "required": ["primary_outcome", "source_location", "status"],
+      "properties": {
+        "primary_outcome": { "type": "string" },
+        "secondary_outcomes": { "type": "array", "items": { "type": "string" } },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "required": ["assay_method", "source_location", "status"],
+      "properties": {
+        "assay_method": { "type": "string" },
+        "parameters": { "type": "array", "items": { "type": "string" } },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "quantitative_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["metric", "value", "unit", "numeric_status", "source_location"],
+        "properties": {
+          "metric": { "type": "string" },
+          "value": { "type": ["number", "string", "null"] },
+          "unit": { "type": "string" },
+          "numeric_status": {
+            "type": "string",
+            "enum": [
+              "DIRECTLY_REPORTED",
+              "CALCULATED_FROM_REPORTED_DATA",
+              "DERIVED",
+              "INFERRED",
+              "NOT_REPORTED"
+            ]
+          },
+          "source_location": { "type": "string" },
+          "uncertainty_or_ci": { "type": ["string", "null"] },
+          "p_value": { "type": ["string", "number", "null"] }
+        }
+      }
+    },
+    "qualitative_results": {
+      "type": "object",
+      "required": ["summary", "source_location", "status"],
+      "properties": {
+        "summary": { "type": "string" },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "negative_or_null_results": {
+      "type": "object",
+      "required": ["has_negative_results", "findings", "source_location"],
+      "properties": {
+        "has_negative_results": { "type": "boolean" },
+        "findings": { "type": "array", "items": { "type": "string" } },
+        "source_location": { "type": "string" }
+      }
+    },
+    "limitations": {
+      "type": "object",
+      "required": ["reported_limitations", "source_location", "status"],
+      "properties": {
+        "reported_limitations": { "type": "array", "items": { "type": "string" } },
+        "source_location": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "funding_or_coi": {
+      "type": "object",
+      "required": ["statement", "has_conflict", "source_location"],
+      "properties": {
+        "statement": { "type": "string" },
+        "has_conflict": { "type": "boolean" },
+        "source_location": { "type": "string" }
+      }
+    },
+    "evidence_directness": {
+      "type": "string",
+      "enum": [
+        "DIRECT_EVIDENCE",
+        "INDIRECT_SUPPORT",
+        "BACKGROUND_ONLY",
+        "CONTEXTUAL_EVIDENCE",
+        "CONTRADICTORY_EVIDENCE",
+        "INSUFFICIENT_EVIDENCE",
+        "REJECTED"
+      ]
+    },
+    "evidence_quality": {
+      "type": "string",
+      "enum": [
+        "DIRECT_HIGH_CONFIDENCE",
+        "DIRECT_MODERATE_CONFIDENCE",
+        "DIRECT_LOW_CONFIDENCE",
+        "INDIRECT_SUPPORT",
+        "MECHANISTIC_SUPPORT",
+        "CONTEXTUAL_SUPPORT",
+        "CONTRADICTORY",
+        "LIMITS_INTERPRETATION"
+      ]
+    },
+    "source_locations": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extractor_version", "extraction_timestamp"],
+      "properties": {
+        "extractor_version": { "type": "string" },
+        "extraction_timestamp": { "type": "string" }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v8.6). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v8.7). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
   Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-source federated literature searches
   (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), utilizes 16 generic query families (SEARCH_FAMILIES_ONTOLOGY)
@@ -14,6 +14,10 @@ description: >
   figure-first and table-first evidence recovery with visual discrepancy flags (PRIMARY_DATA_VISUAL_REQUIRES_REVIEW),
   methods reverse-engineering protocol breakdown, 8-tier evidence hierarchy (DIRECT_HIGH_CONFIDENCE down to LIMITS_INTERPRETATION),
   Paper-to-Claim Verifier 2.0 with formal 8-stage verification pipeline and 13 issue detections (CLAIM_VERIFICATION_ISSUES_V2),
+  Canonical Paper Evidence Record (16 deterministic fields, exact location provenance), Numeric Provenance Gate (anti-numeric hallucination, directly reported vs calculated),
+  Contextual Boundary Gate (11 mismatch categories preventing in silico to experimental or preclinical to clinical leaps),
+  Exact Claim-to-Evidence Mapper (SciFact-aligned 5-tier claim verdicts), Evidence-Driven Variable Paragraph Builder (anti-boilerplate, surfaces negative/null results),
+  strict claim-to-citation binding in Literature Review,
   post-research and post-writing citation auditing (POST_CITATION_AUDIT_STATUSES) preventing orphan placeholders and unverified sources,
   thematic comparative synthesis resolving parameter-driven divergent findings,
   produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA), maps 22 cross-study relationship types, detects gaps across 18 universal categories,
@@ -27,16 +31,23 @@ description: >
   enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
   supports living research incremental delta reports, emits reproducible Research Run Manifests with SHA-256 checksums,
   renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 303-assertion test harness across 10 suites and 28 release gate criteria
+  Dubai Persian typography, native RTL bidi XML, and passes a unified 317-assertion test harness across 11 suites and 34 release gate criteria
   (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 114 adversarial stress tests, 60-test benchmark,
   10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, 24 end-to-end integration tests, 11 cross-topic adversarial tests,
-  22 advanced v8.5 research engine integration tests, and 14 deep reading and recall benchmark tests).
+  22 advanced v8.5 research engine integration tests, 14 deep reading and recall benchmark tests, and 14 v8.7 evidence grounding and semantic attribution integrity tests).
 ---
 
-# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.6)
+# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.7)
 
-این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.6 با ارتقای بنیادین موتور تحقیق و خوانش عمیق متون برگرفته از الگوهای اثبات‌شده AIPOCH و K-Dense، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که مجهز به بنچ‌مارک تجربی ریکال و تاکسونومی ۱۳ گانه تشخیص علل جا افتادن مقالات (Search Miss Diagnosis)، سیستم انتخاب انطباقی پایگاه‌ها با ثبت نقاط کور، اسکنر شواهد منفی و سوگیری انتشار، معماری خوانش عمیق ۵ بخشی (Sections A-E)، بازخوانی داده‌های اصیل تصویرمحور/جدول‌محور با پرچم مغایرت، مهندسی معکوس متدولوژی، سلسله‌مراتب ۸ سطحی شواهد، موتور اعتبارسنجی گزاره-مقاله ۲.۰ با خط لوله ۸ مرحله‌ای و ۱۳ نوع عیب استنادی، و ممیزی پس از نگارش ارجاعات جهت پیشگیری از رفرنس‌های یتیم و بررسی‌نشده است.
-> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.6):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۳۰۳ تست واحد، ۱۰ جهش کشته‌شده، ۲۸ معیار مستر گیت، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. وضعیت نهایی مهارت صراحتاً به عنوان **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED** اعلام می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
+این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.7 با ارتقای بنیادین سامانه اصالت انتساب شواهد و نگاشت معنایی متون (Evidence Grounding & Semantic Attribution Integrity Engine)، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که علاوه بر قابلیت‌های پیشین، مجهز به:
+1. رکورد استاندارد ۱۶ فیلدی شواهد مقاله (`CanonicalPaperEvidenceRecord`) با ردیابی دقیق مکان استخراج (چکیده، متدولوژی، نتایج، جدول، شکل).
+2. گیت اصالت داده‌های کمی (`NumericProvenanceGate`) برای پیشگیری مطلق از تولید یا جعل اعداد ($IC_{50}$، دوز، غلظت، p-value، اندازه نمونه) و تفکیک داده‌های استخراجی صریح از مقادیر مشتق.
+3. گیت مرزهای متنی (`ContextualBoundaryGate`) در ۱۱ بعد جهت مسدودسازی خطاهای جهش متدولوژیک (این‌سیلیکو به آزمایشگاه تجربی، پیش‌بالینی به بالینی، عصاره طبیعی به مولکول خالص، همبستگی به علیت).
+4. نگاشت دقیق گزاره به شواهد (`ExactClaimEvidenceMapper`) منطبق بر استاندارد SciFact در ۵ سطح رأی علمی (`SUPPORTED`, `PARTIALLY_SUPPORTED`, `NOT_SUPPORTED`, `CONTRADICTED`, `INSUFFICIENT_EVIDENCE`).
+5. سازنده پاراگراف‌های متغیر بر پایه شواهد (`EvidenceDrivenParagraphBuilder`) جهت حذف کلیشه‌های تکراری (مانند "گروه کنترل استاندارد") و بازتاب صادقانه یافته‌های پوچ، منفی و بدون اثر.
+6. ممیزی اتصال گزاره به ارجاع در متن پیشینه پژوهش (`audit_claim_citations`) برای جلوگیری از درج مارکرهای استنادی بدون پشتیبانی در مقاله مرجع.
+
+> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.7):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۳۱۷ تست واحد، ۱۰ جهش کشته‌شده، ۳۴ معیار مستر گیت، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. وضعیت نهایی مهارت صراحتاً به عنوان **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED** اعلام می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
 ---
 
 ---

@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClaimEvidenceMapSchema",
+  "description": "Draft-07 schema for exact claim-to-evidence unit mapping with SciFact-aligned verdicts, context boundary gating, and numeric traceability.",
+  "type": "object",
+  "required": [
+    "claim_id",
+    "claim_text",
+    "source_paper_id",
+    "evidence_unit",
+    "source_location",
+    "verdict",
+    "contextual_match",
+    "numeric_provenance",
+    "is_authorized_for_literature_review"
+  ],
+  "properties": {
+    "claim_id": { "type": "string" },
+    "claim_text": { "type": "string" },
+    "source_paper_id": { "type": "string" },
+    "citation_number": { "type": ["integer", "null"] },
+    "evidence_unit": {
+      "type": "object",
+      "required": ["text_snippet", "section"],
+      "properties": {
+        "text_snippet": { "type": "string" },
+        "section": { "type": "string" },
+        "table_or_figure_id": { "type": ["string", "null"] }
+      }
+    },
+    "source_location": { "type": "string" },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "SUPPORTED",
+        "PARTIALLY_SUPPORTED",
+        "NOT_SUPPORTED",
+        "CONTRADICTED",
+        "INSUFFICIENT_EVIDENCE"
+      ]
+    },
+    "contextual_match": {
+      "type": "object",
+      "required": ["is_matched", "mismatches"],
+      "properties": {
+        "is_matched": { "type": "boolean" },
+        "mismatches": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "numeric_provenance": {
+      "type": "object",
+      "required": ["has_numeric_claim", "numeric_status"],
+      "properties": {
+        "has_numeric_claim": { "type": "boolean" },
+        "claimed_values": { "type": "array", "items": { "type": "number" } },
+        "numeric_status": {
+          "type": "string",
+          "enum": [
+            "DIRECTLY_REPORTED",
+            "CALCULATED_FROM_REPORTED_DATA",
+            "DERIVED",
+            "INFERRED",
+            "NOT_REPORTED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "is_verified": { "type": "boolean" }
+      }
+    },
+    "linguistic_certainty": {
+      "type": "object",
+      "properties": {
+        "stated_verb": { "type": "string" },
+        "calibrated_verb": { "type": "string" },
+        "is_calibrated": { "type": "boolean" }
+      }
+    },
+    "is_authorized_for_literature_review": { "type": "boolean" },
+    "rejection_or_downgrade_reason": { "type": ["string", "null"] }
+  }
+}
