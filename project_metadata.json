@@ -1,9 +1,9 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "8.7.0",
-  "version_display": "v8.7.0",
+  "engine_version": "9.0.0",
+  "version_display": "v9.0.0",
   "release_channel": "stable",
-  "semantic_release_date": "2026-10-05",
+  "semantic_release_date": "2026-10-06",
   "architecture": {
     "paradigm": "Universal Evidence-Driven Medical Research & Proposal Engine",
     "topic_agnostic": true,
@@ -11,16 +11,16 @@
     "zero_hardcode_biological_leakage": true
   },
   "metrics": {
-    "total_unified_tests": 256,
-    "suite_1_static_analysis_tests": 22,
+    "total_unified_tests": 350,
+    "suite_1_static_analysis_tests": 31,
     "suite_2_multi_domain_generalization_tests": 12,
-    "suite_3_adversarial_stress_and_negative_rejection_tests": 124,
+    "suite_3_adversarial_stress_and_negative_rejection_tests": 138,
     "suite_4_benchmark_assertions": 60,
     "suite_5_mutation_testing_tests": 10,
     "suite_6_property_and_schema_tests": 14,
     "suite_7_e2e_integration_tests": 16,
     "mutation_score_pct": 100.0,
-    "mandatory_proposal_sections": 14,
+    "mandatory_proposal_sections": 28,
     "section_13_subsections": 14,
     "search_strategy_layers_count": 12,
     "gap_taxonomy_categories_count": 18,

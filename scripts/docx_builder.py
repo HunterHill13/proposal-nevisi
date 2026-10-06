@@ -102,6 +102,11 @@ def add_r(p, text, font_name="Dubai", size_pt=11, bold=False, italic=False, colo
 def add_bidi_text(p, text, font_name="Dubai", size_pt=11, bold=False, italic=False, color_rgb=(0x00, 0x00, 0x00)):
     if not text:
         return
+    try:
+        from native_omml_math_engine import NativeOmmlMathEngine
+        text = NativeOmmlMathEngine.clean_text_of_latex(text)
+    except Exception:
+        pass
     text = str(text).replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
     pattern = r'(\([A-Za-z0-9_\-\s,\./%α-ωΑ-Ω→⇌⇄<>=\+\^±]+\)|\[\d+(?:,\s*\d+)*\]|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+(?:\s*(?:→|->|⇌|<->|⇄|<=|>=|<|>|=)\s*[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+)+|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]{2,}|[→⇌⇄]|(?:<=|>=|[<>=])\s*\d+(?:\.\d+)?)'
     tokens = re.split(pattern, text)
@@ -214,14 +219,18 @@ def add_formula_box(doc, formula_text):
     </w:pBdr>''')
     pPr.append(pBdr)
     
-    run = p.add_run(formula_text)
-    run.font.name = "Times New Roman"
-    run.font.size = Pt(11)
-    run.bold = True
-    run.font.color.rgb = RGBColor(0x1B, 0x26, 0x31)
-    rPr = run._r.get_or_add_rPr()
-    rFonts = parse_xml(f'<w:rFonts {nsdecls("w")} w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>')
-    rPr.append(rFonts)
+    try:
+        from native_omml_math_engine import NativeOmmlMathEngine
+        NativeOmmlMathEngine.insert_math_into_paragraph(p, formula_text, is_display=True)
+    except Exception:
+        run = p.add_run(formula_text)
+        run.font.name = "Times New Roman"
+        run.font.size = Pt(11)
+        run.bold = True
+        run.font.color.rgb = RGBColor(0x1B, 0x26, 0x31)
+        rPr = run._r.get_or_add_rPr()
+        rFonts = parse_xml(f'<w:rFonts {nsdecls("w")} w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>')
+        rPr.append(rFonts)
     return p
 
 def set_cell_margins(cell, top=80, bottom=80, left=100, right=100):

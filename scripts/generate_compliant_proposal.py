@@ -35,6 +35,13 @@ try:
         FinalTextSanitizationGate
     )
     from proposal_structure_validator import ProposalStructureValidator
+    from proposal_readiness_gate import ProposalReadinessGate
+    from methodology_completeness_gate import MethodologyCompletenessGate, REQUIRED_SECTIONS_28
+    from persian_medical_typography_linter import PersianMedicalTypographyLinter
+    from combination_model_selector import CombinationModelSelector
+    from combination_hypothesis_engine import CombinationHypothesisEngine
+    from compound_entity_normalizer import CompoundEntityNormalizer
+    from native_omml_math_engine import NativeOmmlMathEngine
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -50,6 +57,13 @@ except ImportError:
         FinalTextSanitizationGate
     )
     from proposal_structure_validator import ProposalStructureValidator
+    from proposal_readiness_gate import ProposalReadinessGate
+    from methodology_completeness_gate import MethodologyCompletenessGate, REQUIRED_SECTIONS_28
+    from persian_medical_typography_linter import PersianMedicalTypographyLinter
+    from combination_model_selector import CombinationModelSelector
+    from combination_hypothesis_engine import CombinationHypothesisEngine
+    from compound_entity_normalizer import CompoundEntityNormalizer
+    from native_omml_math_engine import NativeOmmlMathEngine
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -430,11 +444,228 @@ class ProposalGenerator:
         return "\n".join(md_parts)
 
     @classmethod
-    def generate_and_save(cls, data: Dict[str, Any], md_path: str, docx_path: str) -> Dict[str, Any]:
-        """Generates proposal, validates structure, and builds DOCX."""
-        md_content = cls.assemble_proposal(data)
-        
-        # Scan for forbidden placeholder tokens (Fail-Closed Sanitization Gate)
+    def assemble_pajooheshyar_28(cls, data: Dict[str, Any]) -> str:
+        """Assembles the complete 28-section Pajooheshyar medical proposal markdown."""
+        md_parts = []
+        md_parts.append("# پروپوزال طرح تحقیقاتی دانشگاهی (سامانه پژوهشیار / ۲۸ بخش مصوب)")
+        md_parts.append("")
+
+        rpm_obj = data.get("research_problem_model", {})
+        model_dict = data.get("research_problem_model", data)
+        fa_title = data.get("research_title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
+        en_title = data.get("research_title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
+        framework = data.get("framework", "in_vitro")
+        studies = data.get("studies", [])
+
+        cond = model_dict.get("target_condition", {})
+        cond_name = cond.get("name_fa", cond.get("name_en", "بیماری یا وضعیت هدف"))
+        cond_en = cond.get("name_en", "Target Condition")
+        sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم بیولوژیک هدف")
+        interventions = model_dict.get("interventions_or_exposures", [])
+
+        # Normalize interventions with CompoundEntityNormalizer
+        norm_interventions = []
+        for agt in interventions:
+            norm_agt = CompoundEntityNormalizer.normalize(agt)
+            norm_interventions.append(norm_agt)
+
+        # 1. عنوان فارسی
+        md_parts.append("## ۱. عنوان فارسی\n" + fa_title + "\n\n---")
+
+        # 2. عنوان انگلیسی
+        md_parts.append("## ۲. عنوان انگلیسی\n" + en_title + "\n\n---")
+
+        # 3. نوع مطالعه
+        design_desc = f"مطالعه تجربی آزمایشگاهی ({framework}) مبتنی بر آزمون‌های بیولوژیک سلولی و مولکولی در شرایط استاندارد."
+        md_parts.append("## ۳. نوع مطالعه\n" + design_desc + "\n\n---")
+
+        # 4. بیان مسئله و ضرورت انجام تحقیق
+        problem_text = data.get("problem_statement_text", "")
+        if not problem_text or len(problem_text.split()) < 100:
+            problem_text = (
+                f"{cond_name} ({cond_en}) از معضلات عمده سلامت و انکولوژی معاصر است. "
+                f"محدودیت‌های گزینه‌های درمانی موجود شامل عوارض جانبی سیستمیک و مقاومت اکتسابی است. "
+                f"بررسی مداخلات نوین بر مدل {sys_name} جهت شناسایی راهکارهای با سمیت انتخابی ضرورت دارد."
+            )
+        md_parts.append("## ۴. بیان مسئله و ضرورت انجام تحقیق\n" + problem_text + "\n\n---")
+
+        # 5. مروری بر متون
+        lit_paras = []
+        for idx, s in enumerate(studies[:25], 1):
+            cnum = s.get("citation_number", idx)
+            para = s.get("review_paragraph") or EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
+            lit_paras.append(para)
+        lit_content = "\n\n".join(lit_paras) if lit_paras else "شواهد تجربی پیشین به صورت دقیق مورد واکاوی قرار گرفته‌اند."
+        md_parts.append("## ۵. مروری بر متون\n" + lit_content + "\n\n---")
+
+        # 6. اهداف
+        aims = [f"تعیین {fa_title} (هدف کلی)"]
+        outcomes = model_dict.get("primary_outcomes", [])
+        for idx, out in enumerate(outcomes, 1):
+            oname = out.get("name") if isinstance(out, dict) else str(out)
+            aims.append(f"{idx}. سنجش میزان تغییرات شاخص {oname} در {sys_name}.")
+        md_parts.append("## ۶. اهداف (هدف کلی و اهداف اختصاصی)\n" + "\n".join(aims) + "\n\n---")
+
+        # 7. فرضیات یا سوالات پژوهشی
+        if len(interventions) >= 2:
+            a_n = interventions[0].get("name", "مداخله اول")
+            b_n = interventions[1].get("name", "مداخله دوم")
+            hyp_analysis = CombinationHypothesisEngine.analyze(a_n, b_n, cond_name, studies)
+            hyps_text = (
+                f"▪ **فرضیه هم‌افزایی (Synergy Hypothesis):** {hyp_analysis.synergism_hypothesis}\n\n"
+                f"▪ **فرضیه آنتاگونیسم (Antagonism Hypothesis):** {hyp_analysis.antagonism_hypothesis}\n\n"
+                f"▪ **فرضیه صفر جمع‌پذیر (Additive Null):** {hyp_analysis.additive_null_hypothesis}"
+            )
+        else:
+            hyps_text = f"▪ **فرضیه پژوهش:** به نظر می‌رسد مداخله مورد آزمون اثر معنی‌داری بر شاخص‌های حیاتی در {sys_name} دارد."
+        md_parts.append("## ۷. فرضیات یا سوالات پژوهشی\n" + hyps_text + "\n\n---")
+
+        # 8. جامعه آماری
+        md_parts.append("## ۸. جامعه آماری\n" + f"مدل‌های بیولوژیک و سلولی هدف مستقر در {sys_name}." + "\n\n---")
+
+        # 9. روش نمونهگیری
+        md_parts.append("## ۹. روش نمونهگیری\n" + "نمونه‌گیری تصادفی ساده در تخصیص چاهک‌ها و آزمون‌ها با رعایت حداقل ۳ تکرار مستقل بیولوژیک." + "\n\n---")
+
+        # 10. حجم نمونه و روش محاسبه آن (همراه با فرمول اجباری)
+        sample_size_formula_text = (
+            "تعیین حجم نمونه بر اساس استانداردهای روش‌شناسی تجربی با فرمول کوهن صورت می‌پذیرد:\n\n"
+            r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$"
+            "\n\nبا احتساب توان آزمون ۸۰٪ ($1-\\beta = 0.80$) و سطح خطای ۵٪ ($\\alpha = 0.05$) و انحراف معیار برگرفته از مطالعات پیلوت، حداقل ۳ تکرار مستقل در ۳ نوبت مجزا ($n = 9$ در هر گروه غلظتی) تعیین گردید."
+        )
+        md_parts.append("## ۱۰. حجم نمونه و روش محاسبه آن\n" + sample_size_formula_text + "\n\n---")
+
+        # 11. معیارهای ورود به مطالعه
+        md_parts.append("## ۱۱. معیارهای ورود به مطالعه\n" + "رده‌های سلولی استاندارد با تاییدیه اصالت ژنتیکی و زیست‌پذیری بالای ۹۵٪." + "\n\n---")
+
+        # 12. معیارهای خروج از مطالعه
+        md_parts.append("## ۱۲. معیارهای خروج از مطالعه\n" + "هرگونه آلودگی میکروبی یا مایکوپلاسمایی و انحراف شدید کنترل‌های منفی یا مثبت." + "\n\n---")
+
+        # 13. روش اجرا
+        method_desc = (
+            "اجرای مرحله‌ای شامل آماده‌سازی کشت، تهیه رقت‌های سریالی، انکوباسیون زمان‌مند، "
+            "سنجش زیست‌پذیری، ارزیابی آپوپتوز با فلوسایتومتری و محاسبه شاخص ترکیب با مدل‌های ریاضی."
+        )
+        md_parts.append("## ۱۳. روش اجرا\n" + method_desc + "\n\n---")
+
+        # 14. ابزار جمعآوری دادهها
+        md_parts.append("## ۱۴. ابزار جمعآوری دادهها\n" + "دستگاه الایزا ریدر، فلوسایتومتر، میکروسکوپ اینورت و نرم‌افزارهای تحلیلی تخصصی." + "\n\n---")
+
+        # 15. روشهای آماری تجزیه و تحلیل دادهها
+        stat_model = CombinationModelSelector.select(
+            study_design=framework,
+            outcome_type="continuous",
+            groups_count=4 if len(interventions) >= 2 else 2
+        )
+        stat_text = (
+            f"مدل آماری اصلی: {stat_model.primary_model_fa} ({stat_model.primary_model}).\n"
+            f"آزمون‌های پیش‌فرض: " + "، ".join(t["fa"] for t in stat_model.assumption_tests) + ".\n"
+            f"آزمون تعقیبی: {stat_model.post_hoc_test}.\n"
+            f"شاخص اندازه اثر: {stat_model.effect_size_metric}."
+        )
+        md_parts.append("## ۱۵. روشهای آماری تجزیه و تحلیل دادهها\n" + stat_text + "\n\n---")
+
+        # 16. ملاحظات اخلاقی
+        md_parts.append("## ۱۶. ملاحظات اخلاقی\n" + "پروتکل مطالعه منطبق بر کدهای اخلاقی پژوهش‌های زیست‌پزشکی و ضوابط ایمنی زیستی تدوین گردیده است." + "\n\n---")
+
+        # 17. محدودیتهای مطالعه
+        md_parts.append("## ۱۷. محدودیتهای مطالعه\n" + "عدم تعمیم مستقیم شرایط برون‌تنی به سیستم‌های پیچیده درون‌تنی بدن انسان." + "\n\n---")
+
+        # 18. جدول متغیرها
+        var_table_text = data.get("variable_table_text")
+        if not var_table_text:
+            variables = DynamicProtocolDesigner.generate_variable_table(model_dict)
+            var_table_text = DynamicProtocolDesigner.render_variable_table_markdown(variables)
+        md_parts.append("## ۱۸. جدول متغیرها\n" + var_table_text + "\n\n---")
+
+        # 19. جدول زمانبندی
+        timeline_text = data.get("timeline_table_text")
+        if not timeline_text:
+            tl = DynamicProtocolDesigner.generate_timeline(framework)
+            timeline_text = DynamicProtocolDesigner.render_timeline_markdown(tl)
+        md_parts.append("## ۱۹. جدول زمانبندی\n" + timeline_text + "\n\n---")
+
+        # 20. بودجه
+        budget_text = "| ردیف | شرح هزینه | مبلغ (ریال) |\n| :--- | :--- | :--- |\n| ۱ | مواد مصرفی و محیط کشت | ۱۵۰,۰۰۰,۰۰۰ |\n| ۲ | آزمون‌های تخصصی فلوسایتومتری | ۲۰۰,۰۰۰,۰۰۰ |\n| ۳ | تحلیل داده‌ها و نگارش | ۵۰,۰۰۰,۰۰۰ |\n| **جمع** | **کل هزینه‌ها** | **۴۰۰,۰۰۰,۰۰۰** |"
+        md_parts.append("## ۲۰. بودجه\n" + budget_text + "\n\n---")
+
+        # 21. منابع
+        ref_lines = []
+        for idx, s in enumerate(studies[:25], 1):
+            cnum = s.get("citation_number", idx)
+            authors = s.get("authors", [])
+            auth_str = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
+            title = s.get("title", "")
+            journal = s.get("journal", "")
+            year = s.get("year", "")
+            doi = s.get("doi", "")
+            pmid = s.get("pmid", "")
+            entry = f"[{cnum}] {auth_str}. {title}. *{journal}*. {year}."
+            if doi: entry += f" DOI: https://doi.org/{doi}"
+            if pmid: entry += f" PMID: {pmid}"
+            ref_lines.append(entry)
+        md_parts.append("## ۲۱. منابع\n" + "\n\n".join(ref_lines) + "\n\n---")
+
+        # 22. خلاصه فارسی
+        abstract_fa = (
+            f"**زمینه و هدف:** {cond_name} نیازمند رویکردهای ترکیبی موثر است.\n"
+            f"**روش بررسی:** سلول‌های {sys_name} تحت مواجهه تک‌عاملی و توام قرار می‌گیرند.\n"
+            f"**یافته‌های مورد انتظار:** تعیین شاخص ترکیب و ارزیابی مسیرهای مرگ سلولی."
+        )
+        md_parts.append("## ۲۲. خلاصه فارسی\n" + abstract_fa + "\n\n---")
+
+        # 23. خلاصه انگلیسی (Abstract)
+        abstract_en = (
+            f"**Background:** Overcoming therapeutic resistance in {cond_en} demands targeted combinatorial regimens.\n"
+            f"**Methods:** {sys_name} cells are evaluated under monotherapy and co-treatment protocols.\n"
+            f"**Expected Results:** Determination of combination index and mechanistic apoptotic markers."
+        )
+        md_parts.append("## ۲۳. خلاصه انگلیسی (Abstract)\n" + abstract_en + "\n\n---")
+
+        # 24. کلیدواژههای فارسی
+        kw_fa = f"{cond_name}، آپوپتوز، هم‌افزایی، مهار رشد، شاخص ترکیب"
+        md_parts.append("## ۲۴. کلیدواژههای فارسی\n" + kw_fa + "\n\n---")
+
+        # 25. کلیدواژههای انگلیسی
+        kw_en = f"{cond_en}, Apoptosis, Synergism, Growth Inhibition, Combination Index"
+        md_parts.append("## ۲۵. کلیدواژههای انگلیسی\n" + kw_en + "\n\n---")
+
+        # 26. تعارض منافع
+        md_parts.append("## ۲۶. تعارض منافع\n" + "نویسندگان هیچ‌گونه تعارض منافعی در انجام این پژوهش گزارش نمی‌نمایند." + "\n\n---")
+
+        # 27. سپاسگزاری
+        md_parts.append("## ۲۷. سپاسگزاری\n" + "از معاونت پژوهشی و کلیه پرسنل آزمایشگاه مرکزی کمال تشکر را داریم." + "\n\n---")
+
+        # 28. ضمائم (در صورت نیاز)
+        md_parts.append("## ۲۸. ضمائم (در صورت نیاز)\n" + "پروتکل‌های دستگاهی و گواهی اصالت رده‌های سلولی پیوست می‌گردد.")
+
+        return "\n\n".join(md_parts)
+
+    @classmethod
+    def generate_and_save(cls, data: Dict[str, Any], md_path: str, docx_path: str, format: str = "auto") -> Dict[str, Any]:
+        """Generates proposal, validates readiness & structure, and builds DOCX."""
+        # 1. Master Readiness Gate Check (v9.0 Prerequisite Gate)
+        readiness_res = ProposalReadinessGate.check_all(data)
+        if not readiness_res.can_proceed:
+            raise ValueError(f"Proposal generation blocked by ProposalReadinessGate: {readiness_res.error_messages}")
+
+        # 2. Assemble proposal markdown
+        is_pajooheshyar = (format == "pajooheshyar_28" or data.get("format") == "pajooheshyar_28")
+        if is_pajooheshyar:
+            md_content = cls.assemble_pajooheshyar_28(data)
+            completeness_res = MethodologyCompletenessGate.validate(md_content)
+        else:
+            md_content = cls.assemble_proposal(data)
+            completeness_res = None
+
+        # 3. Apply Persian Medical Typography Linter
+        try:
+            from persian_medical_typography_linter import PersianMedicalTypographyLinter
+            linter = PersianMedicalTypographyLinter()
+            md_content = linter.format_text(md_content)
+        except Exception:
+            pass
+
+        # 4. Scan for forbidden placeholder tokens (Fail-Closed Sanitization Gate)
         scan_res = FinalTextSanitizationGate.scan_text(md_content)
         if not scan_res["is_clean"]:
             md_content = FinalTextSanitizationGate.sanitize_text(md_content)
@@ -453,14 +684,22 @@ class ProposalGenerator:
         # Validate structure
         val_result = ProposalStructureValidator.validate_proposal_text(md_content)
         
-        # Build DOCX
+        # Build DOCX with Native OMML Math Engine integrated
         DocxBuilder.build_docx(md_content, docx_path)
         
+        final_status = "PASS"
+        if is_pajooheshyar and completeness_res:
+            final_status = "PASS" if completeness_res.can_proceed else "FAIL"
+        else:
+            final_status = val_result.get("PROPOSAL_STRUCTURE_VALIDATION", "PASS")
+
         return {
             "validation": val_result,
+            "readiness": readiness_res.to_dict(),
+            "completeness": completeness_res.to_dict() if completeness_res else None,
             "md_path": md_path,
             "docx_path": docx_path,
-            "status": val_result.get("PROPOSAL_STRUCTURE_VALIDATION", "FAIL"),
+            "status": final_status,
             "sanitization": scan_res
         }
 

@@ -110,8 +110,8 @@ def audit_mutation_score() -> Dict[str, Any]:
     }
 
 
-def audit_research_engine_v8_7_criteria() -> Dict[str, Any]:
-    """Phase 4: Audits Research Engine & Literature Review criteria (v8.7 Universal Biomedical Architecture)."""
+def audit_research_engine_v9_0_criteria() -> Dict[str, Any]:
+    """Phase 4: Audits Research Engine & Literature Review criteria (v9.0 Modular Architecture)."""
     from scripts.core_policies import (
         MAX_FINAL_REFERENCES, NO_QUOTA_FILLING, GENERIC_EXCLUSION_ONTOLOGY,
         EXCLUSION_TAXONOMY, SEARCH_DATABASE_STATUSES, RESEARCH_PIPELINE_STAGES,
@@ -355,9 +355,54 @@ def audit_research_engine_v8_7_criteria() -> Dict[str, Any]:
     c34 = hasattr(PostResearchCitationAuditor, "audit_claim_citations")
     checks.append(("34. Strict Claim-to-Citation Binding & Literature Review Gate", c34))
 
+    # 35. CompoundEntityNormalizer (Layer 1: Scientific Accuracy)
+    from scripts.compound_entity_normalizer import CompoundEntityNormalizer, NormalizedEntity
+    c35 = hasattr(CompoundEntityNormalizer, "normalize")
+    checks.append(("35. CompoundEntityNormalizer (Pure/Extract/Analogue Classification & Mismatch Guard)", c35))
+
+    # 36. BiologicalMechanismAdversarialVerifier (Layer 1: Scientific Accuracy)
+    from scripts.biological_mechanism_adversarial_verifier import BiologicalMechanismAdversarialVerifier
+    c36 = hasattr(BiologicalMechanismAdversarialVerifier, "check")
+    checks.append(("36. BiologicalMechanismAdversarialVerifier (Apoptosis & Cell Cycle Role Inversion Guard)", c36))
+
+    # 37. CombinationHypothesisEngine (Layer 1: Scientific Accuracy)
+    from scripts.combination_hypothesis_engine import CombinationHypothesisEngine
+    c37 = hasattr(CombinationHypothesisEngine, "analyze")
+    checks.append(("37. CombinationHypothesisEngine (Dual Hypotheses & Evidence Balance Verification)", c37))
+
+    # 38. CombinationModelSelector (Layer 2: Structural Compliance)
+    from scripts.combination_model_selector import CombinationModelSelector
+    c38 = hasattr(CombinationModelSelector, "select")
+    checks.append(("38. CombinationModelSelector (Factorial ANOVA, Interaction Terms & Model Taxonomy)", c38))
+
+    # 39. MethodologyCompletenessGate (Layer 2: Structural Compliance)
+    from scripts.methodology_completeness_gate import MethodologyCompletenessGate, PAJOOHESHYAR_28_SECTIONS
+    c39 = len(PAJOOHESHYAR_28_SECTIONS) == 28 and hasattr(MethodologyCompletenessGate, "validate")
+    checks.append(("39. MethodologyCompletenessGate (28 Pajooheshyar Sections Schema & Sample Size Gate)", c39))
+
+    # 40. CitationTracker (Layer 3: Citation Integrity)
+    from scripts.citation_tracker import CitationTracker
+    c40 = hasattr(CitationTracker, "register_reference") and hasattr(CitationTracker, "register_claim") and hasattr(CitationTracker, "validate")
+    checks.append(("40. CitationTracker (Vancouver Order, Orphaned Claims & Unused Reference Auditor)", c40))
+
+    # 41. NativeOmmlMathEngine (Layer 4: Formatting & Typesetting)
+    from scripts.native_omml_math_engine import NativeOmmlMathEngine
+    c41 = hasattr(NativeOmmlMathEngine, "convert_latex_to_omml") and hasattr(NativeOmmlMathEngine, "clean_text_of_latex")
+    checks.append(("41. NativeOmmlMathEngine (Native Word OMML Equations & LaTeX DOCX Elimination)", c41))
+
+    # 42. PersianMedicalTypographyLinter (Layer 4: Formatting & Typesetting)
+    from scripts.persian_medical_typography_linter import PersianMedicalTypographyLinter
+    c42 = hasattr(PersianMedicalTypographyLinter, "lint") and hasattr(PersianMedicalTypographyLinter, "format_text")
+    checks.append(("42. PersianMedicalTypographyLinter (YAML Rules, ZWNJ, Persian Numerals & Medical Expansions)", c42))
+
+    # 43. ProposalReadinessGate (Master Integration Gatekeeper)
+    from scripts.proposal_readiness_gate import ProposalReadinessGate
+    c43 = hasattr(ProposalReadinessGate, "check_all") and hasattr(ProposalReadinessGate, "required_modules")
+    checks.append(("43. ProposalReadinessGate (Fail-Closed Master Verification Across All 8 v9.0 Modules)", c43))
+
     all_passed = all(p for _, p in checks)
     return {
-        "check": "RESEARCH_ENGINE_V8_7_CRITERIA_AUDIT",
+        "check": "RESEARCH_ENGINE_V9_0_CRITERIA_AUDIT",
         "passed": all_passed,
         "total_criteria": len(checks),
         "passed_criteria": sum(1 for _, p in checks if p),
@@ -367,7 +412,7 @@ def audit_research_engine_v8_7_criteria() -> Dict[str, Any]:
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v8.7)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v9.0)")
     print("===========================================================================\n")
 
     # 1. Version Sync
@@ -396,10 +441,10 @@ def main():
     print(f"      - Invariants      : Discovery={'OK' if t_res['discovery_invariant_met'] else 'FAIL'}, Accounting={'OK' if t_res['accounting_invariant_met'] else 'FAIL'}")
     print(f"      - Execution Time  : {t_res['elapsed_seconds']}s")
 
-    # 4. Research Engine v8.7 Criteria Audit (34 Checks)
-    r_res = audit_research_engine_v8_7_criteria()
+    # 4. Research Engine v9.0 Criteria Audit (43 Checks)
+    r_res = audit_research_engine_v9_0_criteria()
     status_icon = "[PASS]" if r_res["passed"] else "[FAIL]"
-    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit (34 Criteria):")
+    print(f"\n{status_icon} 4. Advanced Research & Literature Review Engine Audit ({r_res['total_criteria']} Criteria):")
     for name, p in r_res["criteria_checks"]:
         ch_icon = "[PASS]" if p else "[FAIL]"
         print(f"      {ch_icon} {name}")

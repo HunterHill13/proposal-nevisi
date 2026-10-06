@@ -1,0 +1,51 @@
+# typography_rules.yaml - Configurable Persian Typography and Medical Terminology Rules
+# Proposal-Nevisi Engine v9.0
+
+zwnj_rules:
+  - pattern: '\bمی\s+([آ-ی])'
+    replacement: 'می‌\1'
+    description: "نیم‌فاصله بعد از پیشوند می"
+  - pattern: '\bنمی\s+([آ-ی])'
+    replacement: 'نمی‌\1'
+    description: "نیم‌فاصله بعد از پیشوند نمی"
+  - pattern: '([آ-ی])\s+های\b'
+    replacement: '\1‌های'
+    description: "نیم‌فاصله قبل از پسوند های"
+  - pattern: '([آ-ی])\s+ها\b'
+    replacement: '\1‌ها'
+    description: "نیم‌فاصله قبل از پسوند ها"
+  - pattern: '([آ-ی])\s+تر\b'
+    replacement: '\1‌تر'
+    description: "نیم‌فاصله قبل از پسوند تر"
+  - pattern: '([آ-ی])\s+ترین\b'
+    replacement: '\1‌ترین'
+    description: "نیم‌فاصله قبل از پسوند ترین"
+  - pattern: '([آ-ی])\s+ای\b'
+    replacement: '\1‌ای'
+    description: "نیم‌فاصله قبل از پسوند ای"
+
+digit_rules:
+  enabled: true
+  description: "تبدیل اعداد انگلیسی به فارسی در متن با محافظت از فرمول‌ها و شناسه‌ها"
+
+medical_terms:
+  - pattern: '\bآپوپتوز\b'
+    replacement: 'آپوپتوز (Apoptosis)'
+    apply_once: true
+    description: "درج معادل لاتین آپوپتوز در اولین ذکر"
+  - pattern: '\bانکولیتیک\b'
+    replacement: 'انکولیتیک (Oncolytic)'
+    apply_once: true
+    description: "درج معادل لاتین انکولیتیک در اولین ذکر"
+  - pattern: '\bسیتوتوکسیسیته\b'
+    replacement: 'سیتوتوکسیسیته (Cytotoxicity)'
+    apply_once: true
+    description: "درج معادل لاتین سیتوتوکسیسیته در اولین ذکر"
+  - pattern: '\bهم‌افزایی\b'
+    replacement: 'هم‌افزایی (Synergism)'
+    apply_once: true
+    description: "درج معادل لاتین هم‌افزایی در اولین ذکر"
+  - pattern: '\bآنتاگونیسم\b'
+    replacement: 'آنتاگونیسم (Antagonism)'
+    apply_once: true
+    description: "درج معادل لاتین آنتاگونیسم در اولین ذکر"

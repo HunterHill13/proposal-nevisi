@@ -2,259 +2,129 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v8.7). Operates across diverse biomedical domains
-  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science). Generates dynamic
-  Research Problem Models (PICO, PECO, Diagnostic, Prognostic, Mechanistic), executes multi-source federated literature searches
-  (ScientificSearchAdapter across PubMed, Europe PMC, OpenAlex, Crossref), utilizes 16 generic query families (SEARCH_FAMILIES_ONTOLOGY)
-  with MeSH controlled vocabulary mapping, multi-directional citation chasing (Backward, Forward, Lateral) with complete provenance paths,
-  8-category seed paper discovery anchors (SEED_PAPER_CATEGORIES), 7-dimension evidence-based saturation tracking with false saturation guards and incompleteness bounds (SATURATION_INCOMPLETE),
-  empirical Research Recall Benchmark (Recall, Precision, F1, Coverage) with 13-category search miss taxonomy (SEARCH_MISS_TAXONOMY),
-  adaptive database specialization registry (DATABASE_SPECIALIZATION_REGISTRY) with explicit blind spots and negative evidence scanning (POSITIVE_EVIDENCE_DOMINANCE),
-  5-section deep paper reading (Sections A-E: Study Identity, Methodology, Key Results, Contextual Interpretation, Provenance Integrity),
-  figure-first and table-first evidence recovery with visual discrepancy flags (PRIMARY_DATA_VISUAL_REQUIRES_REVIEW),
-  methods reverse-engineering protocol breakdown, 8-tier evidence hierarchy (DIRECT_HIGH_CONFIDENCE down to LIMITS_INTERPRETATION),
-  Paper-to-Claim Verifier 2.0 with formal 8-stage verification pipeline and 13 issue detections (CLAIM_VERIFICATION_ISSUES_V2),
-  Canonical Paper Evidence Record (16 deterministic fields, exact location provenance), Numeric Provenance Gate (anti-numeric hallucination, directly reported vs calculated),
-  Contextual Boundary Gate (11 mismatch categories preventing in silico to experimental or preclinical to clinical leaps),
-  Exact Claim-to-Evidence Mapper (SciFact-aligned 5-tier claim verdicts), Evidence-Driven Variable Paragraph Builder (anti-boilerplate, surfaces negative/null results),
-  strict claim-to-citation binding in Literature Review,
-  post-research and post-writing citation auditing (POST_CITATION_AUDIT_STATUSES) preventing orphan placeholders and unverified sources,
-  thematic comparative synthesis resolving parameter-driven divergent findings,
-  produces design-aware Study Evidence Records (STUDY_EVIDENCE_RECORD_SCHEMA), maps 22 cross-study relationship types, detects gaps across 18 universal categories,
-  performs study-design-aware comparability and RoB analysis (RoB2, SYRCLE, QUADAS-2, in vitro),
-  clusters study families, cohorts, and trial registries to prevent evidence double-counting (NON_INDEPENDENT_EVIDENCE),
-  resolves contradictions across an extensible 14-category generic root-cause taxonomy with 3-tier explanation partitioning
-  (DEMONSTRATED_EXPLANATION, PLAUSIBLE_EXPLANATION, UNRESOLVED_UNCERTAINTY), builds evidence conflict matrices,
-  enforces epistemic gap bounds and rules ("No Evidence != Evidence of No Effect", "No Synergy Fallacy"),
-  enforces 7-level claim entailment and causal language boundaries with sentence-level CLAIM_PROVENANCE_MAP,
-  enforces 16-category generic PRISMA exclusion ontology and 10-dimension contextual relevance gate strictly dropping IRRELEVANT off-topic records,
-  enforces dynamic temporal boundaries with explicit age justification and OUTDATED_DIRECT_EVIDENCE tracking,
-  supports living research incremental delta reports, emits reproducible Research Run Manifests with SHA-256 checksums,
-  renders publication-grade 14-section Word proposals with dynamic ethics frameworks, individual reference paragraphs,
-  Dubai Persian typography, native RTL bidi XML, and passes a unified 317-assertion test harness across 11 suites and 34 release gate criteria
-  (Static analysis 22 scripts zero leakage, 12-domain generalization fixtures, 114 adversarial stress tests, 60-test benchmark,
-  10 mutation tests with 100% kill score, 14 property and Draft-07 schema tests, 24 end-to-end integration tests, 11 cross-topic adversarial tests,
-  22 advanced v8.5 research engine integration tests, 14 deep reading and recall benchmark tests, and 14 v8.7 evidence grounding and semantic attribution integrity tests).
+  evidence synthesis, humanization, and Word (.docx) publication engine (v9.0). Operates across diverse biomedical domains
+  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
+  Built on a 4-layer modular architecture (Layer 1: Scientific Accuracy via BiologicalMechanismAdversarialVerifier, CombinationHypothesisEngine,
+  CompoundEntityNormalizer; Layer 2: Structural Compliance via MethodologyCompletenessGate validating 28 Pajooheshyar sections and mandatory sample size formula,
+  and CombinationModelSelector; Layer 3: Citation Integrity via CitationTracker enforcing Vancouver order-of-appearance, orphaned claim detection, and unused reference filtering;
+  Layer 4: Formatting & Typesetting via NativeOmmlMathEngine converting LaTeX to native Word OMML XML <m:oMath>, and PersianMedicalTypographyLinter
+  enforcing ZWNJ, Persian numerals, and abbreviation expansions). Enforces ProposalReadinessGate as a fail-closed pre-generation gatekeeper.
+  Supports multi-source federated searches (PubMed, Europe PMC, OpenAlex, Crossref), 16 query families, MeSH mapping, multi-directional citation chasing,
+  saturation tracking, deep paper reading (Sections A-E), SciFact-aligned claim verification, 8-tier evidence hierarchy,
+  and passes a unified 350-assertion test harness across 13 suites and 43 release gate criteria with zero hardcoded biological leakage across all 31 engine scripts.
 ---
 
-# Proposal-Nevisi (موتور جامع، عمومی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v8.7)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v9.0)
 
-این مهارت یک پلتفرم جامع، تعاملی، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و ژورنال‌های بین‌المللی است. نسخه v8.7 با ارتقای بنیادین سامانه اصالت انتساب شواهد و نگاشت معنایی متون (Evidence Grounding & Semantic Attribution Integrity Engine)، به عنوان یک **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine** عمل می‌کند که علاوه بر قابلیت‌های پیشین، مجهز به:
-1. رکورد استاندارد ۱۶ فیلدی شواهد مقاله (`CanonicalPaperEvidenceRecord`) با ردیابی دقیق مکان استخراج (چکیده، متدولوژی، نتایج، جدول، شکل).
-2. گیت اصالت داده‌های کمی (`NumericProvenanceGate`) برای پیشگیری مطلق از تولید یا جعل اعداد ($IC_{50}$، دوز، غلظت، p-value، اندازه نمونه) و تفکیک داده‌های استخراجی صریح از مقادیر مشتق.
-3. گیت مرزهای متنی (`ContextualBoundaryGate`) در ۱۱ بعد جهت مسدودسازی خطاهای جهش متدولوژیک (این‌سیلیکو به آزمایشگاه تجربی، پیش‌بالینی به بالینی، عصاره طبیعی به مولکول خالص، همبستگی به علیت).
-4. نگاشت دقیق گزاره به شواهد (`ExactClaimEvidenceMapper`) منطبق بر استاندارد SciFact در ۵ سطح رأی علمی (`SUPPORTED`, `PARTIALLY_SUPPORTED`, `NOT_SUPPORTED`, `CONTRADICTED`, `INSUFFICIENT_EVIDENCE`).
-5. سازنده پاراگراف‌های متغیر بر پایه شواهد (`EvidenceDrivenParagraphBuilder`) جهت حذف کلیشه‌های تکراری (مانند "گروه کنترل استاندارد") و بازتاب صادقانه یافته‌های پوچ، منفی و بدون اثر.
-6. ممیزی اتصال گزاره به ارجاع در متن پیشینه پژوهش (`audit_claim_citations`) برای جلوگیری از درج مارکرهای استنادی بدون پشتیبانی در مقاله مرجع.
+این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-> **تذکر شفاف روش‌شناختی و تفکیک دو سطح اعتبارسنجی (v8.7):** در نگارش پروپوزال، تفکیک قطعی میان «اعتبارسنجی نرم‌افزاری» (پاس شدن ۳۱۷ تست واحد، ۱۰ جهش کشته‌شده، ۳۴ معیار مستر گیت، عدم نشت کد، تولید فایل ورد با تایپوگرافی دبی) و «اعتبارسنجی تجربی شواهد علمی» (گیت تطابق هویتی دارو و ویروس، عدم ادعای سینرژی بدون دیتای ترکیبی، ممیزی شکاف جستجو) اعمال می‌گردد. وضعیت نهایی مهارت صراحتاً به عنوان **RESEARCH-GRADE — SOFTWARE VALIDATED, LIVE RECALL PARTIALLY VALIDATED** اعلام می‌گردد. هرگز مونو‌تراپی‌ها به عنوان اثبات سینرژی ادعا نمی‌شوند و در صورت نبود مقاله مستقیم، وضعیت صراحتاً به صورت شکاف پژوهشی تجربی محصور (NO_DIRECT_STUDY_IDENTIFIED_IN_SEARCHED_SOURCES) گزارش می‌شود.
----
+نسخه ۹.۰ تمام منطق‌های شرطی شکننده و وابسته به موضوع را به طور کامل حذف کرده و معماری ماژولار ۴ لایه‌ای زیر را با سد بازدارنده آمادگی (`ProposalReadinessGate`) پیاده‌سازی نموده است:
 
 ---
 
-## ۱. چرخه فرآیندی موتور عمومی شواهد (Universal Pipeline)
+## ۱. معماری ۴ لایه‌ای ماژولار نسخه ۹.۰
 
 ```text
-موضوع و عنوان ورودی پژوهشگر
-           │
-           ▼
-[ ۱. مدل‌سازی پویای مسئله پژوهش (Research Problem Model) ]
-├── انتخاب چارچوب متناسب: PICO / PECO / Diagnostic / Prognostic / Mechanistic
-├── شناسایی جمعیت/مدل (Human, Animal, Cell Culture, Diagnostic, Epidemiological)
-├── اصطلاحات کنترل‌شده MeSH و واژگان تخصصی
-           │
-           ▼
-[ ۲. استراتژی جستجوی پویای ۹ لایه‌ای و اشباع شواهد (9-Layer Search & Saturation) ]
-├── لایه‌های نه‌گانه (A: مستقیم، B: اجزاء، C: مکانیسمی، D: مدل، E: ترنسلیشنال، F: ایمنی/سمیت، G: شواهد منفی/پوچ، H: متناقض، I: روش‌شناختی)
-├── زنجیره‌سازی استنادی پیش‌رو و پس‌رو (Forward/Backward Citation Chaining)
-├── سنجش اشباع شواهد (Search Saturation Assessment: دیمینیشینگ ریترن و کفایت متدولوژیک)
-           │
-           ▼
-[ ۳. بازیابی چندپایگاهی و حسابداری PRISMA 2020 ]
-├── بازیابی همزمان از PubMed/MEDLINE, Europe PMC, OpenAlex, Crossref
-├── ثبت دقیق لاگ جستجو، حذف موارد تکراری و جریان غربالگری واقعی
-           │
-           ▼
-[ ۴. اعتبارسنجی فیلد-محور کتابشناختی و مرز زمانی ]
-├── تطبیق دقیق DOI, PMID, Title, First Author, Journal, Year
-├── اعمال قانون زمانی ۶ ساله (Main Evidence >= CURRENT_YEAR - 6)
-├── تایید استثناهای بنیادین با توجیه معتبر (FOUNDATIONAL_JUSTIFICATION)
-           │
-           ▼
-[ ۵. طبقه‌بندی طراحی مطالعه و ارزیابی سوگیری متناسب با متدولوژی ]
-├── سنجش RoB متناسب: Cochrane RoB2 برای کارآزمایی‌ها، SYRCLE برای حیوانات، QUADAS-2 برای تشخیصی
-├── قانون اکید: وضعیت NOT_REPORTED هرگز به LOW_RISK تبدیل نمی‌شود
-           │
-           ▼
-[ ۶. گراف روابط مطالعات و تحلیل شکاف‌های پژوهشی (Study Relationships & Gaps) ]
-├── ترسیم روابط بین‌مطالعه‌ای در ۲۲ بعد پویا (DIRECT_REPLICATION, EXTENSION, TRANSLATIONAL_EXTENSION, SUPPORTS, CONTRADICTS, ...)
-├── شناسایی نظام‌مند شکاف‌های پژوهشی در ۱۱ طبقه تاکسونومی (KNOWLEDGE_GAP, MECHANISTIC_GAP, POPULATION_GAP, METHODOLOGICAL_GAP, ...)
-           │
-           ▼
-[ ۷. ردیابی خوشه‌های مطالعاتی و ممانعت از دوباره‌شماری (Study Family Clustering) ]
-├── شناسایی کارآزمایی‌های مشترک (NCT)، کوهورت‌های اپیدمیولوژیک مشترک و زیرگروه‌ها
-├── تفکیک مقالات مروری سیستماتیک از مطالعات اولیه برای جلوگیری از شمارش مضاعف شواهد
-           │
-           ▼
-[ ۸. موتور تحلیل شواهد منفی، تناقضات و واگرایی پارامتری ]
-├── رده‌بندی تناقضات در ۱۵ شاخه تاکسونومی و تفکیک TRUE_CONTRADICTION از CONTEXTUAL_DISAGREEMENT
-├── تحلیل واگرایی پارامتری (گونه، رده سلولی، دوز، مدت، حامل، روش سنجش)
-├── اعمال قواعد معرفت‌شناختی: No Evidence != Evidence of No Effect و No Synergy Fallacy
-           │
-           ▼
-[ ۹. موتور التزام گزاره-شواهد و دروازه زبان علّی (Claim Entailment & Causal Gate) ]
-├── تفکیک ادعاهای اتمیک و درجه‌بندی التزام در مقیاس ۷ سطحی
-├── مسدودسازی ادعای علیت (Causes/Induces) در مطالعات مشاهده‌ای و همبستگی
-├── ره‌گیری کامل مقادیر عددی در دفتر شواهد (EVIDENCE_LEDGER) و ممانعت از توهم اعداد
-           │
-           ▼
-[ ۱۰. سنتز چندبعدی شواهد بدون رای‌گیری اکثریتی ]
-├── سنتز وزن‌دهی‌شده بر پایه ۸ بعد قطعیت شواهد (مستقیم بودن، همسویی، دقت، کیفیت، سوگیری، کاربردپذیری، حجم، بار تناقض)
-├── ممنوعیت قاطع ساده‌سازی به رای‌گیری اکثریتی (Vote Counting)
-           │
-           ▼
-[ ۱۱. طراحی پروتکل پویا، اعتبارسنجی ساختار و نگارش پروپوزال ۱۴ گانه ]
-├── طراحی پویای جدول متغیرها (مستقل، وابسته، مخدوش‌کننده، کوواریات، کنترل)
-├── طراحی پویای گانت چارت زمان‌بندی و برنامه جامع تحلیل آماری متناسب با مقیاس متغیرها
-├── اعمال دروازه اعتبارسنجی ساختاری ۱۴ گانه (PROPOSAL_STRUCTURE_VALIDATION = PASS/FAIL) با پشتیبانی نیم‌فاصله و ارقام فارسی
-├── نگارش کامل یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع در بخش مرور منابع
-├── فرمت‌بندی رسمی با فونت Dubai، تگ‌های native RTL bidi XML و خروجی Word (.docx)
-           │
-           ▼
-[ ۱۲. ممیزی خودکار چندبعدی و دروازه کیفیت پیش از پرواز (9D QA Gate) ]
-├── ارزیابی ۹ بعد کیفی نهایی: تمامیت ساختار، ره‌گیری استنادها، استقلال موضوعی، مرز زمانی، کنترل علیت، تعادل تناقض، انسجام متغیرها، دقت آماری و آزمون‌های رفتاری
-├── اجرای سوئیت تست یکپارچه ۲۱۶ تستی با قبولی ۱۰۰٪
++-----------------------------------------------------------------------------------+
+|                        ProposalReadinessGate (Master Gatekeeper)                  |
++-----------------------------------------------------------------------------------+
+        │                                                                   │
+        ▼                                                                   ▼
++---------------------------------------+   +---------------------------------------+
+|    LAYER 1: SCIENTIFIC ACCURACY       |   |    LAYER 2: STRUCTURAL COMPLIANCE     |
+| • BiologicalMechanismVerifier         |   | • MethodologyCompletenessGate (28)    |
+| • CombinationHypothesisEngine         |   | • CombinationModelSelector (ANOVA/GLM)|
+| • CompoundEntityNormalizer            |   | • Mandatory Sample Size Formula Box   |
++---------------------------------------+   +---------------------------------------+
+        │                                                                   │
+        ▼                                                                   ▼
++---------------------------------------+   +---------------------------------------+
+|    LAYER 3: CITATION INTEGRITY        |   |   LAYER 4: FORMATTING & TYPESETTING   |
+| • CitationTracker                     |   | • NativeOmmlMathEngine (LaTeX->OMML)  |
+| • Strict Vancouver Order of Appearance|   | • PersianMedicalTypographyLinter      |
+| • Orphaned Claim & Unused Ref Auditor |   | • YAML Rules & First-Mention Expansion|
++---------------------------------------+   +---------------------------------------+
 ```
 
----
+### لایه ۱: صحت علمی (Scientific Accuracy)
+1. **راستی‌آزمای خصمانه مکانیسم‌های بیولوژیک (`BiologicalMechanismAdversarialVerifier`):**
+   - دارای هستی‌شناسی ساختارمند از تنظیم‌کننده‌های مرگ برنامه‌ریزی‌شده سلولی (آپوپتوز) و چرخه سلولی (Bcl-2, Bcl-xL, Bax, Bak, Caspases, p53, AKT, PTEN و ...).
+   - شناسایی و مسدودسازی وارونگی نقش پروتئین‌ها (نظیر معرفی اشتباه Bcl-xL به عنوان پیش‌آپوپتوزی یا Bax به عنوان ضدآپوپتوزی) با برگرداندن وضعیت `CONTRADICTED`.
+2. **موتور فرضیات ترکیب درمانی (`CombinationHypothesisEngine`):**
+   - تولید خودکار دو فرضیه موازی و متوازن: فرضیه هم‌افزایی ($H_1$) و فرضیه تضاد / اثر تجمعی ($H_2$).
+   - محاسبه شاخص توازن شواهد (`evidence_balance_score`) و صدور اخطار سوگیری شواهد مثبت (`POSITIVE_EVIDENCE_DOMINANCE_WARNING`) در صورت غیبت شواهد منفی یا بی‌اثر.
+3. **نرمال‌ساز هویت مواد (`CompoundEntityNormalizer`):**
+   - دسته‌بندی مواد در ۴ رده استاندارد: ماده خالص (`PURE_COMPOUND`)، عصاره استاندارد (`STANDARDIZED_EXTRACT`)، عصاره خام گیاهی (`CRUDE_EXTRACT`) و آنالوگ سنتزی (`SYNTHETIC_ANALOG`).
+   - پیشگیری قطعی از مغالطه انتساب اثرات عصاره به مولکول خالص بدون ذکر مشخصات خلوص و استانداردسازی.
 
-## ۲. اصول و خطوط قرمز علمی مهارت (Non-Negotiable Scientific Principles)
+### لایه ۲: تطابق ساختاری (Structural Compliance)
+4. **گیت جامعیت ۲۸ بخشی پژوهشیار (`MethodologyCompletenessGate`):**
+   - اعتبارسنجی دقیق و بدون اغماض ۲۸ بخش استاندارد سامانه پژوهشیار (وزارت بهداشت).
+   - الزام قطعی درج فرمول ریاضی محاسبه حجم نمونه (فرمول کوهن، رابطه تخصیص منابع مید $E = N - B - T$، فرمول کوکران و ...) در بخش ۱۰؛ نبود فرمول مانع کامپایل سند خواهد شد.
+5. **انتخاب‌گر مدل آماری ترکیبی (`CombinationModelSelector`):**
+   - انتخاب مدل آماری متناسب با طراحی تجربی (مانند Two-Way Factorial ANOVA با ترم اثر متقابل $A \times B$، Repeated Measures ANOVA یا رگرسیون کاکس).
+   - تعریف آزمون‌های بررسی پیش‌فرض‌های آماری (نرمالیته، همگنی واریانس‌ها) و آزمون‌های تعقیبی مناسب (Tukey HSD, Bonferroni).
 
-1. **ممنوعیت کامل Hard-Code شدن موجودیت‌های یک طرح در کدهای هسته:**
-   تمام نام‌های ترکیبات، سویه‌ها، رده‌های سلولی، دوزها و بیماری‌ها به عنوان ورودی و در مدل `ResearchProblemModel` تعریف می‌شوند. کدهای اصلی در `scripts/` فاقد هرگونه پیش‌فرض محدودکننده به یک موضوع خاص هستند.
+### لایه ۳: تمامیت استنادها (Citation Integrity)
+6. **ره‌گیر یکپارچه استنادات (`CitationTracker`):**
+   - اعمال دقیق شیوه ونکوور بر مبنای ترتیب ظهور در متن.
+   - کشف و گزارش ادعاهای بی‌ارجاع (`Orphaned Claims`) و منابع استفاده‌نشده در کتاب‌شناسی (`Unused References`).
+   - شماره‌گذاری و بازآرایی پویای ارجاعات در صورت جابه‌جایی پاراگراف‌ها.
 
-2. **استراتژی جستجوی ۹ لایه‌ای و شواهد منفی الزامی (9-Layer Search):**
-   هیچ جستجویی نباید صرفاً تأییدطلبانه (Confirmation-Seeking) باشد. جستجوی فعال شواهد منفی (Null, Toxicity, Antagonism, Failure, Resistance, Dose Limits) به صورت لایه‌بندی شده و سیستمی اجرا می‌شود.
+### لایه ۴: فرمت‌بندی و تایپوگرافی (Formatting & Typesetting)
+7. **موتور فرمول‌نویسی بومی ورد (`NativeOmmlMathEngine`):**
+   - تبدیل کدهای ریاضی لاتک به فرمول‌های استاندارد Office Math Markup Language (`<m:oMath>`, `<m:oMathPara>`) در ساختار XML ورد با پشتیبانی از فال‌بک یونیکد تمیز.
+   - حذف کامل و قطعی کدهای لاتک، علامت‌های دلار (`$...$`) و براکت‌های ریاضی از متن سند Word.
+8. **لینتر تایپوگرافی پزشکی فارسی (`PersianMedicalTypographyLinter`):**
+   - موتور مبتنی بر قوانین (`typography_rules.yaml`) برای تنظیم دقیق نیم‌فاصله‌ها (ZWNJ).
+   - تبدیل خودکار ارقام انگلیسی به فارسی در متن با محافظت از فرمول‌های علمی و مارکرهای استنادی.
+   - بسط و ترجمه خودکار اختصارات انگلیسی در نخستین اشاره در متن.
 
-3. **اصل تفکیک ارتباط از التزام (Relevance vs. Entailment):**
-   مرتبط بودن موضوعی یک مقاله به هیچ عنوان به معنای اثبات ادعای متن پروپوزال توسط آن مقاله نیست. هر استناد باید بر پایه التزام دقیق محتوایی در مقیاس ۷ سطحی (`DIRECTLY_SUPPORTED` تا `CONTRADICTED`) تایید شود.
-
-4. **ممنوعیت مطلق پرکردن زینتی مراجع (Zero Citation Padding):**
-   هیچ منبعی نباید صرفاً برای زیاد نشان دادن تعداد مراجع به فهرست افزوده شود. هر منبع موجود در رفرنس‌ها باید دارای استناد معتبر در متن، لینک به ادعای علمی و گزاره تاییدشده در دفتر شواهد باشد (`Unused References == 0`).
-
-5. **دروازه زبان علّی (Anti-Overclaim Causal Gate):**
-   تبدیل عبارات همبستگی در مطالعات مشاهده‌ای به ادعاهای علیت اکیداً ممنوع بوده و به صورت خودکار با پرچم `OVERCLAIM_RISK` متوقف و اصلاح می‌گردد.
-
-6. **مغالطه سینرژی بدون آزمون تجربی (No Synergy Fallacy):**
-   اثبات اثربخشی جداگانه دو مداخله به هیچ وجه نباید به عنوان اثبات سینرژی (هم‌افزایی) بیان شود. سینرژی نیازمند آزمون مستقیم ترکیبی با ماتریس دوز و شاخص‌های آماری نظیر Chou-Talalay CI یا Bliss Independence است؛ در غیر این صورت وضعیت الزاما `SYNERGY_NOT_ESTABLISHED` است.
-
-7. **تمایز فقدان شواهد از شواهد فقدان اثر (No Evidence != Evidence of No Effect):**
-   اگر کارآزمایی بالینی برای یک مداخله انجام نشده است، نباید ادعا کرد «این مداخله فاقد اثر بالینی است». فرمول‌بندی معرفت‌شناختی دقیق `NO_DIRECT_EVALUATION_FOUND` الزامی است.
-
-8. **قاعده ره‌گیری عددی و ممانعت از توهم ارقام:**
-   تمام اعداد علمی اعم از دوز، $IC_{50}$، نسبت خطر، مقادیر $p$ و حجم نمونه باید مستقیماً از متن مقاله مرجع استخراج و در `EVIDENCE_LEDGER` ثبت شده باشند. در صورت عدم ذکر، وضعیت `NOT_REPORTED` ثبت شده و حدس زدن عدد اکیداً ممنوع است.
-
-9. **قانون زمانی مراجع و ممانعت از دور زدن با استناد بالا:**
-   شواهد اصلی اولیه باید در پنجره ۶ سال اخیر ($\text{Year} \ge \text{CURRENT\_YEAR} - 6$) باشند. تعداد استناد بالا به تنهایی مجوز عبور از قانون ۶ ساله نیست؛ مقالات قدیمی‌تر تنها در صورت داشتن برچسب توجیه بنیادین متدولوژیک (`FOUNDATIONAL_JUSTIFICATION` نظیر مدل‌های ریاضی، روش‌های سنجش استاندارد، یا کشف‌های تاریخی مرجع) مجازند.
-
-10. **جداسازی بدنه جستجو از مراجع نهایی و سقف سخت ۲۵ رفرنس (Hard Ceiling = 25):**
-    جستجوی اولیه چندپایگاهی و عمیق برای صدها مقاله مجاز است (Research Corpus Broad Screening)، اما مراجع نهایی پروپوزال (Final Proposal References) دارای سقف سخت و قطعی **حداکثر ۲۵ رفرنس** است (`MAX_FINAL_REFERENCES = 25`, بازه استاندارد ۱۵ تا ۲۵). هرگز منبع بیست‌وششم به بعد وارد پروپوزال نهایی نمی‌شود و فقط Top 25 مقالات واجد شرایط برگزیده می‌شوند.
-
-11. **گیت چندمرحله‌ای هم‌خوانی مفهومی و سازگاری زیستی (Multi-Stage Relevance Gate):**
-    مقالات ورودی باید از یک فیلتر ۴ مرحله‌ای متوالی عبور کنند:
-    `Retrieval` $\rightarrow$ `Topic Relevance` $\rightarrow$ `Study Relevance & Biological Compatibility` $\rightarrow$ `Claim Entailment` $\rightarrow$ `Final Top 25 Selection`.
-    تطابق صرف کلیدواژه دارویی/شیمیایی بدون هم‌خوانی بافتار بیماری و ارگانیسم هدف اکیداً ممنوع است. مقالات خارج از بافتار زیستی (نظیر انجماد اسپرم دام، کشاورزی یا کاربردهای صنعتی در پژوهش‌های بالینی و سرطان) با شناسه `REJECT_LOW_CONTEXTUAL_RELEVANCE` و رده `INCOMPATIBLE_BIOLOGICAL_SYSTEM` حذف قطعی می‌شوند.
-
-12. **الزام ثبت دلیل ورود نهایی (`FINAL_INCLUSION_REASON`) و بخش پشتیبانی‌شده در پروپوزال (`PROPOSAL_SECTION_SUPPORTED`):**
-    برای هر یک از مقالات منتخب در سبد نهایی، وجود سه فیلد تحلیلی زیر در دفتر شواهد اجباری است:
-    - `final_inclusion_reason`: یکی از رده‌های مصوب (`DIRECT_DISEASE_MODEL_EVIDENCE`, `INTERVENTION_EFFICACY_EVIDENCE`, `MECHANISTIC_RATIONALE`, `METHODOLOGICAL_BENCHMARK`, `SAFETY_SELECTIVITY_BOUNDARY`).
-    - `proposal_section_supported`: لیست بخش‌هایی از پروپوزال که مقاله از ادعاهای آن پشتیبانی می‌کند (`SECTION_2_PROBLEM_STATEMENT`, `SECTION_3_LITERATURE_REVIEW`, `SECTION_13_METHODOLOGY`, ...).
-    - `why_this_paper_is_needed`: استدلال مشخص و غیرکلی درباره ضرورت اجتناب‌ناپذیر این مقاله برای منطق پژوهش.
-    مقاله‌ای که نتوان دلیل ورود یا بخش مرتبط با آن را مشخص کرد، حق ورود به جمع ۲۵ رفرنس نهایی را ندارد.
-
-13. **مدل امتیازدهی چندعاملی ۱۴ گانه (14-Factor Multi-Factor Scoring):**
-    رتبه‌بندی مقالات کاندید بر پایه ۱۴ معیار (ارتباط مستقیم، مدل، مداخله، مقایسه‌گر، پیامد، مکانیسم، کیفیت متدولوژی، تازگی زمانی، مستقیم بودن شواهد، عدم همپوشانی، ضرورت ادعا، وفاداری التزام، اعتبار نشریه و دقت متادیتا) انجام می‌پذیرد.
+### گیت آمادگی جامع (`ProposalReadinessGate`)
+- یکپارچه‌ساز و سد نهایی پیش از تولید پروپوزال (Fail-Closed). تا زمانی که وضعیت تمام ۸ ماژول فوق به صورت کامل ارزیابی و تأیید نشود، هیچ سندی کامپایل نخواهد شد.
 
 ---
 
-## ۳. ساختار الزامی ۱۴ گانه بدنه پروپوزال (Institutional 14-Section Proposal Structure)
+## ۲. اسکریپت‌ها و ماژول‌های اجرایی مهارت (`scripts/`)
 
-خروجی نهایی پروپوزال در فایل Word (`.docx`) باید واجد دقیقاً ۱۴ بخش استاندارد به شرح زیر باشد:
-1. **موضوع:** عنوان کامل فارسی و انگلیسی.
-2. **بیان مسئله:** نگارش تفصیلی پیرامون بار بیماری، اپیدمیولوژی، مبانی سلولی-مولکولی، چالش‌های درمانی و توجیه علمی طرح.
-3. **مرور بر منابع:** اختصاص **یک پاراگراف تفصیلی و مستقل برای تک‌تک مراجع مورد استفاده** (شامل معرفی، هدف، مدل زیستی و مداخله، یافته‌های کلیدی و مقادیر عددی، ارتباط با طرح جاری و محدودیت‌ها). تیترهای مصنوعی دسته‌بندی محورها (نظیر «محور ۱» یا «محور مداخله») اکیداً ممنوع بوده و در پایان بخش ۳، سنتز نقادانه بین‌مطالعه‌ای ارائه می‌شود.
-4. **اهمیت و ضرورت تحقیق:** تبیین ضرورت اجرای پژوهش در بندهای علمی و کاربردی.
-5. **تعریف واژه‌ها:** تعاریف مفهومی و عملیاتی واژگان کلیدی طرح.
-6. **اهداف جزیی:** اهداف مرحله‌ای متناسب با آزمون متغیرها.
-7. **اهداف کلی:** بیان یکپارچه هدف اصلی با عبارت «تعیین...».
-8. **اهداف کاربردی:** تبیین کاربردهای تشخیصی، درمانی و پیش‌بالینی طرح.
-9. **فرضیات و سوالات پژوهش:** تفکیک روشن فرضیه‌های آماری/تجربی از سوالات پژوهشی.
-10. **دستاوردها:** برشمردن دستاوردهای ملموس علمی، تولید شواهد و چاپ مقالات به عنوان بخش مستقل.
-11. **جدول متغیرها:** جدول ساختارمند شامل نام متغیر، نقش، نوع، تعریف عملیاتی و ابزار اندازه‌گیری.
-12. **جدول زمان‌بندی و مراحل اجرا:** گانت چارت زمان‌بندی ماهانه.
-13. **روش اجرا:** تفکیک متدولوژی در ۱۴ زیربخش استاندارد ۱۳-۱ تا ۱۳-۱۴.
-14. **فهرست منابع:** نمایه مراجع در سقف حداکثر ۲۵ منبع معتبر با شناسه DOI و پیوند مستقیم.
-
----
-
-## ۴. اسکریپت‌ها و ماژول‌های اجرایی مهارت (`scripts/`)
-
+- **`proposal_readiness_gate.py`:** گیت جامع آمادگی پیش از تولید سند پروپوزال (v9.0).
+- **`biological_mechanism_adversarial_verifier.py`:** راستی‌آزمای بیولوژیک و ناظر بر عدم وارونگی مسیرهای مرگ سلولی و چرخه سلولی (v9.0).
+- **`combination_hypothesis_engine.py`:** موتور تولید فرضیات دوگانه ترکیب درمانی و ارزیابی توازن شواهد (v9.0).
+- **`compound_entity_normalizer.py`:** نرمال‌ساز هستی‌شناختی مواد دارویی، عصاره‌ها و مشتقات (v9.0).
+- **`methodology_completeness_gate.py`:** گیت جامعیت ۲۸ بخشی پژوهشیار با الزام فرمول حجم نمونه (v9.0).
+- **`combination_model_selector.py`:** انتخاب‌گر مدل‌های آماری فاکتوریل و اثرات متقابل (v9.0).
+- **`citation_tracker.py`:** ره‌گیر استنادات به سبک ونکوور و کاشف ادعاهای بی‌منبع (v9.0).
+- **`native_omml_math_engine.py`:** تبدیل‌گر LaTeX به OMML بومی Word و حذف نشت کدهای لاتک (v9.0).
+- **`persian_medical_typography_linter.py` & `typography_rules.yaml`:** لینتر قوانین تایپوگرافی، نیم‌فاصله و اصطلاحات پزشکی (v9.0).
 - **`research_problem_model.py`:** استخراج و ساخت مدل مسئله پژوهش بر مبنای چارچوب‌های PICO/PECO/Diagnostic/Mechanistic.
-- **`generic_search_planner.py`:** طراحی استراتژی جستجوی ۱۲ لایه‌ای، تجزیه ابعاد مسئله پژوهش، تکرار انطباقی جستجو بدون سقف بازیابی اولیه و زنجیره‌سازی استنادی.
-- **`generic_study_relationships.py`:** ترسیم روابط چندبُعدی بین‌مطالعه‌ای در ۲۲ نوع ارتباط پویا (Replication, Extension, Supports, Contradicts, ...).
-- **`generic_gap_detector.py`:** شناسایی نظام‌مند شکاف‌های پژوهشی بر پایه شواهد تجربی در ۱۸ شاخه ساختارمند.
-- **`generic_study_family_detector.py`:** شناسایی و خوشه‌بندی مطالعات مشترک، کدهای کارآزمایی و کوهورت‌های اپیدمیولوژیک جهت جلوگیری از شمارش مضاعف شواهد.
-- **`generic_comparability_engine.py`:** ارزیابی همسنجی دوبه‌دوی مطالعات متناسب با طراحی مطالعه.
-- **`generic_contradiction_engine.py`:** تحلیل و رده‌بندی شواهد متناقض بر مبنای تاکسونومی ۱۵ گانه، تفکیک تناقض واقعی از اختلاف زمینه‌ای، و قاعده عدم اثبات اثر.
-- **`generic_claim_entailment_engine.py`:** ممیزی التزام ادعاها در ۷ سطح، کنترل مغالطه سینرژی، کنترل ادعاهای علیت و ره‌گیری دقیق مقادیر عددی.
-- **`generic_reference_auditor.py`:** ممیزی گیت هم‌خوانی مفهومی، امتیازدهی ۱۴ معیاره، انتخاب بهینه مراجع با سقف ۲۵ منبع و ممیزی مرز زمانی.
-- **`generic_evidence_synthesis.py`:** تلفیق چندبعدی شواهد بر پایه ۸ بعد قطعیت و ممانعت از ساده‌سازی اکثریتی.
-- **`dynamic_protocol_designer.py`:** طراحی خودکار و پویای جدول متغیرها، گانت چارت زمان‌بندی و برنامه تحلیل آماری منطبق بر داده‌ها.
-- **`proposal_structure_validator.py`:** دروازه اعتبارسنجی دقیق ساختار ۱۴ گانه، زیربخش‌های ۱۳-۱ تا ۱۳-۱۴، جداول ۱۱ و ۱۲ و سقف ۲۵ رفرنس.
-- **`multi_dimensional_qa_gate.py`:** دروازه ممیزی نهایی ۹ بعدی پیش از پرواز (QA Pre-Flight Gate).
-- **`docx_builder.py`:** تولیدکننده سند نهایی Word با تایپوگرافی اختصاصی دبی فارسی و تگ‌های بومی RTL OpenXML.
-- **`generate_compliant_proposal.py`:** اسمبلر جامع تولید پروپوزال منطبق بر شواهد و ممیزی‌شده با اعمال سقف ۲۵ رفرنس.
-- **`project_organizer.py`:** ماژول ساماندهی و ایجاد ساختار پوشه‌بندی استاندارد پروپوزال.
-- **`self_audit_suite.py`:** سوئیت آزمون ۶۰ گانه تجربی بنچ‌مارک در سه لایه ساختاری، علمی و کنترل‌های منفی.
+- **`generic_search_planner.py`:** طراحی استراتژی جستجوی ۱۶ لایه‌ای، تجزیه ابعاد مسئله پژوهش و نقشه‌برداری اصطلاحات MeSH.
+- **`scientific_search_adapter.py`:** آداپتور چندپایگاهی (PubMed, Europe PMC, OpenAlex, Crossref)، تعقیب استنادی سه‌جهته، بنچ‌مارک ریکال و ردیاب اشباع.
+- **`generic_reference_auditor.py`:** رکورد ۱۶ فیلدی شواهد کانونی، گیت اصالت داده‌های عددی، گیت مرزهای متنی، ونگاشت ادعا-شواهد بر مبنای SciFact.
+- **`generic_evidence_synthesis.py`:** تلفیق چندبعدی شواهد بر پایه ۸ بعد قطعیت، سنتز ساختارمند ۷ نقطه‌ای و تحلیل ریشه‌ای اختلافات.
+- **`docx_builder.py`:** ساخت سند نهایی Word با فونت دبی، تگ‌های بومی RTL OpenXML، فرمول‌های OMML و پاراگراف‌های تفصیلی مراجع.
+- **`generate_compliant_proposal.py`:** پایپ‌لاین یکپارچه و منطبق بر ۲۸ بخش پژوهشیار با کنترل کامل گیت آمادگی.
 
 ---
 
-## ۵. سوئیت جامع آزمون و اعتبارسنجی (`tests/`)
+## ۳. سوئیت جامع آزمون و اعتبارسنجی (`tests/`)
 
-موتور با اجرای دستور زیر ممیزی می‌شود:
+موتور با اجرای دستور زیر ممیزی و آزاد می‌شود:
 ```bash
 python scripts/master_release_gate.py
 ```
-این سیستم به صورت پویا ۱۰ سوئیت آزمون مستقل را اجرا و نتایج واقعی را گزارش می‌کند:
-1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته و استقلال سمانتیک کامل در ۲۲ اسکریپت (۲۲ تست).
-2. **آزمون تعمیم‌پذیری ۱۲ گانه دامنه‌ای (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۱۲ فیکسچر مستقل از رشته‌های مختلف پزشکی (۱۲ تست).
-3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۱۱۴ گانه (`test_adversarial_scenarios.py`):** ۱۱۴ آزمون چالش‌برانگیز شامل آداپتور جستجوی علمی (`ScientificSearchAdapter`)، تجمیع مؤلفه‌های همبند، منحنی اشباع جستجو، گیت ۱۰ بعدی هم‌خوانی مفهومی با ۶ سطح رتبه‌بندی، سقف ۲۵ رفرنس، امتیازدهی ۱۴ عاملی، ممانعت از دور زدن قانون زمانی، قیف غربالگری ۵ مرحله‌ای، الزام توجیه سه‌بخشی ورود، عدم تطابق DOI، مقالات رترکت‌شده، سلسله‌مراتب شرطی، ماتریس تضاد و تبیین‌های جایگزین (۱۱۴ تست).
-4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی، الزامات متدولوژیک و رعایت کامل فرمت ۱۴ گانه Word (۶۰ تست).
+این سیستم به صورت پویا ۱۳ سوئیت آزمون مستقل را اجرا و نتایج زیر را ثبت کرده است:
+1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته در ۳۱ اسکریپت (۳۱ تست).
+2. **آزمون تعمیم‌پذیری ۱۲ گانه دامنه‌ای (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۱۲ فیکسچر مستقل (۱۲ تست).
+3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۱۱۴ گانه (`test_adversarial_scenarios.py`):** ۱۱۴ آزمون شامل آداپتور، اشباع، غربالگری و سقف ۲۵ رفرنس (۱۱۴ تست).
+4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی و رعایت فرمت (۶۰ تست).
 5. **سوئیت آزمون جهش‌های علمی (`test_mutations.py`):** آزمون ۱۰ جهش مخرب عمدی با نمره کشندگی ۱۰۰٪ (۱۰ تست).
 6. **سوئیت آزمون‌های خاصیت و اسکیمای Draft-07 (`test_property_and_schemas.py`):** ممیزی ناوردایی‌ها و تطابق اسکیماها (۱۴ تست).
-7. **سوئیت آزمون‌های یکپارچگی سرتاسری E2E (`test_e2e_integration.py`):** شبیه‌سازی کامل پایپ‌لاین از مدل تا کامپایل (۲۴ تست).
-8. **سوئیت آزمون‌های خصمانه چندموضوعی دامنه‌مستقل (`test_cross_topic_adversarial.py`):** اعتبارسنجی ۱۰ سناریوی مستقل A تا J و بررسی عدم نشت پیش‌فرض‌های پروژه‌های پیشین (۱۱ تست).
-9. **سوئیت موتور پژوهش پیشرفته v8.5 (`test_advanced_research_engine.py`):** اعتبارسنجی یکپارچگی جستجوی چندپایگاهی، تعقیب استنادی، و اعتبارسنجی گزاره‌ها (۲۲ تست).
-10. **سوئیت خوانش عمیق و بنچ‌مارک ریکال v8.6 (`test_v86_deep_reading_and_recall_benchmark.py`):** آزمون بنچ‌مارک ریکال پژوهشی، تاکسونومی ۱۳ گانه جا افتادن مقالات، بخش‌های A-E خوانش عمیق، بازیابی شواهد شکل/جدول با پرچم بازبینی، مهندسی معکوس روش‌ها، رده‌بندی ۸ سطحی شواهد، وریریفایر ۲.۰ گزاره-مقاله، ممیزی ارجاعات پس از نگارش، و سنتز مقایسه‌ای مضمونی (۱۴ تست).
+7. **سوئیت آزمون‌های یکپارچگی سرتاسری E2E (`test_e2e_integration.py`):** شبیه‌سازی کامل پایپ‌لاین (۲۴ تست).
+8. **سوئیت آزمون‌های خصمانه چندموضوعی دامنه‌مستقل (`test_cross_topic_adversarial.py`):** اعتبارسنجی سناریوهای A تا J (۱۱ تست).
+9. **سوئیت موتور پژوهش پیشرفته v8.5 (`test_advanced_research_engine.py`):** اعتبارسنجی جستجوی چندپایگاهی و تعقیب استنادی (۲۲ تست).
+10. **سوئیت خوانش عمیق و بنچ‌مارک ریکال v8.6 (`test_v86_deep_reading_and_recall_benchmark.py`):** آزمون بخش‌های A-E، رده‌بندی ۸ سطحی شواهد و تاکسونومی ۱۳ گانه (۱۴ تست).
+11. **سوئیت اصالت شواهد و نگاشت معنایی v8.7 (`test_v87_evidence_grounding_and_attribution.py`):** آزمون داده‌های عددی، گیت مرزهای متنی و SciFact (۱۴ تست).
+12. **سوئیت رگرسیون ممیزی واقعی v8.7 (`test_v87_remediation_regressions.py`):** پیشگیری قطعی از خطاهای انتساب شواهد و رفع سقف‌های تصنعی (۱۰ تست).
+13. **سوئیت آزمون‌های خصمانه معماری ماژولار v9.0 (`test_v90_adversarial.py`):** اعتبارسنجی شکست‌های عمدی مکانیسم، سوگیری مثبت، فرمول حجم نمونه، OMML، ونکوور و گیت آمادگی (۱۴ تست).
 
-**مجموع آزمون‌ها:** ۳۰۳ آزمون مستقل با قبولی ۱۰۰٪ (303 / 303 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در ۲۲ اسکریپت و پاس کامل ۲۸ معیار Master Release Gate.
-
----
-
-## ۶. معماری پوشه‌بندی و ساماندهی خودکار پروژه (Standard Workspace Layout)
-
-مهارت `proposal-nevisi` در هر سشن جدید پژوهشی، به صورت خودکار یا از طریق اجرای ماژول `project_organizer.py` ساختار پوشه‌بندی استاندارد، تمیز و تفکیک‌شده زیر را ایجاد و حفظ می‌کند:
-
-```text
-├── proposal/          # سند خروجی نهایی Word (.docx)، نسخه مارک‌داون (.md) و استایل‌گایدها
-├── references/        # مجموعه نهایی رفرنس‌ها، کش راستی‌آزمایی کتابشناختی، ممیزی مراجع و فایل‌های RIS/EndNote
-├── evidence/          # سوابق شواهد مطالعات، ماتریس‌ها، گراف‌های DAG، دفاتر التزام و تحلیل سنتز نهایی
-├── literature_search/ # ماتریس و لاگ جستجو، پایگاه‌های مورد جستجو، گزارش PRISMA و پیکره مقالات
-├── contradictions/    # تحلیل و لاگ تناقضات، ماتریس همسنجی مطالعات و گزارش شواهد منفی
-├── policies/          # معماری نهایی سیستم، خط‌مشی‌ها و گزارش‌های تفصیلی ممیزی و تعمیم‌پذیری
-├── archive/           # پیش‌نویس‌های قدیمی، نسخه‌های منسوخ و فایل‌های موقت
-└── schemas/           # اسکیماهای اعتبارسنجی ساختار داده‌ها
-```
-
-**قاعده تفکیک خروجی‌ها:** هیچ فایلی به صورت سرگردان و پراکنده در ریشه پروژه قرار نمی‌گیرد و تمامی ابزارها و اسکریپت‌ها (`self_audit_suite.py` و `reference_validity_auditor.py` و ...) دارای مکانیزم `resolve_path` هستند تا هم در پوشه‌های تفکیک‌شده و هم در صورت جابه‌جایی، فایل‌ها را با انعطاف کامل و دقت ۱۰۰٪ مکان‌یابی و اجرا نمایند.
-
+**مجموع آزمون‌ها:** ۳۵۰ آزمون مستقل با قبولی ۱۰۰٪ (350 / 350 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در ۳۱ اسکریپت و پاس کامل ۴۳ معیار Master Release Gate.
