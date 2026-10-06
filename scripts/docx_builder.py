@@ -356,7 +356,7 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
         if not stripped or stripped == '---':
             continue
 
-        if ('۱۴.' in stripped or '14.' in stripped) and 'منابع' in stripped:
+        if (('۱۴.' in stripped or '14.' in stripped) or ('۲۸.' in stripped or '28.' in stripped)) and 'منابع' in stripped:
             is_refs = True
 
         if stripped.startswith('# '):

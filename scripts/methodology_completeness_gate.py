@@ -24,67 +24,67 @@ from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass, field
 
 REQUIRED_SECTIONS_28 = [
-    "عنوان فارسی",
-    "عنوان انگلیسی",
-    "نوع مطالعه",
-    "بیان مسئله و ضرورت انجام تحقیق",
-    "مروری بر متون",
-    "اهداف (هدف کلی و اهداف اختصاصی)",
-    "فرضیات یا سوالات پژوهشی",
-    "جامعه آماری",
-    "روش نمونهگیری",
-    "حجم نمونه و روش محاسبه آن",
-    "معیارهای ورود به مطالعه",
-    "معیارهای خروج از مطالعه",
+    "موضوع",
+    "بیان مسئله",
+    "مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)",
+    "اهمیت وضرورت تحقیق",
+    "تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)",
+    "اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)",
+    "اهداف کلی (همین موضوع با کلمه تعیین..)",
+    "اهداف کاربردی",
+    "فرضیات و سوالات",
+    "دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)",
+    "جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))",
+    "جدول زمان بندی و مراحل اجرا",
     "روش اجرا",
-    "ابزار جمعآوری دادهها",
-    "روشهای آماری تجزیه و تحلیل دادهها",
-    "ملاحظات اخلاقی",
-    "محدودیتهای مطالعه",
-    "جدول متغیرها",
-    "جدول زمانبندی",
-    "بودجه",
-    "منابع",
-    "خلاصه فارسی",
-    "خلاصه انگلیسی (Abstract)",
-    "کلیدواژههای فارسی",
-    "کلیدواژههای انگلیسی",
-    "تعارض منافع",
-    "سپاسگزاری",
-    "ضمائم (در صورت نیاز)"
+    "نوع مطالعه",
+    "جامعه مورد مطالعه",
+    "محل انجام مطالعه",
+    "معیار های ورود به مطالعه",
+    "معیار های خروج از مطالعه",
+    "ابزار های گردآوری اطلاعات",
+    "تعیین اعتبار ابزار گردآوری",
+    "تعیین ابزار گردآوری",
+    "حجم نمونه و روش محاسبه آن",
+    "روش تجزیه و تحلیل داده",
+    "ملاحظلات اخلاقی در صورت نیاز",
+    "نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز",
+    "مشکلات و محدودیت ها",
+    "روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات",
+    "منابعی که استفاده شد (انگلیسی یا فارسی)"
 ]
 
 PAJOOHESHYAR_28_SECTIONS = REQUIRED_SECTIONS_28
 
 SECTION_SYNONYMS = {
-    "عنوان فارسی": [r"عنوان\s+فارسی", r"موضوع\s+فارسی", r"عنوان\s+طرح"],
-    "عنوان انگلیسی": [r"عنوان\s+انگلیسی", r"english\s+title", r"موضوع\s+انگلیسی"],
-    "نوع مطالعه": [r"نوع\s+مطالعه", r"طراحی\s+مطالعه", r"study\s+design"],
-    "بیان مسئله و ضرورت انجام تحقیق": [r"بیان\s+مسئله", r"ضرورت\s+انجام\s+تحقیق", r"بیان\s+مساله", r"problem\s+statement"],
-    "مروری بر متون": [r"مروری\s+بر\s+متون", r"مرور\s+بر\s+منابع", r"پیشینه\s+پژوهش", r"literature\s+review"],
-    "اهداف (هدف کلی و اهداف اختصاصی)": [r"اهداف", r"هدف\s+کلی", r"اهداف\s+اختصاصی", r"اهداف\s+جزیی", r"objectives"],
-    "فرضیات یا سوالات پژوهشی": [r"فرضیات", r"فرضیه‌ها", r"سوالات\s+پژوهش", r"hypotheses"],
-    "جامعه آماری": [r"جامعه\s+آماری", r"جامعه\s+پژوهش", r"population", r"جامعه\s+هدف"],
-    "روش نمونهگیری": [r"روش\s+نمونه‌?گیری", r"نمونه‌?گیری", r"sampling\s+method"],
-    "حجم نمونه و روش محاسبه آن": [r"حجم\s+نمونه", r"محاسبه\s+حجم\s+نمونه", r"sample\s+size"],
-    "معیارهای ورود به مطالعه": [r"معیارهای\s+ورود", r"شرایط\s+ورود", r"inclusion\s+criteria"],
-    "معیارهای خروج از مطالعه": [r"معیارهای\s+خروج", r"شرایط\s+خروج", r"exclusion\s+criteria"],
-    "روش اجرا": [r"روش\s+اجرا", r"مراحل\s+اجرا", r"روش\s+کار", r"پروتکل\s+اجرایی", r"methodology"],
-    "ابزار جمعآوری دادهها": [r"ابزار\s+جمع‌?آوری", r"ابزارهای\s+گردآوری", r"data\s+collection\s+tools"],
-    "روشهای آماری تجزیه و تحلیل دادهها": [r"روش‌های\s+آماری", r"تجزیه\s+و\s+تحلیل\s+داده", r"تحلیل\s+آماری", r"statistical\s+analysis"],
-    "ملاحظات اخلاقی": [r"ملاحظات\s+اخلاقی", r"کد\s+اخلاق", r"ethical\s+considerations"],
-    "محدودیتهای مطالعه": [r"محدودیت‌های\s+مطالعه", r"مشکلات\s+و\s+محدودیت‌ها", r"limitations"],
-    "جدول متغیرها": [r"جدول\s+متغیرها", r"متغیرهای\s+پژوهش", r"variables\s+table"],
-    "جدول زمانبندی": [r"جدول\s+زمان‌?بندی", r"گانت\s+چارت", r"timeline", r"gantt"],
-    "بودجه": [r"بودجه", r"هزینه‌ها", r"برآورد\s+مالی", r"budget"],
-    "منابع": [r"منابع", r"فهرست\s+منابع", r"references", r"مراجع"],
-    "خلاصه فارسی": [r"خلاصه\s+فارسی", r"چکیده\s+فارسی", r"persian\s+abstract"],
-    "خلاصه انگلیسی (Abstract)": [r"خلاصه\s+انگلیسی", r"چکیده\s+انگلیسی", r"abstract"],
-    "کلیدواژههای فارسی": [r"کلیدواژه‌های\s+فارسی", r"واژگان\s+کلیدی\s+فارسی", r"persian\s+keywords"],
-    "کلیدواژههای انگلیسی": [r"کلیدواژه‌های\s+انگلیسی", r"keywords", r"english\s+keywords"],
-    "تعارض منافع": [r"تعارض\s+منافع", r"تضاد\s+منافع", r"conflict\s+of\s+interest"],
-    "سپاسگزاری": [r"سپاسگزاری", r"تقدیر", r"تشکر", r"acknowledgements?"],
-    "ضمائم (در صورت نیاز)": [r"ضمائم", r"پیوست‌ها", r"ضمیمه", r"appendices?"]
+    "موضوع": [r"^عنوان(?:\s+فارسی|\s+طرح|\s+پروپوزال)?", r"title"],
+    "بیان مسئله": [r"بیان\s+مس[ئأه]له", r"problem\s+statement"],
+    "مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)": [r"مرور\s+بر\s+منابع", r"پیشینه\s+پژوهش", r"مروری\s+بر\s+متون", r"literature\s+review"],
+    "اهمیت وضرورت تحقیق": [r"اهمیت\s+و\s*ضرورت(?:\s+انجام)?\s+تحقیق", r"significance\s*(?:and|&)\s*necessity"],
+    "تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)": [r"تعریف\s+واژه(?:[\s\u200c]*های|ها)?", r"واژگان\s+تخصصی", r"definition\s+of\s+terms"],
+    "اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)": [r"اهداف\s+جز[ئیی]", r"اهداف\s+اختصاصی", r"specific\s+objectives"],
+    "اهداف کلی (همین موضوع با کلمه تعیین..)": [r"هدف\s+کلی", r"اهداف\s+کلی", r"general\s+objective"],
+    "اهداف کاربردی": [r"اهداف\s+کاربردی", r"applied\s+objectives"],
+    "فرضیات و سوالات": [r"فرضی[اه]ت\s+و\s+س[وؤ]الات", r"فرضیه‌ها\s+و\s+پرسش‌ها", r"hypotheses\s*(?:and|&)\s*questions"],
+    "دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)": [r"دستاورد(?:[\s\u200c]*های|ها)?", r"achievements", r"deliverables"],
+    "جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))": [r"جدول\s+متغیر(?:[\s\u200c]*های|ها)?", r"متغیرهای\s+پژوهش", r"variable\s+table"],
+    "جدول زمان بندی و مراحل اجرا": [r"جدول\s+زمان[\s\u200c\-]*بندی(?:\s+و\s+مراحل\s+اجرا)?", r"گانت\s+چارت", r"timeline", r"gantt"],
+    "روش اجرا": [r"روش\s+اجرا", r"متدولوژی", r"روش\s+کار", r"پروتکل\s+اجرایی", r"methodology"],
+    "نوع مطالعه": [r"نوع\s+مطالعه", r"طراحی\s+مطالعه", r"study\s+type", r"study\s+design"],
+    "جامعه مورد مطالعه": [r"جامعه\s+مورد\s+مطالعه", r"جامعه\s+آماری", r"جامعه\s+پژوهش", r"study\s+population", r"target\s+population"],
+    "محل انجام مطالعه": [r"محل\s+انجام(?:\s+مطالعه)?", r"study\s+setting", r"location"],
+    "معیار های ورود به مطالعه": [r"معیار(?:[\s\u200c]*های|ها)?\s+ورود(?:\s+به\s+مطالعه)?", r"شرایط\s+ورود", r"inclusion\s+criteria"],
+    "معیار های خروج از مطالعه": [r"معیار(?:[\s\u200c]*های|ها)?\s+خروج(?:\s+از\s+مطالعه)?", r"شرایط\s+خروج", r"exclusion\s+criteria"],
+    "ابزار های گردآوری اطلاعات": [r"ابزار(?:[\s\u200c]*های|ها)?\s+گردآوری(?:\s+اطلاعات)?", r"ابزار\s+جمع[\s\u200c\-]*آوری", r"data\s+collection\s+tools", r"instruments"],
+    "تعیین اعتبار ابزار گردآوری": [r"تعیین\s+اعتبار\s+ابزار(?:\s+گردآوری)?", r"اعتبار\s+ابزار", r"روایی", r"validity"],
+    "تعیین ابزار گردآوری": [r"تعیین\s*(?:پایایی\s*\/\s*)?ابزار\s*گردآوری", r"پایایی\s+ابزار", r"قابلیت\s+اعتماد", r"reliability"],
+    "حجم نمونه و روش محاسبه آن": [r"حجم\s+نمونه(?:\s+و\s+روش\s+محاسبه\s+آن)?", r"محاسبه\s+حجم\s+نمونه", r"sample\s+size"],
+    "روش تجزیه و تحلیل داده": [r"روش(?:[\s\u200c]*های)?\s+تجزیه\s+و\s+تحلیل\s+داده(?:[\s\u200c]*های|ها)?", r"تحلیل\s+آماری", r"روش‌های\s+آماری", r"statistical\s+analysis"],
+    "ملاحظلات اخلاقی در صورت نیاز": [r"ملاحظ[اه]ت\s+اخلاقی(?:\s+در\s+صورت\s+نیاز)?", r"ملاحظلات\s+اخلاقی(?:\s+در\s+صورت\s+نیاز)?", r"کد\s+اخلاق", r"ethical\s+considerations"],
+    "نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز": [r"(?:نحوه\s+رعایت\s+)?نکات\s+امنیتی\s+و\s+حفاظت\s+پروژه(?:\s+در\s+صورت\s+نیاز)?", r"حفاظت\s*(?:زیستی|پروژه)", r"نکات\s+امنیتی", r"biosafety", r"security"],
+    "مشکلات و محدودیت ها": [r"مشکلات\s+و\s+محدودیت(?:[\s\u200c]*های|ها)?", r"محدودیت‌های\s+مطالعه", r"limitations\s*(?:and|&)\s*challenges"],
+    "روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات": [r"روش\s+انجام\s+طرح[،\s]+شیوه\s+اجرایی(?:\s*مراحل\s*طرح)?(?:\s*و\s*چگونگی\s*جمع[\s\-]*آوری\s*اطلاعات)?", r"شیوه\s+اجرایی", r"مراحل\s*طرح", r"روش\s+انجام\s+طرح", r"چگونگی\s*جمع[\s\-]*آوری"],
+    "منابعی که استفاده شد (انگلیسی یا فارسی)": [r"منابعی\s+که\s+استفاده\s+شد(?:\s*\(.*\))?", r"منابع(?:\s+مورد\s+استفاده)?", r"فهرست\s+منابع", r"مراجع", r"references"]
 }
 
 SAMPLE_SIZE_FORMULA_PATTERNS = [
@@ -329,19 +329,36 @@ class MethodologyCompletenessGate:
                     extracted[sec] = str(val)
                     break
 
-        if "sample_size_calculation" in data and "حجم نمونه و روش محاسبه آن" not in extracted:
-            ss = data["sample_size_calculation"]
-            formula = ss.get("formula", "") if isinstance(ss, dict) else str(ss)
-            extracted["حجم نمونه و روش محاسبه آن"] = formula
+        # Map common standard keys to canonical 28 section names
+        var_key = "جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))"
+        time_key = "جدول زمان بندی و مراحل اجرا"
+        ref_key = "منابعی که استفاده شد (انگلیسی یا فارسی)"
+        ss_key = "حجم نمونه و روش محاسبه آن"
 
-        if "variable_table" in data and "جدول متغیرها" not in extracted:
-            extracted["جدول متغیرها"] = str(data["variable_table"])
+        if ss_key not in extracted:
+            for k in ["sample_size_calculation", "sample_size", "حجم نمونه", "حجم_نمونه"]:
+                if k in data:
+                    ss = data[k]
+                    extracted[ss_key] = ss.get("formula", "") if isinstance(ss, dict) else str(ss)
+                    break
 
-        if "timeline" in data and "جدول زمانبندی" not in extracted:
-            extracted["جدول زمانبندی"] = str(data["timeline"])
+        if var_key not in extracted:
+            for k in ["variable_table", "variables", "جدول متغیرها", "جدول_متغیرها"]:
+                if k in data:
+                    extracted[var_key] = str(data[k])
+                    break
 
-        if "references" in data and "منابع" not in extracted:
-            extracted["منابع"] = str(data["references"])
+        if time_key not in extracted:
+            for k in ["timeline", "timeline_table", "جدول زمانبندی", "جدول_زمانبندی"]:
+                if k in data:
+                    extracted[time_key] = str(data[k])
+                    break
+
+        if ref_key not in extracted:
+            for k in ["references", "studies", "منابع", "فهرست منابع", "فهرست_منابع"]:
+                if k in data:
+                    extracted[ref_key] = str(data[k])
+                    break
 
         return extracted
 
@@ -356,15 +373,35 @@ class MethodologyCompletenessGate:
             if current_sec and current_buffer:
                 extracted[current_sec] = '\n'.join(current_buffer).strip()
 
+        fa_to_en = {'۰':'0', '۱':'1', '۲':'2', '۳':'3', '۴':'4', '۵':'5', '۶':'6', '۷':'7', '۸':'8', '۹':'9'}
+
         for line in lines:
-            header_match = re.match(r'^(?:#+|\d+\s*[-.)]|بخش\s*\d+[:\s])\s*(.+)$', line.strip())
+            stripped = line.strip()
+            # Match Markdown headings (## or #) or institutional headers
+            header_match = re.match(r'^(?:#{1,4})\s*(?:([0-9]+|[\u06F0-\u06F9]+)[.:\s\-]+)?\s*(.+)$', stripped)
             if header_match:
-                candidate_title = header_match.group(1).strip()
+                num_str = header_match.group(1)
+                candidate_title = header_match.group(2).strip()
                 matched_req = None
-                for req_sec, patterns in SECTION_SYNONYMS.items():
-                    if any(re.search(p, candidate_title, re.IGNORECASE) for p in patterns):
-                        matched_req = req_sec
-                        break
+
+                # 1. Primary: if section number 1..28 is present in the heading
+                if num_str:
+                    clean_num = num_str
+                    for fa_d, en_d in fa_to_en.items():
+                        clean_num = clean_num.replace(fa_d, en_d)
+                    try:
+                        val = int(clean_num)
+                        if 1 <= val <= len(REQUIRED_SECTIONS_28):
+                            matched_req = REQUIRED_SECTIONS_28[val - 1]
+                    except ValueError:
+                        pass
+
+                # 2. Fallback: match by title regex patterns
+                if not matched_req:
+                    for req_sec, patterns in SECTION_SYNONYMS.items():
+                        if any(re.search(p, candidate_title, re.IGNORECASE) for p in patterns):
+                            matched_req = req_sec
+                            break
 
                 if matched_req:
                     save_current()

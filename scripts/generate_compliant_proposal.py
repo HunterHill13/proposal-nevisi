@@ -444,17 +444,36 @@ class ProposalGenerator:
         return "\n".join(md_parts)
 
     @classmethod
+    def _extract_methodology_subsections(cls, meth_text: str) -> Dict[str, str]:
+        """Extracts 13-1 through 13-14 subsections if embedded in a combined methodology text."""
+        subsecs = {}
+        if not meth_text:
+            return subsecs
+        
+        pattern = r'(?:^|\n)###?\s*(?:13|۱۳)[-–—]([0-9]+|[\u06F0-\u06F9]+)[.:\s\-]+([^\n]+)\n(.*?)(?=(?:\n###?\s*(?:13|۱۳)[-–—]|\Z))'
+        matches = list(re.finditer(pattern, meth_text, re.DOTALL))
+        for m in matches:
+            sub_num_str = m.group(1).strip()
+            for fa_d, en_d in [('۰','0'), ('۱','1'), ('۲','2'), ('۳','3'), ('۴','4'), ('۵','5'), ('۶','6'), ('۷','7'), ('۸','8'), ('۹','9')]:
+                sub_num_str = sub_num_str.replace(fa_d, en_d)
+            subsecs[sub_num_str] = m.group(3).strip()
+        return subsecs
+
+    @classmethod
     def assemble_pajooheshyar_28(cls, data: Dict[str, Any]) -> str:
-        """Assembles the complete 28-section Pajooheshyar medical proposal markdown."""
+        """
+        Assembles the canonical 28-section Iranian medical research proposal markdown.
+        Strictly conforms to the 28 required sections in exact sequence.
+        """
         md_parts = []
-        md_parts.append("# پروپوزال طرح تحقیقاتی دانشگاهی (سامانه پژوهشیار / ۲۸ بخش مصوب)")
+        md_parts.append("# پروپوزال طرح تحقیقاتی دانشگاهی (ساختار ۲۸ بخشی مصوب)")
         md_parts.append("")
 
         rpm_obj = data.get("research_problem_model", {})
         model_dict = data.get("research_problem_model", data)
         fa_title = data.get("research_title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
         en_title = data.get("research_title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
-        framework = data.get("framework", "in_vitro")
+        framework = data.get("framework") or model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
         studies = data.get("studies", [])
 
         cond = model_dict.get("target_condition", {})
@@ -463,132 +482,348 @@ class ProposalGenerator:
         sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم بیولوژیک هدف")
         interventions = model_dict.get("interventions_or_exposures", [])
 
-        # Normalize interventions with CompoundEntityNormalizer
-        norm_interventions = []
-        for agt in interventions:
-            norm_agt = CompoundEntityNormalizer.normalize(agt)
-            norm_interventions.append(norm_agt)
+        # Parse potential subsections from methodology_text
+        meth_combined = data.get("methodology_text", "")
+        extracted_subs = cls._extract_methodology_subsections(meth_combined)
 
-        # 1. عنوان فارسی
-        md_parts.append("## ۱. عنوان فارسی\n" + fa_title + "\n\n---")
+        # -------------------------------------------------------------
+        # ۱. موضوع
+        # -------------------------------------------------------------
+        md_parts.append("## ۱. موضوع")
+        md_parts.append(f"▪ **عنوان فارسی (Persian Title):**  \n{fa_title}\n")
+        md_parts.append(f"▪ **عنوان انگلیسی (English Title):**  \n{en_title}\n\n---")
 
-        # 2. عنوان انگلیسی
-        md_parts.append("## ۲. عنوان انگلیسی\n" + en_title + "\n\n---")
-
-        # 3. نوع مطالعه
-        design_desc = f"مطالعه تجربی آزمایشگاهی ({framework}) مبتنی بر آزمون‌های بیولوژیک سلولی و مولکولی در شرایط استاندارد."
-        md_parts.append("## ۳. نوع مطالعه\n" + design_desc + "\n\n---")
-
-        # 4. بیان مسئله و ضرورت انجام تحقیق
+        # -------------------------------------------------------------
+        # ۲. بیان مسئله
+        # -------------------------------------------------------------
         problem_text = data.get("problem_statement_text", "")
         if not problem_text or len(problem_text.split()) < 100:
+            agt1 = interventions[0].get("name", "مداخله اول") if interventions else "مداخله اول"
             problem_text = (
-                f"{cond_name} ({cond_en}) از معضلات عمده سلامت و انکولوژی معاصر است. "
-                f"محدودیت‌های گزینه‌های درمانی موجود شامل عوارض جانبی سیستمیک و مقاومت اکتسابی است. "
-                f"بررسی مداخلات نوین بر مدل {sys_name} جهت شناسایی راهکارهای با سمیت انتخابی ضرورت دارد."
+                f"{cond_name} ({cond_en}) از معضلات عمده سلامت و انکولوژی معاصر است که با نرخ بالای بروز و عوارض جانبی سیستمیک همراه است. "
+                f"راهبردهای متداول با چالش‌هایی نظیر سمیت بافتی و مقاومت اکتسابی مواجه هستند. "
+                f"شواهد تجربی و فارماکولوژیک حاکی از پتانسیل مداخله {agt1} در تعدیل مسیرهای پاتولوژیک در سیستم {sys_name} می‌باشد. "
+                f"با این وجود، فقدان شواهد نظام‌مند پیرامون دوزسنجی دقیق و مکانیسم‌های سلولی، اجرای مطالعه حاضر را به ضرورتی مبرم مبدل ساخته است."
             )
-        md_parts.append("## ۴. بیان مسئله و ضرورت انجام تحقیق\n" + problem_text + "\n\n---")
+        md_parts.append("## ۲. بیان مسئله\n" + problem_text + "\n\n---")
 
-        # 5. مروری بر متون
-        lit_paras = []
-        for idx, s in enumerate(studies[:25], 1):
-            cnum = s.get("citation_number", idx)
-            para = s.get("review_paragraph") or EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
-            lit_paras.append(para)
-        lit_content = "\n\n".join(lit_paras) if lit_paras else "شواهد تجربی پیشین به صورت دقیق مورد واکاوی قرار گرفته‌اند."
-        md_parts.append("## ۵. مروری بر متون\n" + lit_content + "\n\n---")
+        # -------------------------------------------------------------
+        # ۳. مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)
+        # -------------------------------------------------------------
+        lit_content = data.get("literature_review_text", "")
+        if not lit_content and studies:
+            lit_paras = []
+            for idx, s in enumerate(studies[:25], 1):
+                cnum = s.get("citation_number", idx)
+                para = s.get("review_paragraph") or EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
+                lit_paras.append(para)
+            lit_content = "\n\n".join(lit_paras)
+        if not lit_content:
+            lit_content = "شواهد تجربی و مطالعات پیشین مرتبط با متغیرهای پژوهش به صورت جامع مورد تحلیل و بررسی قرار گرفته‌اند."
+        md_parts.append("## ۳. مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)\n" + lit_content + "\n\n---")
 
-        # 6. اهداف
-        aims = [f"تعیین {fa_title} (هدف کلی)"]
-        outcomes = model_dict.get("primary_outcomes", [])
-        for idx, out in enumerate(outcomes, 1):
-            oname = out.get("name") if isinstance(out, dict) else str(out)
-            aims.append(f"{idx}. سنجش میزان تغییرات شاخص {oname} در {sys_name}.")
-        md_parts.append("## ۶. اهداف (هدف کلی و اهداف اختصاصی)\n" + "\n".join(aims) + "\n\n---")
-
-        # 7. فرضیات یا سوالات پژوهشی
-        if len(interventions) >= 2:
-            a_n = interventions[0].get("name", "مداخله اول")
-            b_n = interventions[1].get("name", "مداخله دوم")
-            hyp_analysis = CombinationHypothesisEngine.analyze(a_n, b_n, cond_name, studies)
-            hyps_text = (
-                f"▪ **فرضیه هم‌افزایی (Synergy Hypothesis):** {hyp_analysis.synergism_hypothesis}\n\n"
-                f"▪ **فرضیه آنتاگونیسم (Antagonism Hypothesis):** {hyp_analysis.antagonism_hypothesis}\n\n"
-                f"▪ **فرضیه صفر جمع‌پذیر (Additive Null):** {hyp_analysis.additive_null_hypothesis}"
+        # -------------------------------------------------------------
+        # ۴. اهمیت وضرورت تحقیق
+        # -------------------------------------------------------------
+        imp_text = data.get("importance_and_necessity_text", "")
+        if not imp_text:
+            imp_text = (
+                f"۱. شیوع فزاینده و عوارض بالینی و اقتصادی ناشی از {cond_name}.\n"
+                f"۲. محدودیت‌های درمانی موجود و نیاز مبرم به شناسایی عوامل زیستی کم‌عارضه با سمیت انتخابی.\n"
+                f"۳. ضرورت ارزیابی فارماکودینامیک و مکانیسمی مداخلات در سیستم مدل {sys_name}.\n"
+                f"۴. فراهم‌آوری شواهد پایه و استاندارد متدولوژیک جهت فازهای پیش‌بالینی و کاربردی بعدی."
             )
-        else:
-            hyps_text = f"▪ **فرضیه پژوهش:** به نظر می‌رسد مداخله مورد آزمون اثر معنی‌داری بر شاخص‌های حیاتی در {sys_name} دارد."
-        md_parts.append("## ۷. فرضیات یا سوالات پژوهشی\n" + hyps_text + "\n\n---")
+        md_parts.append("## ۴. اهمیت وضرورت تحقیق\n" + imp_text + "\n\n---")
 
-        # 8. جامعه آماری
-        md_parts.append("## ۸. جامعه آماری\n" + f"مدل‌های بیولوژیک و سلولی هدف مستقر در {sys_name}." + "\n\n---")
+        # -------------------------------------------------------------
+        # ۵. تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)
+        # -------------------------------------------------------------
+        def_text = data.get("definitions_text", "")
+        if not def_text:
+            defs = []
+            if cond_name:
+                defs.append(f"▪ **{cond_name} ({cond_en}):** وضعیت پاتولوژیک و بالینی مورد هدف در پروتکل مطالعه.")
+            for agt in interventions:
+                aname = agt.get("name", "مداخله")
+                aclass = agt.get("chemical_or_biological_class", "عامل مورد آزمون")
+                defs.append(f"▪ **{aname}:** {aclass} به عنوان مداخله تجربی مورد ارزیابی.")
+            for out in model_dict.get("primary_outcomes", []):
+                oname = out.get("name") if isinstance(out, dict) else str(out)
+                defs.append(f"▪ **{oname}:** شاخص پیامد اصلی تعیین‌شده جهت ارزیابی پاسخ زیستی.")
+            def_text = "\n\n".join(defs) if defs else "واژگان تخصصی و متغیرهای اصلی پژوهش مطابق استانداردهای بین‌المللی تعریف شده‌اند."
+        md_parts.append("## ۵. تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)\n" + def_text + "\n\n---")
 
-        # 9. روش نمونهگیری
-        md_parts.append("## ۹. روش نمونهگیری\n" + "نمونه‌گیری تصادفی ساده در تخصیص چاهک‌ها و آزمون‌ها با رعایت حداقل ۳ تکرار مستقل بیولوژیک." + "\n\n---")
+        # -------------------------------------------------------------
+        # ۶. اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)
+        # -------------------------------------------------------------
+        spec_text = data.get("specific_objectives_text", "")
+        if not spec_text:
+            aims = []
+            outcomes = model_dict.get("primary_outcomes", [])
+            for idx, out in enumerate(outcomes, 1):
+                oname = out.get("name") if isinstance(out, dict) else str(out)
+                aims.append(f"{idx}. تعیین تاثیر مواجهه با مداخله بر میزان {oname} در {sys_name}.")
+            aims.append(f"{len(aims)+1}. تعیین غلظت‌های موثر، آستانه ایمنی و تغییرات وابسته به زمان و دوز مداخله.")
+            spec_text = "\n".join(aims)
+        md_parts.append("## ۶. اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)\n" + spec_text + "\n\n---")
 
-        # 10. حجم نمونه و روش محاسبه آن (همراه با فرمول اجباری)
-        sample_size_formula_text = (
-            "تعیین حجم نمونه بر اساس استانداردهای روش‌شناسی تجربی با فرمول کوهن صورت می‌پذیرد:\n\n"
-            r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$"
-            "\n\nبا احتساب توان آزمون ۸۰٪ ($1-\\beta = 0.80$) و سطح خطای ۵٪ ($\\alpha = 0.05$) و انحراف معیار برگرفته از مطالعات پیلوت، حداقل ۳ تکرار مستقل در ۳ نوبت مجزا ($n = 9$ در هر گروه غلظتی) تعیین گردید."
-        )
-        md_parts.append("## ۱۰. حجم نمونه و روش محاسبه آن\n" + sample_size_formula_text + "\n\n---")
+        # -------------------------------------------------------------
+        # ۷. اهداف کلی (همین موضوع با کلمه تعیین..)
+        # -------------------------------------------------------------
+        gen_text = data.get("general_objective_text", "")
+        if not gen_text:
+            gen_text = f"تعیین {fa_title}."
+        md_parts.append("## ۷. اهداف کلی (همین موضوع با کلمه تعیین..)\n" + gen_text + "\n\n---")
 
-        # 11. معیارهای ورود به مطالعه
-        md_parts.append("## ۱۱. معیارهای ورود به مطالعه\n" + "رده‌های سلولی استاندارد با تاییدیه اصالت ژنتیکی و زیست‌پذیری بالای ۹۵٪." + "\n\n---")
+        # -------------------------------------------------------------
+        # ۸. اهداف کاربردی
+        # -------------------------------------------------------------
+        app_text = data.get("applied_objectives_text", "")
+        if not app_text:
+            app_text = (
+                "۱. ارائه شواهد تجربی و آزمایشگاهی متقن جهت راهنمایی مطالعات پیش‌بالینی و بالینی آینده.\n"
+                "۲. کمک به تصمیم‌گیری بالینی و پروتکل‌های درمانی مبتنی بر شواهد در مراکز پژوهشی و درمانی.\n"
+                "۳. فراهم‌سازی مبنای علمی جهت طراحی فرمولاسیون‌ها یا رژیم‌های درمانی بهینه با حداقل عوارض جانبی."
+            )
+        md_parts.append("## ۸. اهداف کاربردی\n" + app_text + "\n\n---")
 
-        # 12. معیارهای خروج از مطالعه
-        md_parts.append("## ۱۲. معیارهای خروج از مطالعه\n" + "هرگونه آلودگی میکروبی یا مایکوپلاسمایی و انحراف شدید کنترل‌های منفی یا مثبت." + "\n\n---")
+        # -------------------------------------------------------------
+        # ۹. فرضیات و سوالات
+        # -------------------------------------------------------------
+        hyp_text = data.get("hypotheses_and_questions_text", "")
+        if not hyp_text:
+            if len(interventions) >= 2:
+                a_n = interventions[0].get("name", "مداخله اول")
+                b_n = interventions[1].get("name", "مداخله دوم")
+                hyp_analysis = CombinationHypothesisEngine.analyze(a_n, b_n, cond_name, studies)
+                hyp_text = (
+                    f"### فرضیات تحقیق:\n"
+                    f"۱. {hyp_analysis.synergism_hypothesis}\n"
+                    f"۲. {hyp_analysis.antagonism_hypothesis}\n\n"
+                    f"### سوالات تحقیق:\n"
+                    f"۱. آیا مواجهه همزمان واجد اثر هم‌افزا (CI < 1.0) بر شاخص‌های سلولی در {sys_name} است؟\n"
+                    f"۲. تغییرات کمی پارامترهای دوز-پاسخ در مواجهه ترکیبی نسبت به تک‌عاملی چگونه است؟"
+                )
+            else:
+                hyp_text = (
+                    f"### فرضیات تحقیق:\n"
+                    f"۱. مواجهه با مداخله موجب تغییر معنی‌دار شاخص‌های پیامد در {sys_name} خواهد شد.\n\n"
+                    f"### سوالات تحقیق:\n"
+                    f"۱. میزان غلظت موثر نیمی از حداکثر (IC50) مداخله در مقاطع زمانی مختلف چقدر است؟"
+                )
+        md_parts.append("## ۹. فرضیات و سوالات\n" + hyp_text + "\n\n---")
 
-        # 13. روش اجرا
-        method_desc = (
-            "اجرای مرحله‌ای شامل آماده‌سازی کشت، تهیه رقت‌های سریالی، انکوباسیون زمان‌مند، "
-            "سنجش زیست‌پذیری، ارزیابی آپوپتوز با فلوسایتومتری و محاسبه شاخص ترکیب با مدل‌های ریاضی."
-        )
-        md_parts.append("## ۱۳. روش اجرا\n" + method_desc + "\n\n---")
+        # -------------------------------------------------------------
+        # ۱۰. دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)
+        # -------------------------------------------------------------
+        ach_text = data.get("achievements_text", "")
+        if not ach_text:
+            ach_text = (
+                "۱. تولید و ثبت داده‌های تجربی دست اول پیرامون رفتار فارماکودینامیک مداخله در سیستم مدل.\n"
+                "۲. تعیین کمی و ریاضی شاخص‌های برهم‌کنش، دوزهای ایمن و آستانه اثربخشی زیستی.\n"
+                "۳. انتشار حداقل یک مقاله پژوهشی در ژورنال‌های معتبر بین‌المللی نمایه ISI/Scopus.\n"
+                "۴. توسعه زیرساخت و دانش فنی پروتکل‌های سنجش زیستی در آزمایشگاه تحقیقاتی دانشگاه."
+            )
+        md_parts.append("## ۱۰. دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)\n" + ach_text + "\n\n---")
 
-        # 14. ابزار جمعآوری دادهها
-        md_parts.append("## ۱۴. ابزار جمعآوری دادهها\n" + "دستگاه الایزا ریدر، فلوسایتومتر، میکروسکوپ اینورت و نرم‌افزارهای تحلیلی تخصصی." + "\n\n---")
-
-        # 15. روشهای آماری تجزیه و تحلیل دادهها
-        stat_model = CombinationModelSelector.select(
-            study_design=framework,
-            outcome_type="continuous",
-            groups_count=4 if len(interventions) >= 2 else 2
-        )
-        stat_text = (
-            f"مدل آماری اصلی: {stat_model.primary_model_fa} ({stat_model.primary_model}).\n"
-            f"آزمون‌های پیش‌فرض: " + "، ".join(t["fa"] for t in stat_model.assumption_tests) + ".\n"
-            f"آزمون تعقیبی: {stat_model.post_hoc_test}.\n"
-            f"شاخص اندازه اثر: {stat_model.effect_size_metric}."
-        )
-        md_parts.append("## ۱۵. روشهای آماری تجزیه و تحلیل دادهها\n" + stat_text + "\n\n---")
-
-        # 16. ملاحظات اخلاقی
-        md_parts.append("## ۱۶. ملاحظات اخلاقی\n" + "پروتکل مطالعه منطبق بر کدهای اخلاقی پژوهش‌های زیست‌پزشکی و ضوابط ایمنی زیستی تدوین گردیده است." + "\n\n---")
-
-        # 17. محدودیتهای مطالعه
-        md_parts.append("## ۱۷. محدودیتهای مطالعه\n" + "عدم تعمیم مستقیم شرایط برون‌تنی به سیستم‌های پیچیده درون‌تنی بدن انسان." + "\n\n---")
-
-        # 18. جدول متغیرها
-        var_table_text = data.get("variable_table_text")
-        if not var_table_text:
+        # -------------------------------------------------------------
+        # ۱۱. جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))
+        # -------------------------------------------------------------
+        var_text = data.get("variable_table_text")
+        if not var_text:
             variables = DynamicProtocolDesigner.generate_variable_table(model_dict)
-            var_table_text = DynamicProtocolDesigner.render_variable_table_markdown(variables)
-        md_parts.append("## ۱۸. جدول متغیرها\n" + var_table_text + "\n\n---")
+            var_text = DynamicProtocolDesigner.render_variable_table_markdown(variables)
+        md_parts.append("## ۱۱. جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))\n" + var_text + "\n\n---")
 
-        # 19. جدول زمانبندی
-        timeline_text = data.get("timeline_table_text")
-        if not timeline_text:
+        # -------------------------------------------------------------
+        # ۱۲. جدول زمان بندی و مراحل اجرا
+        # -------------------------------------------------------------
+        time_text = data.get("timeline_table_text")
+        if not time_text:
             tl = DynamicProtocolDesigner.generate_timeline(framework)
-            timeline_text = DynamicProtocolDesigner.render_timeline_markdown(tl)
-        md_parts.append("## ۱۹. جدول زمانبندی\n" + timeline_text + "\n\n---")
+            time_text = DynamicProtocolDesigner.render_timeline_markdown(tl)
+        md_parts.append("## ۱۲. جدول زمان بندی و مراحل اجرا\n" + time_text + "\n\n---")
 
-        # 20. بودجه
-        budget_text = "| ردیف | شرح هزینه | مبلغ (ریال) |\n| :--- | :--- | :--- |\n| ۱ | مواد مصرفی و محیط کشت | ۱۵۰,۰۰۰,۰۰۰ |\n| ۲ | آزمون‌های تخصصی فلوسایتومتری | ۲۰۰,۰۰۰,۰۰۰ |\n| ۳ | تحلیل داده‌ها و نگارش | ۵۰,۰۰۰,۰۰۰ |\n| **جمع** | **کل هزینه‌ها** | **۴۰۰,۰۰۰,۰۰۰** |"
-        md_parts.append("## ۲۰. بودجه\n" + budget_text + "\n\n---")
+        # -------------------------------------------------------------
+        # ۱۳. روش اجرا
+        # -------------------------------------------------------------
+        meth_overview = data.get("methodology_overview_text")
+        if not meth_overview:
+            meth_overview = (
+                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) طراحی گردیده و "
+                f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده مداخله، "
+                f"سنجش‌های بیولوژیک و کمی‌سازی پیامدها بر اساس استانداردهای کنترل کیفیت، و در نهایت تحلیل آماری و مدلسازی برهم‌کنش می‌باشد."
+            )
+        md_parts.append("## ۱۳. روش اجرا\n" + meth_overview + "\n\n---")
 
-        # 21. منابع
+        # -------------------------------------------------------------
+        # ۱۴. نوع مطالعه
+        # -------------------------------------------------------------
+        sec_14 = data.get("study_design_text") or extracted_subs.get("1")
+        if not sec_14:
+            sec_14 = f"مطالعه بنیادی-کاربردی از نوع تجربی آزمایشگاهی در شرایط برون‌تن (In Vitro Experimental Study)."
+        md_parts.append("## ۱۴. نوع مطالعه\n" + sec_14 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۱۵. جامعه مورد مطالعه
+        # -------------------------------------------------------------
+        sec_15 = data.get("study_population_text") or extracted_subs.get("2")
+        if not sec_15:
+            sec_15 = f"مدل زیستی و سیستم سلولی مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی."
+        md_parts.append("## ۱۵. جامعه مورد مطالعه\n" + sec_15 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۱۶. محل انجام مطالعه
+        # -------------------------------------------------------------
+        sec_16 = data.get("study_setting_text") or extracted_subs.get("3")
+        if not sec_16:
+            sec_16 = "آزمایشگاه تحقیقات سلولی و مولکولی و آزمایشگاه جامع تحقیقاتی دانشکده علوم پزشکی."
+        md_parts.append("## ۱۶. محل انجام مطالعه\n" + sec_16 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۱۷. معیار های ورود به مطالعه
+        # -------------------------------------------------------------
+        sec_17 = data.get("inclusion_criteria_text") or extracted_subs.get("4")
+        if not sec_17:
+            sec_17 = (
+                "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
+                "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی.\n"
+                "- استفاده از سلول‌ها در محدوده پاساژ استاندارد جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
+                "- مواد مداخله با درجه خلوص آنالیتیک معتبر و کنترل کیفی تاییدشده."
+            )
+        md_parts.append("## ۱۷. معیار های ورود به مطالعه\n" + sec_17 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۱۸. معیار های خروج از مطالعه
+        # -------------------------------------------------------------
+        sec_18 = data.get("exclusion_criteria_text") or extracted_subs.get("5")
+        if not sec_18:
+            sec_18 = (
+                "- مشاهده هرگونه آلودگی میکروبی یا تغییرات ریخت‌شناسی غیرمعمول در چاهک‌های کشت.\n"
+                "- افت زیست‌پذیری کنترل منفی سلولی به کمتر از ۹۰ درصد در طول دوره آزمایش.\n"
+                "- وجود خطای تفاضل ضریب تغییرات (CV) بالاتر از ۱۵ درصد میان تکرارهای تکنیکی یک گروه."
+            )
+        md_parts.append("## ۱۸. معیار های خروج از مطالعه\n" + sec_18 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۱۹. ابزار های گردآوری اطلاعات
+        # -------------------------------------------------------------
+        sec_19 = data.get("instruments_text") or extracted_subs.get("6")
+        if not sec_19:
+            sec_19 = (
+                "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا در طول موج‌های اختصاصی.\n"
+                "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد و نرم‌افزارهای تحلیل فلورسانس.\n"
+                "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ.\n"
+                "- سیستم Real-Time PCR جهت سنجش بیان کمی ژن‌ها و نرم‌افزارهای تحلیلی GraphPad Prism و CompuSyn."
+            )
+        md_parts.append("## ۱۹. ابزار های گردآوری اطلاعات\n" + sec_19 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۰. تعیین اعتبار ابزار گردآوری
+        # -------------------------------------------------------------
+        sec_20 = data.get("validity_text") or extracted_subs.get("7")
+        if not sec_20:
+            sec_20 = (
+                "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
+                "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب در واکنش‌های تکثیر.\n"
+                "- استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد در کلیه ران‌ها."
+            )
+        md_parts.append("## ۲۰. تعیین اعتبار ابزار گردآوری\n" + sec_20 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۱. تعیین ابزار گردآوری
+        # -------------------------------------------------------------
+        sec_21 = data.get("reliability_text") or extracted_subs.get("8")
+        if not sec_21:
+            sec_21 = (
+                "- اجرای کلیه آزمون‌ها در حداقل سه تکرار بیولوژیکی کاملاً مستقل در روزهای مجزا.\n"
+                "- لحاظ نمودن حداقل سه تکرار تکنیکی (Triplicate) در هر پلیت برای هر غلظت آزمایشی.\n"
+                "- محاسبه ضریب تغییرات درون‌آزمونی (Intra-assay CV) و بین‌آزمونی (Inter-assay CV) و پذیرش داده‌ها صرفاً با CV کمتر از ۱۰ درصد."
+            )
+        md_parts.append("## ۲۱. تعیین ابزار گردآوری\n" + sec_21 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۲. حجم نمونه و روش محاسبه آن
+        # -------------------------------------------------------------
+        sec_22 = data.get("sample_size_text") or extracted_subs.get("9")
+        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\\frac', r'n\s*=', r'Mead', r'Z_']):
+            sec_22 = (
+                "تعیین حجم نمونه بر اساس متدولوژی استاندارد مطالعات تجربی فارماکولوژی سلولی و رابطه کوهن انجام می‌پذیرد:\n\n"
+                r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$"
+                "\n\nبا در نظر گرفتن توان آزمون ۸۰٪ ($1-\\beta = 0.80$)، سطح خطای نوع اول ۵٪ ($\\alpha = 0.05$) و اندازه اثر استاندارد "
+                "برگرفته از مطالعات پیلوت، حداقل ۳ تکرار بیولوژیکی مستقل برای هر شرط تجربی کفایت آماری لازم را تضمین می‌نماید. "
+                "همچنین بر اساس رابطه تخصیص منابع مید (Mead's Resource Equation: $E = N - B - T$) مقدار درجات آزادی خطا در بازه استاندارد ۱۰ الی ۲۰ قرار می‌گیرد."
+            )
+        md_parts.append("## ۲۲. حجم نمونه و روش محاسبه آن\n" + sec_22 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۳. روش تجزیه و تحلیل داده
+        # -------------------------------------------------------------
+        sec_23 = data.get("statistical_analysis_text") or extracted_subs.get("10")
+        if not sec_23:
+            sec_23 = (
+                "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
+                "- تحلیل مقایسه میانگین‌ها در گروه‌های مستقل چندگانه با آنالیز واریانس یک‌طرفه (One-way ANOVA) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
+                "- ارزیابی برهم‌کنش غلظت و زمان با آنالیز واریانس دوطرفه فاکتوریل (Two-way ANOVA with interaction).\n"
+                "- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).\n"
+                "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
+            )
+        md_parts.append("## ۲۳. روش تجزیه و تحلیل داده\n" + sec_23 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۴. ملاحظلات اخلاقی در صورت نیاز
+        # -------------------------------------------------------------
+        sec_24 = data.get("ethics_text") or extracted_subs.get("11")
+        if not sec_24:
+            sec_24 = (
+                "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
+                "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی و ثبت دقیق اصالت نمونه‌ها.\n"
+                "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه."
+            )
+        md_parts.append("## ۲۴. ملاحظلات اخلاقی در صورت نیاز\n" + sec_24 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۵. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز
+        # -------------------------------------------------------------
+        sec_25 = data.get("biosafety_text") or extracted_subs.get("12")
+        if not sec_25:
+            sec_25 = (
+                "- انجام کلیه آزمایش‌های کشت سلولی و زیستی منحصراً در آزمایشگاه سطح ایمنی زیستی ۲ (BSL-2) زیر هودهای لامینار کلاس ۲.\n"
+                "- اتوکلاو نمودن و بی‌خطرسازی کلیه پسماندهای عفونی و پساب‌ها پیش از خروج طبق پروتکل‌های حفاظت زیستی دانشگاه.\n"
+                "- استفاده الزامی اپراتور از تجهیزات حفاظت فردی کامل (PPE شامل دستکش، گان، ماسک و محافظ صورت)."
+            )
+        md_parts.append("## ۲۵. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\n" + sec_25 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۶. مشکلات و محدودیت ها
+        # -------------------------------------------------------------
+        sec_26 = data.get("limitations_text") or extracted_subs.get("13")
+        if not sec_26:
+            sec_26 = (
+                "- چالش حلالیت آبی ترکیبات: کنترل دقیق حلال ناقل (DMSO < 0.1%) جهت ممانعت از سمیت پس‌زمینه حلال.\n"
+                "- نوسانات حساسیت در پاساژهای سلولی: محدودسازی پاساژهای سلولی بین ۵ الی ۱۵ و رصد پیوسته مورفولوژی.\n"
+                "- محدودیت ذاتی مدل‌های برون‌تن: در نظر داشتن ماهیت تک‌لایه‌ای کشت سلولی در تعمیم نتایج به سیستم‌های پیچیده درون‌تنی."
+            )
+        md_parts.append("## ۲۶. مشکلات و محدودیت ها\n" + sec_26 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۷. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات
+        # -------------------------------------------------------------
+        sec_27 = data.get("step_by_step_procedure_text") or extracted_subs.get("14")
+        if not sec_27:
+            sec_27 = (
+                "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
+                "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی و ایجاد شرایط چسبندگی ۲۴ ساعته.\n"
+                "۳. آماده‌سازی رقت‌های سریالی مداخلات و اعمال تیمار تک‌عاملی و ترکیبی در مقاطع ۲۴، ۴۸ و ۷۲ ساعت.\n"
+                "۴. اجرای آزمون MTT و خوانش جذب نوری با الایزاریدر جهت محاسبه درصد مهار زیست‌پذیری.\n"
+                "۵. ارزیابی آپوپتوز با رنگ‌آمیزی فلورسانس و آنالیز فلوسایتومتری.\n"
+                "۶. ثبت و استخراج داده‌های کمی و تحلیل آماری پارامترهای دوز-پاسخ و هم‌افزایی."
+            )
+        md_parts.append("## ۲۷. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات\n" + sec_27 + "\n\n---")
+
+        # -------------------------------------------------------------
+        # ۲۸. منابعی که استفاده شد (انگلیسی یا فارسی)
+        # -------------------------------------------------------------
         ref_lines = []
         for idx, s in enumerate(studies[:25], 1):
             cnum = s.get("citation_number", idx)
@@ -603,40 +838,8 @@ class ProposalGenerator:
             if doi: entry += f" DOI: https://doi.org/{doi}"
             if pmid: entry += f" PMID: {pmid}"
             ref_lines.append(entry)
-        md_parts.append("## ۲۱. منابع\n" + "\n\n".join(ref_lines) + "\n\n---")
-
-        # 22. خلاصه فارسی
-        abstract_fa = (
-            f"**زمینه و هدف:** {cond_name} نیازمند رویکردهای ترکیبی موثر است.\n"
-            f"**روش بررسی:** سلول‌های {sys_name} تحت مواجهه تک‌عاملی و توام قرار می‌گیرند.\n"
-            f"**یافته‌های مورد انتظار:** تعیین شاخص ترکیب و ارزیابی مسیرهای مرگ سلولی."
-        )
-        md_parts.append("## ۲۲. خلاصه فارسی\n" + abstract_fa + "\n\n---")
-
-        # 23. خلاصه انگلیسی (Abstract)
-        abstract_en = (
-            f"**Background:** Overcoming therapeutic resistance in {cond_en} demands targeted combinatorial regimens.\n"
-            f"**Methods:** {sys_name} cells are evaluated under monotherapy and co-treatment protocols.\n"
-            f"**Expected Results:** Determination of combination index and mechanistic apoptotic markers."
-        )
-        md_parts.append("## ۲۳. خلاصه انگلیسی (Abstract)\n" + abstract_en + "\n\n---")
-
-        # 24. کلیدواژههای فارسی
-        kw_fa = f"{cond_name}، آپوپتوز، هم‌افزایی، مهار رشد، شاخص ترکیب"
-        md_parts.append("## ۲۴. کلیدواژههای فارسی\n" + kw_fa + "\n\n---")
-
-        # 25. کلیدواژههای انگلیسی
-        kw_en = f"{cond_en}, Apoptosis, Synergism, Growth Inhibition, Combination Index"
-        md_parts.append("## ۲۵. کلیدواژههای انگلیسی\n" + kw_en + "\n\n---")
-
-        # 26. تعارض منافع
-        md_parts.append("## ۲۶. تعارض منافع\n" + "نویسندگان هیچ‌گونه تعارض منافعی در انجام این پژوهش گزارش نمی‌نمایند." + "\n\n---")
-
-        # 27. سپاسگزاری
-        md_parts.append("## ۲۷. سپاسگزاری\n" + "از معاونت پژوهشی و کلیه پرسنل آزمایشگاه مرکزی کمال تشکر را داریم." + "\n\n---")
-
-        # 28. ضمائم (در صورت نیاز)
-        md_parts.append("## ۲۸. ضمائم (در صورت نیاز)\n" + "پروتکل‌های دستگاهی و گواهی اصالت رده‌های سلولی پیوست می‌گردد.")
+        ref_text = "\n\n".join(ref_lines) if ref_lines else "فهرست منابع به شیوه استاندارد ونکوور تنظیم گردیده است."
+        md_parts.append("## ۲۸. منابعی که استفاده شد (انگلیسی یا فارسی)\n" + ref_text)
 
         return "\n\n".join(md_parts)
 
@@ -648,14 +851,14 @@ class ProposalGenerator:
         if not readiness_res.can_proceed:
             raise ValueError(f"Proposal generation blocked by ProposalReadinessGate: {readiness_res.error_messages}")
 
-        # 2. Assemble proposal markdown
-        is_pajooheshyar = (format == "pajooheshyar_28" or data.get("format") == "pajooheshyar_28")
-        if is_pajooheshyar:
-            md_content = cls.assemble_pajooheshyar_28(data)
-            completeness_res = MethodologyCompletenessGate.validate(md_content)
-        else:
+        # 2. Assemble proposal markdown (defaults to canonical 28-section format)
+        is_14_legacy = (format in ["14", "14_sections"] or data.get("format") in ["14", "14_sections"])
+        if is_14_legacy:
             md_content = cls.assemble_proposal(data)
             completeness_res = None
+        else:
+            md_content = cls.assemble_pajooheshyar_28(data)
+            completeness_res = MethodologyCompletenessGate.validate(md_content)
 
         # 3. Apply Persian Medical Typography Linter
         try:
@@ -688,7 +891,7 @@ class ProposalGenerator:
         DocxBuilder.build_docx(md_content, docx_path)
         
         final_status = "PASS"
-        if is_pajooheshyar and completeness_res:
+        if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
         else:
             final_status = val_result.get("PROPOSAL_STRUCTURE_VALIDATION", "PASS")

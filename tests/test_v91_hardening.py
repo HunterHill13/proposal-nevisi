@@ -42,6 +42,8 @@ from native_omml_math_engine import NativeOmmlMathEngine
 from persian_medical_typography_linter import PersianMedicalTypographyLinter
 from proposal_readiness_gate import ProposalReadinessGate
 from docx_builder import DocxBuilder
+from generate_compliant_proposal import ProposalGenerator
+from proposal_structure_validator import ProposalStructureValidator
 
 
 class TestV91HardeningSuite(unittest.TestCase):
@@ -306,6 +308,56 @@ class TestV91HardeningSuite(unittest.TestCase):
         self.assertIn("(IC50 = 12.5 uM)", formatted)
         self.assertIn("[1, 2]", formatted)
         self.assertIn("10.1016/j.canlet.2020.01.001", formatted)
+
+    # =========================================================================
+    # 9. Canonical 28-Section Architecture & Completeness Tests
+    # =========================================================================
+    def test_canonical_28_section_generation_and_validation(self):
+        """Validates that assemble_pajooheshyar_28 produces the exact 28 canonical sections passing all gates."""
+        benchmark_path = os.path.join(TESTS_DIR, "fixtures", "benchmark_dataset", "benchmark_proposal_data.json")
+        with open(benchmark_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        md_28 = ProposalGenerator.assemble_pajooheshyar_28(data)
+        self.assertIsNotNone(md_28)
+        self.assertIn("## ۲۸. منابعی که استفاده شد (انگلیسی یا فارسی)", md_28)
+
+        # 1. Test ProposalStructureValidator in 28-section mode
+        val_res = ProposalStructureValidator.validate_proposal_text(md_28)
+        self.assertEqual(val_res["status"], "PASS")
+        self.assertEqual(val_res.get("format_detected"), "28_SECTIONS")
+        self.assertTrue(val_res["all_28_sections_present"])
+        self.assertTrue(val_res["section_ordering_intact"])
+        self.assertTrue(val_res["variable_table_present"])
+        self.assertTrue(val_res["timeline_schedule_present"])
+        self.assertEqual(len(val_res["missing_sections"]), 0)
+
+        # 2. Test MethodologyCompletenessGate
+        comp_res = MethodologyCompletenessGate.validate(md_28)
+        self.assertTrue(comp_res.is_complete)
+        self.assertTrue(comp_res.can_proceed)
+        self.assertEqual(len(comp_res.missing_sections), 0)
+
+    def test_canonical_28_section_adversarial_missing_section(self):
+        """Adversarial test: Removing a canonical section must cause validation failure."""
+        benchmark_path = os.path.join(TESTS_DIR, "fixtures", "benchmark_dataset", "benchmark_proposal_data.json")
+        with open(benchmark_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        md_28 = ProposalGenerator.assemble_pajooheshyar_28(data)
+        # Deliberately remove Section 22 (حجم نمونه و روش محاسبه آن)
+        defective_md = re.sub(r'## ۲۲\. حجم نمونه و روش محاسبه آن.*?(?=## ۲۳|\Z)', '', md_28, flags=re.DOTALL)
+        self.assertNotIn("## ۲۲. حجم نمونه و روش محاسبه آن", defective_md)
+
+        val_res = ProposalStructureValidator.validate_proposal_text(defective_md)
+        self.assertEqual(val_res["status"], "FAIL")
+        self.assertFalse(val_res["all_28_sections_present"])
+        self.assertTrue(any("حجم نمونه" in s for s in val_res["missing_sections"]))
+
+        comp_res = MethodologyCompletenessGate.validate(defective_md)
+        self.assertFalse(comp_res.is_complete)
+        self.assertFalse(comp_res.can_proceed)
+        self.assertTrue(any("حجم نمونه" in s for s in comp_res.missing_sections))
 
 
 if __name__ == "__main__":

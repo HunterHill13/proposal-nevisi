@@ -13,15 +13,138 @@ import re
 import sys
 from typing import Dict, List, Any, Optional
 try:
-    from core_policies import MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
+    from core_policies import MANDATORY_28_SECTIONS, MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
 except ImportError:
-    from scripts.core_policies import MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
+    from scripts.core_policies import MANDATORY_28_SECTIONS, MANDATORY_14_SECTIONS, MANDATORY_SUBSECTIONS_13, SECTION_CONTENT_EXPECTATIONS
 
 class ProposalStructureValidator:
     """Validates structural integrity, ordering, and presence of all required sections."""
 
     @classmethod
+    def is_28_section_format(cls, text: str) -> bool:
+        """Determines if the proposal text follows the canonical 28-section structure."""
+        if re.search(r"(?:^|\n)##?\s*(?:28|۲۸)[\.\-:]?", text):
+            return True
+        if re.search(r"(?:^|\n)##?\s*(?:14|۱۴)[\.\-:]?\s*(?:نوع\s*مطالعه|study\s*type)", text):
+            return True
+        if re.search(r"(?:^|\n)##?\s*(?:27|۲۷)[\.\-:]?", text):
+            return True
+        return False
+
+    @classmethod
     def validate_proposal_text(cls, text: str) -> Dict[str, Any]:
+        """Audits markdown proposal text for adherence (supporting 28-section canonical and 14-section legacy)."""
+        if cls.is_28_section_format(text):
+            return cls.validate_28_section_text(text)
+        return cls.validate_14_section_text(text)
+
+    @classmethod
+    def validate_28_section_text(cls, text: str) -> Dict[str, Any]:
+        """Audits markdown proposal text for canonical 28-section adherence."""
+        section_status = []
+        last_index = -1
+        ordering_violated = False
+
+        PERSIAN_DIGITS = {str(i): "".join("۰۱۲۳۴۵۶۷۸۹"[int(d)] for d in str(i)) for i in range(1, 35)}
+
+        # 1. Audit 28 Top-level sections
+        for num, name, patterns in MANDATORY_28_SECTIONS:
+            p_num = PERSIAN_DIGITS.get(str(num), str(num))
+            pattern_regex = rf"(?:^|\n)##?\s*(?:{num}|{p_num})[\.\-:\s]+[^\n]*?(?:{'|'.join(patterns)})"
+            match = re.search(pattern_regex, text, re.IGNORECASE)
+            if match:
+                found_pos = match.start()
+                if found_pos < last_index:
+                    ordering_violated = True
+                last_index = found_pos
+                section_status.append({"section_num": num, "name": name, "found": True, "pos": found_pos})
+            else:
+                section_status.append({"section_num": num, "name": name, "found": False, "pos": -1})
+
+        missing_sections = [s["name"] for s in section_status if not s["found"]]
+
+        # 2. Check Variable Table and Timeline
+        has_var_table = bool(re.search(r"\|\s*نام\s*متغیر\s*\|", text) or re.search(r"\|\s*متغیر\s*\|", text))
+        has_timeline = bool(re.search(r"\|\s*فاز[^\n\|]*\|", text) or re.search(r"\|\s*مرحله[^\n\|]*\|", text) or re.search(r"گانت", text) or re.search(r"زمان[\s\-\u200c]*بندی", text))
+
+        # 3. Content Depth Audit
+        words = text.split()
+        total_word_count = len(words)
+
+        sec_2_match = re.search(r"(?:^|\n)##?\s*(?:2|۲)[\.\-:]?\s*بیان\s*مس[ئأه]له", text)
+        sec_3_match = re.search(r"(?:^|\n)##?\s*(?:3|۳)[\.\-:]?\s*مرور\s*بر\s*منابع", text)
+        sec_4_match = re.search(r"(?:^|\n)##?\s*(?:4|۴)[\.\-:]?\s*اهمیت\s*و\s*ضرورت", text)
+
+        sec_2_words = 0
+        if sec_2_match and sec_3_match:
+            sec_2_text = text[sec_2_match.end():sec_3_match.start()]
+            sec_2_words = len(sec_2_text.split())
+
+        sec_3_words = 0
+        if sec_3_match and sec_4_match:
+            sec_3_text = text[sec_3_match.end():sec_4_match.start()]
+            sec_3_words = len(sec_3_text.split())
+
+        # 4. Reference count in Section 28 (Ceiling: 25, Floor: 15)
+        sec_28_text = ""
+        sec_28_match = re.search(r"(?:^|\n)##?\s*(?:28|۲۸)[\.\-:]?\s*(?:منابع|references)", text, re.IGNORECASE)
+        if sec_28_match:
+            sec_28_text = text[sec_28_match.end():]
+        ref_entries = re.findall(r'(?:^|\n)\s*\[\s*\d+\s*\]', sec_28_text)
+        ref_count = len(ref_entries)
+
+        ref_count_valid = True
+        ref_violation = None
+        if sec_28_match and ref_count > 0:
+            if ref_count > 25:
+                ref_count_valid = False
+                ref_violation = f"EXCEEDS_MAX_REFERENCE_CEILING_25 (Count: {ref_count}, Ceiling: 25)"
+            elif ref_count < 15:
+                ref_count_valid = False
+                ref_violation = f"BELOW_MIN_REFERENCE_FLOOR_15 (Count: {ref_count}, Floor: 15)"
+
+        # 5. Check Section 3 for prohibited artificial axis headers
+        has_artificial_axis_headers = False
+        if sec_3_match and sec_4_match:
+            sec_3_body = text[sec_3_match.end():sec_4_match.start()]
+            if re.search(r'###\s*محور\s+', sec_3_body) or re.search(r'###\s*Axis\s+', sec_3_body, re.IGNORECASE):
+                has_artificial_axis_headers = True
+
+        passed = (
+            len(missing_sections) == 0 and
+            not ordering_violated and
+            has_var_table and
+            has_timeline and
+            (ref_count_valid or not sec_28_match) and
+            not has_artificial_axis_headers
+        )
+
+        status_str = "PASS" if passed else "FAIL"
+
+        return {
+            "status": status_str,
+            "PROPOSAL_STRUCTURE_VALIDATION": status_str,
+            "format_detected": "28_SECTIONS",
+            "all_28_sections_present": len(missing_sections) == 0,
+            "all_14_sections_present": True,
+            "all_subsections_13_present": True,
+            "section_ordering_intact": not ordering_violated,
+            "variable_table_present": has_var_table,
+            "timeline_schedule_present": has_timeline,
+            "reference_count": ref_count,
+            "reference_count_valid": ref_count_valid,
+            "reference_ceiling_violation": ref_violation,
+            "has_artificial_axis_headers": has_artificial_axis_headers,
+            "total_word_count": total_word_count,
+            "problem_statement_word_count": sec_2_words,
+            "literature_review_word_count": sec_3_words,
+            "missing_sections": missing_sections,
+            "missing_subsections_13": [],
+            "section_audit_details": section_status
+        }
+
+    @classmethod
+    def validate_14_section_text(cls, text: str) -> Dict[str, Any]:
         """Audits markdown proposal text for 14-section adherence."""
         section_status = []
         last_index = -1
