@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-combination_hypothesis_engine.py - Parallel Combination Hypotheses & Evidence Balancer
-Proposal-Nevisi Engine v9.0 (Layer 1: Scientific Accuracy)
+combination_hypothesis_engine.py - Context-Aware Parallel Combination Hypotheses & Evidence Balancer
+Proposal-Nevisi Engine v9.1 (Layer 1: Scientific Accuracy)
 
-Eliminates Positive-Evidence Bias (unilateral synergy assumption) by constructing
-parallel hypotheses (Synergism vs Antagonism vs Additive) for drug/biologic combinations.
-Partitions empirical evidence, calculates evidence balance scores, and issues publication bias warnings.
+Eliminates superficial keyword-counting bias by evaluating evidence directness:
+- Disentangles direct combination evidence from monotherapies and indirect background.
+- Categorizes evidence across 6 rigorous tiers:
+  * DIRECT_COMBINATION_EVIDENCE
+  * DIRECT_SINGLE_AGENT_EVIDENCE
+  * CLOSE_ANALOG
+  * MECHANISTIC_SUPPORT
+  * METHODOLOGICAL_SUPPORT
+  * INDIRECT_BACKGROUND
+- Emits explicit 'NO_DIRECT_COMBINATION_EVIDENCE' when co-treatment has not been directly studied.
+- Weights evidence by directness and quality rather than raw volume of irrelevant papers.
+- Enforces parallel hypotheses ($H_1$: Synergy vs $H_2$: Antagonism/Additivity) with publication bias warnings.
 
 100% General-Purpose: Zero hardcoded entity names.
 """
@@ -14,6 +23,15 @@ Partitions empirical evidence, calculates evidence balance scores, and issues pu
 import re
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
+
+@dataclass
+class ClassifiedEvidenceRecord:
+    title: str
+    tier: str  # DIRECT_COMBINATION_EVIDENCE, DIRECT_SINGLE_AGENT_EVIDENCE, CLOSE_ANALOG, MECHANISTIC_SUPPORT, METHODOLOGICAL_SUPPORT, INDIRECT_BACKGROUND
+    interaction_polarity: str  # SYNERGY, ANTAGONISM, ADDITIVE, NEUTRAL, NOT_APPLICABLE
+    weight: float
+    directness_notes: str
+    source_id: Optional[str] = None
 
 @dataclass
 class CombinationHypothesisAnalysis:
@@ -26,8 +44,11 @@ class CombinationHypothesisAnalysis:
     synergism_evidence: List[Dict[str, Any]] = field(default_factory=list)
     antagonism_evidence: List[Dict[str, Any]] = field(default_factory=list)
     neutral_evidence: List[Dict[str, Any]] = field(default_factory=list)
-    evidence_balance_score: float = 0.5  # positive / total
+    evidence_balance_score: float = 0.5  # weighted positive / total weighted informative
     recommended_framing: str = "neutral"  # "synergism" | "antagonism" | "neutral"
+    has_direct_combination_evidence: bool = False
+    direct_combination_evidence_count: int = 0
+    evidence_tiers_breakdown: Dict[str, int] = field(default_factory=dict)
     bias_warnings: List[str] = field(default_factory=list)
     framing_narrative_persian: str = ""
 
@@ -42,6 +63,9 @@ class CombinationHypothesisAnalysis:
             "synergism_evidence_count": len(self.synergism_evidence),
             "antagonism_evidence_count": len(self.antagonism_evidence),
             "neutral_evidence_count": len(self.neutral_evidence),
+            "has_direct_combination_evidence": self.has_direct_combination_evidence,
+            "direct_combination_evidence_count": self.direct_combination_evidence_count,
+            "evidence_tiers_breakdown": self.evidence_tiers_breakdown,
             "synergism_evidence": self.synergism_evidence,
             "antagonism_evidence": self.antagonism_evidence,
             "neutral_evidence": self.neutral_evidence,
@@ -51,8 +75,9 @@ class CombinationHypothesisAnalysis:
             "framing_narrative_persian": self.framing_narrative_persian
         }
 
+
 class CombinationHypothesisEngine:
-    """Universal engine evaluating dual interaction hypotheses and evidence balance."""
+    """Universal engine evaluating dual interaction hypotheses and evidence directness."""
 
     SYNERGISM_PATTERNS = [
         r'\bsynerg(?:y|istic|ism)\b',
@@ -83,20 +108,31 @@ class CombinationHypothesisEngine:
         r'مهار\s+متقابل'
     ]
 
+    TIER_WEIGHTS = {
+        "DIRECT_COMBINATION_EVIDENCE": 1.0,
+        "CLOSE_ANALOG": 0.40,
+        "DIRECT_SINGLE_AGENT_EVIDENCE": 0.20,
+        "MECHANISTIC_SUPPORT": 0.20,
+        "METHODOLOGICAL_SUPPORT": 0.05,
+        "INDIRECT_BACKGROUND": 0.0
+    }
+
     @classmethod
     def analyze(
         cls,
         entity_a: str,
         entity_b: str,
         target: str = "cell_viability",
-        retrieved_evidence: Optional[List[Any]] = None
+        retrieved_evidence: Optional[List[Any]] = None,
+        model_or_cell_line: Optional[str] = None
     ) -> CombinationHypothesisAnalysis:
         """
-        Builds dual hypotheses and evaluates balance across retrieved evidence records.
+        Builds dual hypotheses and evaluates context-aware evidence directness.
         """
         a_str = str(entity_a).strip()
         b_str = str(entity_b).strip()
         tgt_str = str(target).strip()
+        model_str = str(model_or_cell_line).strip() if model_or_cell_line else ""
 
         # 1. Parallel hypothesis construction
         hyp_synergy = (
@@ -116,7 +152,24 @@ class CombinationHypothesisEngine:
         antagonism_ev = []
         neutral_ev = []
 
-        # 2. Partition evidence
+        tiers_counts = {
+            "DIRECT_COMBINATION_EVIDENCE": 0,
+            "DIRECT_SINGLE_AGENT_EVIDENCE": 0,
+            "CLOSE_ANALOG": 0,
+            "MECHANISTIC_SUPPORT": 0,
+            "METHODOLOGICAL_SUPPORT": 0,
+            "INDIRECT_BACKGROUND": 0
+        }
+
+        weighted_pos = 0.0
+        weighted_neg = 0.0
+        direct_combination_count = 0
+
+        a_lower = a_str.lower()
+        b_lower = b_str.lower()
+        model_lower = model_str.lower() if model_str else ""
+
+        # 2. Context-aware evidence evaluation
         for item in evidence_list:
             item_dict = item.to_dict() if hasattr(item, "to_dict") else (item if isinstance(item, dict) else {"raw": str(item)})
             text_rep = (
@@ -126,45 +179,80 @@ class CombinationHypothesisEngine:
                 str(item_dict.get("claim_text", ""))
             ).lower()
 
+            has_a = a_lower in text_rep
+            has_b = b_lower in text_rep
+            has_model = (model_lower in text_rep) if model_lower else True
+
+            # Determine Tier
+            if has_a and has_b and has_model:
+                tier = "DIRECT_COMBINATION_EVIDENCE"
+                direct_combination_count += 1
+            elif has_a and has_b:
+                tier = "CLOSE_ANALOG"
+            elif has_a or has_b:
+                tier = "DIRECT_SINGLE_AGENT_EVIDENCE"
+            elif any(w in text_rep for w in ["apoptosis", "caspase", "bcl", "akt", "pathway", "signaling", "momp"]):
+                tier = "MECHANISTIC_SUPPORT"
+            elif any(w in text_rep for w in ["chou-talalay", "isobologram", "bliss", "loewe", "combination index"]):
+                tier = "METHODOLOGICAL_SUPPORT"
+            else:
+                tier = "INDIRECT_BACKGROUND"
+
+            tiers_counts[tier] = tiers_counts.get(tier, 0) + 1
+            weight = cls.TIER_WEIGHTS.get(tier, 0.0)
+
+            # Polarity detection
             is_syn = any(re.search(p, text_rep, re.IGNORECASE) for p in cls.SYNERGISM_PATTERNS)
             is_ant = any(re.search(p, text_rep, re.IGNORECASE) for p in cls.ANTAGONISM_PATTERNS)
 
             if is_syn and not is_ant:
                 synergy_ev.append(item_dict)
+                weighted_pos += weight
             elif is_ant and not is_syn:
                 antagonism_ev.append(item_dict)
+                weighted_neg += weight
             elif is_syn and is_ant:
-                # Discrepant or dose-dependent
                 synergy_ev.append(item_dict)
                 antagonism_ev.append(item_dict)
+                weighted_pos += (weight * 0.5)
+                weighted_neg += (weight * 0.5)
             else:
                 neutral_ev.append(item_dict)
 
-        total_informative = len(synergy_ev) + len(antagonism_ev)
+        has_direct_evidence = (direct_combination_count > 0)
+        total_weighted = weighted_pos + weighted_neg
         warnings = []
 
-        if total_informative == 0:
+        if not has_direct_evidence:
+            warnings.append(
+                "NO_DIRECT_COMBINATION_EVIDENCE: هیچ مطالعه تجربی مستقیمی پیرامون ترکیب همزمان این دو مداخله "
+                f"({a_str} + {b_str}) در مدل مورد نظر یافت نشد. "
+                "شواهد موجود صرفاً غیرمستقیم، تک‌عاملی یا مکانیسمی هستند؛ گزاره هم‌افزایی باید به عنوان فرضیه آزمون‌نشده تدوین گردد."
+            )
+
+        if total_weighted <= 0.05:
+            # When no informative evidence exists, balance score defaults to 0.5 (neutral)
             balance_score = 0.5
             recommended_framing = "neutral"
             narrative = (
-                f"با توجه به فقدان مطالعات تجربی مستقیم پیرامون هم‌افزایی {a_str} و {b_str} در منابع مورد جستجو، "
-                f"هر دو فرضیه هم‌افزایی (Synergy) و آنتاگونیسم (Antagonism) به عنوان احتمالات معتبر در نظر گرفته شده "
-                f"و فرضیه‌سازی با لحن بی‌طرفانه و مبتنی بر سنجش تجربی CI تدوین می‌گردد."
+                f"با توجه به فقدان یا ناچیز بودن شواهد پیرامون اثر همزمان {a_str} و {b_str} در منابع مورد جستجو، "
+                f"هر دو فرضیه هم‌افزایی (Synergy) و آنتاگونیسم (Antagonism) به عنوان احتمالات علمی هم‌تراز در نظر گرفته شده "
+                f"و فرضیه‌سازی با لحن بی‌طرفانه تدوین گردید."
             )
         else:
-            balance_score = round(len(synergy_ev) / total_informative, 3)
+            balance_score = round(weighted_pos / total_weighted, 3)
 
             # Check for Positive Evidence Dominance Warning
-            if len(synergy_ev) > 0 and len(antagonism_ev) == 0:
+            if weighted_pos > 0 and weighted_neg == 0:
                 warnings.append(
-                    "POSITIVE_EVIDENCE_DOMINANCE_WARNING: کلیه شواهد بازیابی‌شده حاکی از اثرات مثبت هستند. "
+                    "POSITIVE_EVIDENCE_DOMINANCE_WARNING: کلیه شواهد بازیابی‌شده حاکی از اثرات هم‌افزا هستند. "
                     "احتمال سوگیری انتشار (Publication Bias) بالاست؛ پروتکل مطالعه باید آزمون‌های دقیق تفکیک آنتاگونیسم را شامل شود."
                 )
 
             if balance_score >= 0.70:
                 recommended_framing = "synergism"
                 narrative = (
-                    f"شواهد موجود به نفع فرضیه هم‌افزایی برهم‌کنش (وزن شواهد مثبت: {int(balance_score*100)}٪) هستند؛ "
+                    f"شواهد موجود به نفع فرضیه هم‌افزایی برهم‌کنش (وزن شواهد مثبت مستقیم/انتقالی: {int(balance_score*100)}٪) هستند؛ "
                     f"با این وجود، احتمال رخداد اثرات آنتاگونیستی در غلظت‌های نامتعادل در طراحی آزمون مد نظر قرار گرفته است."
                 )
             elif balance_score <= 0.30:
@@ -177,7 +265,7 @@ class CombinationHypothesisEngine:
                 recommended_framing = "neutral"
                 narrative = (
                     f"شواهد متناقض و برابری از اثرات هم‌افزا و آنتاگونیستی گزارش شده است؛ "
-                    f"لذا بررسی بی‌طرفانه دوز-پاسخ و تعیین دقیق ایزوبولوگرام جهت تشخیص پنجره درمانی الزامی است."
+                    f"لذا بررسی بی‌طرفانه دوز-پاسخ و تعیین دقیق شاخص ترکیب (CI) جهت تشخیص پنجره درمانی الزامی است."
                 )
 
         return CombinationHypothesisAnalysis(
@@ -192,8 +280,9 @@ class CombinationHypothesisEngine:
             neutral_evidence=neutral_ev,
             evidence_balance_score=balance_score,
             recommended_framing=recommended_framing,
+            has_direct_combination_evidence=has_direct_evidence,
+            direct_combination_evidence_count=direct_combination_count,
+            evidence_tiers_breakdown=tiers_counts,
             bias_warnings=warnings,
             framing_narrative_persian=narrative
         )
-
-combination_hypothesis_engine = CombinationHypothesisEngine

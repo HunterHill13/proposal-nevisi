@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-methodology_completeness_gate.py - Pajooheshyar 28-Section Methodology Completeness Gate
-Proposal-Nevisi Engine v9.0 (Layer 2: Structural Compliance)
+methodology_completeness_gate.py - Pajooheshyar 28-Section Completeness & Sample Size Methodology Gate
+Proposal-Nevisi Engine v9.1 (Layer 2: Structural Compliance)
 
-Enforces complete compliance with the 28 mandatory sections of the official
-Iranian Biomedical Research Information System (Pajooheshyar / Ministry of Health).
-Requires mandatory mathematical formula in Sample Size calculation.
-100% General-Purpose: Zero hardcoded topics.
+Enforces:
+1. 28 Mandatory Sections of the official Iranian Biomedical Research Information System (Pajooheshyar).
+2. Deep Sample Size Methodology Evaluation:
+   - Evaluates primary endpoint, experimental unit, effect size, variance/SD, alpha, power, design.
+   - If inputs are insufficient, does NOT generate a fictitious formula; emits SAMPLE_SIZE_STATUS = INSUFFICIENT_INPUTS
+     and lists missing_inputs.
+3. Biological vs Technical Replicates Enforcer:
+   - Strictly distinguishes biological replicates (independent experimental units) from technical replicates
+     (pipetting/assay triplicates).
+   - Prevents pseudo-replication fallacy (4 biological x 3 technical is n = 4, NEVER n = 12).
+   - Flags REPLICATION_STRUCTURE_UNDEFINED if experimental unit is ambiguous.
+
+100% General-Purpose: Zero hardcoded project subjects.
 """
 
 import re
@@ -24,7 +33,7 @@ REQUIRED_SECTIONS_28 = [
     "فرضیات یا سوالات پژوهشی",
     "جامعه آماری",
     "روش نمونهگیری",
-    "حجم نمونه و روش محاسبه آن",  # فرمول Cohen یا Mead یا مشابه، اجباری
+    "حجم نمونه و روش محاسبه آن",
     "معیارهای ورود به مطالعه",
     "معیارهای خروج از مطالعه",
     "روش اجرا",
@@ -47,7 +56,6 @@ REQUIRED_SECTIONS_28 = [
 
 PAJOOHESHYAR_28_SECTIONS = REQUIRED_SECTIONS_28
 
-# Aliases and normalization patterns for section recognition
 SECTION_SYNONYMS = {
     "عنوان فارسی": [r"عنوان\s+فارسی", r"موضوع\s+فارسی", r"عنوان\s+طرح"],
     "عنوان انگلیسی": [r"عنوان\s+انگلیسی", r"english\s+title", r"موضوع\s+انگلیسی"],
@@ -55,8 +63,8 @@ SECTION_SYNONYMS = {
     "بیان مسئله و ضرورت انجام تحقیق": [r"بیان\s+مسئله", r"ضرورت\s+انجام\s+تحقیق", r"بیان\s+مساله", r"problem\s+statement"],
     "مروری بر متون": [r"مروری\s+بر\s+متون", r"مرور\s+بر\s+منابع", r"پیشینه\s+پژوهش", r"literature\s+review"],
     "اهداف (هدف کلی و اهداف اختصاصی)": [r"اهداف", r"هدف\s+کلی", r"اهداف\s+اختصاصی", r"اهداف\s+جزیی", r"objectives"],
-    "فرضیات یا سوالات پژوهشی": [r"فرضیات", r"سوالات\s+پژوهشی", r"پرسش‌های\s+پژوهش", r"hypotheses"],
-    "جامعه آماری": [r"جامعه\s+آماری", r"جامعه\s+مورد\s+مطالعه", r"target\s+population"],
+    "فرضیات یا سوالات پژوهشی": [r"فرضیات", r"فرضیه‌ها", r"سوالات\s+پژوهش", r"hypotheses"],
+    "جامعه آماری": [r"جامعه\s+آماری", r"جامعه\s+پژوهش", r"population", r"جامعه\s+هدف"],
     "روش نمونهگیری": [r"روش\s+نمونه‌?گیری", r"نمونه‌?گیری", r"sampling\s+method"],
     "حجم نمونه و روش محاسبه آن": [r"حجم\s+نمونه", r"محاسبه\s+حجم\s+نمونه", r"sample\s+size"],
     "معیارهای ورود به مطالعه": [r"معیارهای\s+ورود", r"شرایط\s+ورود", r"inclusion\s+criteria"],
@@ -79,25 +87,44 @@ SECTION_SYNONYMS = {
     "ضمائم (در صورت نیاز)": [r"ضمائم", r"پیوست‌ها", r"ضمیمه", r"appendices?"]
 }
 
-# Mathematical formula detection patterns for Sample Size
 SAMPLE_SIZE_FORMULA_PATTERNS = [
-    r'n\s*=',
-    r'N\s*=',
-    r'E\s*=\s*N\s*-\s*B\s*-\s*T',  # Mead's resource equation
-    r'\\frac\{',
-    r'z_\{?\\alpha',
-    r'Z_\{?\\alpha',
-    r'z_\{\\alpha',
-    r'\bCohen\b',
-    r'\bCochran\b',
-    r'\bMead\b',
-    r'فرمول\s+(?:کوکران|کوهن|مید|محاسبه)',
-    r'(?:z_\alpha|z_\beta)',
-    r'\(Z_\{?1-\\alpha',
-    r'n\s*=\s*\frac',
-    r'n\s*=\s*\(',
-    r'd\s*=\s*\\frac'
+    r'\\frac',
+    r'Z_\{?1',
+    r'[nN]\s*=',
+    r'Mead',
+    r'E\s*=\s*N\s*-\s*B\s*-\s*T',
+    r'resource equation',
+    r'کوکران|کوهن|مید|پوکاک',
+    r'تکرار.*(بیولوژیک|مستقل|آزمایشگاهی)',
+    r'(biological|independent)\s+replicate'
 ]
+
+@dataclass
+class SampleSizeEvaluation:
+    status: str  # "ADEQUATE", "INSUFFICIENT_INPUTS", "REPLICATION_STRUCTURE_UNDEFINED", "RECOMMENDED_FORMULA_AVAILABLE"
+    can_proceed: bool
+    missing_inputs: List[str] = field(default_factory=list)
+    experimental_unit: Optional[str] = None
+    biological_replicates: Optional[int] = None
+    technical_replicates: Optional[int] = None
+    total_independent_n: Optional[int] = None
+    recommended_formula: Optional[str] = None
+    methodological_rationale_fa: str = ""
+    warnings: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "status": self.status,
+            "can_proceed": self.can_proceed,
+            "missing_inputs": self.missing_inputs,
+            "experimental_unit": self.experimental_unit,
+            "biological_replicates": self.biological_replicates,
+            "technical_replicates": self.technical_replicates,
+            "total_independent_n": self.total_independent_n,
+            "recommended_formula": self.recommended_formula,
+            "methodological_rationale_fa": self.methodological_rationale_fa,
+            "warnings": self.warnings
+        }
 
 @dataclass
 class CompletenessGateResult:
@@ -106,6 +133,7 @@ class CompletenessGateResult:
     missing_sections: List[str] = field(default_factory=list)
     sections_needing_formula: List[str] = field(default_factory=list)
     present_sections: List[str] = field(default_factory=list)
+    sample_size_evaluation: Optional[SampleSizeEvaluation] = None
     total_required: int = 28
     compliance_score: float = 0.0
     detailed_status: Dict[str, str] = field(default_factory=dict)
@@ -117,38 +145,136 @@ class CompletenessGateResult:
             "missing_sections": self.missing_sections,
             "sections_needing_formula": self.sections_needing_formula,
             "present_sections": self.present_sections,
+            "sample_size_evaluation": self.sample_size_evaluation.to_dict() if self.sample_size_evaluation else None,
             "total_required": self.total_required,
             "compliance_score": self.compliance_score,
             "detailed_status": self.detailed_status
         }
 
+
 class MethodologyCompletenessGate:
-    """Validates full structural and mathematical compliance against 28 Pajooheshyar sections."""
+    """Validates 28-section Pajooheshyar completeness, sample size rigor, and replicate structures."""
+
+    @classmethod
+    def evaluate_sample_size_inputs(
+        cls,
+        study_design: str = "in_vitro",
+        primary_endpoint: Optional[str] = None,
+        experimental_unit: Optional[str] = None,
+        effect_size: Optional[float] = None,
+        variance_or_sd: Optional[float] = None,
+        alpha: Optional[float] = 0.05,
+        power: Optional[float] = 0.80,
+        groups_count: int = 4,
+        biological_replicates: Optional[int] = None,
+        technical_replicates: Optional[int] = None
+    ) -> SampleSizeEvaluation:
+        """
+        Evaluates the epistemic adequacy of sample size parameters.
+        Does NOT invent formulas when inputs are missing.
+        Strictly enforces distinction between biological and technical replicates.
+        """
+        missing = []
+        warnings = []
+
+        if not primary_endpoint:
+            missing.append("primary_endpoint")
+
+        if not experimental_unit:
+            missing.append("experimental_unit")
+            warnings.append("REPLICATION_STRUCTURE_UNDEFINED: واحد آزمایشی مستقل (Experimental Unit) مشخص نشده است.")
+
+        # Replicate pseudo-replication check
+        if biological_replicates is not None and technical_replicates is not None:
+            if technical_replicates > 1:
+                warnings.append(
+                    f"PSEUDO_REPLICATION_GUARD: تعداد {biological_replicates} تکرار بیولوژیک مستقل همراه با "
+                    f"{technical_replicates} تکرار تکنیکی (فنی) تعریف شده است. "
+                    f"حجم نمونه مستقل n = {biological_replicates} است و تکرارهای فنی نباید به عنوان درجات آزادی مستقل در آزمون فرض وارد شوند."
+                )
+            independent_n = biological_replicates
+        elif biological_replicates is not None:
+            independent_n = biological_replicates
+        else:
+            independent_n = None
+            missing.append("biological_replicates")
+
+        # Parametric input check
+        has_power_params = (effect_size is not None and variance_or_sd is not None and alpha is not None and power is not None)
+
+        if not has_power_params:
+            if effect_size is None:
+                missing.append("effect_size")
+            if variance_or_sd is None:
+                missing.append("variance_or_sd")
+
+            # In exploratory in vitro/in vivo studies where effect size is unknown:
+            if study_design in ["in_vitro", "in_vivo"]:
+                rationale_fa = (
+                    "وضعیت: INSUFFICIENT_INPUTS برای توان‌آزمایی پارامتریک سنتی. "
+                    "به دلیل ماهیت اکتشافی (Exploratory) و فقدان مطالعات قبلی با اندازه اثر مشخص، "
+                    "محاسبه بر مبنای حداقل تکرار بیولوژیک مستقل استاندارد (حداقل ۳ الی ۴ تکرار مستقل در روزهای مجزا) "
+                    "یا رابطه تخصیص منابع مید (Mead's Resource Equation: E = N - B - T) صورت می‌پذیرد."
+                )
+                rec_formula = "E = N - B - T (10 <= E <= 20) یا حداقل n = 3-4 تکرار بیولوژیک مستقل"
+            else:
+                rationale_fa = (
+                    "وضعیت: INSUFFICIENT_INPUTS. داده‌های کافی برای محاسبه اندازه نمونه (اندازه اثر و واریانس) وجود ندارد. "
+                    "فرمول جعلی تولید نمی‌شود؛ داده‌های پایلوت برای تخمین Cohen's d الزامی است."
+                )
+                rec_formula = None
+
+            return SampleSizeEvaluation(
+                status="INSUFFICIENT_INPUTS",
+                can_proceed=(independent_n is not None and independent_n >= 3),
+                missing_inputs=missing,
+                experimental_unit=experimental_unit,
+                biological_replicates=biological_replicates,
+                technical_replicates=technical_replicates,
+                total_independent_n=independent_n,
+                recommended_formula=rec_formula,
+                methodological_rationale_fa=rationale_fa,
+                warnings=warnings
+            )
+
+        # Full parametric inputs available
+        formula_str = r"n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2}"
+        rationale_fa = f"محاسبه بر مبنای توان آماری {int(power*100)}٪ و آلفای {alpha} با اندازه اثر {effect_size} انجام شد."
+
+        return SampleSizeEvaluation(
+            status="ADEQUATE",
+            can_proceed=True,
+            missing_inputs=[],
+            experimental_unit=experimental_unit,
+            biological_replicates=biological_replicates,
+            technical_replicates=technical_replicates,
+            total_independent_n=independent_n,
+            recommended_formula=formula_str,
+            methodological_rationale_fa=rationale_fa,
+            warnings=warnings
+        )
 
     @classmethod
     def validate(cls, proposal_input: Union[Dict[str, Any], str]) -> CompletenessGateResult:
         """
-        Validates completeness from dictionary or markdown text.
+        Validates presence and adequacy of all 28 Pajooheshyar sections.
         """
-        if isinstance(proposal_input, str):
-            extracted = cls._extract_sections_from_markdown(proposal_input)
-        elif isinstance(proposal_input, dict):
+        if isinstance(proposal_input, dict):
             extracted = cls._extract_sections_from_dict(proposal_input)
         else:
-            raise TypeError("proposal_input must be dict or markdown string")
+            extracted = cls._extract_sections_from_markdown(str(proposal_input))
 
         missing = []
-        needing_formula = []
+        needing_substance = []
         present = []
         details = {}
 
         for req_sec in REQUIRED_SECTIONS_28:
             content = extracted.get(req_sec)
-            
+
             # Check presence
             if not content or len(str(content).strip()) == 0:
                 if req_sec == "ضمائم (در صورت نیاز)":
-                    # Optional section, if missing record as optional present
                     present.append(req_sec)
                     details[req_sec] = "OPTIONAL_OMITTED_CLEAN"
                     continue
@@ -158,22 +284,22 @@ class MethodologyCompletenessGate:
 
             content_str = str(content).strip()
 
-            # Specific check for sample size formula
+            # Specific check for Sample Size Section (Section 10)
             if req_sec == "حجم نمونه و روش محاسبه آن":
                 has_formula = any(re.search(pat, content_str, re.IGNORECASE) for pat in SAMPLE_SIZE_FORMULA_PATTERNS)
                 if not has_formula:
-                    needing_formula.append(req_sec)
-                    details[req_sec] = "MISSING_MATHEMATICAL_FORMULA"
+                    needing_substance.append(req_sec)
+                    details[req_sec] = "MISSING_MATHEMATICAL_FORMULA_OR_DESIGN_JUSTIFICATION"
                     continue
                 else:
                     present.append(req_sec)
-                    details[req_sec] = "VALID_WITH_FORMULA"
+                    details[req_sec] = "PRESENT_METHODOLOGICALLY_EVALUATED"
                     continue
 
             present.append(req_sec)
             details[req_sec] = "PRESENT"
 
-        is_complete = (len(missing) == 0 and len(needing_formula) == 0)
+        is_complete = (len(missing) == 0 and len(needing_substance) == 0)
         can_proceed = is_complete
         score = round((len(present) / len(REQUIRED_SECTIONS_28)) * 100, 1)
 
@@ -181,7 +307,7 @@ class MethodologyCompletenessGate:
             is_complete=is_complete,
             can_proceed=can_proceed,
             missing_sections=missing,
-            sections_needing_formula=needing_formula,
+            sections_needing_formula=needing_substance,
             present_sections=present,
             total_required=len(REQUIRED_SECTIONS_28),
             compliance_score=score,
@@ -191,12 +317,10 @@ class MethodologyCompletenessGate:
     @classmethod
     def _extract_sections_from_dict(cls, data: Dict[str, Any]) -> Dict[str, str]:
         extracted = {}
-        # Direct matches
         for sec in REQUIRED_SECTIONS_28:
             if sec in data:
                 extracted[sec] = str(data[sec])
 
-        # Synonyms and nested keys
         for sec, patterns in SECTION_SYNONYMS.items():
             if sec in extracted:
                 continue
@@ -205,7 +329,6 @@ class MethodologyCompletenessGate:
                     extracted[sec] = str(val)
                     break
 
-        # Check special structured fields
         if "sample_size_calculation" in data and "حجم نمونه و روش محاسبه آن" not in extracted:
             ss = data["sample_size_calculation"]
             formula = ss.get("formula", "") if isinstance(ss, dict) else str(ss)
@@ -229,32 +352,28 @@ class MethodologyCompletenessGate:
         current_sec = None
         current_buffer = []
 
-        header_regex = re.compile(r'^(?:#+|\*+|\-|\d+[\.-])\s*(.+?)(?::|\s*$)')
+        def save_current():
+            if current_sec and current_buffer:
+                extracted[current_sec] = '\n'.join(current_buffer).strip()
 
         for line in lines:
-            line_str = line.strip()
-            # Match heading
-            if line_str.startswith('#') or re.match(r'^\d+[\.-]\s+', line_str):
-                # Identify which section
-                matched_sec = None
-                for sec, patterns in SECTION_SYNONYMS.items():
-                    if any(re.search(p, line_str, re.IGNORECASE) for p in patterns):
-                        matched_sec = sec
+            header_match = re.match(r'^(?:#+|\d+\s*[-.)]|بخش\s*\d+[:\s])\s*(.+)$', line.strip())
+            if header_match:
+                candidate_title = header_match.group(1).strip()
+                matched_req = None
+                for req_sec, patterns in SECTION_SYNONYMS.items():
+                    if any(re.search(p, candidate_title, re.IGNORECASE) for p in patterns):
+                        matched_req = req_sec
                         break
 
-                if matched_sec:
-                    if current_sec:
-                        extracted[current_sec] = "\n".join(current_buffer).strip()
-                    current_sec = matched_sec
+                if matched_req:
+                    save_current()
+                    current_sec = matched_req
                     current_buffer = []
                     continue
 
             if current_sec:
                 current_buffer.append(line)
 
-        if current_sec:
-            extracted[current_sec] = "\n".join(current_buffer).strip()
-
+        save_current()
         return extracted
-
-methodology_completeness_gate = MethodologyCompletenessGate

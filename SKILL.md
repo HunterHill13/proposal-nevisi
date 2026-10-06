@@ -2,23 +2,31 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v9.0). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v9.1). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
-  Built on a 4-layer modular architecture (Layer 1: Scientific Accuracy via BiologicalMechanismAdversarialVerifier, CombinationHypothesisEngine,
-  CompoundEntityNormalizer; Layer 2: Structural Compliance via MethodologyCompletenessGate validating 28 Pajooheshyar sections and mandatory sample size formula,
-  and CombinationModelSelector; Layer 3: Citation Integrity via CitationTracker enforcing Vancouver order-of-appearance, orphaned claim detection, and unused reference filtering;
-  Layer 4: Formatting & Typesetting via NativeOmmlMathEngine converting LaTeX to native Word OMML XML <m:oMath>, and PersianMedicalTypographyLinter
-  enforcing ZWNJ, Persian numerals, and abbreviation expansions). Enforces ProposalReadinessGate as a fail-closed pre-generation gatekeeper.
+  Built on a 4-layer hardened modular architecture (Layer 1: Scientific Accuracy via BiologicalMechanismAdversarialVerifier, CombinationHypothesisEngine,
+  CompoundEntityNormalizer; Layer 2: Structural Compliance via MethodologyCompletenessGate validating 28 Pajooheshyar sections, design-sensitive sample size evaluation,
+  and decoupled StatisticalAnalysisModelSelector / CombinationInteractionModelSelector; Layer 3: Citation Integrity via CitationTracker enforcing global document Vancouver re-indexing,
+  orphaned claim detection, contextual model mismatch audits, and unused reference elimination; Layer 4: Formatting & Typesetting via NativeOmmlMathEngine converting LaTeX to native Word OMML XML <m:oMath>,
+  and PersianMedicalTypographyLinter protecting English parentheses, math, and DOIs). Enforces ProposalReadinessGate as a fail-closed pre-generation gatekeeper.
   Supports multi-source federated searches (PubMed, Europe PMC, OpenAlex, Crossref), 16 query families, MeSH mapping, multi-directional citation chasing,
-  saturation tracking, deep paper reading (Sections A-E), SciFact-aligned claim verification, 8-tier evidence hierarchy,
-  and passes a unified 350-assertion test harness across 13 suites and 43 release gate criteria with zero hardcoded biological leakage across all 31 engine scripts.
+  saturation tracking, deep paper reading, SciFact-aligned claim verification, 8-tier evidence hierarchy,
+  and passes a unified 371-assertion test harness across 14 suites and 43 release gate criteria with zero hardcoded biological leakage across all engine scripts.
 ---
 
-# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v9.0)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v9.1)
 
 این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-نسخه ۹.۰ تمام منطق‌های شرطی شکننده و وابسته به موضوع را به طور کامل حذف کرده و معماری ماژولار ۴ لایه‌ای زیر را با سد بازدارنده آمادگی (`ProposalReadinessGate`) پیاده‌سازی نموده است:
+نسخه ۹.۱ بر مبنای اصل بنیادین «عدم قطعیت باید بازنمایی شود نه پنهان‌سازی» (Uncertainty must be represented, not hidden) تمامی لایه‌های موتور را هاردنینگ نموده و موارد زیر را تضمین می‌کند:
+- تفکیک قطعی هویت ماده از خلوص تحلیلی در `CompoundEntityNormalizer`.
+- راستی‌آزمایی زنجیره‌ای مکانیسم‌ها و رد ادعاهای بدون شواهد در `BiologicalMechanismAdversarialVerifier`.
+- سنجش جهت‌داری شواهد و اعلام صریح فقدان مطالعه مستقیم در `CombinationHypothesisEngine`.
+- تفکیک معماری مدل‌های استنباطی (ANOVA/GLM) از مدل‌های سینرژی (Chou-Talalay/Bliss) و پوشش کینتیک ویروس زنده.
+- ارزیابی معرفت‌شناختی حجم نمونه بدون ساخت فرمول جعلی و اعمال گارد تفکیک تکرار بیولوژیک از تکنیکی در `MethodologyCompletenessGate`.
+- بازنمایه‌سازی یکپارچه ونکوور و رد ارجاعات استفاده‌نشده در `CitationTracker`.
+- تبدیل و اعتبارسنجی E2E فرمول‌های ریاضی به تگ‌های بومی ورد `<m:oMath>` در `docx_builder` و حذف کامل نشت سینتکس LaTeX.
+- محافظت کامل از عبارات انگلیسی داخل پرانتز و شناسه‌های DOI/PMID در `PersianMedicalTypographyLinter`.
 
 ---
 

@@ -21,6 +21,18 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
 
+SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
+
+try:
+    from scripts.native_omml_math_engine import NativeOmmlMathEngine
+except ImportError:
+    try:
+        from native_omml_math_engine import NativeOmmlMathEngine
+    except ImportError:
+        NativeOmmlMathEngine = None
+
 def set_p_rtl(p, space_before=2.5, space_after=3.5, line_spacing=1.15, align="both"):
     p.paragraph_format.space_before = Pt(space_before)
     p.paragraph_format.space_after = Pt(space_after)
@@ -102,11 +114,11 @@ def add_r(p, text, font_name="Dubai", size_pt=11, bold=False, italic=False, colo
 def add_bidi_text(p, text, font_name="Dubai", size_pt=11, bold=False, italic=False, color_rgb=(0x00, 0x00, 0x00)):
     if not text:
         return
-    try:
-        from native_omml_math_engine import NativeOmmlMathEngine
-        text = NativeOmmlMathEngine.clean_text_of_latex(text)
-    except Exception:
-        pass
+    if NativeOmmlMathEngine is not None:
+        try:
+            text = NativeOmmlMathEngine.clean_text_of_latex(text)
+        except Exception:
+            pass
     text = str(text).replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
     pattern = r'(\([A-Za-z0-9_\-\s,\./%α-ωΑ-Ω→⇌⇄<>=\+\^±]+\)|\[\d+(?:,\s*\d+)*\]|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+(?:\s*(?:→|->|⇌|<->|⇄|<=|>=|<|>|=)\s*[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+)+|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]{2,}|[→⇌⇄]|(?:<=|>=|[<>=])\s*\d+(?:\.\d+)?)'
     tokens = re.split(pattern, text)
@@ -219,18 +231,21 @@ def add_formula_box(doc, formula_text):
     </w:pBdr>''')
     pPr.append(pBdr)
     
-    try:
-        from native_omml_math_engine import NativeOmmlMathEngine
-        NativeOmmlMathEngine.insert_math_into_paragraph(p, formula_text, is_display=True)
-    except Exception:
-        run = p.add_run(formula_text)
-        run.font.name = "Times New Roman"
-        run.font.size = Pt(11)
-        run.bold = True
-        run.font.color.rgb = RGBColor(0x1B, 0x26, 0x31)
-        rPr = run._r.get_or_add_rPr()
-        rFonts = parse_xml(f'<w:rFonts {nsdecls("w")} w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>')
-        rPr.append(rFonts)
+    if NativeOmmlMathEngine is not None:
+        try:
+            NativeOmmlMathEngine.insert_math_into_paragraph(p, formula_text, is_display=True)
+            return p
+        except Exception:
+            pass
+
+    run = p.add_run(formula_text)
+    run.font.name = "Times New Roman"
+    run.font.size = Pt(11)
+    run.bold = True
+    run.font.color.rgb = RGBColor(0x1B, 0x26, 0x31)
+    rPr = run._r.get_or_add_rPr()
+    rFonts = parse_xml(f'<w:rFonts {nsdecls("w")} w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>')
+    rPr.append(rFonts)
     return p
 
 def set_cell_margins(cell, top=80, bottom=80, left=100, right=100):
@@ -354,8 +369,25 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
             add_h3(doc, stripped[5:])
         elif is_refs and re.match(r'^\d+\.\s+', stripped):
             add_ref_item(doc, stripped)
-        elif stripped.startswith('Growth Inhibition (%) =') or stripped.startswith('CI =') or (stripped.startswith('$$') and stripped.endswith('$$')):
-            clean_form = stripped[2:-2].strip() if stripped.startswith('$$') else stripped
+        # Check for formula blocks ($$...$$, \[...\], n = \frac, CI =, etc.)
+        is_formula_line = (
+            (stripped.startswith('$$') and stripped.endswith('$$') and len(stripped) > 4) or
+            (stripped.startswith(r'\[') and stripped.endswith(r'\]')) or
+            (stripped.startswith('$') and stripped.endswith('$') and len(stripped) > 2 and ('=' in stripped or r'\frac' in stripped)) or
+            stripped.startswith('Growth Inhibition (%) =') or
+            stripped.startswith('CI =') or
+            stripped.startswith('E = N - B - T') or
+            (r'\frac{' in stripped and ('=' in stripped or 'n' in stripped.lower())) or
+            bool(re.match(r'^[nN]\s*=\s*\\frac', stripped))
+        )
+        if is_formula_line:
+            clean_form = stripped
+            if clean_form.startswith('$$') and clean_form.endswith('$$'):
+                clean_form = clean_form[2:-2].strip()
+            elif clean_form.startswith(r'\[') and clean_form.endswith(r'\]'):
+                clean_form = clean_form[2:-2].strip()
+            elif clean_form.startswith('$') and clean_form.endswith('$'):
+                clean_form = clean_form[1:-1].strip()
             add_formula_box(doc, clean_form)
         elif stripped.startswith('* ') or stripped.startswith('- '):
             add_bullet_p(doc, stripped[2:])

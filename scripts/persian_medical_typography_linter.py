@@ -121,14 +121,17 @@ class PersianMedicalTypographyLinter:
             protected_tokens.append(match.group(0))
             return f"__TYPO_PROT_{idx}__"
 
-        # Protect Display & Inline Math
+        # Protect Display & Inline Math ($$...$$, $...$, \[...\], \(...\))
         current_text = re.sub(r'\$\$[^$]+\$\$|\$[^$\n]+\$', _protect, current_text)
+        current_text = re.sub(r'\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)', _protect, current_text)
         # Protect URLs & DOIs
         current_text = re.sub(r'https?://[^\s]+|10\.\d{4,9}/[-._;()/:A-Za-z0-9]+', _protect, current_text)
-        # Protect Citation brackets e.g. [1], [2, 3]
-        current_text = re.sub(r'\[\d+(?:,\s*\d+)*\]', _protect, current_text)
+        # Protect Citation brackets e.g. [1], [2, 3], [1-4]
+        current_text = re.sub(r'\[\d+(?:[\s,\-–]+\d+)*\]', _protect, current_text)
         # Protect PMIDs
         current_text = re.sub(r'PMID:\s*\d+', _protect, current_text)
+        # Protect English text and mathematical notation inside parentheses e.g. (Apoptosis), (p < 0.05), (CI = 0.45)
+        current_text = re.sub(r'\([A-Za-z0-9_\-\s,\./%α-ωΑ-Ω→⇌⇄<>=\+\^±]+\)', _protect, current_text)
 
         # 2. Apply ZWNJ Rules
         zwnj_rules = self.config.get("zwnj_rules", self.DEFAULT_RULES["zwnj_rules"])

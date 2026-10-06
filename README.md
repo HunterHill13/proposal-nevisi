@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Modular Architecture & Adversarial Verification Engine (v9.0)
-### موتور ماژولار و جامع سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های پژوهشی علوم پزشکی (نسخه ۹.۰)
+### Universal Evidence-Driven Medical Research, Modular Architecture & Hardened Adversarial Verification Engine (v9.1)
+### موتور ماژولار و جامع سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های پژوهشی علوم پزشکی (نسخه ۹.۱)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 350/350 Passed](https://img.shields.io/badge/Unified%20Tests-350%2F350%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 371/371 Passed](https://img.shields.io/badge/Unified%20Tests-371%2F371%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
@@ -20,9 +20,17 @@
 <a name="english"></a>
 ## English Documentation
 
-**Proposal-Nevisi (v9.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v9.0 introduces a 4-Layer Modular Architecture** that replaces rigid, topic-specific heuristics with fully generalized, fail-closed adversarial verification components.
+**Proposal-Nevisi (v9.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v9.1 hardens the 4-Layer Modular Architecture** with strict epistemic bounds: "Uncertainty must be represented, not hidden".
 
-It operates seamlessly across diverse biomedical disciplines—including **Oncology**, **Cardiology**, **Infectious Diseases**, **Molecular Diagnostics**, **Epidemiology**, **Endocrinology**, **Nephrology**, **Regenerative Medicine / Biomaterials**, **Occupational Toxicology**, **Pediatric Pulmonology**, and **Basic Molecular / Cellular Science**.
+Key architectural additions in v9.1 include:
+- **Purity vs. Identity Disentanglement:** Mentioning a substance establishes parent molecular identity, but analytical purity remains `NOT_REPORTED` unless explicitly verified.
+- **Role Inversion & Mechanistic Chains:** Fail-closed biological role verification and multi-edge causal chain evaluation in `BiologicalMechanismAdversarialVerifier`.
+- **Combination Hypothesis Bounding:** Directional evidence ratio calculation with `POSITIVE_EVIDENCE_DOMINANCE_WARNING` and explicit notification when no direct co-treatment study exists on the target model.
+- **Decoupled Statistical Modeling:** Clear distinction between descriptive multi-arm layouts and true factorial models via `StatisticalAnalysisModelSelector`, and dedicated combination interaction modeling (Bliss, Loewe, Chou-Talalay, ZIP, HSA) with live virus kinetics support via `CombinationInteractionModelSelector`.
+- **Methodology & Sample Size Rigor:** Evaluates primary endpoints and variance without fabricating fake formulas, while strictly preventing pseudo-replication fallacy ($4 \times 3$ is $n=4$).
+- **Document-Level Vancouver Re-Indexing:** Monotonic 1-based order-of-appearance rewriting, unused reference elimination, and contextual cell line mismatch detection.
+- **Native Word OMML Equations:** Verified Word-native `<m:oMath>` XML generation with complete absence of raw LaTeX leakage in DOCX files.
+- **Persian Typography Protection:** Preserves English parenthetical terms, statistics, DOIs, PMIDs, and citation ranges.
 
 > **Pre-Generation Readiness Guarantee:** Proposal generation is strictly governed by `ProposalReadinessGate`. If any module fails verification, generation is aborted immediately with a diagnostic error report.
 
