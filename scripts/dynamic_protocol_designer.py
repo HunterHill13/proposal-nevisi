@@ -76,7 +76,7 @@ class DynamicProtocolDesigner:
         variables = []
 
         # 1. Independent Variables (Interventions)
-        interventions = model_dict.get("interventions_or_exposures", [])
+        interventions = model_dict.get("interventions_or_exposures") or model_dict.get("interventions", [])
         for agt in interventions:
             name = agt.get("name", "مداخله پژوهش") if isinstance(agt, dict) else str(agt)
             variables.append({
@@ -89,7 +89,7 @@ class DynamicProtocolDesigner:
             })
 
         # 2. Dependent Variables (Primary Outcomes)
-        outcomes = model_dict.get("primary_outcomes", [])
+        outcomes = model_dict.get("primary_outcomes") or model_dict.get("outcomes", [])
         for out in outcomes:
             name = out.get("name", "پیامد اولیه") if isinstance(out, dict) else str(out)
             unit = out.get("measurement_unit", "درصد مهار") if isinstance(out, dict) else "درصد مهار"
@@ -116,6 +116,27 @@ class DynamicProtocolDesigner:
             })
 
 
+        # 3b. In Vitro Quality & Interference Controls (v9.2 Pillar 5: AssayInterferencePolicy)
+        framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        is_in_vitro = (framework in ["EXPERIMENTAL_IN_VITRO", "MECHANISTIC"]) or any("cell" in str(v).lower() for v in model_dict.values())
+        if is_in_vitro:
+            variables.append({
+                "name": "بلانک بدون سلول (Cell-Free Blank Control)",
+                "role": "کنترل منفی تداخل فنی (Assay Interference Control)",
+                "type": "کیفی اسمی (Categorical)",
+                "operational_definition": "محیط کشت حاوی غلظت‌های مداخله فاقد سلول با معرف سنجش جهت کسر احیای شیمیایی مستقیم و تداخل نوری غیرآنزیمی",
+                "measurement_method": "خوانش اسپکتروفتومتری و کسر جذب نوری بلانک از چاهک‌های آزمایش",
+                "unit": "جذب نوری (OD)"
+            })
+            variables.append({
+                "name": "کنترل حلال ناقل (Vehicle Control)",
+                "role": "کنترل منفی حلال (Vehicle Control)",
+                "type": "کیفی اسمی (Categorical)",
+                "operational_definition": "محیط کشت حاوی حداکثر غلظت حلال ناقل (DMSO < 0.1%) فاقد ماده موثره جهت تفکیک سمیت حلال از اثر اختصاصی",
+                "measurement_method": "انکوباسیون همگام در شرایط یکسان با گروه‌های مداخله",
+                "unit": "درصد زیست‌پذیری نسبت به کنترل دست‌نخورده"
+            })
+
         # 4. Confounders
         variables.append({
             "name": "تعداد پاساژ و یکنواختی محیط کشت / شرایط آزمون",
@@ -127,6 +148,19 @@ class DynamicProtocolDesigner:
         })
 
         return variables
+
+    @classmethod
+    def get_orthogonal_triangulation_protocol(cls, framework: str = "EXPERIMENTAL_IN_VITRO") -> Dict[str, Any]:
+        """Provides universal orthogonal triangulation strategy for viability and cytotoxic assays."""
+        from core_policies import AssayInterferencePolicy
+        return {
+            "required_controls": AssayInterferencePolicy.REQUIRED_CONTROLS,
+            "orthogonal_assays": AssayInterferencePolicy.ORTHOGONAL_ASSAYS,
+            "rationale": (
+                "سنجش‌های زیست‌پذیری مبتنی بر احیای متابولیک (مانند MTT) به تداخلات ناشی از احیای شیمیایی مستقیم یا پلی‌فنول‌ها حساس هستند. "
+                "بنابراین اعتبارسنجی با آزمون آپوپتوز فلوسایتومتری (Annexin V/PI) و آزمون بقای کلونوژنیک ۱۴ روزه الزامی است."
+            )
+        }
 
     @classmethod
     def render_variable_table_markdown(cls, variables: List[Dict[str, str]]) -> str:

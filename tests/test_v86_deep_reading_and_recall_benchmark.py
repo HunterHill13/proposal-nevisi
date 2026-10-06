@@ -433,7 +433,7 @@ class TestV86DeepReadingAndRecallBenchmark(unittest.TestCase):
         """Enforces that core architecture invariants remain strictly protected in v8.6.0."""
         self.assertEqual(MAX_FINAL_REFERENCES, 25, "Hard ceiling of 25 final references must be strictly preserved.")
         self.assertTrue(NO_QUOTA_FILLING, "No artificial quota filling policy must remain True.")
-        self.assertTrue(ENGINE_VERSION in ["8.6.0", "8.7.0", "9.0.0", "9.1.0"], "Engine version must be synchronized to at least 8.6.0.")
+        self.assertTrue(ENGINE_VERSION in ["8.6.0", "8.7.0", "9.0.0", "9.1.0", "9.2.0"], "Engine version must be synchronized to at least 8.6.0.")
 
 
 if __name__ == "__main__":

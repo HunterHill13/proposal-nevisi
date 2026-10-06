@@ -22,9 +22,38 @@ Features:
 100% General-Purpose: Zero hardcoded topics.
 """
 
+import os
+import sys
 import re
 from typing import Dict, List, Any, Optional, Tuple, Set
 from dataclasses import dataclass, field
+
+try:
+    from core_policies import ROLE_SECTION_PERMISSIONS
+except ImportError:
+    scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from core_policies import ROLE_SECTION_PERMISSIONS
+
+@dataclass
+class RoleSectionViolation:
+    citation_key: str
+    evidence_role: str
+    section_num: int
+    permitted_sections: List[int]
+    violation_type: str = "ROLE_SECTION_MISMATCH"
+    message_fa: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "citation_key": self.citation_key,
+            "evidence_role": self.evidence_role,
+            "section_num": self.section_num,
+            "permitted_sections": self.permitted_sections,
+            "violation_type": self.violation_type,
+            "message_fa": self.message_fa
+        }
 
 @dataclass
 class ClaimBindingAudit:
@@ -50,6 +79,8 @@ class DocumentReindexResult:
     sequence_violations_count: int
     error_messages: List[str] = field(default_factory=list)
     claim_audits: List[ClaimBindingAudit] = field(default_factory=list)
+    role_section_violations_count: int = 0
+    role_section_violations: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -58,6 +89,7 @@ class DocumentReindexResult:
             "unused_references_count": self.unused_references_count,
             "duplicate_references_count": self.duplicate_references_count,
             "sequence_violations_count": self.sequence_violations_count,
+            "role_section_violations_count": self.role_section_violations_count,
             "citation_map_old_to_new": self.citation_map_old_to_new,
             "error_messages": self.error_messages,
             "reordered_bibliography_count": len(self.reordered_bibliography)
@@ -251,7 +283,8 @@ class CitationTracker:
     def reindex_document(
         cls,
         document_text: str,
-        bibliography: Dict[str, Dict[str, Any]]
+        bibliography: Dict[str, Dict[str, Any]],
+        validate_role_sections: bool = False
     ) -> DocumentReindexResult:
         """
         Global document-level re-indexing engine:
@@ -360,6 +393,14 @@ class CitationTracker:
                         seq_violations += 1
                     seen_seq_nums.append(val)
 
+        # Audit role-to-section compliance if requested
+        role_violations = []
+        if validate_role_sections:
+            audit_res = EvidenceRoleClaimBindingGate.audit_document_sections(raw_text, bibliography)
+            role_violations = audit_res.get("violations", [])
+            for v_msg in audit_res.get("error_messages", []):
+                errors.append(f"ROLE_SECTION_MISMATCH: {v_msg}")
+
         is_valid = (len(orphan_keys) == 0 and len(unused_keys) == 0 and duplicate_count == 0 and len(errors) == 0)
 
         return DocumentReindexResult(
@@ -371,5 +412,98 @@ class CitationTracker:
             unused_references_count=len(unused_keys),
             duplicate_references_count=duplicate_count,
             sequence_violations_count=seq_violations,
-            error_messages=errors
+            error_messages=errors,
+            role_section_violations_count=len(role_violations),
+            role_section_violations=role_violations
         )
+
+
+# ==============================================================================
+# EVIDENCE ROLE CLAIM BINDING GATE (v9.2 Pillar 2)
+# ==============================================================================
+
+class EvidenceRoleClaimBindingGate:
+    """Anti-Keyword Proximity Bias: Audits citation permissions per proposal section.
+    
+    Prevents assigning papers of distinct evidence roles (e.g. Epidemiological Burden)
+    to inappropriate sections (e.g. Methodology, Cell line baseline, or In vitro procedures).
+    """
+
+    @classmethod
+    def audit_section_citations(
+        cls,
+        section_num: int,
+        citation_keys: List[str],
+        bibliography: Dict[str, Dict[str, Any]]
+    ) -> List[RoleSectionViolation]:
+        violations = []
+        for key in citation_keys:
+            ref = bibliography.get(key, {})
+            role = ref.get("evidence_role") or ref.get("role") or "GENERAL_BACKGROUND"
+            permitted = ROLE_SECTION_PERMISSIONS.get(role, list(range(1, 29)))
+            if section_num not in permitted:
+                msg = f"منبع [{key}] با نقش شواهد '{role}' مجاز به استناد در بخش {section_num} نمی‌باشد (بخش‌های مجاز: {permitted})."
+                violations.append(RoleSectionViolation(
+                    citation_key=str(key),
+                    evidence_role=str(role),
+                    section_num=section_num,
+                    permitted_sections=permitted,
+                    violation_type="ROLE_SECTION_MISMATCH",
+                    message_fa=msg
+                ))
+        return violations
+
+    @classmethod
+    def audit_document_sections(
+        cls,
+        document_text_or_sections: Any,
+        bibliography: Dict[str, Dict[str, Any]],
+        fail_closed: bool = False
+    ) -> Dict[str, Any]:
+        """Audits all proposal sections for evidence role compliance.
+        Accepts either a dict of {section_num: text} or raw full document text.
+        """
+        sections_dict: Dict[int, str] = {}
+        if isinstance(document_text_or_sections, dict):
+            for k, v in document_text_or_sections.items():
+                try:
+                    s_num = int(k)
+                    sections_dict[s_num] = str(v)
+                except (ValueError, TypeError):
+                    continue
+        else:
+            raw_text = str(document_text_or_sections)
+            pattern = re.compile(r'##\s*([۰-۹\d]+)\.\s*([^\n]+)')
+            matches = list(pattern.finditer(raw_text))
+            for i, m in enumerate(matches):
+                num_str = m.group(1)
+                trans = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
+                sec_num = int(num_str.translate(trans))
+                start_idx = m.end()
+                end_idx = matches[i + 1].start() if i + 1 < len(matches) else len(raw_text)
+                sec_content = raw_text[start_idx:end_idx]
+                sections_dict[sec_num] = sec_content
+
+        all_violations: List[RoleSectionViolation] = []
+        for sec_num, sec_content in sections_dict.items():
+            citation_matches = re.findall(r'\[([A-Za-z0-9_,\s-]+)\]', sec_content)
+            sec_keys = []
+            for cm in citation_matches:
+                for tok in cm.split(','):
+                    t = tok.strip()
+                    if t:
+                        sec_keys.append(t)
+            viol = cls.audit_section_citations(sec_num, sec_keys, bibliography)
+            all_violations.extend(viol)
+
+        is_compliant = (len(all_violations) == 0)
+        can_proceed = is_compliant if fail_closed else True
+
+        return {
+            "is_compliant": is_compliant,
+            "can_proceed": can_proceed,
+            "violations_count": len(all_violations),
+            "violations": [v.to_dict() for v in all_violations],
+            "error_messages": [v.message_fa for v in all_violations]
+        }
+

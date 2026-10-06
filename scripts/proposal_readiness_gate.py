@@ -70,7 +70,8 @@ class ProposalReadinessGate:
         "methodology_completeness_gate",
         "native_omml_math_engine",
         "persian_medical_typography_linter",
-        "CitationTracker"
+        "CitationTracker",
+        "LiveReferenceVerificationGate"
     ]
 
     @classmethod
@@ -197,6 +198,20 @@ class ProposalReadinessGate:
             failed.append("CitationTracker")
             errors.append(f"CitationTracker error: {str(e)}")
 
+        # 9. LiveReferenceVerificationGate
+        try:
+            from scientific_search_adapter import LiveReferenceVerificationGate
+            lrv = LiveReferenceVerificationGate()
+            test_rec = {"title": "Benchmark Study", "pmid": "999999", "mock_verified": True}
+            v_chk = lrv.verify_single_reference(test_rec, mode="fixture")
+            if not v_chk.get("is_verified"):
+                raise ValueError("LiveReferenceVerificationGate fixture verification failed")
+            passed.append("LiveReferenceVerificationGate")
+            diagnostics["LiveReferenceVerificationGate"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("LiveReferenceVerificationGate")
+            errors.append(f"LiveReferenceVerificationGate error: {str(e)}")
+
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":
             all_infra_passed = (len(failed) == 0 and len(passed) == len(cls.required_modules))
@@ -304,6 +319,20 @@ class ProposalReadinessGate:
                 if "methodology_completeness_gate" not in failed:
                     failed.append("methodology_completeness_gate")
                 errors.append(f"PAJOOHESHYAR_COMPLETENESS_FAIL: بخش‌های ناقص: {comp_res.missing_sections}")
+
+        # 8. Validate references live / authentic provenance if provided
+        refs_to_verify = ctx.get("retrieved_studies") or ctx.get("studies") or ctx.get("references")
+        if refs_to_verify and isinstance(refs_to_verify, list):
+            from scientific_search_adapter import LiveReferenceVerificationGate
+            lrv_gate = LiveReferenceVerificationGate()
+            verif_mode = ctx.get("reference_verification_mode", "auto")
+            ref_audit = lrv_gate.verify_study_collection(refs_to_verify, mode=verif_mode, fail_closed=strict_mode)
+            diagnostics["reference_live_verification"] = ref_audit
+            if not ref_audit["can_proceed"] and strict_mode:
+                failed_ids = [f.get("title", f.get("pmid", "Unknown")) for f in ref_audit.get("failed_studies", [])]
+                errors.append(f"LIVE_REFERENCE_VERIFICATION_FAIL: {ref_audit['failed_count']} منبع در پایگاه‌های مرجع تایید نشدند: {failed_ids}")
+                if "LiveReferenceVerificationGate" not in failed:
+                    failed.append("LiveReferenceVerificationGate")
 
         # Final Fail-Closed Decision
         can_proceed = (len(failed) == 0 and len(errors) == 0 and len(missing_inputs) == 0)

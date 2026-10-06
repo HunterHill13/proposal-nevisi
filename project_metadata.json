@@ -1,7 +1,7 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "9.1.0",
-  "version_display": "v9.1.0",
+  "engine_version": "9.2.0",
+  "version_display": "v9.2.0",
   "release_channel": "stable",
   "semantic_release_date": "2026-10-06",
   "architecture": {
@@ -11,7 +11,7 @@
     "zero_hardcode_biological_leakage": true
   },
   "metrics": {
-    "total_unified_tests": 371,
+    "total_unified_tests": 391,
     "suite_1_static_analysis_tests": 31,
     "suite_2_multi_domain_generalization_tests": 12,
     "suite_3_adversarial_stress_and_negative_rejection_tests": 138,

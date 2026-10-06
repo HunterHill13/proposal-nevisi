@@ -2,30 +2,32 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v9.1). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v9.2). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture (Layer 1: Scientific Accuracy via BiologicalMechanismAdversarialVerifier, CombinationHypothesisEngine,
-  CompoundEntityNormalizer; Layer 2: Structural Compliance strictly enforcing the canonical 28 sections of Iranian biomedical proposals: 1.موضوع, 2.بیان مسئله, 3.مرور بر منابع, 4.اهمیت وضرورت تحقیق, 5.تعریف واژه ها, 6.اهداف جزیی, 7.اهداف کلی, 8.اهداف کاربردی, 9.فرضیات و سوالات, 10.دستاورد ها, 11.جدول متغیر ها, 12.جدول زمان بندی و مراحل اجرا, 13.روش اجرا, 14.نوع مطالعه, 15.جامعه مورد مطالعه, 16.محل انجام مطالعه, 17.معیار های ورود به مطالعه, 18.معیار های خروج از مطالعه, 19.ابزار های گردآوری اطلاعات, 20.تعیین اعتبار ابزار گردآوری, 21.تعیین ابزار گردآوری, 22.حجم نمونه و روش محاسبه آن, 23.روش تجزیه و تحلیل داده, 24.ملاحظلات اخلاقی در صورت نیاز, 25.نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز, 26.مشکلات و محدودیت ها, 27.روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات, 28.منابعی که استفاده شد (انگلیسی یا فارسی), design-sensitive sample size evaluation,
-  and decoupled StatisticalAnalysisModelSelector / CombinationInteractionModelSelector; Layer 3: Citation Integrity via CitationTracker enforcing global document Vancouver re-indexing,
-  orphaned claim detection, contextual model mismatch audits, and unused reference elimination; Layer 4: Formatting & Typesetting via NativeOmmlMathEngine converting LaTeX to native Word OMML XML <m:oMath>,
+  CompoundEntityNormalizer, and BiphasicRedoxContextRule; Layer 2: Structural Compliance strictly enforcing the canonical 28 sections of Iranian biomedical proposals: 1.موضوع, 2.بیان مسئله, 3.مرور بر منابع, 4.اهمیت وضرورت تحقیق, 5.تعریف واژه ها, 6.اهداف جزیی, 7.اهداف کلی, 8.اهداف کاربردی, 9.فرضیات و سوالات, 10.دستاورد ها, 11.جدول متغیر ها, 12.جدول زمان بندی و مراحل اجرا, 13.روش اجرا, 14.نوع مطالعه, 15.جامعه مورد مطالعه, 16.محل انجام مطالعه, 17.معیار های ورود به مطالعه, 18.معیار های خروج از مطالعه, 19.ابزار های گردآوری اطلاعات, 20.تعیین اعتبار ابزار گردآوری, 21.تعیین ابزار گردآوری, 22.حجم نمونه و روش محاسبه آن, 23.روش تجزیه و تحلیل داده, 24.ملاحظلات اخلاقی در صورت نیاز, 25.نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز, 26.مشکلات و محدودیت ها, 27.روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات, 28.منابعی که استفاده شد (انگلیسی یا فارسی), design-sensitive sample size evaluation,
+  AssayInterferencePolicy (cell-free blank & orthogonal triangulation), and decoupled StatisticalAnalysisModelSelector / CombinationInteractionModelSelector;
+  Layer 3: Citation Integrity via CitationTracker enforcing global document Vancouver re-indexing, EvidenceRoleClaimBindingGate (anti-keyword proximity bias),
+  LiveReferenceVerificationGate (fail-closed PubMed/Crossref authentication with caching), orphaned claim detection, and unused reference elimination;
+  Layer 4: Formatting & Typesetting via NativeOmmlMathEngine converting LaTeX to native Word OMML XML <m:oMath>,
   and PersianMedicalTypographyLinter protecting English parentheses, math, and DOIs). Enforces ProposalReadinessGate as a fail-closed pre-generation gatekeeper.
+  Harmonizes synergy metrics across sections via Single Source of Truth SynergyMetricConfig.
   Supports multi-source federated searches (PubMed, Europe PMC, OpenAlex, Crossref), 16 query families, MeSH mapping, multi-directional citation chasing,
   saturation tracking, deep paper reading, SciFact-aligned claim verification, 8-tier evidence hierarchy,
-  and passes a unified 378-assertion test harness across 14 suites and 43 release gate criteria with zero hardcoded biological leakage across all engine scripts.
+  and passes a unified 391-assertion test harness across 15 suites and 43 release gate criteria with zero hardcoded biological leakage across all engine scripts.
 ---
 
-# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v9.1)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v9.2)
 
 این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-نسخه ۹.۱ بر مبنای اصل بنیادین «عدم قطعیت باید بازنمایی شود نه پنهان‌سازی» (Uncertainty must be represented, not hidden) تمامی لایه‌های موتور را هاردنینگ نموده و موارد زیر را تضمین می‌کند:
+نسخه ۹.۲ بر مبنای ۵ ستون هاردنینگ معماری ناشی از ممیزی دنیای واقعی طراحی گردیده و موارد زیر را تضمین می‌کند:
+- **ستون ۱ (LiveReferenceVerificationGate):** گیت اعتبارسنجی زنده مراجع علیه PubMed E-utilities و Crossref با کش پایدار محلی و سیاست Fail-Closed جهت ممانعت از ارجاعات ساختگی یا عدم تطابق عنوان.
+- **ستون ۲ (EvidenceRoleClaimBindingGate):** گیت اتصال نقش شواهد و بخش‌های سند جهت ممانعت از سوگیری مجاورت کلیدواژه (Keyword Proximity Bias) و ممنوعیت استناد مقالات بار بیماری به عنوان متدولوژی یا خط پایه سلولی.
+- **ستون ۳ (SynergyMetricConfig):** مرجع واحد (Single Source of Truth) برای هارمونیزه کردن مرزهای تئوریک چو (2006) و مقیاس ۵ طبقه‌ای عملیاتی نرم‌افزار CompuSyn در تمام بخش‌های ۵، ۹، ۱۳، ۲۳.
+- **ستون ۴ (BiphasicRedoxContextRule):** قانون تفکیک دوحالته ردوکس در `BiologicalMechanismAdversarialVerifier` برای رفع پارادوکس انتساب اثر آنتی‌اکسیدانی محافظت‌کننده به مهار سلول‌های بدخیم، همراه با پذیرش محافظت سلولی در بافت نرمال.
+- **ستون ۵ (AssayInterferencePolicy):** سیاست متدولوژیک خنثی‌سازی خطاهای سنجش زیست‌پذیری از طریق اجبار کنترل بلانک بدون سلول (Cell-Free Blank) و کنترل حلال ناقل (Vehicle Control) و ترایانگولاسیون ارتوگونال با فلوسایتومتری Annexin V/PI و آزمون بقای کلونوژنیک ۱۴ روزه.
 - الزام قطعی و بدون انحراف ساختار مصوب ۲۸ بخشی پژوهشیار در تمام خروجی‌های سند Markdown و Word.
-- تفکیک قطعی هویت ماده از خلوص تحلیلی در `CompoundEntityNormalizer`.
-- راستی‌آزمایی زنجیره‌ای مکانیسم‌ها و رد ادعاهای بدون شواهد در `BiologicalMechanismAdversarialVerifier`.
-- سنجش جهت‌داری شواهد و اعلام صریح فقدان مطالعه مستقیم در `CombinationHypothesisEngine`.
-- تفکیک معماری مدل‌های استنباطی (ANOVA/GLM) از مدل‌های سینرژی (Chou-Talalay/Bliss) و پوشش کینتیک ویروس زنده.
-- ارزیابی معرفت‌شناختی حجم نمونه بدون ساخت فرمول جعلی و اعمال گارد تفکیک تکرار بیولوژیک از تکنیکی در `MethodologyCompletenessGate`.
-- بازنمایه‌سازی یکپارچه ونکوور و رد ارجاعات استفاده‌نشده در `CitationTracker`.
 - تبدیل و اعتبارسنجی E2E فرمول‌های ریاضی به تگ‌های بومی ورد `<m:oMath>` در `docx_builder` و حذف کامل نشت سینتکس LaTeX.
 - محافظت کامل از عبارات انگلیسی داخل پرانتز و شناسه‌های DOI/PMID در `PersianMedicalTypographyLinter`.
 

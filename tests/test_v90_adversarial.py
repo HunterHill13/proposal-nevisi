@@ -273,7 +273,7 @@ class TestV90AdversarialSuite(unittest.TestCase):
         }
         res_valid = ProposalReadinessGate.check_all(valid_context)
         self.assertTrue(res_valid.can_proceed)
-        self.assertEqual(len(res_valid.passed_modules), 8)
+        self.assertEqual(len(res_valid.passed_modules), len(ProposalReadinessGate.required_modules))
         self.assertEqual(len(res_valid.failed_modules), 0)
 
         # Defective context: role inversion in claim

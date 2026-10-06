@@ -441,7 +441,7 @@ def audit_6_tier_hierarchy(t_res: Dict[str, Any], m_res: Dict[str, Any], r_res: 
 
 def main():
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v9.1)")
+    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v9.2)")
     print("===========================================================================\n")
 
     # 1. Version Sync

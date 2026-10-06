@@ -275,6 +275,23 @@ class BiologicalMechanismAdversarialVerifier:
         r'\bapoptosis\b', r'\bapoptotic\b', r'\bprogrammed\s+cell\s+death\b', r'آپوپتوز', r'مرگ\s+برنامه‌?ریزی‌?شده'
     ]
 
+    # Redox & Oxidative Stress Patterns (v9.2 Pillar 4)
+    REDOX_ROS_KEYWORDS = [
+        r'\bros\b', r'\breactive\s+oxygen\s+species\b', r'\bh2o2\b', r'\bhydrogen\s+peroxide\b',
+        r'\bsuperoxide\b', r'گونه‌های\s+فعال\s+اکسیژن', r'استرس\s+اکسیداتیو', r'رادیکال‌های\s+آزاد'
+    ]
+
+    ANTIOXIDANT_SCAVENGING_KEYWORDS = [
+        r'\bantioxidant\b', r'\bscaveng(?:er|ing)\b', r'\banti-oxidant\b', r'\bquench(?:er|ing)\b',
+        r'آنتی‌?اکسیدان', r'مهار\s+استرس\s+اکسیداتیو', r'پاک‌?سازی\s+رادیکال', r'کاهش\s+(?:ros|گونه‌های\s+فعال)'
+    ]
+
+    PRO_OXIDANT_INDUCTION_KEYWORDS = [
+        r'\bpro-oxidant\b', r'\binduces?\s+ros\b', r'\belevat(?:es?|ing)\s+ros\b',
+        r'\bgenerat(?:es?|ing)\s+ros\b', r'\baccumulat(?:es?|ion)\s+of\s+ros\b',
+        r'القا(?:ی)?\s+ros', r'افزایش\s+ros', r'تولید\s+گونه‌های\s+فعال\s+اکسیژن', r'پرو-?اکسیدان'
+    ]
+
     # Causal inference leap keywords (Level B)
     CAUSAL_LEAP_PATTERNS = [
         r'\b(?:therefore|thereby|thus|consequently|hence)\s+(?:increases?|enhances?|leads\s+to|causes?)\b',
@@ -284,7 +301,93 @@ class BiologicalMechanismAdversarialVerifier:
     ]
 
     @classmethod
-    def check(cls, claim: str, context_section: Optional[str] = None) -> MechanismCheckResult:
+    def verify_biphasic_redox_polarity(
+        cls,
+        claim: str,
+        model_type: Optional[str] = "cancer_in_vitro"
+    ) -> Optional[MechanismCheckResult]:
+        """Verifies biphasic redox polarity between oncology vs normal tissue cytoprotection.
+        
+        In transformed / cancer models:
+        - Natural products / cytotoxic interventions exert antitumor activity via PRO-OXIDANT
+          ROS elevation, mitochondrial damage, or apoptosis induction.
+        - Asserting that a cytotoxic agent 'decreases ROS' or acts as an 'antioxidant' to kill cancer cells
+          is a mechanistic paradox (antioxidant ROS reduction protects cancer cells against cytotoxic cell death).
+        
+        In normal tissue models:
+        - Antioxidant ROS reduction is cytoprotective (reducing off-target chemotherapeutic toxicity).
+        """
+        claim_str = str(claim).strip()
+        claim_lower = claim_str.lower()
+
+        has_ros = any(re.search(pat, claim_lower) for pat in cls.REDOX_ROS_KEYWORDS)
+        has_antioxidant = any(re.search(pat, claim_lower) for pat in cls.ANTIOXIDANT_SCAVENGING_KEYWORDS)
+        has_pro_oxidant = any(re.search(pat, claim_lower) for pat in cls.PRO_OXIDANT_INDUCTION_KEYWORDS)
+
+        if not (has_ros or has_antioxidant or has_pro_oxidant):
+            return None
+
+        # Determine if model context is oncology/cancer/transformed
+        mt = str(model_type or "cancer_in_vitro").lower()
+        is_normal_tissue = any(w in mt for w in ["normal", "healthy", "non-malignant", "سالم", "بافت نرمال", "cytoprotection"])
+        is_cancer_context = not is_normal_tissue
+
+        if is_cancer_context:
+            asserts_ros_reduction = has_antioxidant or any(
+                re.search(pat, claim_lower) for pat in [r'\b(?:decreases?|reduces?|suppresses?|lowers?)\s+ros\b', r'کاهش\s+ros', r'مهار\s+ros']
+            )
+            has_killing_intent = any(
+                re.search(pat, claim_lower) for pat in cls.APOPTOSIS_KEYWORDS + [r'\bcytotoxic\b', r'\bdeath\b', r'\binhibit.*growth\b', r'مرگ', r'مهار\s+رشد', r'سیتوتوکسیک']
+            )
+
+            if asserts_ros_reduction and (has_killing_intent or has_ros):
+                correction = (
+                    "خطای پارادوکس ردوکس در انکولوژی: کاهش گونه‌های فعال اکسیژن (ROS) یا اثر آنتی‌اکسیدانی در سلول‌های بدخیم، "
+                    "موجب محافظت از سلول سرطانی در برابر آپوپتوز و خنثی‌سازی اثر درمانی سیتوتوکسیک می‌گردد. "
+                    "در فارماکولوژی سرطان، ترکیبات ضدتومور اثر کشندگی خود را از طریق القای پرو-اکسیدانی ROS، تخریب پتانسیل غشای میتوکندری "
+                    "و استرس اکسیداتیو مفرط اعمال می‌کنند، نه از طریق اثر آنتی‌اکسیدانی مهارکننده مرگ سلولی."
+                )
+                return MechanismCheckResult(
+                    status="CONTRADICTED",
+                    correction=correction,
+                    confidence=0.96,
+                    entity="ROS / Oxidative Stress",
+                    canonical_role="pro-apoptotic in cancer when elevated; cytoprotective when suppressed",
+                    asserted_role="antioxidant ROS reduction driving cancer cell cytotoxicity",
+                    scientific_rationale="Antioxidant ROS scavenging in transformed cells protects tumor cells against apoptosis, creating a mechanistic contradiction with cytotoxicity.",
+                    inference_type="BIPHASIC_REDOX_CHECK"
+                )
+
+            if has_pro_oxidant:
+                return MechanismCheckResult(
+                    status="VERIFIED",
+                    correction=None,
+                    confidence=0.95,
+                    entity="ROS / Oxidative Stress",
+                    canonical_role="pro-apoptotic pro-oxidant accumulation",
+                    asserted_role="pro-oxidant ROS induction",
+                    scientific_rationale="Pro-oxidant ROS accumulation aligns with cytotoxic apoptosis induction in malignant cell models.",
+                    inference_type="BIPHASIC_REDOX_CHECK"
+                )
+
+        else:
+            # Normal tissue model context
+            if has_antioxidant:
+                return MechanismCheckResult(
+                    status="VERIFIED",
+                    correction=None,
+                    confidence=0.95,
+                    entity="ROS / Oxidative Stress",
+                    canonical_role="cytoprotection via free radical scavenging in normal tissue",
+                    asserted_role="antioxidant cytoprotection",
+                    scientific_rationale="Antioxidant ROS reduction provides authentic cytoprotection against toxic insult in normal non-malignant tissue.",
+                    inference_type="BIPHASIC_REDOX_CHECK"
+                )
+
+        return None
+
+    @classmethod
+    def check(cls, claim: str, context_section: Optional[str] = None, model_context: Optional[str] = None) -> MechanismCheckResult:
         """
         Extracts molecular entities and asserted causal directions from claim text.
         Verifies Level A (Role Inversion) and Level B (Mechanistic Inference Leaps).
@@ -311,6 +414,17 @@ class BiologicalMechanismAdversarialVerifier:
 
         # Level B: Check for multi-step mechanistic causal leaps without direct proof
         has_causal_leap = any(re.search(pat, claim_lower) for pat in cls.CAUSAL_LEAP_PATTERNS)
+
+        # Check Biphasic Redox Polarity Rule (v9.2 Pillar 4)
+        redox_check = cls.verify_biphasic_redox_polarity(claim_str, model_type=model_context or "cancer_in_vitro")
+        if redox_check is not None:
+            if redox_check.status == "CONTRADICTED":
+                redox_check.context_section = context_section
+                return redox_check
+            elif not detected_entity_key and not has_causal_leap:
+                redox_check.context_section = context_section
+                return redox_check
+
         if has_causal_leap:
             # Check if this asserts an ungrounded bridge between target modulation and viral replication/oncolysis
             if any(term in claim_lower for term in ["viral", "oncolysis", "replication", "ویروس", "تکثیر", "انکولیز"]):

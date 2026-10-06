@@ -42,6 +42,7 @@ try:
     from combination_hypothesis_engine import CombinationHypothesisEngine
     from compound_entity_normalizer import CompoundEntityNormalizer
     from native_omml_math_engine import NativeOmmlMathEngine
+    from core_policies import SynergyMetricConfig, AssayInterferencePolicy
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -64,6 +65,7 @@ except ImportError:
     from combination_hypothesis_engine import CombinationHypothesisEngine
     from compound_entity_normalizer import CompoundEntityNormalizer
     from native_omml_math_engine import NativeOmmlMathEngine
+    from core_policies import SynergyMetricConfig, AssayInterferencePolicy
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -471,8 +473,8 @@ class ProposalGenerator:
 
         rpm_obj = data.get("research_problem_model", {})
         model_dict = data.get("research_problem_model", data)
-        fa_title = data.get("research_title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
-        en_title = data.get("research_title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
+        fa_title = data.get("research_title_fa") or data.get("title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
+        en_title = data.get("research_title_en") or data.get("title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
         framework = data.get("framework") or model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
         studies = data.get("studies", [])
 
@@ -480,7 +482,7 @@ class ProposalGenerator:
         cond_name = cond.get("name_fa", cond.get("name_en", "بیماری یا وضعیت هدف"))
         cond_en = cond.get("name_en", "Target Condition")
         sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم بیولوژیک هدف")
-        interventions = model_dict.get("interventions_or_exposures", [])
+        interventions = model_dict.get("interventions_or_exposures") or model_dict.get("interventions") or data.get("interventions_or_exposures") or data.get("interventions") or []
 
         # Parse potential subsections from methodology_text
         meth_combined = data.get("methodology_text", "")
@@ -550,6 +552,8 @@ class ProposalGenerator:
             for out in model_dict.get("primary_outcomes", []):
                 oname = out.get("name") if isinstance(out, dict) else str(out)
                 defs.append(f"▪ **{oname}:** شاخص پیامد اصلی تعیین‌شده جهت ارزیابی پاسخ زیستی.")
+            if len(interventions) >= 2:
+                defs.append(f"▪ **شاخص ترکیب (Combination Index; CI):** معیار کمی استاندارد سنجش برهم‌کنش فارماکولوژیک:\n{SynergyMetricConfig.get_unified_narrative_fa()}")
             def_text = "\n\n".join(defs) if defs else "واژگان تخصصی و متغیرهای اصلی پژوهش مطابق استانداردهای بین‌المللی تعریف شده‌اند."
         md_parts.append("## ۵. تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)\n" + def_text + "\n\n---")
 
@@ -711,9 +715,9 @@ class ProposalGenerator:
         sec_19 = data.get("instruments_text") or extracted_subs.get("6")
         if not sec_19:
             sec_19 = (
-                "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا در طول موج‌های اختصاصی.\n"
-                "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد و نرم‌افزارهای تحلیل فلورسانس.\n"
-                "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ.\n"
+                "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا مجهز به فیلترهای استاندارد با اعمال تصحیح بلانک بدون سلول (Cell-Free Blank Correction).\n"
+                "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد جهت تفکیک آپوپتوز و نکروز با رنگ‌آمیزی دوتایی Annexin V-FITC / PI.\n"
+                "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ جهت آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay).\n"
                 "- سیستم Real-Time PCR جهت سنجش بیان کمی ژن‌ها و نرم‌افزارهای تحلیلی GraphPad Prism و CompuSyn."
             )
         md_parts.append("## ۱۹. ابزار های گردآوری اطلاعات\n" + sec_19 + "\n\n---")
@@ -761,11 +765,14 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_23 = data.get("statistical_analysis_text") or extracted_subs.get("10")
         if not sec_23:
+            ci_explanation = ""
+            if len(interventions) >= 2:
+                ci_explanation = f"\n- تفسیر و طبقه‌بندی ریاضی شاخص ترکیب (CI) بر اساس استاندارد واحد:\n{SynergyMetricConfig.get_unified_narrative_fa()}"
             sec_23 = (
                 "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
                 "- تحلیل مقایسه میانگین‌ها در گروه‌های مستقل چندگانه با آنالیز واریانس یک‌طرفه (One-way ANOVA) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
                 "- ارزیابی برهم‌کنش غلظت و زمان با آنالیز واریانس دوطرفه فاکتوریل (Two-way ANOVA with interaction).\n"
-                "- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).\n"
+                f"- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).{ci_explanation}\n"
                 "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
             )
         md_parts.append("## ۲۳. روش تجزیه و تحلیل داده\n" + sec_23 + "\n\n---")
@@ -813,11 +820,12 @@ class ProposalGenerator:
         if not sec_27:
             sec_27 = (
                 "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
-                "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی و ایجاد شرایط چسبندگی ۲۴ ساعته.\n"
-                "۳. آماده‌سازی رقت‌های سریالی مداخلات و اعمال تیمار تک‌عاملی و ترکیبی در مقاطع ۲۴، ۴۸ و ۷۲ ساعت.\n"
-                "۴. اجرای آزمون MTT و خوانش جذب نوری با الایزاریدر جهت محاسبه درصد مهار زیست‌پذیری.\n"
-                "۵. ارزیابی آپوپتوز با رنگ‌آمیزی فلورسانس و آنالیز فلوسایتومتری.\n"
-                "۶. ثبت و استخراج داده‌های کمی و تحلیل آماری پارامترهای دوز-پاسخ و هم‌افزایی."
+                "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی به همراه چاهک‌های بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر احیای مستقیم و تداخل نوری.\n"
+                "۳. اعمال تیمارهای تک‌عاملی و ترکیبی در کنار کنترل حلال ناقل (DMSO < 0.1%) در مقاطع زمانی ۲۴، ۴۸ و ۷۲ ساعت.\n"
+                "۴. سنجش زیست‌پذیری با آزمون متابولیک (MTT) و تصحیح جذب نوری نسبت به بلانک بدون سلول.\n"
+                "۵. اعتبارسنجی ارتوگونال آپوپتوز با فلوسایتومتری Annexin V-FITC / PI جهت تفکیک آپوپتوز واقعی از نکروز.\n"
+                "۶. اجرای آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay) جهت ارزیابی توان بقای نامحدود سلولی طبق پروتکل استاندارد نیچر (Franken et al. 2006).\n"
+                "۷. ثبت داده‌های کمی و مدلسازی ریاضی هم‌افزایی با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder)."
             )
         md_parts.append("## ۲۷. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات\n" + sec_27 + "\n\n---")
 

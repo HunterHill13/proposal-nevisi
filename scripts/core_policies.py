@@ -48,8 +48,8 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "9.1.0"
-VERSION_DISPLAY = "v9.1.0"
+ENGINE_VERSION = "9.2.0"
+VERSION_DISPLAY = "v9.2.0"
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
@@ -173,6 +173,71 @@ CI_CLASSIFICATION_SOURCES = [
     "EMPIRICAL_STUDY",      # Study-specific cutoff reported by authors
     "UNVERIFIED"            # Threshold unsupported by verified methodology citation
 ]
+
+# ==============================================================================
+# SINGLE SOURCE OF TRUTH: SYNERGY METRIC & COMBINATION INDEX ONTOLOGY (v9.2)
+# ==============================================================================
+
+class SynergyMetricConfig:
+    """Single Source of Truth for Combination Index (CI) and Synergy Metrics.
+    Harmonizes theoretical Chou (2006) boundaries with operational CompuSyn tiers across all sections.
+    """
+    THEORETICAL_THRESHOLDS = {
+        "SYNERGISM": "< 1.0",
+        "ADDITIVE": "= 1.0",
+        "ANTAGONISM": "> 1.0"
+    }
+
+    OPERATIONAL_TIERS = [
+        {"code": "STRONG_SYNERGY", "ci_range": "CI < 0.3", "label_fa": "هم‌افزایی قوی (Strong Synergism)", "min": 0.0, "max": 0.3},
+        {"code": "SYNERGY", "ci_range": "0.3 <= CI < 0.7", "label_fa": "هم‌افزایی متوسط (Synergism)", "min": 0.3, "max": 0.7},
+        {"code": "MODERATE_SYNERGY", "ci_range": "0.7 <= CI < 0.9", "label_fa": "هم‌افزایی خفیف (Slight Synergism)", "min": 0.7, "max": 0.9},
+        {"code": "NEARLY_ADDITIVE", "ci_range": "0.9 <= CI <= 1.1", "label_fa": "اثر نزدیک به جمعی (Nearly Additive)", "min": 0.9, "max": 1.1},
+        {"code": "ANTAGONISM", "ci_range": "CI > 1.1", "label_fa": "تضاد یا آنتاگونیسم (Antagonism)", "min": 1.1, "max": float("inf")},
+    ]
+
+    @classmethod
+    def get_unified_narrative_fa(cls) -> str:
+        """Returns standard unified explanation for all proposal sections."""
+        return (
+            "معیار مرجع تئوریک چو (2006): CI < 1.0 (هم‌افزایی / Synergism)، CI = 1.0 (اثر جمع‌پذیر / Additive) و CI > 1.0 (تضاد / Antagonism).\n"
+            "تفکیک عملیاتی نرم‌افزار CompuSyn / CalcuSyn:\n"
+            "▪ CI < 0.3: هم‌افزایی قوی (Strong Synergism)\n"
+            "▪ 0.3 <= CI < 0.7: هم‌افزایی متوسط (Synergism)\n"
+            "▪ 0.7 <= CI < 0.9: هم‌افزایی خفیف (Slight Synergism)\n"
+            "▪ 0.9 <= CI <= 1.1: اثر نزدیک به جمعی (Nearly Additive)\n"
+            "▪ CI > 1.1: تضاد یا آنتاگونیسم (Antagonism)"
+        )
+
+# ==============================================================================
+# EVIDENCE ROLE SECTION PERMISSIONS (ANTI-KEYWORD PROXIMITY BIAS)
+# ==============================================================================
+
+ROLE_SECTION_PERMISSIONS: Dict[str, List[int]] = {
+    "EPIDEMIOLOGICAL_BURDEN": [1, 2, 4],  # Disease burden, incidence, statistics
+    "CELL_MODEL_ORIGIN": [13, 14, 15, 16],  # Cell line origin, establishment, standard baseline
+    "EXPERIMENTAL_PHARMACOLOGY": [2, 3, 5, 6, 9, 13, 23, 27],  # Drug testing, in vitro/in vivo assays, molecular effects
+    "MATHEMATICAL_MODEL_METHODOLOGY": [5, 9, 11, 13, 23],  # Synergy mathematics, CI formulas, statistical tools
+    "ASSAY_LANDMARK_PROTOCOL": [11, 13, 19, 20, 21, 27],  # MTT assay, Annexin V protocol, clonogenic protocol
+    "GENERAL_BACKGROUND": [1, 2, 3, 4, 5],
+}
+
+# ==============================================================================
+# ASSAY INTERFERENCE & ORTHOGONAL TRIANGULATION POLICY
+# ==============================================================================
+
+class AssayInterferencePolicy:
+    """Universal policy for in vitro viability assay artifact prevention and orthogonal triangulation."""
+    REQUIRED_CONTROLS = {
+        "CELL_FREE_BLANK": "بلانک بدون سلول (محیط کشت + غلظت‌های مداخله + معرف سنجش) جهت کسر احیای شیمیایی مستقیم یا تداخل نوری غیرآنزیمی",
+        "VEHICLE_CONTROL": "کنترل حلال ناقل (DMSO < 0.1%) جهت تفکیک سمیت حلال از اثر اختصاصی مداخله"
+    }
+
+    ORTHOGONAL_ASSAYS = {
+        "PRIMARY_METABOLIC": "سنجش زیست‌پذیری متابولیک (MTT / WST-1 / Resazurin با تصحیح بلانک بدون سلول)",
+        "APOPTOSIS_CONFIRMATION": "فلوسایتومتری Annexin V-FITC / PI جهت تفکیک آپوپتوز اولیه (Annexin+/PI-)، آپوپتوز ثانویه (Annexin+/PI+) و نکروز (Annexin-/PI+)",
+        "REPRODUCTIVE_VIABILITY": "آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay) جهت سنجش مهار تکثیر نامحدود و محاسبه PE و SF طبق پروتکل استاندارد نیچر (Franken et al. 2006)"
+    }
 
 FINAL_INCLUSION_REASON_CATEGORIES = [
     "DIRECT_DISEASE_MODEL_EVIDENCE",    # Direct experimental evidence on target disease/cell/animal model
