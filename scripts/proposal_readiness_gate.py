@@ -75,7 +75,9 @@ class ProposalReadinessGate:
         "FullTextRetrievalEngine",
         "MockGrantReviewPanel",
         "EquatorComplianceAuditor",
-        "PreEmptiveRiskOfBiasMitigator"
+        "PreEmptiveRiskOfBiasMitigator",
+        "EpistemicRigorAuditor",
+        "ProposalResearchDossier"
     ]
 
     @classmethod
@@ -265,6 +267,29 @@ class ProposalReadinessGate:
         except Exception as e:
             failed.append("PreEmptiveRiskOfBiasMitigator")
             errors.append(f"PreEmptiveRiskOfBiasMitigator error: {str(e)}")
+
+        # 14. EpistemicRigorAuditor
+        try:
+            from epistemic_rigor_auditor import EpistemicRigorAuditor
+            era_test = EpistemicRigorAuditor(fail_closed=False)
+            audit_res = era_test.audit_dossier({})
+            passed.append("EpistemicRigorAuditor")
+            diagnostics["EpistemicRigorAuditor"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("EpistemicRigorAuditor")
+            errors.append(f"EpistemicRigorAuditor error: {str(e)}")
+
+        # 15. ProposalResearchDossier
+        try:
+            from proposal_research_dossier import ProposalResearchDossier
+            prd_test = ProposalResearchDossier(topic="Benchmark Topic", domain="Biomedical")
+            if not prd_test.topic:
+                raise ValueError("ProposalResearchDossier failed instantiation")
+            passed.append("ProposalResearchDossier")
+            diagnostics["ProposalResearchDossier"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("ProposalResearchDossier")
+            errors.append(f"ProposalResearchDossier error: {str(e)}")
 
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":

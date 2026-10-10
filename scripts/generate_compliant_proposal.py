@@ -46,6 +46,8 @@ try:
     from mock_grant_review_panel import MockGrantReviewPanel
     from equator_compliance_auditor import EquatorComplianceAuditor
     from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
+    from proposal_research_dossier import ProposalResearchDossier
+    from epistemic_rigor_auditor import EpistemicRigorAuditor
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -72,6 +74,8 @@ except ImportError:
     from mock_grant_review_panel import MockGrantReviewPanel
     from equator_compliance_auditor import EquatorComplianceAuditor
     from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
+    from proposal_research_dossier import ProposalResearchDossier
+    from epistemic_rigor_auditor import EpistemicRigorAuditor
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -928,6 +932,21 @@ class ProposalGenerator:
         rob_result = PreEmptiveRiskOfBiasMitigator.audit_proposal(md_content, data)
         rob_md_path, rob_json_path = PreEmptiveRiskOfBiasMitigator.save_reports(rob_result, output_dir=review_dir)
 
+        # Conduct Epistemic Rigor Audit & Compile Proposal Research Dossier (Two-Loop Pillar 10)
+        dossier = data.get("proposal_research_dossier")
+        dossier_report = None
+        dossier_md_path = None
+        dossier_json_path = None
+        is_dossier = isinstance(dossier, ProposalResearchDossier) or (
+            dossier is not None and getattr(dossier.__class__, "__name__", "") == "ProposalResearchDossier"
+        )
+        if is_dossier:
+            dossier_report = dossier.audit_report if dossier.is_sealed else dossier.seal_dossier()
+            dossier_json_path = os.path.join(review_dir, "PROPOSAL_RESEARCH_DOSSIER.json")
+            dossier_md_path = os.path.join(review_dir, "PROPOSAL_RESEARCH_DOSSIER.md")
+            dossier.export_json(dossier_json_path)
+            dossier.export_markdown(dossier_md_path)
+
         final_status = "PASS"
         if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
@@ -947,6 +966,9 @@ class ProposalGenerator:
             "risk_of_bias": rob_result.to_dict(),
             "risk_of_bias_md": rob_md_path,
             "risk_of_bias_json": rob_json_path,
+            "dossier_audit": dossier_report,
+            "dossier_md": dossier_md_path,
+            "dossier_json": dossier_json_path,
             "md_path": md_path,
             "docx_path": docx_path,
             "status": final_status,
