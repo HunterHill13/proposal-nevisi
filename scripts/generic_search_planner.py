@@ -925,7 +925,7 @@ class GenericSearchPlanner:
                     "gap": f"CRITICAL_{stream}_GAP"
                 })
 
-        completeness_ratio = (len(active_required) - len(missing_streams)) / len(active_required)
+        completeness_ratio = (len(active_required) - len(missing_streams)) / max(len(active_required), 1)
 
         return {
             "evidence_completeness_matrix": matrix_rows,

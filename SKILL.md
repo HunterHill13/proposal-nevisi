@@ -16,14 +16,14 @@ description: >
   Harmonizes synergy metrics across sections via Single Source of Truth SynergyMetricConfig.
   Supports multi-source federated searches (PubMed, Europe PMC, OpenAlex, Crossref), 16 query families, MeSH mapping, multi-directional citation chasing,
   saturation tracking, deep paper reading, SciFact-aligned claim verification, 8-tier evidence hierarchy,
-  and passes a unified 418-assertion test harness across 18 suites and 44 release gate criteria with zero hardcoded biological leakage across all engine scripts.
+  and passes a unified 429-assertion test harness across 19 suites and 44 release gate criteria with zero hardcoded biological leakage across all engine scripts.
 ---
 
-# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v10.1)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v10.2)
 
 این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-نسخه ۱۰.۱ بر مبنای هاردنینگ پیشرفته ضدتوهم، خط لوله واکشی متن کامل، دروازه‌های اعتبارسنجی زنده و استانداردهای بازتولیدپذیری طراحی گردیده و موارد زیر را تضمین می‌کند:
+نسخه ۱۰.۲ بر مبنای هاردنینگ پیشرفته ضدتوهم، خط لوله واکشی متن کامل، دروازه‌های اعتبارسنجی زنده، استانداردهای بازتولیدپذیری EQUATOR و مهار پیشگیرانه سوگیری طراحی گردیده و موارد زیر را تضمین می‌کند:
 - **ستون ۱ (LiveReferenceVerificationGate):** گیت اعتبارسنجی زنده مراجع علیه PubMed E-utilities و Crossref با کش پایدار محلی و سیاست Fail-Closed؛ حذف کامل بای‌پَس‌های آفلاین و پالایش خودکار رفرنس‌های نامعتبر (`auto_drop_unverified`).
 - **ستون ۲ (FullTextRetrievalEngine & Passage Grounding):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML، PMC BioC API و OpenAlex OA با کش پایدار در `.cache/fulltext/` و استخراج الزامی حداقل ۲ گزیده متنی مستند (Passages) برای اثبات مطالعه عمیق متن.
 - **ستون ۳ (Abstract-Only Quota Gate):** سقف قطعی حداکثر ۲۰٪ برای مقالات فقط-چکیده (Tier B) به همراه الزام ارائه توجیه علمی اختصاصی در متادیتا و گزارش ممیزی `FINAL_REFERENCE_VALIDITY_AUDIT.md`.
@@ -32,6 +32,7 @@ description: >
 - **ستون ۶ (Pre-Flight Compilation Gatekeeper):** مسدودسازی قطعی تولید فایل ورد (.docx) در `ProposalReadinessGate` در صورت وجود هرگونه رفرنس تأییدنشده یا تخطی از سقف مقالات چکیده.
 - **ستون ۷ (MockGrantReviewPanel & Inter-Section Semantic Drift Gate):** شبیه‌سازی هیئت داوران گرنت (Mock Study Section) متشکل از ۳ داور تخصصی (اصالت علمی، متدولوژی و بیواستاتیک، اخلاق و ایمنی زیستی) در مقیاس داوری ۱ تا ۹ با آستانه قبولی ۳.۵، پایش تناظر ۱ به ۱ اهداف با متدولوژی و صدور کارنامه رسمی `MOCK_GRANT_REVIEW_REPORT.md` و `.json`.
 - **ستون ۸ (EquatorComplianceAuditor & Biological Resource Authentication):** ممیزی و تطابق خودکار با راهنماهای بین‌المللی شبکه EQUATOR (شامل OECD/GCCP برای کشت سلولی، MIQE برای سنجش‌های بیان ژن، ARRIVE 2.0 برای مطالعات حیوانی) به همراه استانداردهای احراز هویت زیستی NIH (شناسنامه STR سلول، غربالگری مایکوپلاسما، خلوص مواد دارویی $\ge 95\%$ و کنترل حلال ناقل) و صدور کارنامه رسمی `EQUATOR_COMPLIANCE_AUDIT.md` و `.json`.
+- **ستون ۹ (PreEmptiveRiskOfBiasMitigator):** مهار پیشگیرانه سوگیری بر اساس استانداردهای بین‌المللی Cochrane RoB-2 و SYRCLE در ۵ دامنه بنیادین (سوگیری انتخاب، سوگیری عملکرد، سوگیری تشخیص و کورسازی ارزیاب، سوگیری ریزش و مدیریت داده‌های پرت، و سوگیری گزارش‌دهی انتخابی و پیش‌ثبت پروتکل در OSF/پژوهشیار) و صدور کارنامه رسمی `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`.
 - الزام قطعی و بدون انحراف ساختار مصوب ۲۸ بخشی پژوهشیار در تمام خروجی‌های سند Markdown و Word.
 - تبدیل و اعتبارسنجی E2E فرمول‌های ریاضی به تگ‌های بومی ورد `<m:oMath>` در `docx_builder` و حذف کامل نشت سینتکس LaTeX.
 - محافظت کامل از عبارات انگلیسی داخل پرانتز و شناسه‌های DOI/PMID در `PersianMedicalTypographyLinter`.

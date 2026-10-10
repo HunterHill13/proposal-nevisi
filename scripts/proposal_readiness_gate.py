@@ -74,7 +74,8 @@ class ProposalReadinessGate:
         "LiveReferenceVerificationGate",
         "FullTextRetrievalEngine",
         "MockGrantReviewPanel",
-        "EquatorComplianceAuditor"
+        "EquatorComplianceAuditor",
+        "PreEmptiveRiskOfBiasMitigator"
     ]
 
     @classmethod
@@ -252,6 +253,18 @@ class ProposalReadinessGate:
         except Exception as e:
             failed.append("EquatorComplianceAuditor")
             errors.append(f"EquatorComplianceAuditor error: {str(e)}")
+
+        # 13. PreEmptiveRiskOfBiasMitigator
+        try:
+            from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
+            rob_test = PreEmptiveRiskOfBiasMitigator.parse_sections("## 1. موضوع\nعنوان تستی")
+            if 1 not in rob_test:
+                raise ValueError("PreEmptiveRiskOfBiasMitigator failed section parsing")
+            passed.append("PreEmptiveRiskOfBiasMitigator")
+            diagnostics["PreEmptiveRiskOfBiasMitigator"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("PreEmptiveRiskOfBiasMitigator")
+            errors.append(f"PreEmptiveRiskOfBiasMitigator error: {str(e)}")
 
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":

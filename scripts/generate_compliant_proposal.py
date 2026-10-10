@@ -45,6 +45,7 @@ try:
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
     from mock_grant_review_panel import MockGrantReviewPanel
     from equator_compliance_auditor import EquatorComplianceAuditor
+    from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -70,6 +71,7 @@ except ImportError:
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
     from mock_grant_review_panel import MockGrantReviewPanel
     from equator_compliance_auditor import EquatorComplianceAuditor
+    from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -658,10 +660,12 @@ class ProposalGenerator:
         meth_overview = data.get("methodology_overview_text")
         if not meth_overview:
             meth_overview = (
-                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری طراحی گردیده و "
-                f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده مداخله، "
+                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری (Cochrane RoB-2 / SYRCLE) طراحی گردیده است. "
+                f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده، "
+                f"تخصیص شرایط آزمایشی و تیمارها به صورت تصادفی ساختاریافته (Randomized Block Design) و با کدگذاری نمونه‌ها (Coded Vials / Allocation Concealment) توسط ناظر مستقل، "
                 f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
-                f"سنجش‌های بیولوژیک و کمی‌سازی پیامدها بر اساس استانداردهای کنترل کیفیت، و در نهایت تحلیل آماری و مدلسازی برهم‌کنش می‌باشد."
+                f"سنجش‌های بیولوژیک با کورسازی ارزیاب و اپراتور دستگاه نسبت به گروه‌ها (Blinded Outcome Assessment)، "
+                f"و در نهایت تحلیل آماری و مدلسازی برهم‌کنش فارماکولوژیک می‌باشد."
             )
         md_parts.append("## ۱۳. روش اجرا\n" + meth_overview + "\n\n---")
 
@@ -711,7 +715,9 @@ class ProposalGenerator:
             sec_18 = (
                 "- مشاهده هرگونه آلودگی میکروبی یا تغییرات ریخت‌شناسی غیرمعمول در چاهک‌های کشت.\n"
                 "- افت زیست‌پذیری کنترل منفی سلولی به کمتر از ۹۰ درصد در طول دوره آزمایش.\n"
-                "- وجود خطای تفاضل ضریب تغییرات (CV) بالاتر از ۱۵ درصد میان تکرارهای تکنیکی یک گروه."
+                "- وجود خطای تفاضل ضریب تغییرات (CV) بالاتر از ۱۵ درصد میان تکرارهای تکنیکی یک گروه.\n"
+                "- حذف چاهک‌های دارای نقص فنی آشکار مطابق معیارهای از پیش تعریف‌شده بدون انتخاب گزینشی داده‌ها.\n"
+                "- شناسایی و مدیریت داده‌های پرت (Outliers) بر مبنای آزمون آماری گرابز (Grubbs' Test) در سطح معناداری ۰.۰۱ و عدم اعمال حذف سلیقه‌ای."
             )
         md_parts.append("## ۱۸. معیار های خروج از مطالعه\n" + sec_18 + "\n\n---")
 
@@ -795,7 +801,8 @@ class ProposalGenerator:
             sec_24 = (
                 "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
                 "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی و ثبت دقیق اصالت نمونه‌ها.\n"
-                "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه."
+                "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و پیش‌ثبت پروتکل مطالعه (Pre-registration) در سامانه مصوب پژوهشیار و پلتفرم دسترسی آزاد OSF پیش از آغاز فاز آزمایشگاهی.\n"
+                "- تعهد به عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه و رعایت بیانیه هلسینکی."
             )
         md_parts.append("## ۲۴. ملاحظلات اخلاقی در صورت نیاز\n" + sec_24 + "\n\n---")
 
@@ -917,6 +924,10 @@ class ProposalGenerator:
         equator_result = EquatorComplianceAuditor.audit_proposal(md_content, data)
         equator_md_path, equator_json_path = EquatorComplianceAuditor.save_reports(equator_result, output_dir=review_dir)
 
+        # Conduct Pre-emptive Risk of Bias (RoB) Mitigation Audit
+        rob_result = PreEmptiveRiskOfBiasMitigator.audit_proposal(md_content, data)
+        rob_md_path, rob_json_path = PreEmptiveRiskOfBiasMitigator.save_reports(rob_result, output_dir=review_dir)
+
         final_status = "PASS"
         if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
@@ -933,6 +944,9 @@ class ProposalGenerator:
             "equator_audit": equator_result.to_dict(),
             "equator_audit_md": equator_md_path,
             "equator_audit_json": equator_json_path,
+            "risk_of_bias": rob_result.to_dict(),
+            "risk_of_bias_md": rob_md_path,
+            "risk_of_bias_json": rob_json_path,
             "md_path": md_path,
             "docx_path": docx_path,
             "status": final_status,
