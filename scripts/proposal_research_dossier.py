@@ -128,11 +128,22 @@ class ProposalResearchDossier:
         is_full_text: bool = True,
         verified: bool = True,
         passages: Optional[List[str]] = None,
-        grade: str = "High"
+        grade: str = "High",
+        abstract_only_justification: Optional[str] = None,
+        user_approved: bool = False
     ) -> None:
-        """Adds a verified scientific reference with verbatim grounded passages."""
+        """Adds a verified scientific reference with verbatim grounded passages.
+        If is_full_text is False, tracks abstract-only tags and mandatory explicit justifications.
+        """
         if self.is_sealed:
             raise RuntimeError("Cannot modify a sealed research dossier.")
+        
+        # When abstract-only, ensure automatic limitation recording
+        if not is_full_text:
+            limitation_entry = f"Evidence for reference '{title[:60]}...' (PMID: {pmid or 'N/A'}, DOI: {doi or 'N/A'}) was derived from abstract only due to paywall/closed access: {abstract_only_justification or 'Unindexed full text'}"
+            if limitation_entry not in self.limitations_and_boundaries:
+                self.limitations_and_boundaries.append(limitation_entry)
+
         self.literature_evidence.append({
             "pmid": pmid.strip(),
             "doi": doi.strip(),
@@ -142,7 +153,9 @@ class ProposalResearchDossier:
             "is_full_text": is_full_text,
             "verified": verified,
             "passages": passages or [],
-            "grade": grade
+            "grade": grade,
+            "abstract_only_justification": abstract_only_justification.strip() if abstract_only_justification else None,
+            "user_approved": user_approved
         })
 
     def add_contradictory_finding(
@@ -284,11 +297,12 @@ class ProposalResearchDossier:
                 authors_str = ", ".join(paper.get("authors", [])[:3])
                 if len(paper.get("authors", [])) > 3:
                     authors_str += " et al."
-                ft_badge = "✅ Full-Text" if paper.get("is_full_text") else "⚠️ Abstract-Only"
+                ft_badge = "✅ Full-Text" if paper.get("is_full_text") else "⚠️ [ABSTRACT_ONLY]"
+                justif_note = f"\n- **دلیل استفاده از چکیده**: {paper.get('abstract_only_justification')}" if not paper.get("is_full_text") and paper.get("abstract_only_justification") else ""
                 md_lines.extend([
                     f"### [{idx}] {paper.get('title')}",
                     f"- **نویسندگان و سال**: {authors_str} ({paper.get('year')})",
-                    f"- **شناسه‌ها**: PMID: `{paper.get('pmid')}` | DOI: [{paper.get('doi')}](https://doi.org/{paper.get('doi')}) | وضعیت متن: {ft_badge} | رتبه GRADE: `{paper.get('grade')}`",
+                    f"- **شناسه‌ها**: PMID: `{paper.get('pmid')}` | DOI: [{paper.get('doi')}](https://doi.org/{paper.get('doi')}) | وضعیت متن: {ft_badge} | رتبه GRADE: `{paper.get('grade')}`{justif_note}",
                     f"- **فرازهای متنی استخراج‌شده (Verbatim Evidence Sentences)**:",
                 ])
                 passages = paper.get("passages", [])

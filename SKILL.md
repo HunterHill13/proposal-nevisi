@@ -2,21 +2,21 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v11.1). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v11.2). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Two-Loop Research Architecture (Inner Optimization & Evidence Discovery +
   Outer 28-Section Proposal Synthesis), Persistent Proposal Research Dossier (PROPOSAL_RESEARCH_DOSSIER.json/.md), and EpistemicRigorAuditor
   (ARA Seal Level 2-aligned across 6 dimensions: evidence grounding, falsifiability/H0, methodological coherence, boundary conditions,
   contradiction resolution, biological resource authentication). Enforces canonical 28 sections, MockGrantReviewPanel (NIH 1-9 scoring),
   EquatorComplianceAuditor, PreEmptiveRiskOfBiasMitigator, NativeOmmlMathEngine, PersianMedicalTypographyLinter, Canonical Reference Lock,
-  and passes a unified 445-assertion test suite.
+  Multi-Source Evidence Harvester (Europe PMC JATS XML + bioRxiv/medRxiv preprints), Abstract-Only Paywall Protocol, and passes a unified 448-assertion test suite.
 ---
 
-# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.1)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.2)
 
 این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-نسخه ۱۱.۱ بر مبنای هاردنینگ پیشرفته ضدتوهم، قفل فراداده‌های رسمی (Canonical Metadata Lock)، خوانش عمیق متن کامل (Deep Full-Text Reading)، پرونده دائمی پژوهش (Proposal Research Dossier) و ممیزی اپیستمیک ۶ گانه (Epistemic Rigor Auditor) موارد زیر را تضمین می‌کند:
+نسخه ۱۱.۲ بر مبنای هاردنینگ پیشرفته ضدتوهم، قفل فراداده‌های رسمی (Canonical Metadata Lock)، خوانش عمیق متن کامل (Deep Full-Text Reading)، پرونده دائمی پژوهش (Proposal Research Dossier)، استخراج چندمنبعی (Europe PMC و bioRxiv/medRxiv) و ممیزی اپیستمیک ۶ گانه (Epistemic Rigor Auditor) موارد زیر را تضمین می‌کند:
 - **ستون ۱ (Canonical Reference Lock & Live Verification Gate):** بازنویسی و تطبیق ۱۰۰ درصدی تمام اقلام فراداده‌ای مراجع (عنوان مقاله، اسامی نویسندگان، نام ژورنال، سال، دوره، شماره، صفحات، DOI و PMID) مستقیماً از پاسخ خام API های رسمی PubMed / Crossref. ممنوعیت قطعی استناد دستی از حافظه پارامتریک هوش مصنوعی بدون استعلام برخط؛ رد قطعی هر مقاله نامعتبر به صورت Fail-Closed.
 - **ستون ۲ (FullTextRetrievalEngine & Deep Reading Architecture):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML با پارس دقیق `itertext()`، PMC BioC JSON/XML و OpenAlex OA. تفکیک دقیق فصول متدولوژی و نتایج و استخراج مقادیر واقعی مدل‌ها، غلظت‌ها، زمان‌های مواجهه و نشانگرها.
 - **ستون ۳ (Strict Abstract-Only Quota Gate):** سقف حداکثر ۱۵٪ برای مقالات فقط-چکیده (Tier B؛ حداکثر ۱ تا ۲ مقاله)، مشروط به برقراری معیار دوگانه (سنگ‌بنای متدولوژیک مشهور نظیر Chou 2006 یا مطالعه مستقیم غیرقابل‌جایگزین با توجیه صریح). حذف خودکار مقالات چکیده متفرقه و جایگزینی با مقالات متن‌کامل دارای دسترسی آزاد.

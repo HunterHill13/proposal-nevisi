@@ -2772,6 +2772,29 @@ class FullTextRetrievalEngine:
                 return str(oa_dict["oa_url"]).strip()
         return None
 
+    def fetch_biorxiv_fulltext(self, doi: Optional[str] = None) -> Optional[str]:
+        """Fetches full-text JATS XML for bioRxiv/medRxiv preprints via bioRxiv details API."""
+        if not doi or not str(doi).strip().startswith("10.1101/"):
+            return None
+        clean_doi = str(doi).strip()
+        for server in ["biorxiv", "medrxiv"]:
+            api_url = f"https://api.biorxiv.org/details/{server}/{urllib.parse.quote(clean_doi)}"
+            res = self.adapter._http_get_json(api_url)
+            if res and isinstance(res, dict) and "_error" not in res:
+                collection = res.get("collection", [])
+                if collection and isinstance(collection, list):
+                    item = collection[-1]  # latest version
+                    jats_url = item.get("jatsxml")
+                    if jats_url:
+                        xml_res = self.adapter._http_get_text(jats_url)
+                        if xml_res and "_error" not in xml_res:
+                            text_xml = xml_res.get("text", "")
+                            if "<article" in text_xml or "<body" in text_xml:
+                                cleaned = self.clean_jats_xml(text_xml)
+                                if len(cleaned) >= 800:
+                                    return cleaned
+        return None
+
     @staticmethod
     def extract_grounding_passages(
         text: str,
@@ -2864,6 +2887,12 @@ class FullTextRetrievalEngine:
                     fulltext = self.fetch_pmc_bioc_fulltext(pmcid)
                     if fulltext:
                         source_channel = "PMC_BIOC_XML"
+
+            # Cascade: bioRxiv / medRxiv JATS XML
+            if not fulltext and doi and str(doi).strip().startswith("10.1101/"):
+                fulltext = self.fetch_biorxiv_fulltext(doi=doi)
+                if fulltext:
+                    source_channel = "BIORXIV_MEDRXIV_JATS_XML"
 
             # Cascade: OpenAlex OA Location
             if not fulltext and (doi or record.get("openalex_id")):

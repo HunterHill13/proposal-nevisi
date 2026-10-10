@@ -103,6 +103,16 @@ class EpistemicRigorAuditor:
             score -= 50.0
             findings.append(f"Found {len(unverified)} unverified references without verified PMID/DOI.")
 
+        # Check abstract-only justification compliance
+        abstract_only_papers = [e for e in evidence if not e.get("is_full_text", False)]
+        unjustified_abstracts = [
+            e for e in abstract_only_papers 
+            if not e.get("abstract_only_justification") or len(str(e.get("abstract_only_justification")).strip()) < 10
+        ]
+        if unjustified_abstracts:
+            score -= len(unjustified_abstracts) * 20.0
+            findings.append(f"Found {len(unjustified_abstracts)} abstract-only reference(s) lacking mandatory explicit paywall/unindexed justification.")
+
         full_text_ratio = full_text_count / total if total > 0 else 0
         if full_text_ratio < 0.85:
             deficit = (0.85 - full_text_ratio) * 100
@@ -116,12 +126,13 @@ class EpistemicRigorAuditor:
             findings.append(f"Grounded evidence passages ratio ({passage_ratio*100:.1f}%) is below 80% target.")
 
         score = max(0.0, min(100.0, score))
-        passed = (score >= self.PASS_THRESHOLD) and (len(unverified) == 0) and (full_text_ratio >= 0.85)
+        passed = (score >= self.PASS_THRESHOLD) and (len(unverified) == 0) and (full_text_ratio >= 0.85) and (len(unjustified_abstracts) == 0)
         return {
             "passed": passed,
             "score": round(score, 1),
             "full_text_ratio": round(full_text_ratio, 2),
             "unverified_count": len(unverified),
+            "unjustified_abstracts_count": len(unjustified_abstracts),
             "findings": findings,
             "reason": findings[0] if findings else "Evidence grounding compliant."
         }

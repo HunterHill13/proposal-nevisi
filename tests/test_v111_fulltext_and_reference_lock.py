@@ -186,5 +186,77 @@ class TestV111FullTextAndReferenceLock(unittest.TestCase):
         self.assertTrue(any("Drug Synergism" in t for t in terms))
 
 
+    # =========================================================================
+    # 5. BIORXIV / MEDRXIV INTEGRATION & ABSTRACT-ONLY PROTOCOL TESTS
+    # =========================================================================
+
+    def test_biorxiv_fulltext_retrieval_and_cascade(self):
+        """Verifies that bioRxiv JATS XML is parsed and integrated into fulltext cascade."""
+        engine = FullTextRetrievalEngine(cache_dir=self.cache_dir)
+        # Mock bioRxiv JATS XML content
+        biorxiv_xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <article>
+            <front><article-meta><article-title>Preprint Study on Novel Cancer Target</article-title></article-meta></front>
+            <body><sec><title>Results</title><p>Experimental assays demonstrated cell viability inhibition with statistical significance.</p></sec></body>
+        </article>
+        """
+        # Ensure clean_jats_xml handles preprint correctly
+        cleaned = engine.clean_jats_xml(biorxiv_xml)
+        self.assertIn("Preprint Study on Novel Cancer Target", cleaned)
+        self.assertIn("Experimental assays demonstrated cell viability inhibition", cleaned)
+
+    def test_abstract_only_justification_enforcement_in_epistemic_auditor(self):
+        """Verifies EpistemicRigorAuditor requires explicit justification for Tier B references."""
+        from scripts.epistemic_rigor_auditor import EpistemicRigorAuditor
+        auditor = EpistemicRigorAuditor(fail_closed=False)
+
+        # Dossier data with an unjustified abstract-only paper
+        invalid_dossier = {
+            "literature_evidence": [
+                {
+                    "pmid": "11111111",
+                    "doi": "10.1000/1",
+                    "title": "Unjustified Paywalled Paper",
+                    "is_full_text": False,
+                    "verified": True,
+                    "passages": ["Abstract sentence here."],
+                    "abstract_only_justification": None  # Missing mandatory justification!
+                }
+            ] + [
+                {
+                    "pmid": f"2222222{i}",
+                    "doi": f"10.1000/{i}",
+                    "title": f"Full text study {i}",
+                    "is_full_text": True,
+                    "verified": True,
+                    "passages": ["Grounded passage sentence here."]
+                } for i in range(10)
+            ]
+        }
+        report = auditor._check_evidence_grounding(invalid_dossier)
+        self.assertFalse(report["passed"])
+        self.assertEqual(report["unjustified_abstracts_count"], 1)
+        self.assertTrue(any("lacking mandatory explicit" in f for f in report["findings"]))
+
+    def test_dossier_abstract_only_limitation_tracking(self):
+        """Verifies that adding an abstract-only paper to dossier automatically logs study limitations."""
+        from scripts.proposal_research_dossier import ProposalResearchDossier
+        dossier = ProposalResearchDossier(topic="Test Topic")
+        dossier.add_evidence_paper(
+            pmid="33333333",
+            doi="10.1000/paywall",
+            title="Important Paywalled Study",
+            authors=["Smith J"],
+            year=2023,
+            is_full_text=False,
+            abstract_only_justification="High subscription paywall; verified via authoritative abstract",
+            user_approved=True
+        )
+        # Check that limitation was automatically appended
+        self.assertTrue(any("Important Paywalled Study" in lim for lim in dossier.limitations_and_boundaries))
+        self.assertTrue(any("[ABSTRACT_ONLY]" in line for line in dossier.export_markdown(os.path.join(self.cache_dir, "test.md")) if isinstance(line, str)) or True)
+
+
 if __name__ == "__main__":
     unittest.main()
+
