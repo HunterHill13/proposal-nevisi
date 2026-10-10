@@ -50,6 +50,7 @@ from generate_compliant_proposal import ProposalGenerator
 from mock_grant_review_panel import MockGrantReviewPanel
 from equator_compliance_auditor import EquatorComplianceAuditor
 from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
+from generic_reference_auditor import GenericReferenceAuditor
 
 
 class MasterResearchPipeline:
@@ -302,7 +303,37 @@ class MasterResearchPipeline:
         # Enforce Abstract Quota
         quota_audit = self.fulltext_engine.apply_abstract_quota(grounded_studies, max_abstract_ratio=0.15, min_total_required=1)
         final_retained_studies = quota_audit.get("retained_studies", grounded_studies)
-        studies = final_retained_studies
+
+        # Contextual Relevance & Multi-Factor Scientific Portfolio Selection
+        print(f"  ▪ Auditing contextual relevance and selecting optimal evidence portfolio...")
+        problem_model_for_selection = {
+            "domain": "Biomedical Science / Pharmacology",
+            "target_condition": {
+                "name_fa": self.topic,
+                "name_en": kw_info["canonical_query"],
+                "synonyms": kw_info.get("terms", [])
+            },
+            "population_or_model": {
+                "primary_system": kw_info["terms"][-1] if kw_info["terms"] else "Experimental Model"
+            },
+            "interventions_or_exposures": [
+                {"name": t} for t in kw_info.get("terms", [])[:2]
+            ]
+        }
+        selection_res = GenericReferenceAuditor.select_optimal_proposal_references(
+            candidate_records=final_retained_studies,
+            problem_model=problem_model_for_selection,
+            max_references=self.max_refs,
+            min_references=min(self.min_refs, len(final_retained_studies)),
+            no_quota_filling=False
+        )
+        selected_evidence = selection_res.get("selected_references", [])
+        if selected_evidence:
+            studies = selected_evidence
+            print(f"  ✅ Contextual Gate: Selected {len(studies)} high-relevance studies (excluded {len(selection_res.get('excluded_candidates', []))} off-target/incompatible records).")
+        else:
+            studies = final_retained_studies
+            print(f"  ▪ Retained {len(studies)} grounded studies from retrieval corpus.")
 
         # 2. Initialize and populate ProposalResearchDossier
         dossier = ProposalResearchDossier(topic=self.topic, domain="Biomedical Science / Pharmacology")

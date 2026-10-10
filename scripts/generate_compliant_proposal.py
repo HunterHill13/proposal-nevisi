@@ -511,14 +511,59 @@ class ProposalGenerator:
         problem_text = data.get("problem_statement_text", "")
         if not problem_text:
             agt1 = interventions[0].get("name", "مداخله اول") if interventions else "مداخله اول"
+            agt2 = interventions[1].get("name", "مداخله دوم") if len(interventions) > 1 else None
             domain_label = model_dict.get("domain") or "پزشکی و سلامت"
-            problem_text = (
-                f"{cond_name} ({cond_en}) از معضلات عمده حوزه {domain_label} است که با نرخ قابل توجه بروز و پیامدهای سیستمیک همراه است. "
-                f"راهبردهای متداول درمانی اغلب با چالش‌هایی نظیر پاسخ ناکافی یا عوارض جانبی مواجه هستند. "
-                f"شواهد تجربی و فارماکولوژیک حاکی از پتانسیل مداخله {agt1} در تعدیل مسیرهای پاتولوژیک در سیستم {sys_name} می‌باشد. "
-                f"با این وجود، فقدان شواهد نظام‌مند پیرامون دوزسنجی دقیق و مکانیسم‌های سلولی، اجرای مطالعه حاضر را به ضرورتی مبرم مبدل ساخته است."
-            )
-        md_parts.append("## ۲. بیان مسئله\n" + problem_text + "\n\n---")
+
+            # Dynamically identify grounded citations for role-based argumentation
+            direct_cnums = []
+            mech_cnums = []
+            model_cnums = []
+            safety_cnums = []
+            for s in studies[:25]:
+                cnum = s.get("citation_number")
+                if not cnum:
+                    continue
+                role = str(s.get("evidence_role", "")).upper()
+                inc_reason = str(s.get("final_inclusion_reason", "")).upper()
+                if "DIRECT" in role or "INTERVENTION" in inc_reason:
+                    direct_cnums.append(cnum)
+                elif "MECH" in role or "MECHANISTIC" in inc_reason:
+                    mech_cnums.append(cnum)
+                elif "SAFETY" in inc_reason or "TOXIC" in role:
+                    safety_cnums.append(cnum)
+                else:
+                    model_cnums.append(cnum)
+
+            cite_burden = f" [{model_cnums[0]}]" if model_cnums else (" [1]" if studies else "")
+            cite_direct = f" [{direct_cnums[0]}]" if direct_cnums else (" [1]" if studies else "")
+            cite_mech = f" [{mech_cnums[0]}]" if mech_cnums else (f" [{direct_cnums[1]}]" if len(direct_cnums) > 1 else (" [1]" if studies else ""))
+            cite_safety = f" [{safety_cnums[0]}]" if safety_cnums else (f" [{direct_cnums[-1]}]" if len(direct_cnums) > 2 else (" [1]" if studies else ""))
+
+            layered_problem = [
+                f"### ۱. بار بیماری و اهمیت اپیدمیولوژیک\n{cond_name} ({cond_en}) از معضلات عمده سلامت و بالینی در حوزه {domain_label} محسوب می‌شود که با نرخ فزاینده شیوع، ناتوانی عملکردی و مرگ‌ومیر همراه است{cite_burden}. علی‌رغم پیشرفت‌های تشخیصی و راهبردهای موجود، کنترل موثر و کاهش پیامدهای سیستمیک بیماری همچنان نیازمند رویکردهای درمانی نوین و هدفمند می‌باشد.",
+                f"### ۲. وضعیت فعلی دانش و درمان‌های استاندارد موجود\nدر حال حاضر، گزینه‌های متداول بر پایه مداخلات استاندارد شیمی‌درمانی یا دارویی استوارند. با وجود اثربخشی اولیه، چالش‌های عمده‌ای نظیر مقاومت دارویی، پاسخ ناکافی در بلندمدت و عوارض جانبی سیستمیک مانع از دستیابی به پاسخ درمانی مطلوب و پایدار می‌گردند{cite_direct}.",
+                f"### ۳. مبانی بیولوژیک و شواهد تجربی مداخله پژوهش\nشواهد تجربی و پژوهش‌های سلولی-مولکولی حاکی از پتانسیل فارماکولوژیک قابل توجه مداخله {agt1} در تعدیل مسیرهای تنظیمی، القای آپوپتوز و مهار تکثیر سلول‌های پاتولوژیک در سیستم مدل {sys_name} است{cite_mech}." + (f" افزون بر این، فرضیه تلفیق درمانی همزمان با {agt2} با هدف ایجاد هم‌افزایی فارماکولوژیک و کاهش سمیت دوزهای منفرد توسعه یافته است." if agt2 else ""),
+                f"### ۴. چالش‌ها، سمیت و محدودیت‌های ایمنی زیستی\nتعیین دقیق پنجره درمانی، آستانه دوز ایمن و بررسی احتمال عوارض سیتوتوکسیک در بافت‌های نرمال از الزامات کلیدی پیش‌بالینی است{cite_safety}. بررسی دقیق مرزهای ایمنی زیستی و کنترل تداخلات سنجش‌های آزمایشگاهی جهت تفکیک مرگ برنامه‌ریزی‌شده از نکروز غیراختصاصی ضرورت دارد.",
+                f"### ۵. ضرورت انجام پژوهش و شکاف شواهد (Research Gap)\nعلیرغم یافته‌های اولیه پراکنده، خلأهای جدی در زمینه کمی‌سازی دقیق برهم‌کنش غلظت-پاسخ، تایید ارتوگونال آپوپتوز و اعتبارسنجی مکانیسمی در سیستم {sys_name} وجود دارد. مطالعه حاضر به منظور پاسخ‌گویی به این نیاز علمی مبرم و ارائه شواهد تجربی متقن طراحی شده است."
+            ]
+            problem_text = "\n\n".join(layered_problem)
+
+        gap_summary = ""
+        if studies:
+            try:
+                gaps = GenericGapDetector.detect_gaps(studies, model_dict)
+                if gaps:
+                    gap_lines = ["\n\n### شکاف‌های پژوهشی شناسایی‌شده بر پایه شواهد:"]
+                    for g in gaps[:4]:
+                        cat = g.get("gap_category", "KNOWLEDGE_GAP")
+                        trail = g.get("evidence_trail", g.get("definition", ""))
+                        resol = g.get("proposed_resolution", "")
+                        gap_lines.append(f"- **شکاف پژوهشی ({cat}):** {trail} -> *راهکار طرح حاضر:* {resol}")
+                    gap_summary = "\n".join(gap_lines)
+            except Exception:
+                gap_summary = ""
+
+        md_parts.append("## ۲. بیان مسئله\n" + problem_text + gap_summary + "\n\n---")
 
         # -------------------------------------------------------------
         # ۳. مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)

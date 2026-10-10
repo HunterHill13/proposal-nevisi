@@ -177,6 +177,102 @@ class TestV113Enhancements(unittest.TestCase):
         self.assertIn("Baseline Literature Risk of Bias Audit", prop_md)
         self.assertIn("31111111", prop_md)
 
+    def test_pipeline_filters_off_topic_candidates(self):
+        """Pipeline filters out irrelevant or biologically incompatible papers using GenericReferenceAuditor."""
+        from generic_reference_auditor import GenericReferenceAuditor
+
+        candidate_records = [
+            {
+                "pmid": "99999991",
+                "doi": "10.1000/vet1",
+                "title": "Bovine mastitis in dairy cattle herd lactation",
+                "abstract": "Investigation of dairy cows milk yield and udder infections in veterinary agriculture.",
+                "year": 2023
+            },
+            {
+                "pmid": "99999992",
+                "doi": "10.1000/cancer1",
+                "title": "Therapeutic compound induces apoptotic death in cancer cells",
+                "abstract": "Treatment inhibited growth and induced cell apoptosis in experimental model with p < 0.01.",
+                "year": 2023
+            }
+        ]
+        problem_model = {
+            "domain": "oncology",
+            "target_condition": {"name_en": "cancer", "name_fa": "سرطان"},
+            "population_or_model": {"primary_system": "cancer cells"},
+            "interventions_or_exposures": [{"name": "compound"}]
+        }
+
+        sel_res = GenericReferenceAuditor.select_optimal_proposal_references(
+            candidate_records=candidate_records,
+            problem_model=problem_model,
+            max_references=10,
+            min_references=1,
+            no_quota_filling=False
+        )
+
+        selected_pmids = [s.get("pmid") for s in sel_res["selected_references"]]
+        self.assertNotIn("99999991", selected_pmids, "Off-topic veterinary paper must be strictly rejected")
+        self.assertIn("99999992", selected_pmids, "On-topic target paper must be selected")
+        
+        # Verify exclusion recorded in funnel
+        excluded_ids = [e.get("ref_id") for e in sel_res.get("excluded_candidates", [])]
+        self.assertTrue(any("10.1000/vet1" in str(eid) or "mastitis" in str(eid).lower() for eid in excluded_ids))
+
+    def test_section_2_evidence_argumentation_and_citations(self):
+        """Section 2 synthesizes layered evidence-grounded problem statement with valid citations and research gaps."""
+        studies = [
+            {
+                "citation_number": 1,
+                "pmid": "31000001",
+                "doi": "10.1000/sample1",
+                "title": "Direct cellular efficacy of therapeutic compound",
+                "authors": ["Author Alpha", "Author Beta"],
+                "year": 2022,
+                "evidence_role": "DIRECT_EVIDENCE",
+                "final_inclusion_reason": "INTERVENTION_EFFICACY_EVIDENCE"
+            },
+            {
+                "citation_number": 2,
+                "pmid": "31000002",
+                "doi": "10.1000/sample2",
+                "title": "Molecular signaling and apoptotic pathway induction",
+                "authors": ["Author Gamma"],
+                "year": 2023,
+                "evidence_role": "MECHANISTIC_EVIDENCE",
+                "final_inclusion_reason": "MECHANISTIC_RATIONALE"
+            }
+        ]
+        prop_data = {
+            "title_fa": "بررسی اثر درمانی مداخله تجربی در مدل بیماری",
+            "title_en": "Evaluation of experimental intervention in disease model",
+            "studies": studies,
+            "research_problem_model": {
+                "domain": "oncology",
+                "target_condition": {"name_fa": "بیماری هدف", "name_en": "Target Disease"},
+                "population_or_model": {"primary_system": "سلول‌های هدف"},
+                "interventions_or_exposures": [{"name": "مداخله زیستی Alpha"}]
+            }
+        }
+        md = ProposalGenerator.assemble_pajooheshyar_28(prop_data)
+
+        # 1. Section 2 presence and citations
+        self.assertIn("## ۲. بیان مسئله", md)
+        self.assertIn("[1]", md)
+        self.assertIn("شکاف‌های پژوهشی شناسایی‌شده", md)
+
+        # 2. Section 28 presence and synchronization
+        self.assertIn("## ۲۸. منابعی که استفاده شد", md)
+        self.assertIn("[1] Author Alpha", md)
+        self.assertIn("[2] Author Gamma", md)
+
+        # 3. PostResearchCitationAuditor validates citation integrity
+        from generic_reference_auditor import PostResearchCitationAuditor
+        cite_audit = PostResearchCitationAuditor.audit_proposal_citations(md, studies)
+        self.assertEqual(cite_audit["unresolved_placeholders_count"], 0)
+        self.assertEqual(cite_audit["total_citations_in_text"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()
