@@ -401,5 +401,101 @@ class PreEmptiveRiskOfBiasMitigator:
         return md_path, json_path
 
 
+class BaselinePaperQualityAuditor:
+    """Automated Risk of Bias (RoB) evaluator for foundation literature papers cited in Proposal.
+    
+    Extracts methodological signals from abstract/fulltext passages across 4 domains:
+    1. Randomization / Allocation (D1)
+    2. Blinding / Masking (D2)
+    3. Outcome Rigor / Controls (D3)
+    4. Attrition / Sample Completeness (D4)
+    """
+
+    @classmethod
+    def evaluate_paper(cls, paper: Dict[str, Any]) -> Dict[str, Any]:
+        """Evaluates a single paper record and assigns domain-level and overall RoB status."""
+        title = paper.get("title", "")
+        abstract = paper.get("abstract", "")
+        passages = " ".join(paper.get("passages", []))
+        full_text = f"{title} {abstract} {passages}".lower()
+
+        # D1: Randomization
+        has_rand = any(k in full_text for k in ["random", "randomized", "randomly", "تصادفی"])
+        d1_risk = "LOW_RISK" if has_rand else "UNCLEAR_RISK"
+
+        # D2: Blinding
+        has_blind = any(k in full_text for k in ["blind", "blinded", "masked", "double-blind", "کورسازی", "کور"])
+        d2_risk = "LOW_RISK" if has_blind else "UNCLEAR_RISK"
+
+        # D3: Outcome Rigor & Controls
+        has_ctrl = any(k in full_text for k in ["control", "vehicle", "placebo", "baseline", "کنترل"])
+        has_quant = any(k in full_text for k in ["ic50", "p <", "p<", "p-value", "significant", "fold", "anova", "ci <", "ci<"])
+        d3_risk = "LOW_RISK" if (has_ctrl and has_quant) else ("SOME_CONCERNS" if (has_ctrl or has_quant) else "HIGH_RISK")
+
+        # D4: Attrition & Replication
+        has_rep = any(k in full_text for k in ["triplicate", "replicate", "n =", "n=", "independent", "تکرار"])
+        d4_risk = "LOW_RISK" if has_rep else "UNCLEAR_RISK"
+
+        # Aggregate overall quality
+        high_count = sum(1 for r in [d1_risk, d2_risk, d3_risk, d4_risk] if r == "HIGH_RISK")
+        unclear_count = sum(1 for r in [d1_risk, d2_risk, d3_risk, d4_risk] if r == "UNCLEAR_RISK")
+        
+        if high_count > 0:
+            overall = "HIGH_RISK"
+        elif unclear_count >= 3:
+            overall = "SOME_CONCERNS"
+        else:
+            overall = "LOW_RISK"
+
+        return {
+            "pmid": paper.get("pmid"),
+            "doi": paper.get("doi"),
+            "title": title,
+            "overall_rob": overall,
+            "domains": {
+                "d1_randomization": d1_risk,
+                "d2_blinding": d2_risk,
+                "d3_controls_rigor": d3_risk,
+                "d4_replication_reporting": d4_risk
+            }
+        }
+
+    @classmethod
+    def evaluate_corpus(cls, papers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Evaluates an entire collection of foundation papers."""
+        return [cls.evaluate_paper(p) for p in papers]
+
+    @classmethod
+    def render_markdown_table(cls, evaluations: List[Dict[str, Any]]) -> str:
+        """Renders an academic Risk of Bias summary table for Dossier or Section 3."""
+        if not evaluations:
+            return "_هیچ مقاله‌ای برای ارزیابی ریسک سوگیری ثبت نشده است._"
+
+        badge_map = {
+            "LOW_RISK": "🟢 کم‌ریسک",
+            "SOME_CONCERNS": "🟡 مبهم/متوسط",
+            "UNCLEAR_RISK": "⚪ نامشخص",
+            "HIGH_RISK": "🔴 پرریسک"
+        }
+
+        header = (
+            "| ردیف | شناسه / عنوان مقاله | تصادفی‌سازی (D1) | کورسازی (D2) | کنترل‌ها و کمی‌سازی (D3) | تکرارپذیری (D4) | ریسک کلی سوگیری |\n"
+            "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+        )
+        rows = []
+        for idx, ev in enumerate(evaluations, 1):
+            short_title = (ev.get("title") or "مقاله")[:55] + ("..." if len(ev.get("title", "")) > 55 else "")
+            pmid = ev.get("pmid") or ev.get("doi") or "N/A"
+            d1 = badge_map.get(ev["domains"]["d1_randomization"], ev["domains"]["d1_randomization"])
+            d2 = badge_map.get(ev["domains"]["d2_blinding"], ev["domains"]["d2_blinding"])
+            d3 = badge_map.get(ev["domains"]["d3_controls_rigor"], ev["domains"]["d3_controls_rigor"])
+            d4 = badge_map.get(ev["domains"]["d4_replication_reporting"], ev["domains"]["d4_replication_reporting"])
+            tot = badge_map.get(ev["overall_rob"], ev["overall_rob"])
+
+            rows.append(f"| {idx} | **{short_title}**<br>*(ID: {pmid})* | {d1} | {d2} | {d3} | {d4} | **{tot}** |")
+
+        return header + "\n".join(rows)
+
+
 if __name__ == "__main__":
-    print("PreEmptiveRiskOfBiasMitigator loaded successfully.")
+    print("PreEmptiveRiskOfBiasMitigator and BaselinePaperQualityAuditor loaded successfully.")

@@ -531,6 +531,20 @@ class ProposalGenerator:
                 para = s.get("review_paragraph") or EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
                 lit_paras.append(para)
             lit_content = "\n\n".join(lit_paras)
+
+            # Append Academic Baseline Literature Risk of Bias Matrix Table
+            try:
+                from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
+                rob_evals = BaselinePaperQualityAuditor.evaluate_corpus(studies[:25])
+                rob_table = BaselinePaperQualityAuditor.render_markdown_table(rob_evals)
+                lit_content += (
+                    "\n\n### جدول ارزیابی کیفیت و ریسک سوگیری مقالات پایه (Baseline Literature Risk of Bias Audit)\n\n"
+                    "جهت تضمین استحکام معرفت‌شناختی و سنجش اعتبار شواهد استنادشده، کیفیت روش‌شناختی مقالات پایه بر مبنای معیارهای بین‌المللی ارزیابی گردید:\n\n"
+                    + rob_table
+                )
+            except Exception:
+                pass
+
         if not lit_content:
             lit_content = "شواهد تجربی و مطالعات پیشین مرتبط با متغیرهای پژوهش به صورت جامع مورد تحلیل و بررسی قرار گرفته‌اند."
         md_parts.append("## ۳. مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)\n" + lit_content + "\n\n---")

@@ -388,7 +388,10 @@ class MasterResearchPipeline:
         dossier.add_limitation("محدودیت ترجمان برون‌تنی (In Vitro): نیاز به تایید درون‌تنی به دلیل تفاوت در فارماکوکینتیک و دسترسی زیستی سیستمیک.")
         dossier.add_limitation("لزوم کنترل تداخلات فتومتریک و طیفی در چاهک‌های آزمایش با استفاده از کنترل بلانک بدون سلول (Cell-Free Blank).")
 
-        # 3. Seal the dossier via Epistemic Rigor Auditor
+        # 3. Audit Baseline Literature Risk of Bias & Seal the dossier
+        print(f"  ▪ Auditing foundation literature quality (Automated RoB Table)...")
+        dossier.audit_baseline_literature_quality()
+
         print(f"  ▪ Auditing dossier across 6 Epistemic Rigor Dimensions (ARA Seal Level 2)...")
         auditor = EpistemicRigorAuditor(fail_closed=True)
         audit_rep = dossier.seal_dossier(auditor)

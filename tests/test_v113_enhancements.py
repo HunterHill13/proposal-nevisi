@@ -110,5 +110,73 @@ class TestV113Enhancements(unittest.TestCase):
         self.assertIn("NIH Notice NOT-OD-15-103", cell_md)
         self.assertIn("Pseudo-Replication", cell_md)
 
+    def test_baseline_paper_quality_auditor_and_section_3_rob_table(self):
+        """BaselinePaperQualityAuditor evaluates papers and renders markdown matrix table in Section 3."""
+        from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
+        from proposal_research_dossier import ProposalResearchDossier
+
+        papers = [
+            {
+                "pmid": "31111111",
+                "doi": "10.1016/j.biopha.2021.01",
+                "title": "Randomized double-blind evaluation of compound against baseline control with triplicate runs",
+                "abstract": "We conducted a randomized double-blind trial. Vehicle control was used. Results showed p < 0.01 in triplicate experiments.",
+                "passages": ["Assays performed in independent triplicate with vehicle control."]
+            },
+            {
+                "pmid": "32222222",
+                "doi": "10.1016/j.biopha.2021.02",
+                "title": "Preliminary brief observation report",
+                "abstract": "Brief notes recorded under laboratory observation.",
+                "passages": []
+            }
+        ]
+
+        # 1. Direct Auditor test
+        evals = BaselinePaperQualityAuditor.evaluate_corpus(papers)
+        self.assertEqual(len(evals), 2)
+        self.assertEqual(evals[0]["domains"]["d1_randomization"], "LOW_RISK")
+        self.assertEqual(evals[0]["domains"]["d2_blinding"], "LOW_RISK")
+        self.assertEqual(evals[0]["domains"]["d3_controls_rigor"], "LOW_RISK")
+        self.assertEqual(evals[0]["overall_rob"], "LOW_RISK")
+        self.assertEqual(evals[1]["overall_rob"], "HIGH_RISK")
+
+        tbl = BaselinePaperQualityAuditor.render_markdown_table(evals)
+        self.assertIn("ریسک کلی سوگیری", tbl)
+        self.assertIn("31111111", tbl)
+
+        # 2. Dossier Integration test
+        dossier = ProposalResearchDossier(topic="تست سوگیری")
+        for p in papers:
+            dossier.add_evidence_paper(
+                pmid=p["pmid"],
+                doi=p["doi"],
+                title=p["title"],
+                authors=["Author X"],
+                year=2021,
+                is_full_text=True,
+                verified=True,
+                passages=p["passages"]
+            )
+        rob_dossier = dossier.audit_baseline_literature_quality()
+        self.assertEqual(len(rob_dossier), 2)
+        dossier_dict = dossier.to_dict()
+        self.assertIn("literature_rob_evaluations", dossier_dict)
+
+        # 3. Section 3 Integration in generated proposal
+        prop_data = {
+            "title_fa": "طرح آزمایشی",
+            "studies": papers,
+            "research_problem_model": {
+                "target_condition": {"name_fa": "بیماری هدف", "name_en": "Disease Target"},
+                "population_or_model": {"primary_system": "مدل هدف"},
+                "interventions_or_exposures": [{"name": "ترکیب T"}]
+            }
+        }
+        prop_md = ProposalGenerator.assemble_pajooheshyar_28(prop_data)
+        self.assertIn("Baseline Literature Risk of Bias Audit", prop_md)
+        self.assertIn("31111111", prop_md)
+
+
 if __name__ == "__main__":
     unittest.main()

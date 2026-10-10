@@ -64,9 +64,21 @@ class ProposalResearchDossier:
 
         self.biological_entities: List[Dict[str, Any]] = []
         self.literature_evidence: List[Dict[str, Any]] = []
+        self.literature_rob_evaluations: List[Dict[str, Any]] = []
         self.contradictory_evidence: List[Dict[str, Any]] = []
         self.limitations_and_boundaries: List[str] = []
         self.audit_report: Optional[Dict[str, Any]] = None
+
+    def audit_baseline_literature_quality(self) -> List[Dict[str, Any]]:
+        """Audits the Risk of Bias for all cited foundation papers using BaselinePaperQualityAuditor."""
+        if not self.literature_evidence:
+            return []
+        try:
+            from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
+            self.literature_rob_evaluations = BaselinePaperQualityAuditor.evaluate_corpus(self.literature_evidence)
+        except Exception:
+            self.literature_rob_evaluations = []
+        return self.literature_rob_evaluations
 
     def set_hypotheses(self, h0: str, h1: str, rationale: str = "") -> None:
         """Sets null and alternative hypotheses."""
@@ -216,6 +228,7 @@ class ProposalResearchDossier:
             "methodological_invariants": self.methodological_invariants,
             "biological_entities": self.biological_entities,
             "literature_evidence": self.literature_evidence,
+            "literature_rob_evaluations": self.literature_rob_evaluations,
             "contradictory_evidence": self.contradictory_evidence,
             "limitations_and_boundaries": self.limitations_and_boundaries,
             "audit_report": self.audit_report
@@ -312,6 +325,20 @@ class ProposalResearchDossier:
                     for p in passages:
                         md_lines.append(f"  > \"{p}\"")
                 md_lines.append("")
+
+            # Render Risk of Bias Table for Baseline Literature
+            if self.literature_rob_evaluations:
+                try:
+                    from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
+                    rob_table = BaselinePaperQualityAuditor.render_markdown_table(self.literature_rob_evaluations)
+                    md_lines.extend([
+                        "### ۴-۱. جدول ارزیابی ریسک سوگیری مقالات پایه (Baseline Literature Risk of Bias Matrix)",
+                        "",
+                        rob_table,
+                        "",
+                    ])
+                except Exception:
+                    pass
 
         md_lines.extend([
             f"---",
