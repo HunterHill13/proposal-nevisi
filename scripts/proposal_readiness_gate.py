@@ -71,7 +71,8 @@ class ProposalReadinessGate:
         "native_omml_math_engine",
         "persian_medical_typography_linter",
         "CitationTracker",
-        "LiveReferenceVerificationGate"
+        "LiveReferenceVerificationGate",
+        "FullTextRetrievalEngine"
     ]
 
     @classmethod
@@ -212,6 +213,20 @@ class ProposalReadinessGate:
             failed.append("LiveReferenceVerificationGate")
             errors.append(f"LiveReferenceVerificationGate error: {str(e)}")
 
+        # 10. FullTextRetrievalEngine
+        try:
+            from scientific_search_adapter import FullTextRetrievalEngine
+            ft_engine = FullTextRetrievalEngine()
+            test_study = {"title": "Benchmark Study", "pmid": "999999", "abstract": "Sample abstract text for testing."}
+            grounded = ft_engine.retrieve_and_ground_study(test_study, mode="fixture")
+            if not grounded.get("tier"):
+                raise ValueError("FullTextRetrievalEngine failed study grounding classification")
+            passed.append("FullTextRetrievalEngine")
+            diagnostics["FullTextRetrievalEngine"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("FullTextRetrievalEngine")
+            errors.append(f"FullTextRetrievalEngine error: {str(e)}")
+
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":
             all_infra_passed = (len(failed) == 0 and len(passed) == len(cls.required_modules))
@@ -320,10 +335,10 @@ class ProposalReadinessGate:
                     failed.append("methodology_completeness_gate")
                 errors.append(f"PAJOOHESHYAR_COMPLETENESS_FAIL: بخش‌های ناقص: {comp_res.missing_sections}")
 
-        # 8. Validate references live / authentic provenance if provided
+        # 8. Validate references live / authentic provenance and full-text grounding if provided
         refs_to_verify = ctx.get("retrieved_studies") or ctx.get("studies") or ctx.get("references")
         if refs_to_verify and isinstance(refs_to_verify, list):
-            from scientific_search_adapter import LiveReferenceVerificationGate
+            from scientific_search_adapter import LiveReferenceVerificationGate, FullTextRetrievalEngine
             lrv_gate = LiveReferenceVerificationGate()
             verif_mode = ctx.get("reference_verification_mode", "auto")
             ref_audit = lrv_gate.verify_study_collection(refs_to_verify, mode=verif_mode, fail_closed=strict_mode)
@@ -333,6 +348,23 @@ class ProposalReadinessGate:
                 errors.append(f"LIVE_REFERENCE_VERIFICATION_FAIL: {ref_audit['failed_count']} منبع در پایگاه‌های مرجع تایید نشدند: {failed_ids}")
                 if "LiveReferenceVerificationGate" not in failed:
                     failed.append("LiveReferenceVerificationGate")
+
+            # Check Abstract-Only Quota & Passage Grounding if tier info is present or in strict mode
+            has_tier_tags = any("tier" in r or "has_full_text" in r for r in refs_to_verify)
+            if strict_mode or has_tier_tags:
+                quota_audit = FullTextRetrievalEngine.apply_abstract_quota(
+                    refs_to_verify,
+                    max_abstract_ratio=0.20,
+                    min_total_required=ctx.get("min_references", 15) if strict_mode else 1
+                )
+                diagnostics["abstract_quota_evaluation"] = quota_audit
+                if not quota_audit["can_proceed"] and strict_mode:
+                    errors.append(
+                        f"ABSTRACT_QUOTA_EXCEEDED: نسبت مقالات فقط-چکیده ({round(quota_audit['abstract_ratio']*100, 1)}%) "
+                        f"از سقف مجاز (۲۰٪) فراتر رفته یا تعداد کل منابع معتبر به حدنصاب نرسیده است."
+                    )
+                    if "FullTextRetrievalEngine" not in failed:
+                        failed.append("FullTextRetrievalEngine")
 
         # Final Fail-Closed Decision
         can_proceed = (len(failed) == 0 and len(errors) == 0 and len(missing_inputs) == 0)

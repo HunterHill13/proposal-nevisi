@@ -1841,6 +1841,34 @@ class GenericReferenceAuditor:
         if seen_nums and seen_nums != list(range(1, count + 1)):
             violations.append(f"NON_SEQUENTIAL_CITATION_NUMBERING: Expected 1..{count}, found {seen_nums[:5]}...")
 
+        # Check Tier A vs Tier B (Abstract-Only Quota & Passage Grounding)
+        has_tier_info = any("tier" in ref or "has_full_text" in ref for ref in references)
+        tier_b_count = 0
+        tier_a_count = 0
+        if has_tier_info and count > 0:
+            for idx, ref in enumerate(references, 1):
+                ref_id = ref.get("ref_id", ref.get("doi", f"REF_{idx}"))
+                tier = ref.get("tier")
+                if tier == "TIER_B_ABSTRACT_ONLY" or (tier is None and ref.get("has_full_text") is False):
+                    tier_b_count += 1
+                    just = ref.get("abstract_only_justification")
+                    if not just or len(str(just).strip()) < 10:
+                        violations.append(f"MISSING_ABSTRACT_ONLY_JUSTIFICATION: Reference {ref_id} is Tier B (abstract-only) without required scientific justification.")
+                elif tier == "TIER_A_FULL_TEXT_GROUNDED" or ref.get("has_full_text") is True:
+                    tier_a_count += 1
+                    passages = ref.get("grounding_passages")
+                    if not passages and not ref.get("has_full_text"):
+                        violations.append(f"MISSING_PASSAGE_GROUNDING: Reference {ref_id} is classified as Tier A but lacks verified grounding passages.")
+
+            abstract_ratio = tier_b_count / count
+            if abstract_ratio > 0.20:
+                violations.append(
+                    f"EXCEEDS_ABSTRACT_ONLY_QUOTA_20_PERCENT: Tier B (abstract-only) papers "
+                    f"({tier_b_count}/{count} = {round(abstract_ratio * 100, 1)}%) exceed 20% quota ceiling."
+                )
+        else:
+            abstract_ratio = 0.0
+
         passed = len(violations) == 0
         return {
             "portfolio_status": "PASS" if passed else "FAIL",
@@ -1848,6 +1876,9 @@ class GenericReferenceAuditor:
             "total_references": count,
             "max_reference_ceiling": max_references,
             "min_reference_floor": min_references,
+            "tier_a_count": tier_a_count,
+            "tier_b_count": tier_b_count,
+            "abstract_ratio": round(abstract_ratio, 3),
             "violations_count": len(violations),
             "violations": violations
         }
