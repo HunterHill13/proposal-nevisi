@@ -509,11 +509,12 @@ class ProposalGenerator:
         # ۲. بیان مسئله
         # -------------------------------------------------------------
         problem_text = data.get("problem_statement_text", "")
-        if not problem_text or len(problem_text.split()) < 100:
+        if not problem_text:
             agt1 = interventions[0].get("name", "مداخله اول") if interventions else "مداخله اول"
+            domain_label = model_dict.get("domain") or "پزشکی و سلامت"
             problem_text = (
-                f"{cond_name} ({cond_en}) از معضلات عمده سلامت و انکولوژی معاصر است که با نرخ بالای بروز و عوارض جانبی سیستمیک همراه است. "
-                f"راهبردهای متداول با چالش‌هایی نظیر سمیت بافتی و مقاومت اکتسابی مواجه هستند. "
+                f"{cond_name} ({cond_en}) از معضلات عمده حوزه {domain_label} است که با نرخ قابل توجه بروز و پیامدهای سیستمیک همراه است. "
+                f"راهبردهای متداول درمانی اغلب با چالش‌هایی نظیر پاسخ ناکافی یا عوارض جانبی مواجه هستند. "
                 f"شواهد تجربی و فارماکولوژیک حاکی از پتانسیل مداخله {agt1} در تعدیل مسیرهای پاتولوژیک در سیستم {sys_name} می‌باشد. "
                 f"با این وجود، فقدان شواهد نظام‌مند پیرامون دوزسنجی دقیق و مکانیسم‌های سلولی، اجرای مطالعه حاضر را به ضرورتی مبرم مبدل ساخته است."
             )
@@ -894,6 +895,19 @@ class ProposalGenerator:
             from persian_medical_typography_linter import PersianMedicalTypographyLinter
             linter = PersianMedicalTypographyLinter()
             md_content = linter.format_text(md_content)
+        except Exception:
+            pass
+
+        # 3.5 Apply CitationTracker Document-Level Monotonic Vancouver Re-indexing
+        try:
+            from citation_tracker import CitationTracker
+            tracker = CitationTracker()
+            for idx, s in enumerate(data.get("studies", [])[:25], 1):
+                ckey = s.get("citation_id") or s.get("pmid") or f"ref_{idx}"
+                tracker.register_reference(str(ckey), s)
+            reindex_res = tracker.reindex_document(md_content, bibliography=tracker._registered_references)
+            if reindex_res and reindex_res.rewritten_text:
+                md_content = reindex_res.rewritten_text
         except Exception:
             pass
 
