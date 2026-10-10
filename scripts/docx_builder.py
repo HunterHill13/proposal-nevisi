@@ -204,7 +204,13 @@ def add_ref_item(doc, text):
         pPr.append(parse_xml(r'<w:jc {} w:val="both"/>'.format(nsdecls('w'))))
     else:
         jc.set(qn('w:val'), 'both')
-    add_r(p, text, font_name="Times New Roman", size_pt=10, bold=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
+
+    has_persian = any('\u0600' <= c <= '\u06FF' for c in text)
+    if has_persian:
+        set_p_rtl(p, space_before=3, space_after=3, line_spacing=1.15, align="both")
+        add_formatted_bidi_text(p, text, font_name="Dubai", size_pt=10, color_rgb=(0x00, 0x00, 0x00))
+    else:
+        add_r(p, text, font_name="Times New Roman", size_pt=10, bold=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
     return p
 
 def add_formula_box(doc, formula_text):
@@ -265,11 +271,19 @@ def set_cell_borders(cell, color="D3D3D3"):
     )
     tcPr.append(tcBorders)
 
+def is_table_separator(line: str) -> bool:
+    clean = line.strip()
+    if not clean or not clean.startswith('|'):
+        return False
+    inner = clean.strip('|')
+    parts = [p.strip() for p in inner.split('|')]
+    return bool(parts) and all(bool(re.match(r'^:?-+:?$', p)) for p in parts)
+
 def render_styled_table(doc, table_lines):
     rows = []
     for line in table_lines:
         line_clean = line.strip()
-        if not line_clean or line_clean.startswith('|:--') or line_clean.startswith('|---'):
+        if not line_clean or is_table_separator(line_clean):
             continue
         cells = [c.strip() for c in line_clean.split('|')[1:-1]]
         if cells:
@@ -302,14 +316,14 @@ def render_styled_table(doc, table_lines):
                 set_p_rtl(p, space_before=2, space_after=2, align="center")
 
                 if is_header:
-                    add_r(p, cell_value, font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x1B, 0x26, 0x31))
+                    add_formatted_bidi_text(p, cell_value, font_name="Dubai", size_pt=10.5, default_bold=True, color_rgb=(0x1B, 0x26, 0x31))
                     tcPr = cell._tc.get_or_add_tcPr()
                     tcPr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="F1F4F8"/>'))
                 else:
                     if cell_value == '■■■■':
                         add_r(p, cell_value, font_name="Dubai", size_pt=10, bold=True, color_rgb=(0x2E, 0x86, 0xC1))
                     else:
-                        add_r(p, cell_value, font_name="Dubai", size_pt=10, bold=False, color_rgb=(0x2C, 0x3E, 0x50))
+                        add_formatted_bidi_text(p, cell_value, font_name="Dubai", size_pt=10, default_bold=False, color_rgb=(0x2C, 0x3E, 0x50))
 
                 set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
                 set_cell_borders(cell, color="D3D3D3")
@@ -367,7 +381,7 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
             add_h2(doc, stripped[4:])
         elif stripped.startswith('#### '):
             add_h3(doc, stripped[5:])
-        elif is_refs and re.match(r'^\d+\.\s+', stripped):
+        elif is_refs and (re.match(r'^\d+\.\s+', stripped) or re.match(r'^\[\d+\]\s*', stripped)):
             add_ref_item(doc, stripped)
         # Check for formula blocks ($$...$$, \[...\], n = \frac, CI =, etc.)
         is_formula_line = (
