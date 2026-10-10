@@ -144,7 +144,7 @@ class MasterResearchPipeline:
         print(f"  ▪ Formulated Search Query: {query}")
 
         # 1. Search literature across PubMed & Europe PMC with Query Expansion
-        search_mode = "online" if self.mode in ["live", "online"] else "offline"
+        search_mode = "online" if self.mode in ["live", "online", "auto"] else "offline"
         studies = []
         seen_pmids = set()
         seen_dois = set()
@@ -199,11 +199,11 @@ class MasterResearchPipeline:
                 except Exception:
                     continue
 
-        # In offline/testing mode, load genuine authentic corpus (Zero synthetic fabrication)
-        if len(studies) < self.min_refs:
+        # In offline/fixture testing mode, load genuine authentic corpus without domain cross-contamination
+        if len(studies) < self.min_refs and self.mode in ["offline", "fixture"]:
             corpus_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "AUTHENTIC_PUBMED_CORPUS.json")
             if os.path.exists(corpus_path):
-                print(f"  ▪ Loading verified authentic corpus (Zero synthetic fabrication)...")
+                print(f"  ▪ Loading verified authentic corpus for offline fixture mode...")
                 try:
                     with open(corpus_path, "r", encoding="utf-8") as f:
                         corp = json.load(f)
@@ -211,12 +211,12 @@ class MasterResearchPipeline:
                 except Exception:
                     pass
 
-        # If STILL below min_refs in live mode: fail-closed with honest informative error
+        # If STILL below min_refs in live/auto mode: fail-closed with honest informative error
         if len(studies) < self.min_refs:
             raise RuntimeError(
                 f"Fail-Closed Evidence Stop: Found only {len(studies)} authentic peer-reviewed papers "
-                f"for query '{query}'. Minimum required is {self.min_refs}. Zero synthetic/fake citations "
-                f"permitted. Please refine or expand search keywords using --keywords."
+                f"for query '{query}'. Minimum required is {self.min_refs}. Zero synthetic or off-target "
+                f"citations permitted. Please check internet connection or refine search keywords using --keywords."
             )
 
         # Deep Reading: Authentic Full-Text Retrieval & Passage Grounding
