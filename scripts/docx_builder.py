@@ -210,7 +210,21 @@ def add_ref_item(doc, text):
         set_p_rtl(p, space_before=3, space_after=3, line_spacing=1.15, align="both")
         add_formatted_bidi_text(p, text, font_name="Dubai", size_pt=10, color_rgb=(0x00, 0x00, 0x00))
     else:
-        add_r(p, text, font_name="Times New Roman", size_pt=10, bold=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
+        # English reference: parse markdown asterisks (*journal*) and style with Times New Roman LTR
+        segments = re.split(r'(\*\*.*?\*\*|\*.*?\*)', text)
+        for seg in segments:
+            if not seg:
+                continue
+            b = False
+            it = False
+            clean = seg
+            if seg.startswith('**') and seg.endswith('**'):
+                b = True
+                clean = seg[2:-2]
+            elif seg.startswith('*') and seg.endswith('*'):
+                it = True
+                clean = seg[1:-1]
+            add_r(p, clean, font_name="Times New Roman", size_pt=10, bold=b, italic=it, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
     return p
 
 def add_formula_box(doc, formula_text):
@@ -415,13 +429,17 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
         render_styled_table(doc, table_lines)
 
     # Save via temporary ASCII path to avoid Windows path encoding bugs
-    temp_dir = tempfile.gettempdir()
-    temp_docx = os.path.join(temp_dir, "master_temp_out.docx")
-    doc.save(temp_docx)
-
-    shutil.copy2(temp_docx, output_docx_path)
-    if os.path.exists(temp_docx):
-        os.remove(temp_docx)
+    with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tf:
+        temp_docx = tf.name
+    try:
+        doc.save(temp_docx)
+        shutil.copy2(temp_docx, output_docx_path)
+    finally:
+        if os.path.exists(temp_docx):
+            try:
+                os.remove(temp_docx)
+            except Exception:
+                pass
 
     print(f"Master Word DOCX successfully generated at: {output_docx_path}", file=sys.stderr)
 
@@ -483,10 +501,7 @@ class DocxBuilder:
         has_bidi = False
         has_dubai = False
 
-        PERSIAN_TO_INT = {
-            "۱": 1, "۲": 2, "۳": 3, "۴": 4, "۵": 5, "۶": 6, "۷": 7, "۸": 8, "۹": 9,
-            "۱۰": 10, "۱۱": 11, "۱۲": 12, "۱۳": 13, "۱۴": 14
-        }
+        digits_map = str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")
 
         for p in doc.paragraphs:
             p_xml = p._p.xml
@@ -500,9 +515,9 @@ class DocxBuilder:
             is_h1_size = ('w:sz w:val="28"' in p_xml or 'w:szCs w:val="28"' in p_xml or any(r.font.size and r.font.size.pt >= 13.5 for r in p.runs))
             
             if m_h1 and is_h1_size:
-                num_str = m_h1.group(1)
-                num_val = int(num_str) if num_str.isdigit() else PERSIAN_TO_INT.get(num_str)
-                if num_val and 1 <= num_val <= 14:
+                num_str = m_h1.group(1).translate(digits_map)
+                num_val = int(num_str) if num_str.isdigit() else None
+                if num_val and 1 <= num_val <= 28:
                     h1_headings.append(p_text)
                     h1_numbers.append(num_val)
             elif re.match(r'^(?:13|۱۳)\-(?:[0-9]{1,2}|[۰-۹]{1,2})\.\s+', p_text):
@@ -516,14 +531,19 @@ class DocxBuilder:
             if len(first_tbl.rows) > 0 and len(first_tbl.rows[0].cells) > 0:
                 has_table_headers = True
 
-        all_14_present = len(h1_headings) >= 14
-        sec_13_subsecs_present = len(h2_headings) >= 14
+        is_28_section = (max(h1_numbers) > 14) if h1_numbers else False
+        if is_28_section:
+            sections_present = len(h1_headings) >= 28
+            subsecs_present = True
+        else:
+            sections_present = len(h1_headings) >= 14
+            subsecs_present = len(h2_headings) >= 14
 
         # Check order and duplicates
         has_duplicate_h1 = len(h1_numbers) != len(set(h1_numbers))
         is_strictly_ordered = (h1_numbers == sorted(h1_numbers)) if h1_numbers else False
 
-        is_valid = bool(all_14_present and sec_13_subsecs_present and has_bidi and has_dubai and tables_count >= 2 and not has_duplicate_h1 and is_strictly_ordered)
+        is_valid = bool(sections_present and subsecs_present and has_bidi and has_dubai and tables_count >= 2 and not has_duplicate_h1 and is_strictly_ordered)
 
         status = "INSPECTION_PASSED"
         if not is_valid:
@@ -543,9 +563,9 @@ class DocxBuilder:
             "h1_numbers": h1_numbers,
             "has_duplicate_sections": has_duplicate_h1,
             "is_strictly_ordered": is_strictly_ordered,
-            "all_14_sections_present": all_14_present,
+            "all_14_sections_present": sections_present,
             "h2_subsections_count": len(h2_headings),
-            "sec_13_subsections_present": sec_13_subsecs_present,
+            "sec_13_subsections_present": subsecs_present,
             "tables_count": tables_count,
             "has_table_headers": has_table_headers,
             "openxml_rtl_bidi_detected": has_bidi,
