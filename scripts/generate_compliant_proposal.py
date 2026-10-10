@@ -876,10 +876,17 @@ class ProposalGenerator:
     @classmethod
     def generate_and_save(cls, data: Dict[str, Any], md_path: str, docx_path: str, format: str = "auto") -> Dict[str, Any]:
         """Generates proposal, validates readiness & structure, and builds DOCX."""
-        # 1. Master Readiness Gate Check (v9.0 Prerequisite Gate)
+        # 1. Master Readiness Gate Check (v11.1 Prerequisite Gate)
+        # Ensure studies/references are authenticated fail-closed
         readiness_res = ProposalReadinessGate.check_all(data)
         if not readiness_res.can_proceed:
             raise ValueError(f"Proposal generation blocked by ProposalReadinessGate: {readiness_res.error_messages}")
+
+        # Update data with canonically verified references if modified by readiness gate
+        if "reference_live_verification" in readiness_res.module_diagnostics:
+            verif_data = readiness_res.module_diagnostics["reference_live_verification"]
+            if verif_data.get("verified_studies"):
+                data["studies"] = verif_data["verified_studies"]
 
         # 2. Assemble proposal markdown (defaults to canonical 28-section format)
         is_14_legacy = (format in ["14", "14_sections"] or data.get("format") in ["14", "14_sections"])

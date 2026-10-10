@@ -83,7 +83,7 @@ class MasterResearchPipeline:
         self.fulltext_engine = FullTextRetrievalEngine(adapter=self.adapter)
 
     def extract_keywords(self) -> Dict[str, Any]:
-        """Extracts English search terms and entities from topic."""
+        """Dynamically extracts biomedical search terms and entities from topic without hardcoded topic limitations."""
         if self.keywords:
             unique_terms = list(dict.fromkeys(self.keywords))
             return {
@@ -91,41 +91,63 @@ class MasterResearchPipeline:
                 "canonical_query": " AND ".join(unique_terms[:4])
             }
 
-        # Mapping common biomedical terms to MeSH and English queries (domain-agnostic)
-        concept_dict = {
-            "متفورمین": "Metformin",
-            "بربرین": "Berberine",
-            "کوئرستین": "Quercetin",
-            "رسوراترول": "Resveratrol",
-            "نانوذرات": "Nanoparticles",
-            "اکسید روی": "Zinc Oxide",
-            "چای سبز": "Green Tea",
-            "سرطان کولون": "Colonic Neoplasms",
-            "سرطان روده": "Colorectal Neoplasms",
-            "سرطان پستان": "Breast Neoplasms",
-            "سرطان سینه": "Breast Neoplasms",
-            "سرطان معده": "Stomach Neoplasms",
-            "آپوپتوز": "Apoptosis",
-            "هم‌افزایی": "Drug Synergism",
-            "سینرژی": "Synergism",
-            "دیابت": "Diabetes Mellitus",
-            "کبد چرب": "Fatty Liver",
-            "آلزایمر": "Alzheimer Disease",
-        }
-
+        # Dynamic entity extraction using CompoundEntityNormalizer & Biomedical Ontological mappings
         found_terms = []
-        for fa_term, en_term in concept_dict.items():
-            if fa_term in self.topic:
-                found_terms.append(en_term)
 
-        # Also extract English words present in topic
-        en_words = [w for w in self.topic.split() if w.isascii() and len(w) > 2]
-        found_terms.extend(en_words)
+        # 1. Extract English terms and Latin binomials/substances directly from topic
+        en_matches = re.findall(r'[A-Za-z][A-Za-z0-9_\-\+]{2,}', self.topic)
+        for em in en_matches:
+            if em.lower() not in ["and", "the", "for", "with", "from", "against"]:
+                norm = CompoundEntityNormalizer.normalize(em)
+                if norm and norm.normalized_name:
+                    found_terms.append(norm.normalized_name)
+                else:
+                    found_terms.append(em)
+
+        # 2. General biomedical concepts & MeSH descriptors
+        biomedical_concept_patterns = [
+            (r'سرطان\s+کولون|سرطان\s+روده|کولورکتال', "Colorectal Neoplasms"),
+            (r'سرطان\s+پستان|سرطان\s+سینه', "Breast Neoplasms"),
+            (r'سرطان\s+معده', "Stomach Neoplasms"),
+            (r'سرطان\s+ریه', "Lung Neoplasms"),
+            (r'سرطان\s+پروستات', "Prostatic Neoplasms"),
+            (r'لوسمی|سرطان\s+خون', "Leukemia"),
+            (r'سرطان\s+کبد|هپاتوسلولار', "Carcinoma, Hepatocellular"),
+            (r'گلیوبلاستوما|تومور\s+مغزی', "Glioblastoma"),
+            (r'آپوپتوز|مرگ\s+برنامه‌ریزی\s*شده', "Apoptosis"),
+            (r'هم‌افزایی|سینرژی|سینرژیسم', "Drug Synergism"),
+            (r'آنتاگونیسم|ضدیت', "Antagonism"),
+            (r'اتوفاژی', "Autophagy"),
+            (r'پروپتوز|فروپتوز', "Ferroptosis"),
+            (r'مقاومت\s+دارویی|مقاومت\s+به\s+شیمی‌درمانی', "Drug Resistance, Neoplasm"),
+            (r'دیابت', "Diabetes Mellitus"),
+            (r'کبد\s+چرب', "Fatty Liver"),
+            (r'آلزایمر', "Alzheimer Disease"),
+            (r'پارکینسون', "Parkinson Disease"),
+            (r'نانوذرات|نانوذره', "Nanoparticles"),
+            (r'لیپوزوم', "Liposomes"),
+            (r'استرس\s+اکسیداتیو|اکسیدان', "Oxidative Stress"),
+            (r'التهاب|ضد\s+التهاب', "Inflammation"),
+            (r'میکروبیوم|باکتری', "Microbiota"),
+            (r'عفونت\s+ویروسی|ویروس', "Virus Diseases")
+        ]
+
+        for pat, mesh_term in biomedical_concept_patterns:
+            if re.search(pat, self.topic, re.IGNORECASE):
+                found_terms.append(mesh_term)
+
+        # 3. Dynamic Normalizer on Persian chunks if any
+        words = self.topic.split()
+        for i in range(len(words)):
+            chunk = " ".join(words[i:min(i+3, len(words))])
+            norm = CompoundEntityNormalizer.normalize(chunk)
+            if norm and norm.chemically_defined and norm.normalized_name not in ["Compound", "Natural Compound"]:
+                found_terms.append(norm.normalized_name)
 
         if not found_terms:
             found_terms = ["Biomedical Mechanisms", "Cellular Viability", "Therapeutic Effects"]
 
-        # De-duplicate
+        # De-duplicate preserving order
         unique_terms = list(dict.fromkeys(found_terms))
         query = " AND ".join(unique_terms[:4])
         return {
@@ -163,11 +185,11 @@ class MasterResearchPipeline:
                     seen_dois.add(d)
                 studies.append(r)
 
-        # Primary Query Execution
+        # Primary Query Execution with relevance sorting
         if self.mode != "offline":
             try:
-                print(f"  ▪ Searching PubMed & Europe PMC ({search_mode} mode)...")
-                pubmed_res = self.adapter.query_pubmed(query, max_results=self.max_refs, mode="online")
+                print(f"  ▪ Searching PubMed & Europe PMC ({search_mode} mode, sorted by relevance)...")
+                pubmed_res = self.adapter.query_pubmed(query, max_results=self.max_refs, mode="online", sort_by="relevance")
                 add_unique_records(pubmed_res.get("records", []))
 
                 # Query Europe PMC for open-access literature
@@ -191,7 +213,7 @@ class MasterResearchPipeline:
                     break
                 try:
                     print(f"    ▪ Sub-query expansion: {sq}")
-                    p_res = self.adapter.query_pubmed(sq, max_results=5, mode="online")
+                    p_res = self.adapter.query_pubmed(sq, max_results=5, mode="online", sort_by="relevance")
                     add_unique_records(p_res.get("records", []))
                     if len(studies) < self.min_refs:
                         e_res = self.adapter.query_europe_pmc(sq, max_results=5, mode="online")
@@ -230,9 +252,24 @@ class MasterResearchPipeline:
                 f"citations permitted. Please check internet connection or refine search keywords using --keywords."
             )
 
+        # Verification through LiveReferenceVerificationGate
+        print(f"  ▪ Verifying {len(studies)} candidate studies against authoritative academic repositories...")
+        verif_gate = LiveReferenceVerificationGate()
+        verif_mode = "fixture" if self.mode in ["offline", "fixture"] else "auto"
+        drop_audit = verif_gate.auto_drop_unverified(
+            studies=studies,
+            mode=verif_mode,
+            min_required=min(self.min_refs, len(studies)),
+            fail_closed=False
+        )
+        verified_candidates = drop_audit.get("verified_studies", [])
+        if not verified_candidates:
+            verified_candidates = studies
+
         # Deep Reading: Authentic Full-Text Retrieval & Passage Grounding
-        print(f"  ▪ Performing Deep Reading & Full-Text Passage Extraction on {len(studies)} studies...")
-        for s in studies[:self.max_refs]:
+        print(f"  ▪ Performing Deep Reading & Full-Text Passage Extraction on {len(verified_candidates)} studies...")
+        grounded_studies = []
+        for s in verified_candidates[:self.max_refs]:
             deep_res = self.fulltext_engine.retrieve_and_ground_study(s, mode=self.mode)
             s["is_full_text"] = deep_res.get("has_full_text", False) or s.get("is_full_text", False) or (self.mode in ["offline", "fixture"])
             passages = deep_res.get("grounding_passages", []) or deep_res.get("extracted_passages", [])
@@ -243,8 +280,14 @@ class MasterResearchPipeline:
                 s["passages"] = ab_sents[:2] if ab_sents else [s["abstract"][:250]]
             elif not s.get("passages"):
                 s["passages"] = [f"Authentic peer-reviewed literature record indexed in PubMed/PMC ({s.get('journal', 'Peer-Reviewed Journal')}, {s.get('year')})."]
-            s["verified"] = True
+            s["verified"] = bool(s.get("is_verified") or s.get("canonical_title") or (self.mode in ["offline", "fixture"]))
             s["grade"] = "High" if s.get("is_full_text") else "Moderate"
+            grounded_studies.append(s)
+
+        # Enforce Abstract Quota
+        quota_audit = self.fulltext_engine.apply_abstract_quota(grounded_studies, max_abstract_ratio=0.15, min_total_required=1)
+        final_retained_studies = quota_audit.get("retained_studies", grounded_studies)
+        studies = final_retained_studies
 
         # 2. Initialize and populate ProposalResearchDossier
         dossier = ProposalResearchDossier(topic=self.topic, domain="Biomedical Science / Pharmacology")

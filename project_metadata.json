@@ -1,7 +1,7 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "11.0.0",
-  "version_display": "v11.0.0",
+  "engine_version": "11.1.0",
+  "version_display": "v11.1.0",
   "release_channel": "stable",
   "semantic_release_date": "2026-10-10",
   "architecture": {

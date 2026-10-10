@@ -3553,6 +3553,13 @@ class EvidenceDrivenParagraphBuilder:
             if quant_entries:
                 parts.append(f"از حیث مقادیر کمی گزارش‌شده، شاخص‌ها در محدوده ({', '.join(quant_entries)}) مستند شدند.")
 
+        # Grounded Passages from Full-Text Reading (v11.1 Hardening)
+        passages = study_record.get("passages") or study_record.get("grounding_passages") or []
+        if passages:
+            first_passage = str(passages[0]).strip().rstrip(".")
+            if len(first_passage) >= 30 and not any(noise in first_passage.lower() for noise in ["doi:", "http", "issn"]):
+                parts.append(f"بر اساس مستندات تجربی استخراج‌شده از متن اصلی مقاله: «{first_passage}».")
+
         # Limitations (Strictly if reported)
         limits = canonical["limitations"]["reported_limitations"]
         if limits:

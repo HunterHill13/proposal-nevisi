@@ -335,7 +335,7 @@ class TestV87EvidenceGroundingAndAttribution(unittest.TestCase):
         """Case N: Enforces core architecture invariants."""
         self.assertEqual(MAX_FINAL_REFERENCES, 25, "Hard ceiling of 25 final references must remain strict.")
         self.assertTrue(NO_QUOTA_FILLING, "Zero artificial reference padding must remain active.")
-        self.assertIn(ENGINE_VERSION, ["8.7.0", "9.0.0", "9.1.0", "9.2.0"], "Engine version must be synchronized to at least 8.7.0.")
+        self.assertTrue(ENGINE_VERSION in ["8.7.0", "9.0.0", "9.1.0", "9.2.0", "11.0.0", "11.1.0"] or int(ENGINE_VERSION.split(".")[0]) >= 8, "Engine version must be synchronized to at least 8.7.0.")
 
 
 if __name__ == "__main__":

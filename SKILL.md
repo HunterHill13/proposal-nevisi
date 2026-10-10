@@ -2,30 +2,32 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v11.0). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v11.1). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Two-Loop Research Architecture (Inner Optimization & Evidence Discovery +
   Outer 28-Section Proposal Synthesis), Persistent Proposal Research Dossier (PROPOSAL_RESEARCH_DOSSIER.json/.md), and EpistemicRigorAuditor
   (ARA Seal Level 2-aligned across 6 dimensions: evidence grounding, falsifiability/H0, methodological coherence, boundary conditions,
   contradiction resolution, biological resource authentication). Enforces canonical 28 sections, MockGrantReviewPanel (NIH 1-9 scoring),
-  EquatorComplianceAuditor, PreEmptiveRiskOfBiasMitigator, NativeOmmlMathEngine, PersianMedicalTypographyLinter, and passes a unified 439-assertion test suite.
+  EquatorComplianceAuditor, PreEmptiveRiskOfBiasMitigator, NativeOmmlMathEngine, PersianMedicalTypographyLinter, Canonical Reference Lock,
+  and passes a unified 445-assertion test suite.
 ---
 
-# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.0)
+# Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.1)
 
 این مهارت یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی و استانداردهای پژوهشی کشور است.
 
-نسخه ۱۱.۰ بر مبنای هاردنینگ پیشرفته ضدتوهم، معماری دو حلقه‌ای پژوهش (Two-Loop Research Architecture)، پرونده دائمی پژوهش (Proposal Research Dossier) و ممیزی اپیستمیک ۶ گانه (Epistemic Rigor Auditor برگرفته از Orchestra ARA و بنچمارک پزشکی AIPOCH) طراحی گردیده و موارد زیر را تضمین می‌کند:
-- **ستون ۱ (LiveReferenceVerificationGate):** گیت اعتبارسنجی زنده مراجع علیه PubMed E-utilities و Crossref با کش پایدار محلی و سیاست Fail-Closed؛ حذف کامل بای‌پَس‌های آفلاین و پالایش خودکار رفرنس‌های نامعتبر (`auto_drop_unverified`).
-- **ستون ۲ (FullTextRetrievalEngine & Passage Grounding):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML، PMC BioC API و OpenAlex OA با کش پایدار در `.cache/fulltext/` و استخراج الزامی حداقل ۲ گزیده متنی مستند (Passages) برای اثبات مطالعه عمیق متن.
-- **ستون ۳ (Abstract-Only Quota Gate):** سقف قطعی حداکثر ۲۰٪ برای مقالات فقط-چکیده (Tier B) به همراه الزام ارائه توجیه علمی اختصاصی در متادیتا و گزارش ممیزی `FINAL_REFERENCE_VALIDITY_AUDIT.md`.
+نسخه ۱۱.۱ بر مبنای هاردنینگ پیشرفته ضدتوهم، قفل فراداده‌های رسمی (Canonical Metadata Lock)، خوانش عمیق متن کامل (Deep Full-Text Reading)، پرونده دائمی پژوهش (Proposal Research Dossier) و ممیزی اپیستمیک ۶ گانه (Epistemic Rigor Auditor) موارد زیر را تضمین می‌کند:
+- **ستون ۱ (Canonical Reference Lock & Live Verification Gate):** بازنویسی و تطبیق ۱۰۰ درصدی تمام اقلام فراداده‌ای مراجع (عنوان مقاله، اسامی نویسندگان، نام ژورنال، سال، دوره، شماره، صفحات، DOI و PMID) مستقیماً از پاسخ خام API های رسمی PubMed / Crossref. ممنوعیت قطعی استناد دستی از حافظه پارامتریک هوش مصنوعی بدون استعلام برخط؛ رد قطعی هر مقاله نامعتبر به صورت Fail-Closed.
+- **ستون ۲ (FullTextRetrievalEngine & Deep Reading Architecture):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML با پارس دقیق `itertext()`، PMC BioC JSON/XML و OpenAlex OA. تفکیک دقیق فصول متدولوژی و نتایج و استخراج مقادیر واقعی مدل‌ها، غلظت‌ها، زمان‌های مواجهه و نشانگرها.
+- **ستون ۳ (Strict Abstract-Only Quota Gate):** سقف حداکثر ۱۵٪ برای مقالات فقط-چکیده (Tier B؛ حداکثر ۱ تا ۲ مقاله)، مشروط به برقراری معیار دوگانه (سنگ‌بنای متدولوژیک مشهور نظیر Chou 2006 یا مطالعه مستقیم غیرقابل‌جایگزین با توجیه صریح). حذف خودکار مقالات چکیده متفرقه و جایگزینی با مقالات متن‌کامل دارای دسترسی آزاد.
 - **ستون ۴ (EvidenceRoleClaimBindingGate & CitationTracker):** اتصال نقش شواهد و بخش‌های سند جهت ممانعت از سوگیری مجاورت کلیدواژه، به همراه بازشماری یکپارچه ونکوور درون‌متنی و حذف هرگونه ارجاع بدون استفاده.
 - **ستون ۵ (BiphasicRedoxContextRule & AssayInterferencePolicy):** تفکیک دوحالته ردوکس در ارزیابی مکانیسمی، اجبار کنترل بلانک بدون سلول (Cell-Free Blank) و ترایانگولاسیون ارتوگونال با فلوسایتومتری Annexin V/PI و آزمون کلونوژنیک.
-- **ستون ۶ (Pre-Flight Compilation Gatekeeper):** مسدودسازی قطعی تولید فایل ورد (.docx) در `ProposalReadinessGate` در صورت وجود هرگونه رفرنس تأییدنشده یا تخطی از سقف مقالات چکیده.
+- **ستون ۶ (Pre-Flight Compilation Gatekeeper & Agent Guard):** مسدودسازی قطعی تولید فایل ورد (.docx) در `ProposalReadinessGate` در صورت وجود هرگونه رفرنس تأییدنشده یا تخطی از سقف مقالات چکیده یا فقدان پرونده پلمپ‌شده `PROPOSAL_RESEARCH_DOSSIER.json`.
 - **ستون ۷ (MockGrantReviewPanel & Inter-Section Semantic Drift Gate):** شبیه‌سازی هیئت داوران گرنت (Mock Study Section) متشکل از ۳ داور تخصصی (اصالت علمی، متدولوژی و بیواستاتیک، اخلاق و ایمنی زیستی) در مقیاس داوری ۱ تا ۹ با آستانه قبولی ۳.۵، پایش تناظر ۱ به ۱ اهداف با متدولوژی و صدور کارنامه رسمی `MOCK_GRANT_REVIEW_REPORT.md` و `.json`.
 - **ستون ۸ (EquatorComplianceAuditor & Biological Resource Authentication):** ممیزی و تطابق خودکار با راهنماهای بین‌المللی شبکه EQUATOR (شامل OECD/GCCP برای کشت سلولی، MIQE برای سنجش‌های بیان ژن، ARRIVE 2.0 برای مطالعات حیوانی) به همراه استانداردهای احراز هویت زیستی NIH (شناسنامه STR سلول، غربالگری مایکوپلاسما، خلوص مواد دارویی $\ge 95\%$ و کنترل حلال ناقل) و صدور کارنامه رسمی `EQUATOR_COMPLIANCE_AUDIT.md` و `.json`.
-- **ستون ۹ (PreEmptiveRiskOfBiasMitigator):** مهار پیشگیرانه سوگیری بر اساس استانداردهای بین‌المللی Cochrane RoB-2 و SYRCLE در ۵ دامنه بنیادین (سوگیری انتخاب، سوگیری عملکرد، سوگیری تشخیص و کورسازی ارزیاب، سوگیری ریزش و مدیریت داده‌های پرت، و سوگیری گزارش‌دهی انتخابی و پیش‌ثبت پروتکل در OSF/پژوهشیار) و صدور کارنامه رسمی `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`.
-- **ستون ۱۰ (Two-Loop Research Architecture & Epistemic Rigor Auditor):** تفکیک قطعی چرخه کشف و سنتز شواهد (حلقه داخلی) از چرخه نگارش پروپوزال (حلقه خارجی). صدور پرونده دائمی پژوهش (`PROPOSAL_RESEARCH_DOSSIER.json` و `.md`) حاوی فرضیات صریح ($H_0$, $H_1$)، پیوستگی متدولوژیک (شکاف $\rightarrow$ متغیر $\rightarrow$ فرمول حجم نمونه $\rightarrow$ مدل آماری)، جدول تحلیل یافته‌های متناقض مقالات (Contradictory Findings Resolver) و پلمپ رسمی با ممیزی اپیستمیک ۶ گانه تراز ARA Seal Level 2.
+- **ستون ۹ (PreEmptiveRiskOfBiasMitigator):** مهار پیشگیرانه سوگیری بر اساس استانداردهای بین‌المللی Cochrane RoB-2 و SYRCLE در ۵ دامنه بنیادین و صدور کارنامه رسمی `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`.
+- **ستون ۱۰ (Two-Loop Research Architecture & Epistemic Rigor Auditor):** تفکیک قطعی چرخه کشف و سنتز شواهد (حلقه داخلی) از چرخه نگارش پروپوزال (حلقه خارجی). صدور پرونده دائمی پژوهش (`PROPOSAL_RESEARCH_DOSSIER.json` و `.md`) حاوی فرضیات صریح ($H_0$, $H_1$)، پیوستگی متدولوژیک و پلمپ رسمی با ممیزی اپیستمیک ۶ گانه تراز ARA Seal Level 2.
+- **قانون الزامی برای کلیه ایجنت‌های هوش مصنوعی:** هیچ ایجنتی حق ندارد رفرنس‌های علمی را به صورت دستی یا از حافظه خود تولید کند. تمام منابع باید ابتدا از طریق `run_research_pipeline.py` یا `scientific_search_adapter.py` در پایگاه‌های آنلاین واکشی، اعتبارسنجی و خوانش عمیق شده و در پرونده پلمپ شوند.
 - الزام قطعی و بدون انحراف ساختار مصوب ۲۸ بخشی پژوهشیار در تمام خروجی‌های سند Markdown و Word.
 - تبدیل و اعتبارسنجی E2E فرمول‌های ریاضی به تگ‌های بومی ورد `<m:oMath>` در `docx_builder` و حذف کامل نشت سینتکس LaTeX.
 - محافظت کامل از عبارات انگلیسی داخل پرانتز و شناسه‌های DOI/PMID در `PersianMedicalTypographyLinter`.

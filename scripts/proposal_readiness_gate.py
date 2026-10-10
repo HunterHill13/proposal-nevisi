@@ -404,28 +404,33 @@ class ProposalReadinessGate:
         if refs_to_verify and isinstance(refs_to_verify, list):
             from scientific_search_adapter import LiveReferenceVerificationGate, FullTextRetrievalEngine
             lrv_gate = LiveReferenceVerificationGate()
-            verif_mode = ctx.get("reference_verification_mode", "auto")
-            ref_audit = lrv_gate.verify_study_collection(refs_to_verify, mode=verif_mode, fail_closed=strict_mode)
+            verif_mode = ctx.get("reference_verification_mode", ("fixture" if ctx.get("mode") in ["fixture", "offline"] else "auto"))
+            # References must fail-closed if invalid
+            ref_audit = lrv_gate.verify_study_collection(refs_to_verify, mode=verif_mode, fail_closed=True)
             diagnostics["reference_live_verification"] = ref_audit
-            if not ref_audit["can_proceed"] and strict_mode:
+            if not ref_audit["can_proceed"]:
                 failed_ids = [f.get("title", f.get("pmid", "Unknown")) for f in ref_audit.get("failed_studies", [])]
                 errors.append(f"LIVE_REFERENCE_VERIFICATION_FAIL: {ref_audit['failed_count']} منبع در پایگاه‌های مرجع تایید نشدند: {failed_ids}")
                 if "LiveReferenceVerificationGate" not in failed:
                     failed.append("LiveReferenceVerificationGate")
+            else:
+                # Update verified studies with canonical metadata
+                if "studies" in ctx:
+                    ctx["studies"] = ref_audit.get("verified_studies", ctx["studies"])
 
-            # Check Abstract-Only Quota & Passage Grounding if tier info is present or in strict mode
+            # Check Abstract-Only Quota & Passage Grounding
             has_tier_tags = any("tier" in r or "has_full_text" in r for r in refs_to_verify)
-            if strict_mode or has_tier_tags:
+            if strict_mode or has_tier_tags or len(refs_to_verify) > 0:
                 quota_audit = FullTextRetrievalEngine.apply_abstract_quota(
                     refs_to_verify,
-                    max_abstract_ratio=0.20,
+                    max_abstract_ratio=0.15,
                     min_total_required=ctx.get("min_references", 15) if strict_mode else 1
                 )
                 diagnostics["abstract_quota_evaluation"] = quota_audit
-                if not quota_audit["can_proceed"] and strict_mode:
+                if not quota_audit["can_proceed"] and (strict_mode or quota_audit.get("tier_b_dropped_count", 0) > 0):
                     errors.append(
                         f"ABSTRACT_QUOTA_EXCEEDED: نسبت مقالات فقط-چکیده ({round(quota_audit['abstract_ratio']*100, 1)}%) "
-                        f"از سقف مجاز (۲۰٪) فراتر رفته یا تعداد کل منابع معتبر به حدنصاب نرسیده است."
+                        f"از سقف مجاز (۱۵٪) فراتر رفته یا فاقد توجیه قطعی متدولوژیک/مستقیم است."
                     )
                     if "FullTextRetrievalEngine" not in failed:
                         failed.append("FullTextRetrievalEngine")

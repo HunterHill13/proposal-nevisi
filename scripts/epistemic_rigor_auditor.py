@@ -104,18 +104,19 @@ class EpistemicRigorAuditor:
             findings.append(f"Found {len(unverified)} unverified references without verified PMID/DOI.")
 
         full_text_ratio = full_text_count / total if total > 0 else 0
-        if full_text_ratio < 0.80:
-            deficit = (0.80 - full_text_ratio) * 100
-            score -= deficit * 0.5
-            findings.append(f"Full-text ratio ({full_text_ratio*100:.1f}%) is below 80% quota target.")
+        if full_text_ratio < 0.85:
+            deficit = (0.85 - full_text_ratio) * 100
+            score -= deficit * 0.8
+            findings.append(f"Full-text ratio ({full_text_ratio*100:.1f}%) is below 85% quota target (max 15% abstract-only permitted).")
 
         passage_ratio = has_grounded_passages / total if total > 0 else 0
-        if passage_ratio < 0.70:
-            score -= 20.0
-            findings.append(f"Grounded evidence passages ratio ({passage_ratio*100:.1f}%) is below 70%.")
+        if passage_ratio < 0.80:
+            deficit = (0.80 - passage_ratio) * 100
+            score -= deficit * 0.5
+            findings.append(f"Grounded evidence passages ratio ({passage_ratio*100:.1f}%) is below 80% target.")
 
         score = max(0.0, min(100.0, score))
-        passed = (score >= self.PASS_THRESHOLD) and (len(unverified) == 0)
+        passed = (score >= self.PASS_THRESHOLD) and (len(unverified) == 0) and (full_text_ratio >= 0.85)
         return {
             "passed": passed,
             "score": round(score, 1),
