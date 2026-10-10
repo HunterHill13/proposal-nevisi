@@ -43,6 +43,7 @@ try:
     from compound_entity_normalizer import CompoundEntityNormalizer
     from native_omml_math_engine import NativeOmmlMathEngine
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
+    from mock_grant_review_panel import MockGrantReviewPanel
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -66,6 +67,7 @@ except ImportError:
     from compound_entity_normalizer import CompoundEntityNormalizer
     from native_omml_math_engine import NativeOmmlMathEngine
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
+    from mock_grant_review_panel import MockGrantReviewPanel
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -898,6 +900,11 @@ class ProposalGenerator:
         # Build DOCX with Native OMML Math Engine integrated
         DocxBuilder.build_docx(md_content, docx_path)
         
+        # Conduct Mock Grant Review Study Section & Inter-Section Semantic Drift Gate
+        review_dir = os.path.dirname(os.path.abspath(md_path))
+        review_result = MockGrantReviewPanel.conduct_panel_review(md_content, data)
+        review_md_path, review_json_path = MockGrantReviewPanel.save_reports(review_result, output_dir=review_dir)
+
         final_status = "PASS"
         if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
@@ -908,6 +915,9 @@ class ProposalGenerator:
             "validation": val_result,
             "readiness": readiness_res.to_dict(),
             "completeness": completeness_res.to_dict() if completeness_res else None,
+            "mock_grant_review": review_result.to_dict(),
+            "mock_grant_review_md": review_md_path,
+            "mock_grant_review_json": review_json_path,
             "md_path": md_path,
             "docx_path": docx_path,
             "status": final_status,

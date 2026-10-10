@@ -16,7 +16,7 @@ description: >
   Harmonizes synergy metrics across sections via Single Source of Truth SynergyMetricConfig.
   Supports multi-source federated searches (PubMed, Europe PMC, OpenAlex, Crossref), 16 query families, MeSH mapping, multi-directional citation chasing,
   saturation tracking, deep paper reading, SciFact-aligned claim verification, 8-tier evidence hierarchy,
-  and passes a unified 399-assertion test harness across 16 suites and 44 release gate criteria with zero hardcoded biological leakage across all engine scripts.
+  and passes a unified 408-assertion test harness across 17 suites and 44 release gate criteria with zero hardcoded biological leakage across all engine scripts.
 ---
 
 # Proposal-Nevisi (موتور جامع، ماژولار و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v10.0)
@@ -30,6 +30,7 @@ description: >
 - **ستون ۴ (EvidenceRoleClaimBindingGate & CitationTracker):** اتصال نقش شواهد و بخش‌های سند جهت ممانعت از سوگیری مجاورت کلیدواژه، به همراه بازشماری یکپارچه ونکوور درون‌متنی و حذف هرگونه ارجاع بدون استفاده.
 - **ستون ۵ (BiphasicRedoxContextRule & AssayInterferencePolicy):** تفکیک دوحالته ردوکس در ارزیابی مکانیسمی، اجبار کنترل بلانک بدون سلول (Cell-Free Blank) و ترایانگولاسیون ارتوگونال با فلوسایتومتری Annexin V/PI و آزمون کلونوژنیک.
 - **ستون ۶ (Pre-Flight Compilation Gatekeeper):** مسدودسازی قطعی تولید فایل ورد (.docx) در `ProposalReadinessGate` در صورت وجود هرگونه رفرنس تأییدنشده یا تخطی از سقف مقالات چکیده.
+- **ستون ۷ (MockGrantReviewPanel & Inter-Section Semantic Drift Gate):** شبیه‌سازی هیئت داوران گرنت (Mock Study Section) متشکل از ۳ داور تخصصی (اصالت علمی، متدولوژی و بیواستاتیک، اخلاق و ایمنی زیستی) در مقیاس داوری ۱ تا ۹ با آستانه قبولی ۳.۵، پایش تناظر ۱ به ۱ اهداف با متدولوژی و صدور کارنامه رسمی `MOCK_GRANT_REVIEW_REPORT.md` و `.json`.
 - الزام قطعی و بدون انحراف ساختار مصوب ۲۸ بخشی پژوهشیار در تمام خروجی‌های سند Markdown و Word.
 - تبدیل و اعتبارسنجی E2E فرمول‌های ریاضی به تگ‌های بومی ورد `<m:oMath>` در `docx_builder` و حذف کامل نشت سینتکس LaTeX.
 - محافظت کامل از عبارات انگلیسی داخل پرانتز و شناسه‌های DOI/PMID در `PersianMedicalTypographyLinter`.

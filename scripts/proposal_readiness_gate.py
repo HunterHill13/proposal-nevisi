@@ -72,7 +72,8 @@ class ProposalReadinessGate:
         "persian_medical_typography_linter",
         "CitationTracker",
         "LiveReferenceVerificationGate",
-        "FullTextRetrievalEngine"
+        "FullTextRetrievalEngine",
+        "MockGrantReviewPanel"
     ]
 
     @classmethod
@@ -226,6 +227,18 @@ class ProposalReadinessGate:
         except Exception as e:
             failed.append("FullTextRetrievalEngine")
             errors.append(f"FullTextRetrievalEngine error: {str(e)}")
+
+        # 11. MockGrantReviewPanel
+        try:
+            from mock_grant_review_panel import MockGrantReviewPanel
+            mgrp_test = MockGrantReviewPanel.parse_proposal_sections("## 1. موضوع\nعنوان تستی")
+            if 1 not in mgrp_test:
+                raise ValueError("MockGrantReviewPanel failed section parsing")
+            passed.append("MockGrantReviewPanel")
+            diagnostics["MockGrantReviewPanel"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("MockGrantReviewPanel")
+            errors.append(f"MockGrantReviewPanel error: {str(e)}")
 
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":
