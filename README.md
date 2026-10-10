@@ -1,201 +1,233 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Modular Architecture & Hardened Adversarial Verification Engine (v9.1)
-### موتور ماژولار و جامع سنتز شواهد، راستی‌آزمایی خصمانه و نگارش پروپوزال‌های پژوهشی علوم پزشکی (نسخه ۹.۱)
+### Universal Evidence-Driven Medical Research, Two-Loop Architecture & Autonomous Proposal Pipeline (v11.0)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری دو حلقه‌ای و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۰)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 371/371 Passed](https://img.shields.io/badge/Unified%20Tests-371%2F371%20Passed-success.svg)](#unified-multi-tier-test-harness)
-[![Mutation Testing: 100%](https://img.shields.io/badge/Mutation%20Score-100%25%20Killed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 440/440 Passed](https://img.shields.io/badge/Unified%20Tests-440%2F440%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
-[![Architecture: Topic-Agnostic](https://img.shields.io/badge/Architecture-Topic--Agnostic%20Core-blueviolet.svg)](#universal-architecture)
+[![Architecture: Two-Loop Autonomous](https://img.shields.io/badge/Architecture-Two--Loop%20Autonomous-blueviolet.svg)](#two-loop-autonomous-architecture)
+[![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
 
 ---
 
-> **Language / زبان:** [English](#english) | [فارسی](#فارسی)
+> **Language / زبان:** [English Documentation](#english) | [مستندات فارسی](#فارسی)
 
 ---
 
 <a name="english"></a>
-## English Documentation
+## English Documentation (v11.0)
 
-**Proposal-Nevisi (v9.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v9.1 hardens the 4-Layer Modular Architecture** with strict epistemic bounds: "Uncertainty must be represented, not hidden".
+**Proposal-Nevisi (v11.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.0 introduces the Master Autonomous Two-Loop Research Architecture**, solving the AI literature hallucination and abstract-only truncation problems through an immutable research dossier and fail-closed epistemic auditing.
 
-Key architectural additions in v9.1 include:
-- **Purity vs. Identity Disentanglement:** Mentioning a substance establishes parent molecular identity, but analytical purity remains `NOT_REPORTED` unless explicitly verified.
-- **Role Inversion & Mechanistic Chains:** Fail-closed biological role verification and multi-edge causal chain evaluation in `BiologicalMechanismAdversarialVerifier`.
-- **Combination Hypothesis Bounding:** Directional evidence ratio calculation with `POSITIVE_EVIDENCE_DOMINANCE_WARNING` and explicit notification when no direct co-treatment study exists on the target model.
-- **Decoupled Statistical Modeling:** Clear distinction between descriptive multi-arm layouts and true factorial models via `StatisticalAnalysisModelSelector`, and dedicated combination interaction modeling (Bliss, Loewe, Chou-Talalay, ZIP, HSA) with live virus kinetics support via `CombinationInteractionModelSelector`.
-- **Methodology & Sample Size Rigor:** Evaluates primary endpoints and variance without fabricating fake formulas, while strictly preventing pseudo-replication fallacy ($4 \times 3$ is $n=4$).
-- **Document-Level Vancouver Re-Indexing:** Monotonic 1-based order-of-appearance rewriting, unused reference elimination, and contextual cell line mismatch detection.
-- **Native Word OMML Equations:** Verified Word-native `<m:oMath>` XML generation with complete absence of raw LaTeX leakage in DOCX files.
-- **Persian Typography Protection:** Preserves English parenthetical terms, statistics, DOIs, PMIDs, and citation ranges.
+### Key Architectural Pillars in v11.0:
 
-> **Pre-Generation Readiness Guarantee:** Proposal generation is strictly governed by `ProposalReadinessGate`. If any module fails verification, generation is aborted immediately with a diagnostic error report.
+1. **Two-Loop Autonomous Architecture:**
+   - **Inner Optimization Loop (Research & Grounding):** Executes live literature discovery across PubMed and Europe PMC, retrieves full-text XML, extracts verbatim grounded passages, detects cross-study contradictions, and immutably seals findings into `PROPOSAL_RESEARCH_DOSSIER.json` and `.md`.
+   - **Outer Synthesis Loop (Proposal Drafting):** Synthesizes all 28 canonical sections required by Iranian biomedical universities (Pajooheshyar format), strictly bound to the sealed dossier without parametric memory hallucination.
+2. **Epistemic Rigor Auditor (`scripts/epistemic_rigor_auditor.py`):**
+   - 6-Dimensional audit gate aligned with ARA Seal Level 2:
+     - Evidence Grounding & DOI/PMID Authenticity
+     - Falsifiability & Explicit Null Hypothesis ($H_0$)
+     - Methodological & Statistical Coherence
+     - Boundary Conditions & Applicability Limits
+     - Contradiction & Discordance Resolution
+     - Biological Resource Authentication (Cell line STR profiling, mycoplasma guards, catalog codes)
+3. **Tri-Fold Peer Review & Compliance Engines:**
+   - **Mock Grant Review Panel (`scripts/mock_grant_review_panel.py`):** Simulates an NIH/IRB grant review panel, scoring Significance, Investigators, Innovation, Approach, and Environment on a 1–9 NIH scale.
+   - **EQUATOR Compliance Auditor (`scripts/equator_compliance_auditor.py`):** Enforces global reporting standards: ARRIVE 2.0 (in vivo), MIQE (RT-qPCR), CONSORT 2010 (clinical RCTs), and STROBE (observational studies).
+   - **Pre-Emptive Risk of Bias Mitigator (`scripts/pre_emptive_risk_of_bias_mitigator.py`):** Implements Cochrane RoB-2 and SYRCLE frameworks, verifying randomization, blinding, and attrition controls.
+4. **Native Word OMML Equations (`scripts/native_omml_math_engine.py`):**
+   - Converts LaTeX formulas directly into Microsoft Word native Office Math Markup Language (`<m:oMath>`), eliminating raw LaTeX leakage in `.docx` files.
+5. **Persian Medical Typography Linter (`scripts/persian_medical_typography_linter.py`):**
+   - Strictly enforces Persian Zero-Width Non-Joiner (ZWNJ), Persian numerals in prose, and bilingual expansion for medical acronyms on first mention.
 
 ---
 
-### v9.0 Four-Layer Modular Architecture
+### Quick Start / CLI Usage
 
+Run the master autonomous research pipeline with a single command:
+
+```powershell
+uv run python scripts/run_research_pipeline.py --topic "Your Biomedical Research Topic" --output-dir "./output"
 ```
+
+To supply explicit MeSH keywords or study family designs:
+```powershell
+uv run python scripts/run_research_pipeline.py \
+  --topic "Investigating the Synergistic Effect of Metformin and Curcumin in Colon Cancer HCT116 Cells" \
+  --keywords "Metformin, Curcumin, Colonic Neoplasms, Apoptosis" \
+  --study-family "in_vitro" \
+  --output-dir "./output"
+```
+
+#### Generated Artifacts:
+- `proposal.docx`: Publication-grade Microsoft Word proposal with native OMML formulas and styled tables.
+- `proposal.md`: Complete 28-section Markdown proposal.
+- `PROPOSAL_RESEARCH_DOSSIER.json` & `.md`: Sealed immutable evidence records with full-text passages and audit logs.
+- `MOCK_GRANT_REVIEW_REPORT.md` & `.json`: Grant panel score and detailed critique.
+- `EQUATOR_COMPLIANCE_AUDIT.md` & `.json`: ARRIVE 2.0 / MIQE compliance scorecards.
+- `RISK_OF_BIAS_MITIGATION_REPORT.md` & `.json`: Cochrane RoB-2 / SYRCLE domain assessments.
+
+---
+
+### Four-Layer Modular Architecture
+
+```text
 +-----------------------------------------------------------------------------------+
-|                        ProposalReadinessGate (Master Gatekeeper)                  |
+|               MasterResearchPipeline (Two-Loop Autonomous Orchestrator)           |
 +-----------------------------------------------------------------------------------+
         |                                                                   |
         v                                                                   v
 +---------------------------------------+   +---------------------------------------+
 |    LAYER 1: SCIENTIFIC ACCURACY       |   |    LAYER 2: STRUCTURAL COMPLIANCE     |
-| • BiologicalMechanismVerifier         |   | • MethodologyCompletenessGate (28)    |
-| • CombinationHypothesisEngine         |   | • CombinationModelSelector (ANOVA/GLM)|
+| • EpistemicRigorAuditor (6 Dimensions)|   | • MethodologyCompletenessGate (28)    |
+| • BiologicalMechanismVerifier         |   | • DynamicProtocolDesigner             |
+| • CombinationHypothesisEngine         |   | • StatisticalAnalysisModelSelector    |
 | • CompoundEntityNormalizer            |   | • Mandatory Sample Size Formula Box   |
 +---------------------------------------+   +---------------------------------------+
         |                                                                   |
         v                                                                   v
 +---------------------------------------+   +---------------------------------------+
-|    LAYER 3: CITATION INTEGRITY        |   |   LAYER 4: FORMATTING & TYPESETTING   |
-| • CitationTracker                     |   | • NativeOmmlMathEngine (LaTeX->OMML)  |
-| • Strict Vancouver Order of Appearance|   | • PersianMedicalTypographyLinter      |
-| • Orphaned Claim & Unused Ref Auditor |   | • YAML Rules & First-Mention Expansion|
+|    LAYER 3: CITATION & EVIDENCE       |   |   LAYER 4: FORMATTING & TYPESETTING   |
+| • ProposalResearchDossier (Sealed)    |   | • NativeOmmlMathEngine (LaTeX->OMML)  |
+| • ScientificSearchAdapter (PubMed/PMC)|   | • PersianMedicalTypographyLinter      |
+| • Strict Vancouver Order of Appearance|   | • DocxBuilder (Styled Word Generator) |
 +---------------------------------------+   +---------------------------------------+
 ```
-
-#### Layer 1: Scientific Accuracy
-1. **Adversarial Biological Mechanism Verifier (`scripts/biological_mechanism_adversarial_verifier.py`):**
-   - Implements a structured biomedical ontology of apoptosis and cell cycle regulators (Bcl-2, Bcl-xL, Bax, Bak, Caspases 3/7/8/9, p53, AKT, PTEN, etc.).
-   - Catches biological role inversions (e.g. claiming Bcl-xL is pro-apoptotic or Bax is anti-apoptotic) returning `CONTRADICTED` and blocking flawed mechanistic statements.
-2. **Combination Hypothesis Engine (`scripts/combination_hypothesis_engine.py`):**
-   - Automatically generates dual, parallel hypotheses for co-treatment studies: $H_1$ (Synergism) and $H_2$ (Antagonism / Additive effect).
-   - Computes an `evidence_balance_score` and triggers `POSITIVE_EVIDENCE_DOMINANCE_WARNING` when only positive synergy claims are present without negative/neutral evidence.
-3. **Compound Entity Normalizer (`scripts/compound_entity_normalizer.py`):**
-   - Classifies substances into standardized ontological tiers: `PURE_COMPOUND`, `STANDARDIZED_EXTRACT`, `CRUDE_EXTRACT`, `SYNTHETIC_ANALOG`.
-   - Prevents the crude extract attribution fallacy (e.g., claiming whole-plant extract effects as isolated constituent properties without purity specifications).
-
-#### Layer 2: Structural Compliance
-4. **Pajooheshyar 28-Section Methodology Completeness Gate (`scripts/methodology_completeness_gate.py`):**
-   - Strictly enforces all 28 mandatory sections required by the official Iranian Biomedical Research Information System (Pajooheshyar / Ministry of Health).
-   - Enforces a mandatory mathematical sample size formula (Cohen's $d$, Mead's Resource Equation $E = N - B - T$, or Cochran's formula) in Section 10; missing formulas completely block compilation.
-5. **Combination Model Selector (`scripts/combination_model_selector.py`):**
-   - Selects scientifically valid statistical models based on study design and factor structures (e.g., Two-Way Factorial ANOVA with explicit interaction term $A \times B$, Repeated Measures ANOVA, or Cox Proportional Hazards).
-   - Generates statistical assumption checks (Shapiro-Wilk, Levene's test) and appropriate post-hoc tests (Tukey HSD / Bonferroni).
-
-#### Layer 3: Citation Integrity
-6. **Unified Citation Tracker (`scripts/citation_tracker.py`):**
-   - Enforces strict Vancouver numeric style strictly by order of appearance.
-   - Detects orphaned claims (text making substantive factual claims without reference markers) and unused references (sources registered in the bibliography but never cited).
-   - Re-indexes citations dynamically if the narrative structure is altered.
-
-#### Layer 4: Formatting & Typesetting
-7. **Native OMML Word Math Engine (`scripts/native_omml_math_engine.py`):**
-   - Converts LaTeX formulas into standard Office Math Markup Language (`<m:oMath>`, `<m:oMathPara>`) via MathML, with clean Unicode text fallback.
-   - Completely eliminates raw LaTeX code, delimiters (`$...$`, `\[...\]`), and markup leakage in generated Microsoft Word `.docx` documents.
-8. **Persian Medical Typography Linter (`scripts/persian_medical_typography_linter.py` & `scripts/typography_rules.yaml`):**
-   - Configuration-driven typography engine enforcing Zero-Width Non-Joiner (ZWNJ, `\u200c`) for Persian affixes (`می‌`, `ها`, `تر`).
-   - Normalizes digits in Persian prose to Persian numerals while protecting scientific formulas, units, and citation keys.
-   - Automatically expands first mentions of medical abbreviations (e.g. `NDV` -> `ویروس بیماری نیوکاسل (Newcastle Disease Virus; NDV)`).
 
 ---
 
 <a name="master-release-gate-43-criteria"></a>
 ### Master Release Gate (43 Production Criteria)
 
-The engine enforces 43 non-negotiable release criteria verified on every build:
-1. `MAX_FINAL_REFERENCES == 25` (Hard Ceiling)
-2. `NO_QUOTA_FILLING == True` (Zero Artificial Padding)
-3. `GENERIC_EXCLUSION_ONTOLOGY` (16 Topic-Agnostic Categories)
-4. Two-Stage Screening & Citation Integrity Engine
-5. `SEARCH_DATABASE_STATUSES` (8 Standardized Statuses)
-6. `RESEARCH_PIPELINE_STAGES` (7 Standard Phases)
-7. `GENERIC_CONTRADICTION_ROOT_CAUSES` (14 Generic Root Causes)
-8. `HIGH_VALUE_SCORING_WEIGHTS` (10 Dimensions Normalized)
-9. `SELECTION_ORDER_PRIORITIES` (9 Strict Tiers)
-10. Universal Entity Hierarchy (13 Types) & Evidence Roles (10 Roles)
-11. Bounded Search Gap Policy ("Absence of Evidence != Evidence of Absence")
-12. Anti-Hardcoding Static Leakage Audit (31/31 Scripts Zero Leakage)
-13. Portfolio Audit with Decoupled Search Pool and Ceiling Enforcement
-14. 7-Point Structured Literature Synthesis Narrative Engine
-15. `SEARCH_FAMILIES_ONTOLOGY` (16 Query Families) & MeSH Mapper
-16. Citation Chasing Engine (Backward, Forward, Lateral) with Provenance
-17. Seed Paper Discovery Engine (8 Categories & Non-Automatic Inclusion)
-18. Evidence-Based Saturation Tracker (7 Dimensions & False Saturation Guard)
-19. Structured Paper Reader (4 Tracks & 18 Deterministic Fields)
-20. Paper-to-Claim Verifier (6 Citation Drift Types & Entailment Verdicts)
-21. Enhanced Triple-Check Deduplication & Identifier Canonicalization
-22. Reproducible Research Run Manifest & SHA-256 Checksum
-23. Research Recall Benchmark & Diagnostic Taxonomy (13 Failure Modes)
-24. Deep Reading 5-Section Architecture & Figure-First Visual Review
-25. 8-Tier Evidence Hierarchy & Confidence Evaluation
-26. Paper-to-Claim Verification 2.0 (8-Stage Pipeline & 13 Issues)
-27. Post-Research Citation Auditor (Placeholders & Unused References)
-28. Adaptive Database Selector & Negative Evidence Scanner
-29. Canonical Paper Evidence Record (16 Fields & Location Provenance)
-30. Numeric Provenance Gate (Anti-Numeric Hallucination & Exact Extraction)
-31. Contextual Boundary Gate (11 Boundary Mismatches & Leap Prevention)
-32. Exact Claim-to-Evidence Mapper (SciFact-Aligned 5-Tier Claim Verdicts)
-33. Evidence-Driven Paragraph Builder (Anti-Boilerplate & Null/Negative Surfacing)
-34. Strict Claim-to-Citation Binding & Literature Review Gate
-35. `CompoundEntityNormalizer` (Pure/Extract/Analogue Classification & Mismatch Guard)
-36. `BiologicalMechanismAdversarialVerifier` (Apoptosis & Cell Cycle Role Inversion Guard)
-37. `CombinationHypothesisEngine` (Dual Hypotheses & Evidence Balance Verification)
-38. `CombinationModelSelector` (Factorial ANOVA, Interaction Terms & Model Taxonomy)
-39. `MethodologyCompletenessGate` (28 Pajooheshyar Sections Schema & Sample Size Gate)
-40. `CitationTracker` (Vancouver Order, Orphaned Claims & Unused Reference Auditor)
-41. `NativeOmmlMathEngine` (Native Word OMML Equations & LaTeX DOCX Elimination)
-42. `PersianMedicalTypographyLinter` (YAML Rules, ZWNJ, Persian Numerals & Medical Expansions)
-43. `ProposalReadinessGate` (Fail-Closed Master Verification Across All 8 v9.0 Modules)
+The engine enforces 43 fail-closed release criteria before generating or approving proposals:
+1. Static analysis leakage audit: 0 hardcoded biological entities in core scripts (`test_hard_code_leakage.py`).
+2. Two-Loop Research Dossier immutability and pass/fail sealing.
+3. 28 canonical Pajooheshyar section completeness.
+4. Mandatory mathematical sample size formulas (Cohen's $d$, Mead's Equation, Cochran).
+5. 100% Native OMML XML generation without raw LaTeX delimiter leakage.
+6. 100% Vancouver citation re-indexing by appearance order.
+7. Zero tolerance for orphaned claims or unreferenced citations.
 
 ---
 
 <a name="unified-multi-tier-test-harness"></a>
-### Unified Multi-Tier Test Harness (`scripts/master_release_gate.py`)
+### Unified Multi-Tier Test Harness
 
-The engine includes a master test harness verifying 350 total software assertions across 13 independent test suites:
-- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`):** Asserts 0 hard-coded biological entities across all 31 core generic scripts (31 tests - **PASS**).
-- **Suite 2: Multi-Domain Generalization Suite (`test_generalization.py`):** Validates execution across 12 distinct biomedical fixtures (12 tests - **PASS**).
-- **Suite 3: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`):** 114 stress tests evaluating swappable search backends, deduplication, saturation curves, relevance gates, 25-reference ceiling, 14-factor scoring, screening funnels, DOI conflicts, retracted papers, calendar cutoffs, leap years, causal overclaims, synergy fallacies (114 tests - **PASS**).
-- **Suite 4: Tri-Tier Benchmark Audit (`self_audit_suite.py`):** 60 behavioral and scientific assertions on the benchmark proposal (60 tests - **PASS**).
-- **Suite 5: Mutation Testing Layer (`test_mutations.py`):** 10 deliberate scientific defect mutations with 100% kill score (10 tests - **PASS**).
-- **Suite 6: Property-Based Invariants & JSON Schemas (`test_property_and_schemas.py`):** 14 tests validating Invariants 1–8 and Draft-07 JSON Schemas (14 tests - **PASS**).
-- **Suite 7: End-to-End Pipeline & Integration Scenarios (`test_e2e_integration.py`):** 24 tests validating full pipeline execution and adversarial failure/demotion scenarios (24 tests - **PASS**).
-- **Suite 8: Cross-Topic Adversarial Test Suite (`test_cross_topic_adversarial.py`):** 11 tests verifying topic-agnosticism across Scenarios A through J (11 tests - **PASS**).
-- **Suite 9: Advanced Research Engine Integration (`test_advanced_research_engine.py`):** 22 tests verifying multi-source federated search, citation chasing, and claim verification (22 tests - **PASS**).
-- **Suite 10: Deep Reading & Recall Benchmark Suite (`test_v86_deep_reading_and_recall_benchmark.py`):** 14 tests verifying recall benchmarking, 13-category search miss taxonomy, 5-section deep reading, figure-first evidence recovery, methods reverse-engineering, 8-tier evidence hierarchy, paper-to-claim verifier 2.0, post-research citation auditing, and thematic comparative synthesis (14 tests - **PASS**).
-- **Suite 11: Evidence Grounding & Semantic Attribution Integrity Suite (`test_v87_evidence_grounding_and_attribution.py`):** 14 tests validating Canonical Paper Evidence Records, numeric provenance, contextual boundary gates, SciFact claim-evidence mapping, anti-boilerplate paragraph generation, and claim-to-citation binding (14 tests - **PASS**).
-- **Suite 12: Real-World Evidence Remediation Regressions (`test_v87_remediation_regressions.py`):** 10 tests validating complete architectural prevention of off-target intervention leakage, derivative/extract conflation, non-human model mismatches, template placeholder leaks, and quota filling (10 tests - **PASS**).
-- **Suite 13: v9.0 Adversarial Stress & Modular Architecture Suite (`test_v90_adversarial.py`):** 14 adversarial stress tests deliberately testing mechanism inversion detection, positive evidence bias warnings, crude extract normalization, missing sample size formula blocks, complex OMML equation rendering, Vancouver re-ordering, orphaned claim detection, and fail-closed readiness gatekeeping (14 tests - **PASS**).
+The engine includes 20 comprehensive test suites with **440 / 440 tests passing (100% Pass Rate)**:
 
-```bash
-# Run the master production release gate
-python scripts/master_release_gate.py
+```powershell
+uv run python tests/run_all_tests.py
 ```
+
+- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`)** - Zero hardcoded biological entities.
+- **Suite 2: Two-Loop Dossier & Master Pipeline Suite (`test_two_loop_dossier.py`)** - E2E verification of research dossier, epistemic auditor, and orchestrator.
+- **Suite 3: Multi-Domain Generalization Suite (`test_generalization.py`)** - Validates across 12 distinct biomedical domains.
+- **Suite 4: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`)** - 114 stress tests.
+- **Suite 5: Mutation Testing Layer (`test_mutations.py`)** - 10 deliberate scientific defects with 100% kill score.
+- **Suites 6–20:** Property invariants, schema audits, EQUATOR compliance, RoB-2 mitigation, OMML math engines, and typography linters.
 
 ---
 
 <a name="فارسی"></a>
-## مستندات فارسی
+## مستندات فارسی (نسخه ۱۱.۰)
 
-مهارت **Proposal-Nevisi (نسخه v9.0)** یک پلتفرم جامع، تعاملی، کاملاً ماژولار، مستقل از موضوع (Topic-Agnostic) و مبتنی بر شواهد برای تدوین پروپوزال‌های پژوهشی علوم پزشکی و زیست‌پزشکی در بالاترین تراز دانشگاهی است. نسخه ۹.۰ منطق‌های شرطی و وابسته به موضوع را به طور کامل حذف کرده و معماری ماژولار ۴ لایه‌ای زیر را ارائه می‌دهد:
+پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۱.۰)** یک سیستم خودکار، پیشرفته و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است.
 
-### لایه‌های معماری v9.0:
+نسخه ۱۱.۰ با معرفی **معماری خودکار دو حلقه‌ای (Two-Loop Research Architecture)** و **پرونده پژوهش پلمپ‌شده (`ProposalResearchDossier`)**، مشکل همیشگی هوش‌های مصنوعی در ساخت مقالات نامعتبر یا اکتفا به چکیده (Abstract-Only) را به صورت زیرساختی حل کرده است.
 
-1. **لایه ۱: صحت علمی (Scientific Accuracy):**
-   - **راستی‌آزمای خصمانه مکانیسم‌های بیولوژیک (`BiologicalMechanismAdversarialVerifier`):** کشف و مسدودسازی وارونگی نقش پروتئین‌ها (نظیر انتساب نقش پیش‌آپوپتوزی به Bcl-xL یا ضدآپوپتوزی به Bax).
-   - **موتور فرضیات ترکیب درمانی (`CombinationHypothesisEngine`):** تولید خودکار دو فرضیه موازی هم‌افزایی ($H_1$) و عدم هم‌افزایی/تضاد ($H_2$)، ارزیابی تعادل شواهد و هشدار سوگیری شواهد مثبت (`POSITIVE_EVIDENCE_DOMINANCE_WARNING`).
-   - **نرمال‌ساز هویت مواد (`CompoundEntityNormalizer`):** دسته‌بندی مواد در سطوح استاندارد ماده خالص، عصاره استاندارد، عصاره خام و آنالوگ سنتزی با جلوگیری از تعمیم نادرست اثرات عصاره گیاهی به ترکیب خالص.
+### قابلیت‌های کلیدی نسخه ۱۱.۰:
 
-2. **لایه ۲: تطابق ساختاری (Structural Compliance):**
-   - **گیت جامعیت ۲۸ بخشی پژوهشیار (`MethodologyCompletenessGate`):** اعتبارسنجی کامل ۲۸ بخش رسمی سامانه اطلاعات تحقیقاتی پزشکی کشور (پژوهشیار / وزارت بهداشت) با الزامی بودن فرمول ریاضی محاسبه حجم نمونه (کوهن، مید، کوکران).
-   - **انتخاب‌گر مدل آماری ترکیبی (`CombinationModelSelector`):** تعیین خودکار آنالیز واریانس عاملی دوطرفه با ترم اثر متقابل ($A \times B$)، آزمون‌های پیش‌فرض و آزمون‌های تعقیبی متناسب با ساختار آزمایش.
+1. **معماری خودکار دو حلقه‌ای (Two-Loop Architecture):**
+   - **حلقه درونی (Inner Optimization Loop):** جستجوی زنده در PubMed و Europe PMC، دانلود خودکار متن کامل (Full-Text XML)، استخراج گزیده‌های مستند، واکاوی تناقضات مقالات و پلمپ غیرقابل تغییر پرونده پژوهش (`PROPOSAL_RESEARCH_DOSSIER.json` و `.md`).
+   - **حلقه بیرونی (Outer Synthesis Loop):** نگارش دقیق و گام‌به‌گام ۲۸ بخش مصوب دانشگاه‌های علوم پزشکی ایران منحصراً بر اساس شواهد موجود در پرونده پلمپ‌شده، بدون کوچک‌ترین توهم ذهنی (Hallucination-Free).
+2. **ممیز دقت اپیستمیک ۶ بعدی (`EpistemicRigorAuditor`):**
+   - اعتبارسنجی فرضیه پوچ ($H_0$)، استنادهای متنی با DOI/PMID واقعی، همسویی روش‌شناختی، تعیین دقیق مرزهای تعمیم‌پذیری، حل شواهد متناقض و احراز هویت منابع زیستی (پروفایلینگ STR رده‌های سلولی و استانداردهای خلوص).
+3. **ممیزی‌های سه‌گانه داوری گرنت و استانداردهای بین‌المللی:**
+   - **داوری شبیه‌سازی‌شده گرنت (Mock Grant Review):** نمره‌دهی ۱ تا ۹ طبق استاندارد NIH و داوری پیش از ارسال به شورای پژوهشی.
+   - **انطباق با شبکه گایدلاین‌های جهانی EQUATOR:** پشتیبانی خودکار از ARRIVE 2.0 (حیوانات آزمایشگاهی)، MIQE (آزمایش‌های RT-qPCR)، CONSORT 2010 (کارآزمایی بالینی) و STROBE (مطالعات مشاهده‌ای).
+   - **مهار پیش‌دستانه سوگیری (RoB-2 / SYRCLE):** ارزیابی و مهار خطاهای تصادفی‌سازی، کورسازی و خروج از مطالعه.
+4. **فرمول‌های ریاضی بومی ورد (Native OMML):**
+   - درج تمامی فرمول‌های تعیین حجم نمونه (کوهن، رابطه منابع مید $E = N - B - T$، کوکران) به صورت فرمول‌های واقعی و استاندارد ورد مایکروسافت بدون نشت کدهای لاتک خام (`$...$`).
+5. **لینتر تایپوگرافی پزشکی فارسی:**
+   - رعایت دقیق نیم‌فاصله (ZWNJ)، فارسی‌سازی ارقام در متن، و باز کردن نام اختصاری اصطلاحات پزشکی در نخستین کاربرد.
 
-3. **لایه ۳: تمامیت استنادها (Citation Integrity):**
-   - **ره‌گیر یکپارچه استنادات (`CitationTracker`):** بازشماری و مرتب‌سازی ارجاعات بر اساس ترتیب ظهور در متن (ونکور استاندارد)، کشف گزاره‌های بی‌رفرنس (Orphaned Claims) و رفرنس‌های استفاده‌نشده (Unused References).
+---
 
-4. **لایه ۴: فرمت‌بندی و تایپوگرافی (Formatting & Typesetting):**
-   - **موتور فرمول‌نویسی بومی ورد (`NativeOmmlMathEngine`):** تبدیل کدهای LaTeX به فرمول‌های استاندارد OMML ورد (`<m:oMath>`) و حذف ۱۰۰٪ نشت کدهای لاتک (`$...$`) از سند DOCX.
-   - **لینتر تایپوگرافی پزشکی فارسی (`PersianMedicalTypographyLinter`):** اصلاح خودکار نیم‌فاصله‌ها (ZWNJ)، تبدیل ارقام در متن فارسی به اعداد فارسی و باز کردن خودکار اختصارات انگلیسی در نخستین اشاره.
+### راهنمای اجرای سریع (خط فرمان)
 
-5. **گیت یکپارچه‌ساز آمادگی (`ProposalReadinessGate`):**
-   - سد بازدارنده (Fail-Closed) که تا پیش از تأیید سلامت و انطباق تمامی ۸ ماژول فوق، اجازه کامپایل نهایی هیچ پروپوزالی را صادر نمی‌کند.
+اجرای کامل پایپ‌لاین تحقیق و نگارش پروپوزال با یک دستور واحد:
+
+```powershell
+uv run python scripts/run_research_pipeline.py --topic "عنوان کامل پژوهش شما" --output-dir "./output"
+```
+
+در صورت تمایل به تعیین کلمات کلیدی تخصصی MeSH یا خانواده طراحی مطالعه:
+```powershell
+uv run python scripts/run_research_pipeline.py `
+  --topic "بررسی اثر هم‌افزایی متفورمین و کورکومین بر مهار رشد سلول‌های سرطان کولون HCT116" `
+  --keywords "Metformin, Curcumin, Colonic Neoplasms, Apoptosis" `
+  --study-family "in_vitro" `
+  --output-dir "./output"
+```
+
+#### اسناد خروجی تولیدشده در پوشه خروجی:
+1. `proposal.docx`: فایل نهایی Word پروپوزال شامل ۲۸ بخش کامل پژوهشیار، فرمول‌های OMML، جداول متغیرها و صفحه امضا.
+2. `proposal.md`: متن کامل پروپوزال به فرمت مارک‌داون.
+3. `PROPOSAL_RESEARCH_DOSSIER.json` و `.md`: پرونده شواهد پلمپ‌شده شامل قطعات استخراج‌شده از متن کامل مقالات.
+4. `MOCK_GRANT_REVIEW_REPORT.md` و `.json`: کارنامه داوری گرنت و نقاط قوت و ضعف روش‌شناسی.
+5. `EQUATOR_COMPLIANCE_AUDIT.md` و `.json`: کارنامه انطباق با گایدلاین‌های بین‌المللی پژوهش.
+6. `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`: جدول جامع مهار سوگیری‌های مطالعاتی.
+
+---
+
+### ۲۸ بخش مصوب سامانه پژوهشیار (وزارت بهداشت)
+
+۱. عنوان فارسی  
+۲. بیان مسئله  
+۳. مرور بر منابع (پیشینه پژوهش با تحلیل نقادانه و ونکوور ترتیبی)  
+۴. اهمیت و ضرورت تحقیق  
+۵. تعریف واژه‌ها  
+۶. اهداف جزئی  
+۷. اهداف کلی  
+۸. اهداف کاربردی  
+۹. فرضیات پژوهش  
+۱۰. سوالات پژوهش  
+۱۱. نوع مطالعه  
+۱۲. روش جمع‌آوری اطلاعات  
+۱۳. روش نمونه‌گیری  
+۱۴. جامعه پژوهش  
+۱۵. محیط پژوهش  
+۱۶. حجم نمونه و نحوه محاسبه آن (با فرمول‌های ریاضی استاندارد)  
+۱۷. مشخصات ابزار گردآوری اطلاعات  
+۱۸. روایی و پایایی ابزار  
+۱۹. روش کار و مراحل آزمایشگاهی / بالینی  
+۲۰. روش تجزیه و تحلیل داده‌ها (آمار توصیفی و استنباطی با کنترل خطای نوع اول)  
+۲۱. ملاحظات اخلاقی و کدهای اخلاق  
+۲۲. پیش‌بینی محدودیت‌های تحقیق و راهکارهای مهار آن  
+۲۳. جدول متغیرها (مستقل، وابسته، مخدوش‌کننده، مقیاس و نقش)  
+۲۴. جدول زمان‌بندی و گانت چارت مراحل اجرا  
+۲۵. فهرست هزینه‌ها و بودجه‌بندی  
+۲۶. محل اجرای طرح و همکاران  
+۲۷. سازمان‌های بهره‌بردار از نتایج طرح  
+۲۸. منابع و مآخذ (فهرست کامل منابع معتبر به شیوه ونکوور ترتیبی)
+
+---
+
+### وضعیت آزمون‌های کنترل کیفیت نرم‌افزاری
+
+سیستم دارای ۲۰ سوئیت آزمون مستقل با **۴۴۰ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
+
+```powershell
+uv run python tests/run_all_tests.py
+```
+
+- **تست ضد نشت و تعمیم‌پذیری کامل (`test_hard_code_leakage.py`):** صفر بودن کلمات سخت‌کدشده زیستی در اسکریپت‌ها.
+- **تست پلمپ پرونده شواهد (`test_two_loop_dossier.py`):** بررسی تغییرناپذیری شواهد پس از پلمپ.
+- **تست‌های خصمانه و جهش نرم‌افزاری (`test_adversarial_scenarios.py` و `test_mutations.py`):** کشتن ۱۰۰٪ جهش‌های عمدی در منطق بیولوژیک.
 
 ---
 
