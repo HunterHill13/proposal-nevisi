@@ -44,6 +44,7 @@ try:
     from native_omml_math_engine import NativeOmmlMathEngine
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
     from mock_grant_review_panel import MockGrantReviewPanel
+    from equator_compliance_auditor import EquatorComplianceAuditor
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -68,6 +69,7 @@ except ImportError:
     from native_omml_math_engine import NativeOmmlMathEngine
     from core_policies import SynergyMetricConfig, AssayInterferencePolicy
     from mock_grant_review_panel import MockGrantReviewPanel
+    from equator_compliance_auditor import EquatorComplianceAuditor
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -656,8 +658,9 @@ class ProposalGenerator:
         meth_overview = data.get("methodology_overview_text")
         if not meth_overview:
             meth_overview = (
-                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) طراحی گردیده و "
+                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری طراحی گردیده و "
                 f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده مداخله، "
+                f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
                 f"سنجش‌های بیولوژیک و کمی‌سازی پیامدها بر اساس استانداردهای کنترل کیفیت، و در نهایت تحلیل آماری و مدلسازی برهم‌کنش می‌باشد."
             )
         md_parts.append("## ۱۳. روش اجرا\n" + meth_overview + "\n\n---")
@@ -675,7 +678,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_15 = data.get("study_population_text") or extracted_subs.get("2")
         if not sec_15:
-            sec_15 = f"مدل زیستی و سیستم سلولی مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی."
+            sec_15 = f"مدل زیستی و سیستم سلولی مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی."
         md_parts.append("## ۱۵. جامعه مورد مطالعه\n" + sec_15 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -693,9 +696,10 @@ class ProposalGenerator:
         if not sec_17:
             sec_17 = (
                 "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
-                "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی.\n"
-                "- استفاده از سلول‌ها در محدوده پاساژ استاندارد جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
-                "- مواد مداخله با درجه خلوص آنالیتیک معتبر و کنترل کیفی تاییدشده."
+                "- احراز هویت ژنتیکی سلول‌ها با پروفایل STR (Short Tandem Repeat) جهت تضمین اصالت و عدم آلودگی متقاطع.\n"
+                "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی (غربالگری شده با آزمون PCR مایکوپلاسما).\n"
+                "- استفاده از سلول‌ها در محدوده پاساژ استاندارد (پاساژهای بین ۳ الی ۱۰) جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
+                "- مواد مداخله با درجه خلوص آنالیتیکال استاندارد (Analytical Standard با خلوص بالای ۹۵٪ از کمپانی‌های معتبر)."
             )
         md_parts.append("## ۱۷. معیار های ورود به مطالعه\n" + sec_17 + "\n\n---")
 
@@ -731,8 +735,9 @@ class ProposalGenerator:
         if not sec_20:
             sec_20 = (
                 "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
-                "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب در واکنش‌های تکثیر.\n"
-                "- استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد در کلیه ران‌ها."
+                "- ارزیابی کمّی و کیفی RNA استخراج‌شده با اسپکتروفتومتر نانودراپ (نسبت A260/A280 بین ۱.۸ الی ۲.۰) و شاخص سلامت RNA (RIN >= 7).\n"
+                "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب (Melting Curve) با کارایی تکثیر استاندارد ۹۰ الی ۱۱۰ درصد.\n"
+                "- احراز هویت سلولی با آنالیز پروفایل STR و استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد."
             )
         md_parts.append("## ۲۰. تعیین اعتبار ابزار گردآوری\n" + sec_20 + "\n\n---")
 
@@ -742,6 +747,8 @@ class ProposalGenerator:
         sec_21 = data.get("reliability_text") or extracted_subs.get("8")
         if not sec_21:
             sec_21 = (
+                "- تامین کلیه کیت‌ها، آنتی‌بادی‌ها و مواد شیمیایی از کمپانی‌های مرجع معتبر (مانند Sigma-Aldrich / Merck / Gibco) با کد کاتالوگ مشخص.\n"
+                "- نرمال‌سازی داده‌های بیان ژن با استفاده از ژن مرجع داخلی پایدار (GAPDH / ACTB) مطابق استاندارد بین‌المللی MIQE.\n"
                 "- اجرای کلیه آزمون‌ها در حداقل سه تکرار بیولوژیکی کاملاً مستقل در روزهای مجزا.\n"
                 "- لحاظ نمودن حداقل سه تکرار تکنیکی (Triplicate) در هر پلیت برای هر غلظت آزمایشی.\n"
                 "- محاسبه ضریب تغییرات درون‌آزمونی (Intra-assay CV) و بین‌آزمونی (Inter-assay CV) و پذیرش داده‌ها صرفاً با CV کمتر از ۱۰ درصد."
@@ -774,6 +781,7 @@ class ProposalGenerator:
                 "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
                 "- تحلیل مقایسه میانگین‌ها در گروه‌های مستقل چندگانه با آنالیز واریانس یک‌طرفه (One-way ANOVA) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
                 "- ارزیابی برهم‌کنش غلظت و زمان با آنالیز واریانس دوطرفه فاکتوریل (Two-way ANOVA with interaction).\n"
+                "- کمی‌سازی نسبی بیان ژن‌ها مطابق فرمول استاندارد لیواک ($2^{-\\Delta\\Delta C_t}$) و ارزیابی معناداری تغییرات نسبت به گروه کنترل.\n"
                 f"- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).{ci_explanation}\n"
                 "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
             )
@@ -905,6 +913,10 @@ class ProposalGenerator:
         review_result = MockGrantReviewPanel.conduct_panel_review(md_content, data)
         review_md_path, review_json_path = MockGrantReviewPanel.save_reports(review_result, output_dir=review_dir)
 
+        # Conduct EQUATOR Network & Biological Resource Authentication Audit
+        equator_result = EquatorComplianceAuditor.audit_proposal(md_content, data)
+        equator_md_path, equator_json_path = EquatorComplianceAuditor.save_reports(equator_result, output_dir=review_dir)
+
         final_status = "PASS"
         if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
@@ -918,6 +930,9 @@ class ProposalGenerator:
             "mock_grant_review": review_result.to_dict(),
             "mock_grant_review_md": review_md_path,
             "mock_grant_review_json": review_json_path,
+            "equator_audit": equator_result.to_dict(),
+            "equator_audit_md": equator_md_path,
+            "equator_audit_json": equator_json_path,
             "md_path": md_path,
             "docx_path": docx_path,
             "status": final_status,

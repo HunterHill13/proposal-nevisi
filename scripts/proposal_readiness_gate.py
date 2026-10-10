@@ -73,7 +73,8 @@ class ProposalReadinessGate:
         "CitationTracker",
         "LiveReferenceVerificationGate",
         "FullTextRetrievalEngine",
-        "MockGrantReviewPanel"
+        "MockGrantReviewPanel",
+        "EquatorComplianceAuditor"
     ]
 
     @classmethod
@@ -239,6 +240,18 @@ class ProposalReadinessGate:
         except Exception as e:
             failed.append("MockGrantReviewPanel")
             errors.append(f"MockGrantReviewPanel error: {str(e)}")
+
+        # 12. EquatorComplianceAuditor
+        try:
+            from equator_compliance_auditor import EquatorComplianceAuditor
+            eq_test = EquatorComplianceAuditor.parse_sections("## 1. موضوع\nعنوان تستی")
+            if 1 not in eq_test:
+                raise ValueError("EquatorComplianceAuditor failed section parsing")
+            passed.append("EquatorComplianceAuditor")
+            diagnostics["EquatorComplianceAuditor"] = {"status": "PASS"}
+        except Exception as e:
+            failed.append("EquatorComplianceAuditor")
+            errors.append(f"EquatorComplianceAuditor error: {str(e)}")
 
         # If running purely in infrastructure mode, return status
         if selected_mode == "PRE_GENERATION_INFRASTRUCTURE":
