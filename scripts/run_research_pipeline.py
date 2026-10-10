@@ -165,7 +165,7 @@ class MasterResearchPipeline:
         query = kw_info["canonical_query"]
         print(f"  ▪ Formulated Search Query: {query}")
 
-        # 1. Search literature across PubMed & Europe PMC with Query Expansion
+        # 1. Search literature across PubMed & Europe PMC with Two-Tier MeSH Cascaded Execution
         search_mode = "online" if self.mode in ["live", "online", "auto"] else "offline"
         studies = []
         seen_pmids = set()
@@ -185,22 +185,37 @@ class MasterResearchPipeline:
                     seen_dois.add(d)
                 studies.append(r)
 
-        # Primary Query Execution with relevance sorting
+        # Tier 1: Precision MeSH Boolean Search
         if self.mode != "offline":
             try:
-                print(f"  ▪ Searching PubMed & Europe PMC ({search_mode} mode, sorted by relevance)...")
-                pubmed_res = self.adapter.query_pubmed(query, max_results=self.max_refs, mode="online", sort_by="relevance")
+                from mesh_query_expander import MeSHQueryExpander
+                tier1_mesh_q = MeSHQueryExpander.build_tier1_precision_mesh_query(self.topic, self.keywords)
+                print(f"  ▪ [Tier 1] Precision MeSH Query: {tier1_mesh_q}")
+                pubmed_res = self.adapter.query_pubmed(tier1_mesh_q, max_results=self.max_refs, mode="online", sort_by="relevance")
                 add_unique_records(pubmed_res.get("records", []))
-
-                # Query Europe PMC for open-access literature
-                epmc_res = self.adapter.query_europe_pmc(query, max_results=self.max_refs, mode="online")
+                
+                epmc_res = self.adapter.query_europe_pmc(tier1_mesh_q, max_results=self.max_refs, mode="online")
                 add_unique_records(epmc_res.get("records", []))
             except Exception as e:
-                print(f"    Notice: Primary search encountered network pause: {e}")
+                print(f"    Notice: Tier 1 MeSH search encountered exception: {e}")
 
-        # Intelligent Query Expansion if below min_refs
+        # Tier 2: Free-Text Smart Expansion Fallback if below min_refs
         if len(studies) < self.min_refs and self.mode != "offline":
-            print(f"  ▪ Executing Intelligent Query Expansion across constituent biomedical facets...")
+            try:
+                from mesh_query_expander import MeSHQueryExpander
+                tier2_fallback_q = MeSHQueryExpander.build_tier2_fallback_query(self.topic, self.keywords)
+                print(f"  ▪ [Tier 2] MeSH yielded {len(studies)} papers (< {self.min_refs}). Triggering Tier 2 Fallback: {tier2_fallback_q}")
+                pubmed_res2 = self.adapter.query_pubmed(tier2_fallback_q, max_results=self.max_refs, mode="online", sort_by="relevance")
+                add_unique_records(pubmed_res2.get("records", []))
+
+                epmc_res2 = self.adapter.query_europe_pmc(tier2_fallback_q, max_results=self.max_refs, mode="online")
+                add_unique_records(epmc_res2.get("records", []))
+            except Exception as e:
+                print(f"    Notice: Tier 2 Fallback encountered exception: {e}")
+
+        # Additional Faceted Query Expansion if STILL below min_refs
+        if len(studies) < self.min_refs and self.mode != "offline":
+            print(f"  ▪ Executing Constituent Facet Expansion...")
             terms = kw_info.get("terms", [])
             sub_queries = []
             if len(terms) >= 2:

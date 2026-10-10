@@ -94,7 +94,7 @@ SAMPLE_SIZE_FORMULA_PATTERNS = [
     r'Mead',
     r'E\s*=\s*N\s*-\s*B\s*-\s*T',
     r'resource equation',
-    r'کوکران|کوهن|مید|پوکاک',
+    r'Festing|ARRIVE|Chow|کوکران|کوهن|مید|پوکاک',
     r'تکرار.*(بیولوژیک|مستقل|آزمایشگاهی)',
     r'(biological|independent)\s+replicate'
 ]

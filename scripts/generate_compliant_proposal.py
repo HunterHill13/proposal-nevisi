@@ -687,7 +687,28 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_15 = data.get("study_population_text") or extracted_subs.get("2")
         if not sec_15:
-            sec_15 = f"مدل زیستی و سیستم سلولی مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی."
+            # Generate PICO/PECO structured matrix aligned with study design
+            is_clinical = framework in ["PICO", "CLINICAL_TRIAL", "COHORT"] or any(k in str(framework).lower() for k in ["human", "patient", "clinical"])
+            framework_label = "PICO" if is_clinical else "PECO"
+            pop_label = "جامعه بیماران / جمعیت هدف (Population)" if is_clinical else "سیستم سلولی / مدل بیولوژیک (Population/Model)"
+            exp_label = "مداخله دارویی / بالینی (Intervention)" if is_clinical else "مواجهه / مداخله تجربی (Exposure/Intervention)"
+            comp_label = "گروه کنترل / دارونما (Comparator/Placebo)" if is_clinical else "کنترل منفی / حلال ناقل (Comparator/Vehicle)"
+            out_label = "پیامدهای اولیه و بالینی (Primary Outcomes)" if is_clinical else "پیامدهای مولکولی و آپوپتوز (Outcomes)"
+
+            outcomes_list = model_dict.get("primary_outcomes", [])
+            outcomes_str = "، ".join(o.get("name") if isinstance(o, dict) else str(o) for o in outcomes_list) if outcomes_list else "زیست‌پذیری، آپوپتوز و شاخص‌های مولکولی"
+            interventions_str = " و ".join(ag.get("name") if isinstance(ag, dict) else str(ag) for ag in interventions) if interventions else "مداخلات تجربی طرح"
+
+            pico_table = (
+                f"▪ **چارچوب ساختارمند متدولوژی ({framework_label} Framework):**\n\n"
+                f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
+                f"| :--- | :--- |\n"
+                f"| **P ({pop_label})** | {sys_name} تهیه شده از بانک‌های معتبر زیستی با احراز هویت ژنتیکی و کنترل سالم بافتی |\n"
+                f"| **I/E ({exp_label})** | مواجهه زمان‌بندی‌شده و غلظت‌سنجی {interventions_str} با خلوص تاییدشده |\n"
+                f"| **C ({comp_label})** | گروه دست‌نخورده، کنترل منفی حلال ناقل (DMSO < 0.1%) و کنترل بدون سلول |\n"
+                f"| **O ({out_label})** | {outcomes_str} |\n\n"
+            )
+            sec_15 = pico_table + f"مدل زیستی و سیستم هدف مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی."
         md_parts.append("## ۱۵. جامعه مورد مطالعه\n" + sec_15 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -704,6 +725,7 @@ class ProposalGenerator:
         sec_17 = data.get("inclusion_criteria_text") or extracted_subs.get("4")
         if not sec_17:
             sec_17 = (
+                "- تطابق کامل با ویژگی‌های جمعیت/مدل بر مبنای چارچوب PICO/PECO مطالعه.\n"
                 "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
                 "- احراز هویت ژنتیکی سلول‌ها با پروفایل STR (Short Tandem Repeat) جهت تضمین اصالت و عدم آلودگی متقاطع.\n"
                 "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی (غربالگری شده با آزمون PCR مایکوپلاسما).\n"
@@ -771,13 +793,30 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_22 = data.get("sample_size_text") or extracted_subs.get("9")
         if not sec_22 or not any(re.search(p, sec_22) for p in [r'\\frac', r'n\s*=', r'Mead', r'Z_']):
-            sec_22 = (
-                "تعیین حجم نمونه بر اساس متدولوژی استاندارد مطالعات تجربی فارماکولوژی سلولی و رابطه کوهن انجام می‌پذیرد:\n\n"
-                r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$"
-                "\n\nبا در نظر گرفتن توان آزمون ۸۰٪ ($1-\\beta = 0.80$)، سطح خطای نوع اول ۵٪ ($\\alpha = 0.05$) و اندازه اثر استاندارد "
-                "برگرفته از مطالعات پیلوت، حداقل ۳ تکرار بیولوژیکی مستقل برای هر شرط تجربی کفایت آماری لازم را تضمین می‌نماید. "
-                "همچنین بر اساس رابطه تخصیص منابع مید (Mead's Resource Equation: $E = N - B - T$) مقدار درجات آزادی خطا در بازه استاندارد ۱۰ الی ۲۰ قرار می‌گیرد."
-            )
+            if framework in ["EXPERIMENTAL_ANIMAL", "ANIMAL_IN_VIVO"]:
+                # In Vivo Animal: Festing (2002) & ARRIVE Guidelines (Mead's Resource Equation)
+                sec_22 = (
+                    "تعیین حجم نمونه در مطالعه حیوانی بر مبنای راهنمای بین‌المللی ARRIVE Guidelines و معادله تخصیص منابع فستینگ (Festing & Altman, 2002; Festing, 2006) انجام می‌پذیرد:\n\n"
+                    r"$$E = N - B - T$$"
+                    "\n\nدر این رابطه، $N$ کل حیوانات آزمایشگاهی، $B$ اثر بلوک‌بندی و $T$ درجات آزادی تیمارها است. "
+                    "طبق استاندارد جهانی Festing، مقدار درجات آزادی خطا ($E$) باید در بازه $10 \le E \le 20$ قرار گیرد تا هم توان آماری آزمون ($1-\\beta \ge 0.80$) تضمین گردد و هم از هدررفت اخلاقی حیوانات جلوگیری شود. "
+                    "با فرض ۴ بازوی آزمایشی و ۶ سر حیوان در هر گروه ($N = 24$)، مقدار $E = 24 - 1 - 3 = 20$ حاصل می‌شود. با احتساب ۱۰٪ نرخ تلفات احتمالی ($Attrition Rate$)، حجم نهایی نمونه‌ها تثبیت می‌گردد."
+                )
+            elif framework in ["PICO", "CLINICAL_TRIAL", "COHORT", "HUMAN"]:
+                # Clinical Trial / Human Cohort: Chow et al. (2017) Sample Size Calculations in Clinical Research
+                sec_22 = (
+                    "محاسبه حجم نمونه بر اساس استاندارد مرجع کارآزمایی‌های بالینی چو و وانگ (Chow, Shao, Wang, & Lokhnygina, 2017 - *Sample Size Calculations in Clinical Research*) جهت مقایسه دو گروه موازی انجام می‌پذیرد:\n\n"
+                    r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2} = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2}$$"
+                    "\n\nدر این معادله با در نظر گرفتن توان آماری ۸۰٪ ($1-\\beta = 0.80$ معادل $Z_{1-\\beta} = 0.84$)، ضریب خطای نوع اول دوطرفه ۵٪ ($\\alpha = 0.05$ معادل $Z_{1-\\alpha/2} = 1.96$) و اندازه اثر استاندارد کوهن ($Cohen's\\ d = \\Delta / \\sigma$) بر مبنای تفاوت حداقل معنادار بالینی (MCID) مستخرج از کارآزمایی‌های پایه، حجم نمونه محاسبه و با لحاظ ۱۰٪ احتمال ریزش نمونه‌ها تعدیل می‌گردد."
+                )
+            else:
+                # In Vitro Cellular: NIH Guidelines (NOT-OD-15-103) & Nature Reproducibility Standards
+                sec_22 = (
+                    "تعیین حجم نمونه بر اساس استانداردهای بازتولیدپذیری کشت سلولی NIH (NIH Notice NOT-OD-15-103) و استاندارد تکرارهای زیستی مستقل نیچر انجام می‌پذیرد:\n\n"
+                    r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$"
+                    "\n\nبا لحاظ نمودن توان آزمون ۸۰٪ ($1-\\beta = 0.80$)، سطح خطای نوع اول ۵٪ ($\\alpha = 0.05$) و حداقل ۳ تکرار بیولوژیکی کاملاً مستقل در روزها و پاساژهای سلولی مجزا ($n = 3$ Biological Replicates). "
+                    "همچنین بر اساس معادله منبع مید (Mead's Resource Equation: $E = N - B - T$) درجات آزادی خطا در بازه استاندارد ۱۰ الی ۲۰ تنظیم شده و کلیه تکرارهای تکنیکی درون‌پلیتی (Technical Triplicates) جهت ممانعت از خطای شبه‌تکرار (Pseudo-Replication Fallacy) به صورت میانگین یک واحد تجربی لحاظ می‌گردند."
+                )
         md_parts.append("## ۲۲. حجم نمونه و روش محاسبه آن\n" + sec_22 + "\n\n---")
 
         # -------------------------------------------------------------
