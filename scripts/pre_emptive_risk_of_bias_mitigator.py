@@ -298,11 +298,21 @@ class PreEmptiveRiskOfBiasMitigator:
         high_risk = [d.domain_title_fa for d in domains.values() if d.risk_level == "HIGH_RISK"]
         some_concerns = [d.domain_title_fa for d in domains.values() if d.risk_level == "SOME_CONCERNS"]
 
+        # In Vitro Specific Quality Check (ToxRTool / NTP OHAT / GIVIMP Standards)
+        s14 = sections.get(14, "")
+        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"]) or (context and "in_vitro" in str(context.get("framework", "")).lower())
+        full_text_lower = " ".join(sections.values()).lower()
+        if is_in_vitro:
+            # Detect Cochrane RoB-2 misapplication on cell culture studies
+            has_rob2_misapplied = any(k in full_text_lower for k in ["cochrane rob-2", "rob-2", "rob 2"]) and not any(k in full_text_lower for k in ["toxrtool", "ntp ohat", "givimp", "ecvam"])
+            if has_rob2_misapplied:
+                high_risk.append("ROB2_IN_VITRO_MISAPPLICATION: ابزار RoB-2 ککرین مخصوص کارآزمایی‌های بالینی انسانی است و کاربرد آن در مطالعه سلولی برون‌تن غیرمجاز است. چارچوب استاندارد ToxRTool یا NTP OHAT جایگزین گردید.")
+
         if len(high_risk) == 0 and len(some_concerns) <= 1:
             overall_risk = "LOW_RISK"
             is_acceptable = True
             exec_summary = (
-                "پروپوزال از حیث مهار سیستماتیک سوگیری‌های آزمایشگاهی (Cochrane RoB-2 / SYRCLE) در رتبه ممتاز (Low Risk of Bias) "
+                "پروپوزال از حیث مهار سیستماتیک سوگیری‌های آزمایشگاهی (استاندارد ترکیبی ToxRTool / SYRCLE / Cochrane) در رتبه ممتاز (Low Risk of Bias) "
                 "قرار دارد. تدابیر تصادفی‌سازی، کورسازی، پنهان‌سازی تخصیص و شفافیت خروج نمونه‌ها به صورت استاندارد لحاظ گردیده است."
             )
         elif len(high_risk) == 0:
@@ -327,6 +337,55 @@ class PreEmptiveRiskOfBiasMitigator:
             high_risk_domains=high_risk,
             executive_summary_fa=exec_summary
         )
+
+    @classmethod
+    def evaluate_in_vitro_toxrtool_quality(cls, sections: Dict[int, str]) -> Dict[str, Any]:
+        """Evaluates in vitro study against 5 domains of ToxRTool / NTP OHAT / GIVIMP quality framework."""
+        methods_text = f"{sections.get(13, '')} {sections.get(15, '')} {sections.get(17, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
+        
+        # Domain 1: Characterization & Vehicle control
+        has_purity = any(k in methods_text for k in ["خلوص", "purity", "standard", "آنالیتیکال", "analytical", ">95%", "۹۵٪", ">=95%"])
+        has_vehicle = any(k in methods_text for k in ["dmso", "حلال ناقل", "حلال", "vehicle", "0.1%", "۰.۱٪"])
+        d1_pass = has_purity or has_vehicle
+        
+        # Domain 2: Cell Authentication & Health
+        has_str = any(k in methods_text for k in ["str", "پروفایل str", "احراز هویت", "authentication"])
+        has_myco = any(k in methods_text for k in ["مایکوپلاسما", "mycoplasma"])
+        has_passage = any(k in methods_text for k in ["پاساژ", "passage"])
+        d2_pass = (has_str or has_myco) and has_passage
+        
+        # Domain 3: Specific Controls & Cell-Free Blank
+        has_blank = any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک", "بلانک"])
+        has_pos_ctrl = any(k in methods_text for k in ["کنترل مثبت", "positive control", "استاروسپورین", "staurosporine"])
+        d3_pass = has_blank or has_pos_ctrl
+        
+        # Domain 4: Positional Bias & Uniformity
+        has_layout = any(k in methods_text for k in ["چیدمان تصادفی", "edge effect", "تبخیر حاشیه‌ای", "موقعیت چاهک", "randomized layout", "پلیت"])
+        d4_pass = has_layout
+        
+        # Domain 5: Biological vs Technical Replicates & Outlier Handling
+        has_bio_reps = any(k in methods_text for k in ["تکرار بیولوژیک", "biological replicate", "روزهای مجزا", "پاساژهای مجزا", "مستقل"])
+        has_outlier = any(k in methods_text for k in ["گرابز", "grubbs", "outlier", "داده‌های پرت", "داده پرت"])
+        d5_pass = has_bio_reps and has_outlier
+        
+        toxrtool_domains = {
+            "d1_characterization_vehicle": "RELIABLE" if d1_pass else "RESTRICTED",
+            "d2_cell_authentication": "RELIABLE" if d2_pass else "RESTRICTED",
+            "d3_controls_and_blank": "RELIABLE" if d3_pass else "RESTRICTED",
+            "d4_positional_uniformity": "RELIABLE" if d4_pass else "RESTRICTED",
+            "d5_replication_outlier": "RELIABLE" if d5_pass else "RESTRICTED"
+        }
+        reliable_count = sum(1 for v in toxrtool_domains.values() if v == "RELIABLE")
+        overall_category = "CATEGORY_1_RELIABLE_WITHOUT_RESTRICTION" if reliable_count >= 4 else (
+            "CATEGORY_2_RELIABLE_WITH_RESTRICTION" if reliable_count >= 3 else "CATEGORY_3_NOT_RELIABLE"
+        )
+        return {
+            "framework": "TOXRTOOL_NTP_OHAT_IN_VITRO",
+            "domains": toxrtool_domains,
+            "reliable_count": reliable_count,
+            "overall_category": overall_category,
+            "is_compliant": reliable_count >= 3
+        }
 
     # =========================================================================
     # REPORT GENERATION & PERSISTENCE
@@ -466,22 +525,36 @@ class BaselinePaperQualityAuditor:
         return [cls.evaluate_paper(p) for p in papers]
 
     @classmethod
-    def render_markdown_table(cls, evaluations: List[Dict[str, Any]]) -> str:
-        """Renders an academic Risk of Bias summary table for Dossier or Section 3."""
+    def render_markdown_table(cls, evaluations: List[Dict[str, Any]], framework: Optional[str] = None) -> str:
+        """Renders an academic Risk of Bias summary table for Dossier or Section 3, supporting ToxRTool for in vitro."""
         if not evaluations:
             return "_هیچ مقاله‌ای برای ارزیابی ریسک سوگیری ثبت نشده است._"
 
-        badge_map = {
-            "LOW_RISK": "🟢 کم‌ریسک",
-            "SOME_CONCERNS": "🟡 مبهم/متوسط",
-            "UNCLEAR_RISK": "⚪ نامشخص",
-            "HIGH_RISK": "🔴 پرریسک"
-        }
+        is_in_vitro = bool(framework and any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell"]))
 
-        header = (
-            "| ردیف | شناسه / عنوان مقاله | تصادفی‌سازی (D1) | کورسازی (D2) | کنترل‌ها و کمی‌سازی (D3) | تکرارپذیری (D4) | ریسک کلی سوگیری |\n"
-            "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
-        )
+        if is_in_vitro:
+            badge_map = {
+                "LOW_RISK": "🟢 معتبر (Cat 1)",
+                "SOME_CONCERNS": "🟡 مشروط (Cat 2)",
+                "UNCLEAR_RISK": "⚪ نامشخص",
+                "HIGH_RISK": "🔴 غیرمعتبر (Cat 3)"
+            }
+            header = (
+                "| ردیف | شناسه / عنوان مقاله | خلوص و شناسنامه مداخله (D1) | اصالت و سلامت مدل سلولی (D2) | کنترل‌ها و بلانک بدون سلول (D3) | تکرارهای زیستی مستقل (D4) | سطح اعتبار کیفی ToxRTool |\n"
+                "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            )
+        else:
+            badge_map = {
+                "LOW_RISK": "🟢 کم‌ریسک",
+                "SOME_CONCERNS": "🟡 مبهم/متوسط",
+                "UNCLEAR_RISK": "⚪ نامشخص",
+                "HIGH_RISK": "🔴 پرریسک"
+            }
+            header = (
+                "| ردیف | شناسه / عنوان مقاله | تصادفی‌سازی (D1) | کورسازی (D2) | کنترل‌ها و کمی‌سازی (D3) | تکرارپذیری (D4) | ریسک کلی سوگیری |\n"
+                "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            )
+
         rows = []
         for idx, ev in enumerate(evaluations, 1):
             short_title = (ev.get("title") or "مقاله")[:55] + ("..." if len(ev.get("title", "")) > 55 else "")

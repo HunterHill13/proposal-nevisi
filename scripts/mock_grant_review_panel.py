@@ -181,8 +181,11 @@ class MockGrantReviewPanel:
         # Section 2 Audit: Outdated Epidemiology (GLOBOCAN 2020 vs 2022/2024)
         s2_lower = s2.lower()
         if ("2.2" in s2 and ("میلیون" in s2 or "million" in s2_lower)) or "globocan 2020" in s2_lower:
-            weaknesses.append("OUTDATED_EPIDEMIOLOGY: آمار ابتلا به سرطان بر پایه گزارش قدیمی GLOBOCAN 2020 درج شده است. بر اساس آخرین گزارش رسمی IARC GLOBOCAN 2022 (منتشرشده در 2024 در CA: A Cancer Journal for Clinicians)، آمار جهانی سالانه ۲.۴۸ میلیون مورد جدید (۱۲.۴٪ کل) و ۱.۸۱ میلیون مرگ است.")
+            weaknesses.append("OUTDATED_EPIDEMIOLOGY: آمار ابتلا به سرطان بر پایه گزارش قدیمی GLOBOCAN 2020 درج شده است. بر اساس آخرین گزارش رسمی IARC GLOBOCAN 2022 (منتشرشده در 2024 در CA: A Cancer Journal for Clinicians توسط Bray و همکاران)، آمار جهانی سالانه ۲.۴۸ میلیون مورد جدید (دقیقاً ۲,۴۸۰,۳۰۱ مورد جدید معادل ۱۲.۴٪ کل) و ۱.۸۱ میلیون مرگ (دقیقاً ۱,۸۱۷,۱۷۲ مرگ) است.")
             score += 0.6
+        elif "globocan" in s2_lower:
+            if any(k in s2 for k in ["۲.۴۸", "2.48", "۲,۴۸۰,۳۰۱"]):
+                strengths.append("آمار اپیدمیولوژیک با دقت عددی کامل از آخرین گزارش رسمی GLOBOCAN 2022 (Bray et al. 2024) استخراج گردیده است.")
 
         # Section 2 Audit: Unsubstantiated Novelty Claim without Negative Search Log
         claims_novelty = any(k in s2 for k in ["اولین بار", "اولین مطالعه", "نخستین بار", "نخستین مطالعه", "هیچ مطالعه‌ای", "first-in-class", "برای نخستین"])
@@ -190,6 +193,12 @@ class MockGrantReviewPanel:
         if claims_novelty and not has_negative_log:
             weaknesses.append("UNSUBSTANTIATED_NOVELTY_CLAIM: ادعای نخستین مطالعه یا فقدان پیشینه قبلی فاقد استراتژی سرچ منفی مدون (Negative Boolean Query Log) و اثبات صفر نتیجه (0 Hits) در پایگاه‌های معتبر است.")
             score += 0.5
+
+        # Section 2 Audit: Unbounded Cosmic Novelty Claim
+        cosmic_novelty_patterns = ["در کل دنیا", "در جهان وجود ندارد", "هیچ مطالعه‌ای در دنیا", "در سراسر جهان فاقد", "در کل عالم"]
+        if any(cn in s2 for cn in cosmic_novelty_patterns) and not any(hedge in s2 for hedge in ["بر اساس استعلام", "در پایگاه‌های", "مطابق جستجو", "تا تاریخ"]):
+            weaknesses.append("UNBOUNDED_EPISTEMIC_NOVELTY: ادعای نوآوری کیهانی به صورت مطلق ('در کل دنیا/جهان') بیان شده است. در نگارش علمی، ادعای نوآوری باید مقید و تحدیدشده به استعلام نظام‌مند از پایگاه‌های اطلاعاتی (PubMed/Europe PMC) تا تاریخ معین بیان گردد.")
+            score += 0.4
 
         # Section 3: Literature Review & Semantic Drift Audit
         s3 = sections.get(3, "")
@@ -214,6 +223,29 @@ class MockGrantReviewPanel:
         else:
             weaknesses.append("ضرورت و اهمیت تحقیق به صورت کلی بیان شده و دلایل بالینی یا کاربردی شفاف‌تری می‌طلبد.")
             score += 0.5
+
+        # Cross-sectional audit: In Vitro to Clinical Toxicity Extrapolation
+        s14 = sections.get(14, "")
+        full_text_lower = " ".join(sections.values()).lower()
+        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
+        claims_patient_cure = any(k in full_text_lower for k in [
+            "کاهش عوارض در بیماران", "کاهش سمیت کلیوی بیماران", "کاهش سمیت خونی بیماران",
+            "کاهش نفروتوکسیسیتی بیماران"
+        ])
+        has_translational_hedge = any(k in full_text_lower for k in [
+            "فرضیه پیش‌بالینی", "محدودیت مدل برون‌تن", "نیازمند کارآزمایی بالینی",
+            "نیازمند مطالعات in vivo", "مرزهای تعمیم‌پذیری", "selectivity index"
+        ])
+        if is_in_vitro and claims_patient_cure and not has_translational_hedge:
+            critical_flaws.append("TRANSLATIONAL_OVER_EXTRAPOLATION: تعمیم ناموجه نتایج آزمایشگاهی برون‌تن به کاهش عوارض ارگانی در بیماران بالینی؛ در مطالعات برون‌تن، بررسی سمیت سلول نرمال صرفاً شاخص انتخاب‌پذیری و فرضیه اولیه پیش‌بالینی است.")
+            score += 1.2
+
+        # Section 15: Molecular Heterogeneity Rationale
+        s15 = sections.get(15, "")
+        if len(s15) >= 100:
+            has_heterogeneity = any(k in s15.lower() for k in ["موتاسیون", "mutation", "p53", "kras", "ژنتیک", "تبارشناسی", "انتخاب‌پذیری", "selectivity index", "heterogeneity"])
+            if has_heterogeneity:
+                strengths.append("مبنای تبارشناسی ژنتیکی و ناهمگونی مولکولی رده‌های سلولی انتخابی تبیین شده است.")
 
         # Section 9: Hypotheses
         s9 = sections.get(9, "")
@@ -329,19 +361,74 @@ class MockGrantReviewPanel:
             weaknesses.append("ASSAY_INTERFERENCE_ADVISORY: در سنجش‌های تترازولیوم، قید صریح کنترل بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر مستقیم احیای شیمیایی مواد بر نمک تترازولیوم الزامی است.")
             score += 0.3
 
-        # 4. qPCR / Gene Expression Rigor (MIQE Dual Reference Gene Check)
+        # 4. RoB-2 In Vitro Misapplication Guard
+        s14 = sections.get(14, "")
+        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
+        full_text_lower = " ".join(sections.values()).lower()
+        if is_in_vitro and ("rob-2" in full_text_lower or "rob 2" in full_text_lower or "cochrane" in full_text_lower):
+            if not any(k in full_text_lower for k in ["toxrtool", "ntp ohat", "givimp", "ecvam"]):
+                critical_flaws.append("ROB2_IN_VITRO_MISAPPLICATION: ابزار RoB-2 ککرین اختصاصاً برای کارآزمایی‌های بالینی انسانی تصادفی‌سازی‌شده طراحی شده است. برای مطالعات سلولی برون‌تن (In Vitro)، استفاده از RoB-2 فاقد وجاهت روش‌شناختی است و باید از چارچوب‌های استاندارد ToxRTool یا NTP OHAT استفاده شود.")
+                score += 1.5
+
+        # 5. qPCR / Gene Expression Rigor (MIQE Dual Reference Gene Check)
         if any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن"]):
             has_dual_refs = any(k in methods_text for k in ["دو ژن مرجع", "gapdh و actb", "actb و gapdh", "حداقل دو ژن"]) or ("gapdh" in methods_text and ("actb" in methods_text or "actin" in methods_text))
             if not has_dual_refs:
                 weaknesses.append("MIQE_COMPLIANCE_DEFECT: بر اساس راهنمای بین‌المللی MIQE، سنجش‌های RT-qPCR باید حداقل بر پایه دو ژن مرجع داخلی پایدار (نظیر GAPDH و ACTB) نرمال‌سازی شوند نه صرفاً یک تک‌ژن.")
                 score += 0.5
 
-        # 5. Section 22: Sample Size & Mathematical Coherence
+        # 6. Caspase-3 mRNA vs Active Proteolytic Cleavage Rigor
+        if any(k in methods_text for k in ["کاسپاز", "caspase", "casp3"]):
+            mentions_pcr = any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن", "mrna"])
+            mentions_cleavage = any(k in methods_text for k in ["برش پروتئینی", "برش پروتئولیتیک", "cleaved", "فعالیت آنزیمی", "annexin", "آنکسین", "وسترن بلات", "western"])
+            if mentions_pcr and not mentions_cleavage:
+                critical_flaws.append("CASPASE3_MRNA_INSUFFICIENCY: استناد صرف به افزایش بیان mRNA ژن CASP3 برای اثبات آپوپتوز ناکافی است؛ کاسپاز-۳ یک پروآنزیم غیرفعال ۳۲ کیلودالتونی است و آپوپتوز مستلزم سنجش برش پروتئولیتیک به قطعات فعال یا سنجش ارتوگونال با Annexin V/PI است.")
+                score += 1.2
+            elif mentions_cleavage:
+                strengths.append("سنجش ارتوگونال فعال‌سازی کاسپاز-۳ از طریق برش پروتئینی یا فلوسایتومتری Annexin V/PI تضمین شده است.")
+
+        # 7. Chou-Talalay Synergy 2-Phase Protocol Rigor
+        has_synergy = any(k in methods_text for k in ["هم‌افزایی", "سینرژی", "چو", "تالالی", "ci", "chou", "compusyn", "synergyfinder"])
+        if has_synergy:
+            has_phase1 = any(k in methods_text for k in ["فاز اول", "منحنی‌های دوز-پاسخ منفرد", "دوز-پاسخ تک‌دارویی", "تک‌دارویی", "monotherapy", "serial dilution", "رقت متوالی", "ic50 منفرد", "شیب m"])
+            if not has_phase1:
+                weaknesses.append("CHOU_TALALAY_PROTOCOL_INCOMPLETE: در طراحی سنجش هم‌افزایی چو-تالالای، الزامی است که پیش از تیمار ترکیبی، فاز اول (ترسیم منحنی ۵ الی ۷ نقطه‌ای تک‌دارویی جهت استخراج دقیق IC50 و پارامترهای Dm و m در CompuSyn) تصریح گردد.")
+                score += 0.5
+            else:
+                strengths.append("پروتکل دوفازی استاندارد Chou-Talalay (فاز اول تک‌دارویی و فاز دوم نسبت ثابت هم‌توان) به درستی طراحی شده است.")
+
+        # 8. Apoptosis Positive Control Rigor
+        has_apoptosis = any(k in methods_text for k in ["آپوپتوز", "مرگ سلولی", "annexin", "آنکسین"])
+        if has_apoptosis:
+            has_pos_ctrl = any(k in methods_text for k in ["کنترل مثبت", "positive control", "استاروسپورین", "staurosporine"])
+            if not has_pos_ctrl:
+                weaknesses.append("APOPTOSIS_POSITIVE_CONTROL_MISSING: در سنجش‌های آپوپتوز و مرگ سلولی، تعبیه کنترل مثبت استاندارد (مانند استاروسپورین ۱ میکرومولار) جهت اعتبارسنجی کیت و گیت‌بندی فلوسایتومتری الزامی است.")
+                score += 0.4
+            else:
+                strengths.append("کنترل مثبت استاندارد آپوپتوز در پروتکل آزمایشگاهی لحاظ شده است.")
+
+        # 9. Section 22: Sample Size & Mathematical Coherence
         s22 = sections.get(22, "")
         s22_lower = s22.lower()
         has_ttest_formula = bool(re.search(r'\\frac\{2\(z', s22_lower) or re.search(r'2\(z_\{?1-\\alpha', s22_lower))
         claims_n3 = bool(re.search(r'n\s*=\s*3', s22_lower) or "۳ تکرار" in s22 or "3 biological" in s22_lower)
         has_mead_or_factorial = bool("mead" in s22_lower or "resource equation" in s22_lower or "factorial" in s22_lower or "واریانس دوطرفه" in s22)
+
+        has_mead = "mead" in s22_lower or "resource equation" in s22_lower or "معادله مید" in s22 or "معادله تخصیص منابع" in s22
+        if has_mead:
+            # Check for B = 1 error when 3 block days are mentioned
+            claims_3days_b1 = any(k in s22 for k in ["۳ روز", "3 روز", "سه روز", "3 independent"]) and ("b = 1" in s22_lower or "b=1" in s22_lower)
+            if claims_3days_b1:
+                critical_flaws.append("BIOSTATISTICAL_BLOCK_DF_ERROR: در معادله تخصیص منابع مید (E = N - B - T)، با داشتن ۳ روز کاری مستقل، درجات آزادی بلوک B = k - 1 = 3 - 1 = 2 است نه ۱ (E = 30 - 2 - 9 = 19).")
+                score += 1.2
+            
+            # Check for conflating Mead with Statistical Power without separate power analysis
+            conflates_power = any(k in s22 for k in ["تضمین‌کننده توان بالای ۸۰", "تضمین توان بالای 80", "توان آماری را تضمین", "تضمین‌کننده توان آماری کافی", "تضمین‌کننده توان"]) and not any(k in s22_lower for k in ["g*power", "gpower", "تحلیل توان", "تحلیل مستقل توان", "محاسبه مستقل توان", "قدرت آزمون"])
+            if conflates_power:
+                critical_flaws.append("BIOSTATISTICAL_MEAD_POWER_CONFLATION: خلط فرمول مید با توان آماری؛ معادله تخصیص منابع مید صرفاً یک قاعده تجربی برای درجات آزادی خطای ANOVA است (10 <= E <= 20) و به تنهایی توان آماری (>80%) را اثبات نمی‌کند. توان آماری باید مستقلاً بر پایه تحلیل توان آزمون F فاکتوریل (G*Power) ارائه شود.")
+                score += 1.5
+            elif any(k in s22_lower for k in ["g*power", "gpower", "تحلیل توان", "تحلیل مستقل توان"]):
+                strengths.append("تفکیک دقیق معادله تخصیص منابع مید از تحلیل مستقل توان آماری ANOVA فاکتوریل (G*Power) رعایت شده است.")
 
         if has_ttest_formula and claims_n3 and not has_mead_or_factorial:
             critical_flaws.append("BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION: تناقض محاسباتی در حجم نمونه؛ فرمول مقایسه دو میانگین مستقل عدد n~7 تولید می‌کند، در حالی که ادعای n=3 شده است. در طرح‌های فاکتوریل سلولی الزاما باید از معادله تخصیص منابع مید (Mead: E=N-B-T) یا تحلیل توان اثر متقابل ANOVA فاکتوریل استفاده شود.")
@@ -352,7 +439,7 @@ class MockGrantReviewPanel:
             weaknesses.append("بخش حجم نمونه نیازمند ارائه فرمول مشخص و تفکیک تکرارهای بیولوژیک و تکنیکال است.")
             score += 1.0
 
-        # 6. Section 23: Statistical Analysis & Factorial Interaction
+        # 10. Section 23: Statistical Analysis & Factorial Interaction
         s23 = sections.get(23, "")
         s23_lower = s23.lower()
         if any(stat in s23_lower for stat in ["anova", "t-test", "معناداری", "نرمال", "compusyn", "spss", "p-value", "p<"]):

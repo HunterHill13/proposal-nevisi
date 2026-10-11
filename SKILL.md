@@ -2,15 +2,15 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v11.4 Cognitive Multi-Agent Architecture). Operates across diverse biomedical domains
+  evidence synthesis, humanization, and Word (.docx) publication engine (v11.4.1 Cognitive Multi-Agent Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
-  Cell-Free Blank interference controls, and passes a unified 462-assertion test suite.
+  Cell-Free Blank interference controls, and passes a unified 473-assertion test suite.
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.4)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.4.1)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)

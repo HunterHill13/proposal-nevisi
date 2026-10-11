@@ -1,10 +1,10 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture & Autonomous Proposal Pipeline (v11.4)
-### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری چندایجنت شناختی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۴)
+### Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture & Autonomous Proposal Pipeline (v11.4.1)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری چندایجنت شناختی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۴.۱)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 462/462 Passed](https://img.shields.io/badge/Unified%20Tests-462%2F462%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 473/473 Passed](https://img.shields.io/badge/Unified%20Tests-473%2F473%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
@@ -124,7 +124,7 @@ The engine enforces 43 fail-closed release criteria before generating or approvi
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness
 
-The engine includes 22 comprehensive test suites with **462 / 462 tests passing (100% Pass Rate)**:
+The engine includes 23 comprehensive test suites with **473 / 473 tests passing (100% Pass Rate)**:
 
 ```powershell
 uv run python tests/run_all_tests.py

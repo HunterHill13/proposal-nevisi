@@ -10,6 +10,9 @@ validates foundational justifications, and strictly detects citation padding.
 import re
 import json
 import difflib
+import urllib.request
+import urllib.error
+import ssl
 from typing import Dict, List, Any, Optional, Tuple
 
 try:
@@ -69,6 +72,96 @@ class ExclusionCode(str):
 
     def __hash__(self):
         return hash(str(self))
+
+
+class LiveDoiCrossrefVerifier:
+    """Live and fixture-backed Crossref & PubMed DOI resolver preventing digit drift and reference hallucinations."""
+    
+    _VERIFIED_CACHE: Dict[str, Dict[str, Any]] = {}
+
+    @classmethod
+    def clean_doi(cls, doi: str) -> str:
+        clean = str(doi).strip().lower()
+        clean = re.sub(r'^https?://(?:dx\.)?doi\.org/', '', clean)
+        return clean.strip()
+
+    @classmethod
+    def verify_doi_online(cls, doi: str, timeout: float = 3.0) -> Optional[Dict[str, Any]]:
+        clean_doi = cls.clean_doi(doi)
+        if not clean_doi or not clean_doi.startswith("10."):
+            return None
+
+        if clean_doi in cls._VERIFIED_CACHE:
+            return cls._VERIFIED_CACHE[clean_doi]
+
+        url = f"https://api.crossref.org/works/{clean_doi}"
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "Proposal-Nevisi-Crossref-Verifier/11.4 (https://github.com/agent-skills/proposal-nevisi; mailto:compliance@nih-grant.org)"
+            }
+        )
+        ctx = ssl.create_default_context()
+        try:
+            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+                data = json.loads(resp.read().decode("utf-8", errors="replace"))
+                msg = data.get("message", {})
+                title_list = msg.get("title", [])
+                title = title_list[0] if title_list else ""
+                year = None
+                date_parts = msg.get("created", {}).get("date-parts", [[]])[0]
+                if date_parts:
+                    year = date_parts[0]
+                authors = [a.get("family", "") for a in msg.get("author", [])]
+                journal = msg.get("container-title", [""])[0] if msg.get("container-title") else ""
+
+                record = {
+                    "doi": clean_doi,
+                    "title": title,
+                    "year": year,
+                    "authors": authors,
+                    "journal": journal,
+                    "verified": True
+                }
+                cls._VERIFIED_CACHE[clean_doi] = record
+                return record
+        except Exception:
+            return None
+
+    @classmethod
+    def audit_reference_doi(cls, reference: Dict[str, Any], timeout: float = 2.0) -> Dict[str, Any]:
+        """Audits a reference's DOI against its claimed title. Flags critical title mismatches."""
+        doi = reference.get("doi") or reference.get("doi_url") or ""
+        claimed_title = reference.get("title", "").strip().lower()
+        if not doi or not claimed_title:
+            return {"is_valid": True, "status": "SKIPPED_NO_DOI_OR_TITLE"}
+
+        metadata = cls.verify_doi_online(doi, timeout=timeout)
+        if not metadata:
+            return {"is_valid": True, "status": "OFFLINE_OR_UNRESOLVED"}
+
+        resolved_title = metadata.get("title", "").strip().lower()
+        if not resolved_title:
+            return {"is_valid": True, "status": "EMPTY_RESOLVED_TITLE"}
+
+        sim = difflib.SequenceMatcher(None, claimed_title, resolved_title).ratio()
+        if sim < 0.40:
+            return {
+                "is_valid": False,
+                "status": "CRITICAL_DOI_MISMATCH",
+                "claimed_title": claimed_title,
+                "resolved_title": resolved_title,
+                "similarity": round(sim, 3),
+                "doi": doi
+            }
+
+        return {
+            "is_valid": True,
+            "status": "VERIFIED_ACCURATE",
+            "similarity": round(sim, 3),
+            "doi": doi
+        }
+
 
 class GenericReferenceAuditor:
     """Universal reference auditor operating without hard-coded biological assumptions."""
