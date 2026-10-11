@@ -351,6 +351,69 @@ class TestV114AdversarialImmunization(unittest.TestCase):
         self.assertNotIn("۲۰۲۲", ref_lines[0])
         self.assertNotIn("آپوپتوز (Apoptosis) (Apoptosis)", md_linted)
 
+    def test_13_non_lung_cancer_organ_globocan_and_pipeline_alignment(self):
+        """Pillar 13: Verifies organ-specific GLOBOCAN 2022 stats, quantitative Sec 3 extraction, Sec 11 variables, and Sec 15/22 alignment on non-lung topics."""
+        from run_research_pipeline import MasterResearchPipeline
+
+        pipe = MasterResearchPipeline(
+            topic="بررسی اثر هم‌افزایی متفورمین و رسوراترول بر آپوپتوز سلول‌های سرطان پستان",
+            study_family="in_vitro"
+        )
+        problem_model = pipe.build_research_problem_model()
+        data = {
+            "title_fa": pipe.topic,
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "studies": [
+                {
+                    "pmid": "38111111",
+                    "doi": "10.1000/bc.2024.1",
+                    "title": "Synergistic effect of metformin and resveratrol in breast carcinoma cells",
+                    "authors": ["Alavi S", "Navaei M"],
+                    "year": 2024,
+                    "journal": "Breast Cancer Res",
+                    "abstract": "Co-treatment induced apoptosis in breast carcinoma cells with IC50 = 14.5 uM and p < 0.01.",
+                    "verified": True,
+                    "is_full_text": True
+                },
+                {
+                    "pmid": "16807400",
+                    "doi": "10.1124/pr.58.3.10",
+                    "title": "Theoretical basis, experimental design, and computerized simulation of synergism and antagonism in drug combination studies",
+                    "authors": ["Chou TC"],
+                    "year": 2006,
+                    "journal": "Pharmacol Rev",
+                    "abstract": "Median-effect equation and combination index CI method.",
+                    "verified": True,
+                    "is_full_text": True
+                }
+            ],
+            "research_problem_model": problem_model
+        }
+        md = ProposalGenerator.assemble_pajooheshyar_28(data)
+        secs = MockGrantReviewPanel.parse_proposal_sections(md)
+
+        # 1. Breast cancer GLOBOCAN 2022 statistics (2,296,840 cases / 666,103 deaths), NOT Lung (2,480,301)
+        self.assertIn("۲,۲۹۶,۸۴۰", secs[2])
+        self.assertIn("۶۶۶,۱۰۳", secs[2])
+        self.assertNotIn("۲,۴۸۰,۳۰۱", secs[2])
+
+        # 2. Quantitative IC50 extracted from abstract into Section 3
+        self.assertIn("14.5 uM", secs[3])
+
+        # 3. Section 11 has both Independent and Dependent variable rows
+        self.assertIn("| مستقل |", secs[11])
+        self.assertIn("| وابسته |", secs[11])
+
+        # 4. Section 15 does not leak lung-specific p53-null or F-12K
+        self.assertNotIn("p53-null", secs[15])
+        self.assertNotIn("F-12K", secs[15])
+
+        # 5. Section 22 has exact G*Power noncentrality lambda = 10.1 and passes MockGrantReviewPanel
+        self.assertIn("10.1", secs[22])
+        panel_res = MockGrantReviewPanel.conduct_panel_review(md)
+        self.assertEqual(panel_res.critical_flaws_count, 0)
+        self.assertTrue(panel_res.can_proceed)
+
 
 if __name__ == "__main__":
     unittest.main()

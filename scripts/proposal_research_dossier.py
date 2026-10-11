@@ -150,7 +150,11 @@ class ProposalResearchDossier:
         grade: str = "High",
         abstract_only_justification: Optional[str] = None,
         evidence_applicability_tier: str = "TIER_1_DIRECT_EVIDENCE",
-        user_approved: bool = False
+        user_approved: bool = False,
+        journal: str = "",
+        abstract: str = "",
+        review_paragraph: Optional[str] = None,
+        extra_metadata: Optional[Dict[str, Any]] = None
     ) -> None:
         """Adds a verified scientific reference with verbatim grounded passages.
         If is_full_text is False, tracks abstract-only tags and mandatory explicit justifications.
@@ -164,20 +168,32 @@ class ProposalResearchDossier:
             if limitation_entry not in self.limitations_and_boundaries:
                 self.limitations_and_boundaries.append(limitation_entry)
 
-        self.literature_evidence.append({
-            "pmid": pmid.strip(),
-            "doi": doi.strip(),
-            "title": title.strip(),
+        entry = {
+            "pmid": str(pmid or "").strip(),
+            "doi": str(doi or "").strip(),
+            "title": str(title or "").strip(),
             "authors": authors,
             "year": year,
+            "journal": str(journal or "").strip(),
+            "abstract": str(abstract or "").strip(),
             "is_full_text": is_full_text,
+            "has_full_text": is_full_text,
+            "tier": "TIER_A_FULL_TEXT_GROUNDED" if is_full_text else "TIER_B_ABSTRACT_ONLY",
             "verified": verified,
+            "is_verified": verified,
             "passages": passages or [],
             "grade": grade,
             "evidence_applicability_tier": evidence_applicability_tier,
             "abstract_only_justification": abstract_only_justification.strip() if abstract_only_justification else None,
             "user_approved": user_approved
-        })
+        }
+        if review_paragraph:
+            entry["review_paragraph"] = review_paragraph
+        if isinstance(extra_metadata, dict):
+            for k, v in extra_metadata.items():
+                if k not in entry and v is not None:
+                    entry[k] = v
+        self.literature_evidence.append(entry)
 
     def add_contradictory_finding(
         self,

@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 477/477 Passed](https://img.shields.io/badge/Unified%20Tests-477%2F477%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 479/479 Passed](https://img.shields.io/badge/Unified%20Tests-479%2F479%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
@@ -21,9 +21,9 @@
 <a name="english"></a>
 ## English Documentation (v11.4.1)
 
-**Proposal-Nevisi (v11.4.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.4.1 introduces the Cognitive Multi-Agent Architecture, Closed-Loop Iterative Critic-Refine Remediation Engine, and 10-Pillar Adversarial Review Immunization**.
+**Proposal-Nevisi (v11.4.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.4.1 introduces the Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
 
-It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, DOI digit drift, biostatistical conflation, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and adversarial mock grant peer review.
+It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
 ---
 
@@ -31,52 +31,49 @@ It completely eliminates AI literature hallucination, Frankenstein/chimera metho
 
 ```mermaid
 flowchart TD
-    subgraph InputStage ["۱. ورودی و مدل‌سازی موضوع (Input & Topic Modeling)"]
+    subgraph Stage1 ["۱. مرحله اول: ساب‌ایجنت‌های تخصصی پیش از نگارش (Stage 1: Pre-Draft Subagents)"]
         A["کاربر: عنوان پژوهش به فارسی + کلیدواژه‌های انگلیسی"] --> B["MeSHQueryExpander<br>• نگاشت به سرعنوان‌های MeSH<br>• فیلتر ۱۰۰٪ کاراکترهای غیرلاتین"]
-        B --> C["فراخوانی همزمان ۳ ساب‌ایجنت شناختی (Native Subagents)"]
+        B --> S1["ساب‌ایجنت ارزیابی شواهد (Evidence Appraisal)<br>• استخراج مقالات زنده PubMed/PMC<br>• آمار اختصاصی ارگان هدف در GLOBOCAN 2022<br>• استخراج مقادیر کمی (IC50, p-value)"]
+        B --> S2["ساب‌ایجنت متدولوژی ضد کیمرا (Methodology & Anti-Chimera)<br>• پروفایل ژنتیکی و محیط کشت ATCC اختصاصی مدل<br>• جدول متغیرهای بخش ۱۱ (مستقل/وابسته/کنترل)<br>• همگام‌سازی حجم نمونه N=30 با G*Power"]
+        S1 & S2 --> SPEC["تولید فایل مشخصات اختصاصی طرح<br>PROPOSAL_SPEC.json (--spec-file)"]
     end
 
-    subgraph Subagents ["۲. ساب‌ایجنت‌های شناختی (Cognitive Subagents)"]
-        C --> S1["ساب‌ایجنت ارزیابی شواهد<br>(Evidence Appraisal)<br>تفکیک شواهد مستقیم از موازی"]
-        C --> S2["ساب‌ایجنت متدولوژی ضد کیمرا<br>(Methodology & Anti-Chimera)<br>پروتکل یکپارچه OECD GCCP"]
-        C --> S3["داور گرنت خصمانه<br>(Adversarial Mock Grant Reviewer)<br>امتیازدهی ۱ تا ۹ NIH و ممیزی نشت"]
-    end
-
-    subgraph InnerLoop ["۳. حلقه بهینه‌سازی درونی: استخراج و پلمپ شواهد (Inner Loop)"]
-        S1 & S2 & S3 --> D["ScientificSearchAdapter (جستجوی فدرال برخط)"]
+    subgraph InnerLoop ["۲. حلقه بهینه‌سازی درونی: استخراج و پلمپ شواهد (Inner Loop)"]
+        SPEC --> D["ScientificSearchAdapter (جستجوی فدرال برخط)"]
         D --> D1["NCBI PubMed (E-Search, E-Summary, E-Fetch XML)"]
         D --> D2["Europe PMC REST API"]
         D1 & D2 --> E["FullTextRetrievalEngine (واکشی متن کامل JATS XML)"]
         E --> F["LiveDoiCrossrefVerifier (ممیزی برخط DOI در Crossref)"]
-        F --> G["استخراج گزیده‌های متنی موثق (Passage Grounding)"]
+        F --> G["استخراج گزیده‌های متنی و شاخص‌های کمی (Quantitative Grounding)"]
         G --> H["پلمپ تغییرناپذیر پرونده پژوهش<br>PROPOSAL_RESEARCH_DOSSIER.json / .md<br>(ARA Seal Level 2 - ممیزی ۶ بعدی)"]
     end
 
-    subgraph OuterLoop ["۴. حلقه نگارش بیرونی: تدوین ۲۸ بخش پژوهشیار (Outer Loop)"]
+    subgraph OuterLoop ["۳. حلقه نگارش بیرونی: تدوین ۲۸ بخش پژوهشیار (Outer Loop)"]
         H --> I["ProposalGenerator (موتور تدوین ۲۸ بخشی)"]
-        I --> J1["بخش ۲: بیان مسئله + آمار دقیق GLOBOCAN 2022/2024"]
-        I --> J2["بخش ۳: مرور منابع + سنتز ۱۰۰٪ فارسی (عدم نشت انگلیسی)"]
-        I --> J3["بخش ۱۵: شناسنامه سلولی ATCC + ناهمگونی ژنتیکی (KRAS/p53)"]
-        I --> J4["بخش ۲۲: حجم نمونه معادله مید (B=2, E=19) + توان فاکتوریل G*Power"]
-        I --> J5["بخش ۲۷: پروتکل دو فازی چو-تالالای + کنترل‌های بلانک تداخل نوری"]
+        I --> J1["بخش ۲: بیان مسئله + آمار GLOBOCAN 2022 اختصاصی ارگان هدف"]
+        I --> J2["بخش ۳: مرور منابع + شاخص‌های کمی اختصاصی هر مقاله + جدول ToxRTool فارسی"]
+        I --> J3["بخش ۱۱ و ۱۵: جدول کامل متغیرها + شناسنامه ژنتیکی و محیط کشت اختصاصی"]
+        I --> J4["بخش ۲۲: حجم نمونه همگام (N=30, B=2, E=19) + پارامتر غیرمرکزی λ=10.1 در G*Power"]
+        I --> J5["بخش ۲۷ و ۲۸: پروتکل دو فازی چو-تالالای + منابع انگلیسی با ارقام استاندارد"]
     end
 
-    subgraph RemediationLoop ["۵. چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine)"]
+    subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح پیوسته (Symbolic Critic-Refine)"]
         J1 & J2 & J3 & J4 & J5 --> R1["MockGrantReviewPanel (داوری گرنت NIH 1-9)"]
         R1 --> R2{"آیا نیاز به اصلاح دارد؟<br>(Flaws > 0 یا نمره > 2.0)"}
         R2 -- "بله (ایراد بحرانی)" --> R3["IterativeRemediationEngine<br>• پچ جراحی بخش هدف (Surgical Patcher)<br>• اصلاح تا ۵ راند پیوسته"]
         R3 --> R1
-        R2 -- "خیر (اجماع کامل)" --> R4["تایید قطعی (APPROVED_FUNDABLE)<br>ثبت در REVISION_AUDIT_TRAIL.md"]
+        R2 -- "خیر (اجماع کامل)" --> DRAFT["تولید پیش‌نویس کامل ۲۸ بخشی<br>proposal.md"]
     end
 
-    subgraph Validation ["۶. هیئت ممیزی و گیت‌های کنترل کیفیت (Quality Gates)"]
-        R4 --> K1["PreEmptiveRiskOfBiasMitigator (ToxRTool / RoB-2)"]
-        R4 --> K2["EquatorComplianceAuditor (MIQE / ARRIVE / GCCP)"]
-        R4 --> K3["NativeOmmlMathEngine (تبدیل بومی OMML برای ورد)"]
-        K1 & K2 & K3 --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
+    subgraph Stage2 ["۵. مرحله دوم: داور کور پس از تولید درفت (Stage 2: Post-Draft Blind Reviewer)"]
+        DRAFT --> BLIND["ساب‌ایجنت داور کور گرنت (Post-Draft Blind Adversarial Reviewer)<br>• مطالعه خط‌به‌خط فایل واقعی proposal.md<br>• ممیزی تطابق بیولوژیک، اپیدمیولوژیک و آماری بین ۲۸ بخش"]
+        BLIND --> BCHECK{"تایید داور کور؟<br>(0 خطای علمی/منطقی)"}
+        BCHECK -- "خیر (کشف خطای معنایی)" --> BPATCH["اصلاح PROPOSAL_SPEC.json و بازتولید"]
+        BPATCH --> I
+        BCHECK -- "بله (APPROVED_FUNDABLE)" --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
     end
 
-    subgraph Artifacts ["۷. اسناد نهایی تولیدشده (Final Output Artifacts)"]
+    subgraph Artifacts ["۶. اسناد نهایی تولیدشده (Final Output Artifacts)"]
         L --> M1["proposal.docx (سند ورد با فرمول‌های بومی OMML)"]
         L --> M2["proposal.md (متن کامل ۲۸ بخشی)"]
         L --> M3["PROPOSAL_RESEARCH_DOSSIER (پلمپ پرونده شواهد)"]

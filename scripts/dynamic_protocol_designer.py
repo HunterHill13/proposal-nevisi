@@ -77,6 +77,8 @@ class DynamicProtocolDesigner:
 
         # 1. Independent Variables (Interventions)
         interventions = model_dict.get("interventions_or_exposures") or model_dict.get("interventions", [])
+        if not interventions:
+            interventions = [{"name": "مداخله اصلی پژوهش"}]
         for agt in interventions:
             name = agt.get("name", "مداخله پژوهش") if isinstance(agt, dict) else str(agt)
             variables.append({
@@ -90,6 +92,11 @@ class DynamicProtocolDesigner:
 
         # 2. Dependent Variables (Primary Outcomes)
         outcomes = model_dict.get("primary_outcomes") or model_dict.get("outcomes", [])
+        if not outcomes:
+            outcomes = [
+                {"name": "بقای سلولی و سمیت دارویی (IC50)", "measurement_unit": "درصد (%) و میکرومولار"},
+                {"name": "نرخ مرگ برنامه‌ریزی‌شده سلولی (آپوپتوز)", "measurement_unit": "درصد سلول‌های Annexin-V مثبت"}
+            ]
         for out in outcomes:
             name = out.get("name", "پیامد اولیه") if isinstance(out, dict) else str(out)
             unit = out.get("measurement_unit", "درصد مهار") if isinstance(out, dict) else "درصد مهار"

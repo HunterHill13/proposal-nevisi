@@ -2962,7 +2962,7 @@ class FullTextRetrievalEngine:
 
         for s in studies:
             t = s.get("tier")
-            has_ft = (t == "TIER_A_FULL_TEXT_GROUNDED" or (t is None and s.get("has_full_text") is True))
+            has_ft = (t == "TIER_A_FULL_TEXT_GROUNDED" or (t is None and (s.get("has_full_text") is True or s.get("is_full_text") is True)))
             if has_ft:
                 tier_a.append(s)
             else:

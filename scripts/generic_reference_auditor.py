@@ -3029,8 +3029,43 @@ class CanonicalPaperEvidenceRecord:
         elif isinstance(raw_quants, dict):
             quant_list.append(raw_quants)
 
+        if not quant_list:
+            abstract_or_passages = str(paper_record.get("abstract", "")) + " " + " ".join(
+                str(p) for p in (paper_record.get("passages") or paper_record.get("grounding_passages") or [])
+            )
+            extracted_metrics = re.findall(
+                r'(?:IC50\s*[=:≈]?\s*\d+(?:\.\d+)?\s*(?:μM|uM|mM|nM|μg/mL|ug/mL)|'
+                r'CI\s*[<≤=]\s*\d+(?:\.\d+)?|'
+                r'\b\d+(?:\.\d+)?\s*(?:%|μM|uM|mM|nM|mg/kg|μg/mL|ug/mL)\b|'
+                r'p\s*[<≤=]\s*0\.\d+)',
+                abstract_or_passages,
+                flags=re.IGNORECASE
+            )
+            seen_metrics = []
+            for m_str in extracted_metrics:
+                m_clean = m_str.strip()
+                if m_clean and m_clean not in seen_metrics:
+                    seen_metrics.append(m_clean)
+                if len(seen_metrics) >= 3:
+                    break
+            for m_clean in seen_metrics:
+                quant_list.append({
+                    "metric": "شاخص کمی گزارش‌شده",
+                    "value": m_clean,
+                    "unit": "",
+                    "numeric_status": "DIRECTLY_REPORTED",
+                    "source_location": "Abstract",
+                    "uncertainty_or_ci": None,
+                    "p_value": None
+                })
+
         # 9. Qualitative results
-        findings = paper_record.get("primary_findings") or paper_record.get("observed_qualitative_effect") or paper_record.get("title", "")
+        findings = (
+            paper_record.get("primary_findings")
+            or paper_record.get("observed_qualitative_effect")
+            or paper_record.get("abstract")
+            or paper_record.get("title", "")
+        )
         qualitative_obj = {
             "summary": str(findings),
             "source_location": paper_record.get("findings_location", "Abstract"),

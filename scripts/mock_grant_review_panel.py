@@ -196,10 +196,19 @@ class MockGrantReviewPanel:
             weaknesses.append("OUTDATED_EPIDEMIOLOGY: آمار ابتلا به سرطان بر پایه گزارش قدیمی GLOBOCAN 2020 درج شده است. بر اساس آخرین گزارش رسمی IARC GLOBOCAN 2022 (منتشرشده در 2024 در CA: A Cancer Journal for Clinicians توسط Bray و همکاران)، آمار جهانی سالانه ۲.۴۸ میلیون مورد جدید (دقیقاً ۲,۴۸۰,۳۰۱ مورد جدید معادل ۱۲.۴٪ کل) و ۱.۸۱ میلیون مرگ (دقیقاً ۱,۸۱۷,۱۷۲ مرگ) است.")
             score += 0.6
         elif "globocan" in s2_lower:
-            if any(k in s2 for k in ["۲.۴۸", "2.48", "۲,۴۸۰,۳۰۱"]):
+            valid_globocan_2022_markers = [
+                "۲.۴۸", "2.48", "۲,۴۸۰,۳۰۱",  # Trachea, bronchus and lung
+                "۲.۳۰", "2.30", "۲,۲۹۶,۸۴۰",  # Female breast
+                "۱.۹۳", "1.93", "۱,۹۲۶,۴۲۵",  # Colorectum
+                "۱.۴۷", "1.47", "۱,۴۶۷,۸۵۴",  # Prostate
+                "۹۶۸,۷۸۴", "۶۶۰,۱۷۵",          # Stomach
+                "۸۶۶,۱۳۶", "۷۵۸,۷۲۵",          # Liver
+                "۱۹,۹۷۶,۴۹۹", "۹,۷۴۳,۸۳۲", "۲۰ میلیون", "20 million"  # All cancers combined
+            ]
+            if any(k in s2 for k in valid_globocan_2022_markers):
                 strengths.append("آمار اپیدمیولوژیک با دقت عددی کامل از آخرین گزارش رسمی GLOBOCAN 2022 (Bray et al. 2024) استخراج گردیده است.")
             else:
-                weaknesses.append("GLOBOCAN_CASE_DEATH_CHECKSUM_ERROR: در استناد به گزارش GLOBOCAN، ارقام دقیق گزارش رسمی ۲۰۲۲ (۲,۴۸۰,۳۰۱ مورد جدید و ۱,۸۱۷,۱۷۲ مرگ) درج نشده است.")
+                weaknesses.append("GLOBOCAN_CASE_DEATH_CHECKSUM_ERROR: در استناد به گزارش GLOBOCAN، ارقام دقیق گزارش رسمی ۲۰۲۲ (Bray et al., 2024) متناسب با ارگان هدف درج نشده است.")
                 score += 0.5
 
         # Section 2 Audit: Unsubstantiated Novelty Claim without Negative Search Log
@@ -225,7 +234,7 @@ class MockGrantReviewPanel:
 
         # Section 3 Semantic Drift / Cross-Model Overgeneralization Audit
         s1 = sections.get(1, "")
-        if any(cancer in s1 for cancer in ["ریه", "نئوپلاسم", "تومور", "سرطان"]) and any(other in s3 for other in ["پستان", "ido1", "ماکروفاژ"]):
+        if any(cancer in s1 for cancer in ["ریه", "نئوپلاسم", "تومور", "سرطان"]) and "پستان" not in s1 and any(other in s3 for other in ["پستان", "ido1", "ماکروفاژ"]):
             # Check if text acknowledges the distinct model or falsely extrapolates
             if not any(ack in s3 for ack in ["مدل دیگر", "مبنای نظری", "شاهد کمکی", "شاهد موازی", "مدل تجربی دیگر"]):
                 critical_flaws.append("SEMANTIC_DRIFT_CROSS_MODEL_OVERGENERALIZATION: انتساب غیرمستند نتایج مطالعات سایر بافت‌ها/بیماری‌ها به مدل اختصاصی طرح؛ شواهد به دست آمده از سایر سیستم‌ها باید صراحتاً به عنوان مبنای نظری و موازی معرفی شوند نه اثبات تجربی مستقیم بر روی مدل هدف.")
@@ -264,7 +273,7 @@ class MockGrantReviewPanel:
 
         # Section 9: Hypotheses
         s9 = sections.get(9, "")
-        if "فرضیه" in s9 or "آیا" in s9 or "هم‌افزایی" in s9 or "synerg" in s9.lower():
+        if any(k in s9 for k in ["فرضیه", "فرضیات", "آیا", "هم‌افزایی"]) or "synerg" in s9.lower():
             strengths.append("فرضیات و سوالات پژوهش آزمون‌پذیر و متناظر با پرسش مرکزی طرح صورت‌بندی شده‌اند.")
         else:
             critical_flaws.append("بخش فرضیات فاقد گزاره‌های دقیق آزمون‌پذیر یا سوالات کمی پژوهش است.")
@@ -359,6 +368,11 @@ class MockGrantReviewPanel:
                 score += 0.6
         else:
             strengths.append("تناظر معنایی و یکپارچگی بین اهداف اختصاصی، جدول متغیرها و آزمون‌های آزمایشگاهی ۱۰۰٪ برقرار است.")
+
+        s11 = sections.get(11, "")
+        if s11 and (("| مستقل |" not in s11 and "متغیر مستقل" not in s11) or ("| وابسته |" not in s11 and "متغیر وابسته" not in s11)):
+            critical_flaws.append("EMPTY_VARIABLE_TABLE: جدول متغیرهای بخش ۱۱ فاقد تعریف صریح متغیرهای مستقل و وابسته است.")
+            score += 1.5
 
         # 2. Controls and Assay Interference (AssayInterferencePolicy)
         methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
