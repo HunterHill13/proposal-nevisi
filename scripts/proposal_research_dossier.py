@@ -67,7 +67,14 @@ class ProposalResearchDossier:
         self.literature_rob_evaluations: List[Dict[str, Any]] = []
         self.contradictory_evidence: List[Dict[str, Any]] = []
         self.limitations_and_boundaries: List[str] = []
+        self.negative_search_strategy: Optional[str] = None
         self.audit_report: Optional[Dict[str, Any]] = None
+
+    def set_negative_search_strategy(self, query_log: str) -> None:
+        """Sets the formal negative search strategy and zero hits verification log."""
+        if self.is_sealed:
+            raise RuntimeError("Cannot modify a sealed research dossier.")
+        self.negative_search_strategy = query_log.strip()
 
     def audit_baseline_literature_quality(self) -> List[Dict[str, Any]]:
         """Audits the Risk of Bias for all cited foundation papers using BaselinePaperQualityAuditor."""
@@ -142,6 +149,7 @@ class ProposalResearchDossier:
         passages: Optional[List[str]] = None,
         grade: str = "High",
         abstract_only_justification: Optional[str] = None,
+        evidence_applicability_tier: str = "TIER_1_DIRECT_EVIDENCE",
         user_approved: bool = False
     ) -> None:
         """Adds a verified scientific reference with verbatim grounded passages.
@@ -166,6 +174,7 @@ class ProposalResearchDossier:
             "verified": verified,
             "passages": passages or [],
             "grade": grade,
+            "evidence_applicability_tier": evidence_applicability_tier,
             "abstract_only_justification": abstract_only_justification.strip() if abstract_only_justification else None,
             "user_approved": user_approved
         })
@@ -231,6 +240,7 @@ class ProposalResearchDossier:
             "literature_rob_evaluations": self.literature_rob_evaluations,
             "contradictory_evidence": self.contradictory_evidence,
             "limitations_and_boundaries": self.limitations_and_boundaries,
+            "negative_search_strategy": self.negative_search_strategy,
             "audit_report": self.audit_report
         }
 

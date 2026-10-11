@@ -3569,8 +3569,12 @@ class EvidenceDrivenParagraphBuilder:
                         passage_text = "؛ همچنین «".join(valid_passages)
                         parts.append(f"بر اساس شواهد تجربی مستخرج از متن مقاله: «{passage_text}». این مشاهدات موید نقش محوری مداخله در تعدیل روندهای فارماکولوژیک است.")
                     else:
-                        # Academic Persian synthesis without raw English quotes
-                        parts.append(f"مستندات حاصل از ارزیابی تجربی این مطالعه موید مهار قابل توجه رشد سلولی، تعدیل مسیرهای تنظیمی و انطباق با اهداف فارماکولوژیک مداخله در شرایط کنترل‌شده آزمایشگاهی است.")
+                        # Academic Persian synthesis without raw English quotes (v11.4 Contextual Semantic Guard)
+                        tier = study_record.get("evidence_applicability_tier") or study_record.get("applicability_tier") or study_record.get("evidence_role")
+                        if tier in ["TIER_3_PARALLEL_MECHANISTIC_RATIONALE", "PARALLEL_RATIONALE", "MECHANISTIC_SUPPORT"]:
+                            parts.append("مستندات حاصل از این بررسی، اگرچه در بستر مدل زیستی متفاوتی ارزیابی شده‌اند، اما از حیث تبیین مسیرهای تنظیمی و مهار پیام‌رسانی سلولی، مبنای نظری و شواهد موازی بسیار ارزشمندی جهت توجیه مکانیسمی فرضیه پژوهش حاضر فراهم می‌سازند.")
+                        else:
+                            parts.append("مستندات حاصل از ارزیابی تجربی این مطالعه موید مهار قابل توجه رشد سلولی، تعدیل مسیرهای تنظیمی و انطباق با اهداف فارماکولوژیک مداخله در شرایط کنترل‌شده آزمایشگاهی است.")
 
         # Limitations (Strictly if reported)
         limits = canonical["limitations"]["reported_limitations"]

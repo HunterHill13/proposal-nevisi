@@ -320,6 +320,69 @@ class TestV113Enhancements(unittest.TestCase):
         self.assertIn("OECD_GCCP_CELL_CULTURE", guidelines)
         self.assertNotIn("ARRIVE_2_0_ANIMAL_STUDIES", guidelines, "In vitro study must NOT trigger ARRIVE 2.0 due to 'صورت' or 'مهارت'")
 
+    def test_methodology_research_subagent_derives_cohesive_protocol(self):
+        """Verifies MethodologyResearchSubagent derives cohesive, non-chimera protocols."""
+        from methodology_research_subagent import MethodologyResearchSubagent
+
+        res = MethodologyResearchSubagent.derive_cohesive_protocol(
+            topic="ارزیابی هم‌افزایی ترکیب داروی الف با داروی ب در رده‌های سلولی",
+            target_model="رده سلولی سرطان",
+            interventions=["داروی الف", "داروی ب"]
+        )
+        self.assertEqual(res.archetype, "IN_VITRO_CELLULAR_COMBINATION")
+        self.assertEqual(res.coherence_score, 1.0)
+        self.assertIn(22, res.formatted_sections_fa)
+        self.assertIn("Mead's Resource Equation", res.formatted_sections_fa[22])
+        self.assertIn("Two-Way", res.formatted_sections_fa[23])
+        self.assertIn("GAPDH و ACTB", res.formatted_sections_fa[23])
+        self.assertIn("Cell-Free Blank", res.formatted_sections_fa[27])
+
+    def test_methodology_research_subagent_detects_chimera_inconsistencies(self):
+        """Verifies detection of biostatistical formula contradiction and missing cell-free blank."""
+        from methodology_research_subagent import MethodologyResearchSubagent
+
+        incoherent_text = (
+            "## ۲۲. حجم نمونه\n"
+            r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$" + "\n"
+            "با ۳ تکرار n=3 برای هر گروه.\n\n"
+            "## ۲۷. روش اجرا\n"
+            "سنجش زیست‌پذیری سلول‌ها صرفاً با کیت MTT و کنترل حلال انجام می‌شود."
+        )
+        audit = MethodologyResearchSubagent.audit_chimera_inconsistencies(incoherent_text)
+        self.assertFalse(audit["is_cohesive"])
+        self.assertGreaterEqual(audit["findings_count"], 1)
+        self.assertTrue(any("BIOSTATISTICAL_CONTRADICTION" in f for f in audit["findings"]))
+        self.assertTrue(any("ASSAY_INTERFERENCE_DEFECT" in f for f in audit["findings"]))
+
+    def test_mock_grant_review_detects_contradictions(self):
+        """Verifies Reviewer 1 and Reviewer 2 adversarial detections."""
+        from mock_grant_review_panel import MockGrantReviewPanel
+
+        sections = {
+            1: "## ۱. موضوع\nبررسی مهار رده‌های سلولی سرطان",
+            2: "## ۲. بیان مسئله\n" + "بر اساس گزارش GLOBOCAN 2020 تعداد مبتلایان ۲.۲ میلیون نفر بوده است. ادعا می‌شود برای نخستین بار در دنیا این پژوهش انجام می‌گردد. " * 5,
+            3: "## ۳. مرور بر منابع\n" + "مطالعه Li 2026 روی موش‌های سرطان پستان با مهار IDO1 آپوپتوز را نشان داد. [1] " * 5,
+            6: "## ۶. اهداف\nبررسی سمیت و آپوپتوز",
+            11: "## ۱۱. متغیرها\nمتغیر مستقل و وابسته",
+            13: "## ۱۳. روش\nکشت سلولی با کنترل منفی",
+            22: "## ۲۲. حجم نمونه\n" + r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{d^2}$$" + "\nتعداد n=3 تکرار بیولوژیک.",
+            23: "## ۲۳. تحلیل داده\nتحلیل با آزمون ANOVA",
+            24: "## ۲۴. اخلاق\nکد اخلاق سازمانی رعایت گردید.",
+            25: "## ۲۵. ایمنی\nرعایت نکات ایمنی زیستی BSL-2.",
+            26: "## ۲۶. محدودیت\nمحدودیت‌های مطالعه.",
+            27: "## ۲۷. شیوه اجرا\nسنجش MTT و فلوسایتومتری آپوپتوز."
+        }
+        res = MockGrantReviewPanel.conduct_panel_review(sections)
+        # Should detect outdated epidemiology (2020) and unsubstantiated novelty claim
+        r1_eval = res.reviewer_evaluations["REVIEWER_1"]
+        self.assertTrue(any("OUTDATED_EPIDEMIOLOGY" in w for w in r1_eval["weaknesses"]))
+        self.assertTrue(any("UNSUBSTANTIATED_NOVELTY_CLAIM" in w for w in r1_eval["weaknesses"]))
+
+        # Should detect sample size contradiction in Reviewer 2
+        r2_eval = res.reviewer_evaluations["REVIEWER_2"]
+        self.assertTrue(any("BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION" in cf for cf in r2_eval["critical_flaws"]))
+        self.assertEqual(res.funding_verdict, "REVISION_REQUIRED")
+
 
 if __name__ == "__main__":
     unittest.main()

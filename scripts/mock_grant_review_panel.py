@@ -178,13 +178,34 @@ class MockGrantReviewPanel:
             critical_flaws.append("بیان مسئله فاقد عمق علمی کافی است (کمتر از ۲۰۰ کاراکتر).")
             score += 2.0
 
-        # Section 3: Literature Review
+        # Section 2 Audit: Outdated Epidemiology (GLOBOCAN 2020 vs 2022/2024)
+        s2_lower = s2.lower()
+        if ("2.2" in s2 and ("میلیون" in s2 or "million" in s2_lower)) or "globocan 2020" in s2_lower:
+            weaknesses.append("OUTDATED_EPIDEMIOLOGY: آمار ابتلا به سرطان بر پایه گزارش قدیمی GLOBOCAN 2020 درج شده است. بر اساس آخرین گزارش رسمی IARC GLOBOCAN 2022 (منتشرشده در 2024 در CA: A Cancer Journal for Clinicians)، آمار جهانی سالانه ۲.۴۸ میلیون مورد جدید (۱۲.۴٪ کل) و ۱.۸۱ میلیون مرگ است.")
+            score += 0.6
+
+        # Section 2 Audit: Unsubstantiated Novelty Claim without Negative Search Log
+        claims_novelty = any(k in s2 for k in ["اولین بار", "اولین مطالعه", "نخستین بار", "نخستین مطالعه", "هیچ مطالعه‌ای", "first-in-class", "برای نخستین"])
+        has_negative_log = any(k in s2.lower() for k in ["0 hit", "0 یافته", "صفر یافته", "mesh", "استراتژی جستجو", "بولین", "boolean", "کوئری"])
+        if claims_novelty and not has_negative_log:
+            weaknesses.append("UNSUBSTANTIATED_NOVELTY_CLAIM: ادعای نخستین مطالعه یا فقدان پیشینه قبلی فاقد استراتژی سرچ منفی مدون (Negative Boolean Query Log) و اثبات صفر نتیجه (0 Hits) در پایگاه‌های معتبر است.")
+            score += 0.5
+
+        # Section 3: Literature Review & Semantic Drift Audit
         s3 = sections.get(3, "")
         if len(s3) >= 800 and ("[" in s3 or "همکاران" in s3):
             strengths.append("مرور منابع غنی و ساختاریافته با استناد به مطالعات پیشین تنظیم شده است.")
         else:
             weaknesses.append("مرور منابع نیازمند تفکیک دقیق‌تر مطالعات و استنادات درون‌متنی مستقیم است.")
             score += 1.0
+
+        # Section 3 Semantic Drift / Cross-Model Overgeneralization Audit
+        s1 = sections.get(1, "")
+        if any(cancer in s1 for cancer in ["ریه", "نئوپلاسم", "تومور", "سرطان"]) and any(other in s3 for other in ["پستان", "ido1", "ماکروفاژ"]):
+            # Check if text acknowledges the distinct model or falsely extrapolates
+            if not any(ack in s3 for ack in ["مدل دیگر", "مبنای نظری", "شاهد کمکی", "شاهد موازی", "مدل تجربی دیگر"]):
+                critical_flaws.append("SEMANTIC_DRIFT_CROSS_MODEL_OVERGENERALIZATION: انتساب غیرمستند نتایج مطالعات سایر بافت‌ها/بیماری‌ها به مدل اختصاصی طرح؛ شواهد به دست آمده از سایر سیستم‌ها باید صراحتاً به عنوان مبنای نظری و موازی معرفی شوند نه اثبات تجربی مستقیم بر روی مدل هدف.")
+                score += 1.5
 
         # Section 4: Significance
         s4 = sections.get(4, "")
@@ -293,25 +314,51 @@ class MockGrantReviewPanel:
             strengths.append("تناظر معنایی و یکپارچگی بین اهداف اختصاصی، جدول متغیرها و آزمون‌های آزمایشگاهی ۱۰۰٪ برقرار است.")
 
         # 2. Controls and Assay Interference (AssayInterferencePolicy)
-        methods_text = f"{sections.get(13, '')} {sections.get(27, '')}".lower()
+        methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
         if "کنترل" in methods_text or "control" in methods_text:
             strengths.append("طراحی کنترل‌های آزمایشگاهی متناسب در متدولوژی لحاظ شده است.")
         else:
             critical_flaws.append("گروه‌های کنترل منفی، حلال یا شاهد در روش اجرا به صورت صریح تعریف نشده‌اند.")
             score += 1.5
 
-        # 3. Section 22: Sample Size
+        # 3. Assay Interference: Cell-Free Blank in MTT / CCK-8
+        if ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک", "بلانک", "کنترل"]):
+            critical_flaws.append("ASSAY_INTERFERENCE_DEFECT: عدم تعبیه کنترل در سنجش تترازولیوم؛ پلی‌ساکاریدها یا آنتی‌اکسیدان‌ها ممکن است مستقیماً نمک تترازولیوم را احیا کنند و سیتوتوکسیستی کاذب ایجاد نمایند.")
+            score += 1.2
+        elif ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک"]):
+            weaknesses.append("ASSAY_INTERFERENCE_ADVISORY: در سنجش‌های تترازولیوم، قید صریح کنترل بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر مستقیم احیای شیمیایی مواد بر نمک تترازولیوم الزامی است.")
+            score += 0.3
+
+        # 4. qPCR / Gene Expression Rigor (MIQE Dual Reference Gene Check)
+        if any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن"]):
+            has_dual_refs = any(k in methods_text for k in ["دو ژن مرجع", "gapdh و actb", "actb و gapdh", "حداقل دو ژن"]) or ("gapdh" in methods_text and ("actb" in methods_text or "actin" in methods_text))
+            if not has_dual_refs:
+                weaknesses.append("MIQE_COMPLIANCE_DEFECT: بر اساس راهنمای بین‌المللی MIQE، سنجش‌های RT-qPCR باید حداقل بر پایه دو ژن مرجع داخلی پایدار (نظیر GAPDH و ACTB) نرمال‌سازی شوند نه صرفاً یک تک‌ژن.")
+                score += 0.5
+
+        # 5. Section 22: Sample Size & Mathematical Coherence
         s22 = sections.get(22, "")
-        if ("n=" in s22.lower() or "تکرار" in s22 or "فرمول" in s22 or "توان" in s22) and len(s22) >= 200:
-            strengths.append("روش محاسبه حجم نمونه با قید تکرارها و منطق بیومتینیک تشریح گردیده است.")
+        s22_lower = s22.lower()
+        has_ttest_formula = bool(re.search(r'\\frac\{2\(z', s22_lower) or re.search(r'2\(z_\{?1-\\alpha', s22_lower))
+        claims_n3 = bool(re.search(r'n\s*=\s*3', s22_lower) or "۳ تکرار" in s22 or "3 biological" in s22_lower)
+        has_mead_or_factorial = bool("mead" in s22_lower or "resource equation" in s22_lower or "factorial" in s22_lower or "واریانس دوطرفه" in s22)
+
+        if has_ttest_formula and claims_n3 and not has_mead_or_factorial:
+            critical_flaws.append("BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION: تناقض محاسباتی در حجم نمونه؛ فرمول مقایسه دو میانگین مستقل عدد n~7 تولید می‌کند، در حالی که ادعای n=3 شده است. در طرح‌های فاکتوریل سلولی الزاما باید از معادله تخصیص منابع مید (Mead: E=N-B-T) یا تحلیل توان اثر متقابل ANOVA فاکتوریل استفاده شود.")
+            score += 1.5
+        elif ("n=" in s22_lower or "تکرار" in s22 or "فرمول" in s22 or "توان" in s22 or "mead" in s22_lower) and len(s22) >= 200:
+            strengths.append("روش محاسبه حجم نمونه با قید تکرارها و منطق بیواستاتیک مستند تشریح گردیده است.")
         else:
             weaknesses.append("بخش حجم نمونه نیازمند ارائه فرمول مشخص و تفکیک تکرارهای بیولوژیک و تکنیکال است.")
             score += 1.0
 
-        # 4. Section 23: Statistical Analysis
+        # 6. Section 23: Statistical Analysis & Factorial Interaction
         s23 = sections.get(23, "")
-        if any(stat in s23.lower() for stat in ["anova", "t-test", "معناداری", "نرمال", "compusyn", "spss", "p-value", "p<"]):
+        s23_lower = s23.lower()
+        if any(stat in s23_lower for stat in ["anova", "t-test", "معناداری", "نرمال", "compusyn", "spss", "p-value", "p<"]):
             strengths.append("آزمون‌های آماری، سطح معناداری و نرم‌افزار تحلیلی به درستی تعیین شده‌اند.")
+            if "فاکتوریل" in s23 or "two-way" in s23_lower or "برهم‌کنش" in s23 or "interaction" in s23_lower:
+                strengths.append("تحلیل اثر متقابل (Interaction Effect) با آزمون فاکتوریل به درستی پیش‌بینی شده است.")
         else:
             critical_flaws.append("روش تجزیه و تحلیل داده فاقد نام آزمون آماری مشخص (مانند ANOVA یا آزمون ناپارامتری) است.")
             score += 1.5
