@@ -44,9 +44,16 @@
 
 ---
 
+### Native Antigravity Subagent Orchestration
+
+When invoked within Antigravity or compatible agentic IDEs, the master agent spawns 3 parallel subagents in the Overview panel:
+1. **Evidence Appraisal Subagent (`research`)**: Deep critical reading of full-text papers, protecting against model drift.
+2. **Methodology & Anti-Chimera Subagent (`research`)**: Harmonized OECD GCCP cell culture protocols, cell-free blank interference controls, MIQE dual reference genes, and Mead's sample size equation.
+3. **Adversarial Mock Grant Reviewer (`research`)**: NIH 1–9 scoring, GLOBOCAN 2022/2024 epidemiology audit, and formal negative search verification.
+
 ### Quick Start / CLI Usage
 
-Run the master autonomous research pipeline with a single command:
+Run the master autonomous research pipeline:
 
 ```powershell
 uv run python scripts/run_research_pipeline.py --topic "Your Biomedical Research Topic in Persian" --keywords "Agent1, Agent2, Target Condition" --output-dir "./output"
