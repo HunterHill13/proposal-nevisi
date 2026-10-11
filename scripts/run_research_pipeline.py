@@ -532,6 +532,8 @@ class MasterResearchPipeline:
         print(f"▪ Proposal Markdown (28 Sections): {results['md_path']}")
         print(f"▪ Proposal Word Document (DOCX): {results['docx_path']}")
         print(f"▪ Mock Grant Review Panel: {results.get('mock_grant_review_md')}")
+        if results.get('revision_audit_trail_md'):
+            print(f"▪ Revision Audit Trail: {results.get('revision_audit_trail_md')}")
         print(f"▪ EQUATOR Compliance Audit: {results.get('equator_audit_md')}")
         print(f"▪ Risk of Bias Mitigation: {results.get('risk_of_bias_md')}")
         print("=" * 80 + "\n")

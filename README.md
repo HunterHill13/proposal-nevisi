@@ -4,11 +4,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 473/473 Passed](https://img.shields.io/badge/Unified%20Tests-473%2F473%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 477/477 Passed](https://img.shields.io/badge/Unified%20Tests-477%2F477%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
 [![Architecture: Cognitive Multi-Agent](https://img.shields.io/badge/Architecture-Cognitive%20Multi--Agent-blueviolet.svg)](#cognitive-multi-agent-architecture)
+[![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
 [![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
 
 ---
@@ -20,9 +21,9 @@
 <a name="english"></a>
 ## English Documentation (v11.4.1)
 
-**Proposal-Nevisi (v11.4.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.4.1 introduces the Cognitive Multi-Agent Architecture and 10-Pillar Adversarial Review Immunization**.
+**Proposal-Nevisi (v11.4.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.4.1 introduces the Cognitive Multi-Agent Architecture, Closed-Loop Iterative Critic-Refine Remediation Engine, and 10-Pillar Adversarial Review Immunization**.
 
-It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, DOI digit drift, biostatistical conflation, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, and adversarial mock grant peer review.
+It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, DOI digit drift, biostatistical conflation, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and adversarial mock grant peer review.
 
 ---
 
@@ -60,19 +61,26 @@ flowchart TD
         I --> J5["بخش ۲۷: پروتکل دو فازی چو-تالالای + کنترل‌های بلانک تداخل نوری"]
     end
 
-    subgraph Validation ["۵. هیئت ممیزی و گیت‌های کنترل کیفیت (Quality Gates)"]
-        J1 & J2 & J3 & J4 & J5 --> K1["MockGrantReviewPanel (داوری گرنت NIH 1-9)"]
-        J1 & J2 & J3 & J4 & J5 --> K2["PreEmptiveRiskOfBiasMitigator (ToxRTool / RoB-2)"]
-        J1 & J2 & J3 & J4 & J5 --> K3["EquatorComplianceAuditor (MIQE / ARRIVE / GCCP)"]
-        J1 & J2 & J3 & J4 & J5 --> K4["NativeOmmlMathEngine (تبدیل بومی OMML برای ورد)"]
-        K1 & K2 & K3 & K4 --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
+    subgraph RemediationLoop ["۵. چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine)"]
+        J1 & J2 & J3 & J4 & J5 --> R1["MockGrantReviewPanel (داوری گرنت NIH 1-9)"]
+        R1 --> R2{"آیا نیاز به اصلاح دارد؟<br>(Flaws > 0 یا نمره > 2.0)"}
+        R2 -- "بله (ایراد بحرانی)" --> R3["IterativeRemediationEngine<br>• پچ جراحی بخش هدف (Surgical Patcher)<br>• اصلاح تا ۵ راند پیوسته"]
+        R3 --> R1
+        R2 -- "خیر (اجماع کامل)" --> R4["تایید قطعی (APPROVED_FUNDABLE)<br>ثبت در REVISION_AUDIT_TRAIL.md"]
     end
 
-    subgraph Artifacts ["۶. اسناد نهایی تولیدشده (Final Output Artifacts)"]
+    subgraph Validation ["۶. هیئت ممیزی و گیت‌های کنترل کیفیت (Quality Gates)"]
+        R4 --> K1["PreEmptiveRiskOfBiasMitigator (ToxRTool / RoB-2)"]
+        R4 --> K2["EquatorComplianceAuditor (MIQE / ARRIVE / GCCP)"]
+        R4 --> K3["NativeOmmlMathEngine (تبدیل بومی OMML برای ورد)"]
+        K1 & K2 & K3 --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
+    end
+
+    subgraph Artifacts ["۷. اسناد نهایی تولیدشده (Final Output Artifacts)"]
         L --> M1["proposal.docx (سند ورد با فرمول‌های بومی OMML)"]
         L --> M2["proposal.md (متن کامل ۲۸ بخشی)"]
         L --> M3["PROPOSAL_RESEARCH_DOSSIER (پلمپ پرونده شواهد)"]
-        L --> M4["گزارش‌های ممیزی داوری گرنت و ریسک سوگیری"]
+        L --> M4["MOCK_GRANT_REVIEW & REVISION_AUDIT_TRAIL"]
     end
 ```
 
@@ -168,6 +176,7 @@ uv run python scripts/run_research_pipeline.py `
 - `proposal.md`: Complete 28-section Markdown proposal.
 - `PROPOSAL_RESEARCH_DOSSIER.json` & `.md`: Sealed immutable evidence records with full-text passages and audit logs.
 - `MOCK_GRANT_REVIEW_REPORT.md` & `.json`: Grant panel score and detailed critique.
+- `REVISION_AUDIT_TRAIL.md` & `.json`: Closed-loop iterative surgical remediation audit trail across all reviewer rounds.
 - `EQUATOR_COMPLIANCE_AUDIT.md` & `.json`: ARRIVE 2.0 / MIQE compliance scorecards.
 - `RISK_OF_BIAS_MITIGATION_REPORT.md` & `.json`: ToxRTool / NTP OHAT / RoB-2 domain assessments.
 
@@ -191,19 +200,20 @@ The engine enforces 43 fail-closed release criteria before approving proposals:
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness
 
-The engine includes 23 comprehensive test suites with **473 / 473 tests passing (100% Pass Rate)**:
+The engine includes 24 comprehensive test suites with **477 / 477 tests passing (100% Pass Rate)**:
 
 ```powershell
 uv run python tests/run_all_tests.py
 ```
 
-- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`)** - 41 tests verifying zero hardcoded entities.
+- **Suite 1: Static Analysis Hard-Code Leakage Audit (`test_hard_code_leakage.py`)** - 42 tests verifying zero hardcoded entities.
 - **Suite 2: Two-Loop Dossier & Master Pipeline Suite (`test_two_loop_dossier.py`)** - E2E verification of research dossier, epistemic auditor, and orchestrator.
 - **Suite 3: Multi-Domain Generalization Suite (`test_generalization.py`)** - Validates across 12 distinct biomedical domains.
 - **Suite 4: Adversarial Stress Scenarios & Negative Rejection Tests (`test_adversarial_scenarios.py`)** - 114 stress tests.
 - **Suite 5: Mutation Testing Layer (`test_mutations.py`)** - 10 deliberate scientific defects with 100% kill score.
 - **Suite 6: v11.4.1 Adversarial Immunization Suite (`test_v114_adversarial_immunization.py`)** - 11 tests verifying DOI Crossref verification, ToxRTool quality assessment, GLOBOCAN checksums, Mead degrees of freedom, and Chou-Talalay two-phase protocol.
-- **Suites 7–23:** Property invariants, schema audits, EQUATOR compliance, RoB-2 mitigation, OMML math engines, typography linters, and Pillar 1-5 hardening.
+- **Suite 7: Closed-Loop Iterative Remediation Suite (`test_iterative_remediation_engine.py`)** - 3 tests auditing surgical section patching, multi-round convergence, and fail-closed consensus gating.
+- **Suites 8–24:** Property invariants, schema audits, EQUATOR compliance, RoB-2 mitigation, OMML math engines, typography linters, and Pillar 1-5 hardening.
 
 ---
 
@@ -212,37 +222,42 @@ uv run python tests/run_all_tests.py
 
 پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۱.۴.۱)** یک سیستم خودکار، پیشرفته، شناختی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است.
 
-نسخه ۱۱.۴.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک و بیواستاتیک را به صورت قطعی ریشه‌کن کرده است.
+نسخه ۱۱.۴.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک و بیواستاتیک را به صورت قطعی ریشه‌کن کرده است.
 
 ---
 
 ### قابلیت‌های کلیدی و نوین نسخه ۱۱.۴.۱:
 
-1. **استعلام برخط شناسه‌های DOI و ممیزی عنوان مقاله (`LiveDoiCrossrefVerifier`):**
+1. **موتور چرخه بسته داوری و اصلاح پیوسته (`IterativeRemediationEngine`):**
+   - جایگزینی داوری تک‌مرحله‌ای باز (Open-Loop) با لوپ بسته بازخورد و اصلاح پیوسته (تا ۵ راند).
+   - پچ‌کردن جراحی بخش‌های آسیب‌دیده با `SurgicalSectionPatcher` بدون دستکاری سایر بخش‌های تاییدشده.
+   - اعمال فیوز توقف قطعی (Fail-Closed Circuit Breaker) در صورت عدم احراز نمره ممتاز (< 2.0) و عدم تایید اجماعی هیئت داوران.
+   - ثبت شفاف کارنامه حسابرسی اصلاحات در `REVISION_AUDIT_TRAIL.md` و `.json`.
+2. **استعلام برخط شناسه‌های DOI و ممیزی عنوان مقاله (`LiveDoiCrossrefVerifier`):**
    - اتصال مستقیم به سرورهای رسمی Crossref جهت راستی‌آزمایی عنوان مقاله در برابر شناسه ثبت‌شده.
    - ممانعت قطعی از خطای لغزش ارقام انتهای DOI (تطابق رشته عنوان با آستانه تشابه حداقل ۴۰٪ و صدور خطای بحرانی در صورت مغایرت).
-2. **سنتز ۱۰۰٪ فارسی و آکادمیک بخش ۳ (مرور منابع):**
+3. **سنتز ۱۰۰٪ فارسی و آکادمیک بخش ۳ (مرور منابع):**
    - استقرار متد `synthesize_findings_persian` جهت ترجمه و سنتز مفهومی افعال و مکانیزم‌های زیستی (مهار رشد، آپوپتوز، استرس اکسیداتیو، مهاجرت سلولی، مقاومت دارویی).
    - حذف کامل نشت عناوین یا جملات خام انگلیسی در گیومه‌ها.
-3. **همسویی دقیق بیواستاتیک در معادله مید ($B=2, E=19$):**
+4. **همسویی دقیق بیواستاتیک در معادله مید ($B=2, E=19$):**
    - محاسبه دقیق درجات آزادی اثر بلوک‌بندی آزمایشگاهی برای ۳ روز کاری مستقل ($B = k_{\text{blocks}} - 1 = 3 - 1 = 2$).
    - انطباق درجات آزادی خطای آزمون با بازه استاندارد جهانی ($E = 30 - 2 - 9 = 19 \in [10, 20]$).
    - تفکیک قطعی معادله مید از تحلیل مستقل توان آزمون ANOVA دوطرفه در G*Power با توان ۸۵.۲٪ ($1 - \beta = 0.852$).
-4. **جایگزینی RoB-2 بالینی با ابزار استاندارد سلولی ToxRTool / NTP OHAT:**
+5. **جایگزینی RoB-2 بالینی با ابزار استاندارد سلولی ToxRTool / NTP OHAT:**
    - حذف خطای اعمال ابزار کارآزمایی بالینی انسانی (Cochrane RoB-2) روی مطالعات کشت سلولی آزمایشگاهی.
    - ارزیابی ۵ دامنه اختصاصی سمیت و زیستایی برون‌تن (مستندسازی ماده، خلوص، شرایط آزمون، اعتبار بیولوژیک و پایایی).
-5. **چک‌سام دقیق آمار رسمی سرطان GLOBOCAN 2022/2024:**
+6. **چک‌سام دقیق آمار رسمی سرطان GLOBOCAN 2022/2024:**
    - الزام به ثبت دقیق ارقام مرجع بین‌المللی جدول Bray et al. 2024 در CA Cancer J Clin (۲,۴۸۰,۳۰۱ مورد ابتلا و ۱,۸۱۷,۱۷۲ مورد مرگ).
-6. **پروتکل دو فازی برهم‌کنش دارویی چو-تالالای (Chou-Talalay 2-Phase Protocol):**
+7. **پروتکل دو فازی برهم‌کنش دارویی چو-تالالای (Chou-Talalay 2-Phase Protocol):**
    - الزام به رسم منحنی ۵ تا ۷ نقطه‌ای تک‌دارویی جهت استخراج $IC_{50}$، شیب منحنی $m$ و دوز میانه $D_m$ پیش از اجرای ماتریس ترکیبی و محاسبه شاخص ترکیب (CI).
-7. **احراز اصالت بیوشیمیایی و بیولوژیک:**
+8. **احراز اصالت بیوشیمیایی و بیولوژیک:**
    - تفکیک بیان رونویسی mRNA کاسپاز ۳ از فعالیت پروتئولیتیک آنزیم فعال (Cleaved Caspase-3) به همراه فلوسایتومتری دوگانه Annexin V/PI.
    - الزام به کنترل مثبت القای آپوپتوز (استاروسپورین ۱ میکرومولار) و کنترل بلانک بدون سلول (Cell-Free Blank) در تست‌های تترازولیوم.
    - ثبت محیط‌های کشت اختصاصی بر پایه شناسنامه ATCC (مانند Ham's F-12K برای A549 و EMEM برای MRC-5).
    - تبیین ناهمگونی ژنتیکی رده‌های سلولی بر مبنای جهش‌های KRAS و وضعیت p53 وحشی در برابر p53-null.
-8. **تواضع معرفتی و مقیدسازی نوآوری به سرچ منفی:**
+9. **تواضع معرفتی و مقیدسازی نوآوری به سرچ منفی:**
    - مهار ادعاهای مطلق کیهانی («برای اولین بار در جهان») و مقیدسازی نوآوری به گزارش رسمی استراتژی جستجوی منفی بولین (0 Hits در PubMed).
-9. **فرمول‌نویسی بومی ورد (Native OMML):**
+10. **فرمول‌نویسی بومی ورد (Native OMML):**
    - تبدیل تمامی فرمول‌های ریاضی مستقیماً به ساختار XML بومی ورد (`<m:oMath>`) بدون نشت کدهای لاتک خام (`$...$`).
 
 ---
@@ -309,13 +324,14 @@ uv run python scripts/run_research_pipeline.py `
 
 ### وضعیت آزمون‌های کنترل کیفیت نرم‌افزاری
 
-سیستم دارای ۲۳ سوئیت آزمون مستقل با **۴۷۳ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
+سیستم دارای ۲۴ سوئیت آزمون مستقل با **۴۷۷ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
 
 ```powershell
 uv run python tests/run_all_tests.py
 ```
 
-- **تست ضد نشت و تعمیم‌پذیری کامل (`test_hard_code_leakage.py`):** صفر بودن کلمات سخت‌کدشده زیستی در ۴۱ آزمون استاتیک.
+- **تست ضد نشت و تعمیم‌پذیری کامل (`test_hard_code_leakage.py`):** صفر بودن کلمات سخت‌کدشده زیستی در ۴۲ آزمون استاتیک.
+- **تست چرخه بسته داوری و اصلاح پیوسته (`test_iterative_remediation_engine.py`):** ۳ تست ممیزی پچ‌های جراحی، همگرایی نمره داوری و فیوز Fail-Closed.
 - **تست ایمن‌سازی ده‌گانه داوری (`test_v114_adversarial_immunization.py`):** ۱۱ تست اعتبارسنجی ارقام DOI، ارزیابی ToxRTool، چک‌سام گلوبوکان و درجات آزادی مید.
 - **تست پلمپ پرونده شواهد (`test_two_loop_dossier.py`):** بررسی تغییرناپذیری شواهد پس از پلمپ.
 - **تست‌های خصمانه و جهش نرم‌افزاری (`test_adversarial_scenarios.py` و `test_mutations.py`):** کشتن ۱۰۰٪ جهش‌های عمدی در منطق بیولوژیک.
