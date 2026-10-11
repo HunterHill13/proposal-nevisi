@@ -48,8 +48,8 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "11.4.0"
-VERSION_DISPLAY = "v11.4.0"
+ENGINE_VERSION = "11.4.1"
+VERSION_DISPLAY = "v11.4.1"
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
