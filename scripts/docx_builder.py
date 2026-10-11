@@ -368,6 +368,7 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
     in_table = False
     table_lines = []
     is_refs = False
+    last_h1 = ""
 
     for line in lines:
         stripped = line.strip()
@@ -386,6 +387,15 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
         if not stripped or stripped == '---':
             continue
 
+        # Prevent redundant heading echoes right after a section header
+        if last_h1:
+            clean_s = re.sub(r'^[۰-۹0-9]+[\.\-\s]+', '', stripped).strip()
+            clean_h = re.sub(r'^[۰-۹0-9]+[\.\-\s]+', '', last_h1).strip()
+            if clean_s and clean_h and clean_s == clean_h:
+                last_h1 = ""
+                continue
+            last_h1 = ""
+
         if (('۱۴.' in stripped or '14.' in stripped) or ('۲۸.' in stripped or '28.' in stripped)) and 'منابع' in stripped:
             is_refs = True
 
@@ -393,7 +403,8 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
             add_title(doc, stripped[2:])
             continue
         elif stripped.startswith('## '):
-            add_h1(doc, stripped[3:])
+            last_h1 = stripped[3:].strip()
+            add_h1(doc, last_h1)
             continue
         elif stripped.startswith('### '):
             add_h2(doc, stripped[4:])
