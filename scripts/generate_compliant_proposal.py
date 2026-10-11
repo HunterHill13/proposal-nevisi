@@ -48,6 +48,7 @@ try:
     from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
     from proposal_research_dossier import ProposalResearchDossier
     from epistemic_rigor_auditor import EpistemicRigorAuditor
+    from iterative_remediation_engine import IterativeRemediationEngine
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -76,6 +77,7 @@ except ImportError:
     from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
     from proposal_research_dossier import ProposalResearchDossier
     from epistemic_rigor_auditor import EpistemicRigorAuditor
+    from iterative_remediation_engine import IterativeRemediationEngine
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -737,8 +739,10 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         meth_overview = data.get("methodology_overview_text")
         if not meth_overview:
+            is_in_vitro = any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell", "سلول"])
+            bias_framework = "ToxRTool / NTP OHAT In Vitro Data Quality Framework" if is_in_vitro else "Cochrane RoB-2 / SYRCLE"
             meth_overview = (
-                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری (Cochrane RoB-2 / SYRCLE) طراحی گردیده است. "
+                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری ({bias_framework}) طراحی گردیده است. "
                 f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده، "
                 f"تخصیص شرایط آزمایشی و تیمارها به صورت تصادفی ساختاریافته (Randomized Block Design) و با کدگذاری نمونه‌ها (Coded Vials / Allocation Concealment) توسط ناظر مستقل، "
                 f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
@@ -1067,16 +1071,32 @@ class ProposalGenerator:
         with open(md_path, "w", encoding="utf-8") as f:
             f.write(md_content)
         
+        # Conduct Mock Grant Review Study Section & Closed-Loop Iterative Remediation Engine
+        review_dir = os.path.dirname(os.path.abspath(md_path))
+        review_result = MockGrantReviewPanel.conduct_panel_review(md_content, data)
+        remediation_res = None
+        
+        # If panel requires revision, run closed-loop iterative surgical remediation (up to 5 rounds)
+        if review_result.funding_verdict != "APPROVED_FUNDABLE" or review_result.critical_flaws_count > 0:
+            remediation_res = IterativeRemediationEngine.remediate_proposal(
+                md_content=md_content,
+                proposal_data=data,
+                max_iterations=5,
+                output_dir=review_dir
+            )
+            md_content = remediation_res["final_markdown"]
+            review_result = remediation_res["final_review"]
+            # Overwrite markdown file with converged patched text
+            with open(md_path, "w", encoding="utf-8") as f:
+                f.write(md_content)
+
+        review_md_path, review_json_path = MockGrantReviewPanel.save_reports(review_result, output_dir=review_dir)
+        
         # Validate structure
         val_result = ProposalStructureValidator.validate_proposal_text(md_content)
         
-        # Build DOCX with Native OMML Math Engine integrated
+        # Build final DOCX with Native OMML Math Engine integrated
         DocxBuilder.build_docx(md_content, docx_path)
-        
-        # Conduct Mock Grant Review Study Section & Inter-Section Semantic Drift Gate
-        review_dir = os.path.dirname(os.path.abspath(md_path))
-        review_result = MockGrantReviewPanel.conduct_panel_review(md_content, data)
-        review_md_path, review_json_path = MockGrantReviewPanel.save_reports(review_result, output_dir=review_dir)
 
         # Conduct EQUATOR Network & Biological Resource Authentication Audit
         equator_result = EquatorComplianceAuditor.audit_proposal(md_content, data)
@@ -1114,6 +1134,9 @@ class ProposalGenerator:
             "mock_grant_review": review_result.to_dict(),
             "mock_grant_review_md": review_md_path,
             "mock_grant_review_json": review_json_path,
+            "revision_audit_trail": remediation_res["audit_trail"] if remediation_res else None,
+            "revision_audit_trail_md": remediation_res["audit_trail_md"] if remediation_res else None,
+            "revision_audit_trail_json": remediation_res["audit_trail_json"] if remediation_res else None,
             "equator_audit": equator_result.to_dict(),
             "equator_audit_md": equator_md_path,
             "equator_audit_json": equator_json_path,

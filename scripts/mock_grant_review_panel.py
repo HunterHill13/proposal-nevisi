@@ -64,12 +64,24 @@ class PanelReviewResult:
     critical_flaws_count: int
     executive_summary_fa: str
 
+    @property
+    def critical_flaws(self) -> List[str]:
+        """Aggregate all critical flaws from all reviewers."""
+        flaws: List[str] = []
+        for r_key, r_eval in self.reviewer_evaluations.items():
+            if isinstance(r_eval, dict):
+                flaws.extend(r_eval.get("critical_flaws", []))
+            elif hasattr(r_eval, "critical_flaws"):
+                flaws.extend(getattr(r_eval, "critical_flaws", []))
+        return flaws
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "overall_score": round(self.overall_score, 2),
             "funding_verdict": self.funding_verdict,
             "can_proceed": self.can_proceed,
             "critical_flaws_count": self.critical_flaws_count,
+            "critical_flaws": self.critical_flaws,
             "executive_summary_fa": self.executive_summary_fa,
             "inter_section_drift": self.inter_section_drift,
             "reviewer_evaluations": self.reviewer_evaluations
@@ -186,6 +198,9 @@ class MockGrantReviewPanel:
         elif "globocan" in s2_lower:
             if any(k in s2 for k in ["۲.۴۸", "2.48", "۲,۴۸۰,۳۰۱"]):
                 strengths.append("آمار اپیدمیولوژیک با دقت عددی کامل از آخرین گزارش رسمی GLOBOCAN 2022 (Bray et al. 2024) استخراج گردیده است.")
+            else:
+                weaknesses.append("GLOBOCAN_CASE_DEATH_CHECKSUM_ERROR: در استناد به گزارش GLOBOCAN، ارقام دقیق گزارش رسمی ۲۰۲۲ (۲,۴۸۰,۳۰۱ مورد جدید و ۱,۸۱۷,۱۷۲ مرگ) درج نشده است.")
+                score += 0.5
 
         # Section 2 Audit: Unsubstantiated Novelty Claim without Negative Search Log
         claims_novelty = any(k in s2 for k in ["اولین بار", "اولین مطالعه", "نخستین بار", "نخستین مطالعه", "هیچ مطالعه‌ای", "first-in-class", "برای نخستین"])

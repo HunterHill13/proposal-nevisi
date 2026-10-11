@@ -13,7 +13,7 @@
     "epistemic_rigor_audit_dimensions": 6
   },
   "metrics": {
-    "total_unified_tests": 473,
+    "total_unified_tests": 477,
     "mutation_score_pct": 100.0,
     "mandatory_proposal_sections": 28,
     "search_strategy_layers_count": 12,
