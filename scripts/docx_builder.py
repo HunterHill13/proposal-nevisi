@@ -122,16 +122,16 @@ def add_bidi_text(p, text, font_name="Dubai", size_pt=11, bold=False, italic=Fal
         except Exception:
             pass
     text = str(text).replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
-    pattern = r'(\([A-Za-z0-9_\-\s,\./%α-ωΑ-Ω→⇌⇄<>=\+\^±]+\)|\[\d+(?:,\s*\d+)*\]|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+(?:\s*(?:→|->|⇌|<->|⇄|<=|>=|<|>|=)\s*[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]+)+|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±]{2,}|[→⇌⇄]|(?:<=|>=|[<>=])\s*\d+(?:\.\d+)?)'
+    pattern = r'(\([A-Za-z0-9_\-\s,\./%α-ωΑ-Ω→⇌⇄<>=\+\^±"\[\]:]+\)|\[\d+(?:,\s*\d+)*\]|[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±"\[\]]+(?:\s+[A-Za-z0-9_\-\./%α-ωΑ-Ω\+\^±"\[\]:<>=→⇌⇄]+)*|[→⇌⇄]|(?:<=|>=|[<>=])\s*\d+(?:\.\d+)?)'
     tokens = re.split(pattern, text)
     for tok in tokens:
         if not tok:
             continue
         has_persian = any('\u0600' <= c <= '\u06FF' for c in tok)
-        if re.match(r'^\[\d+(?:,\s*\d+)*\]$', tok.strip()):
-            add_r(p, " " + tok.strip() + " ", font_name=font_name, size_pt=size_pt, bold=True, italic=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
-        elif not has_persian and (re.search(r'[A-Za-z0-9→⇌⇄<>=]', tok) or tok.startswith('(')):
-            add_r(p, " " + tok.strip() + " ", font_name=font_name, size_pt=size_pt, bold=bold, italic=italic, color_rgb=color_rgb, is_rtl=False)
+        if re.match(r'^\s*\[\d+(?:,\s*\d+)*\]\s*$', tok):
+            add_r(p, tok, font_name=font_name, size_pt=size_pt, bold=True, italic=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=False)
+        elif not has_persian and (re.search(r'[A-Za-z0-9→⇌⇄<>=]', tok) or tok.strip().startswith('(')):
+            add_r(p, tok, font_name=font_name, size_pt=size_pt, bold=bold, italic=italic, color_rgb=color_rgb, is_rtl=False)
         else:
             add_r(p, tok, font_name=font_name, size_pt=size_pt, bold=bold, italic=italic, color_rgb=color_rgb, is_rtl=True)
 
@@ -207,13 +207,16 @@ def add_ref_item(doc, text):
     else:
         jc.set(qn('w:val'), 'both')
 
-    has_persian = any('\u0600' <= c <= '\u06FF' for c in text)
-    if has_persian:
+    # Check for actual Persian letters (excluding Persian digits)
+    has_persian_letters = any('\u0620' <= c <= '\u06EF' or c in ('\u067E', '\u0686', '\u0698', '\u06AF', '\u06A9', '\u06CC') for c in text)
+    if has_persian_letters:
         set_p_rtl(p, space_before=3, space_after=3, line_spacing=1.15, align="both")
         add_formatted_bidi_text(p, text, font_name="Dubai", size_pt=10, color_rgb=(0x00, 0x00, 0x00))
     else:
-        # English reference: parse markdown asterisks (*journal*) and style with Times New Roman LTR
-        segments = re.split(r'(\*\*.*?\*\*|\*.*?\*)', text)
+        # English reference: restore any Persian digits to ASCII and style with Times New Roman LTR
+        fa_to_en = str.maketrans("۰۱۲۳۴۵۶۷۸۹", "0123456789")
+        clean_ref_text = text.translate(fa_to_en)
+        segments = re.split(r'(\*\*.*?\*\*|\*.*?\*)', clean_ref_text)
         for seg in segments:
             if not seg:
                 continue

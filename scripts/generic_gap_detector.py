@@ -42,41 +42,57 @@ class GenericGapDetector:
         identified_gaps = []
 
         # 1. Model Gap: Check if studies cover primary target system
-        target_system = target_model.get("population_or_model", {}).get("primary_system", "").lower()
-        system_studies = [
-            s for s in study_evidence
-            if target_system and target_system in str(s.get("model_system", s.get("organism_cell_line", ""))).lower()
-        ]
+        import re as _re
+        raw_target_system = target_model.get("population_or_model", {}).get("primary_system", "")
+        target_system = raw_target_system.lower()
+        # Extract ASCII model identifiers if raw_target_system contains mixed Persian and Latin text
+        ascii_model_tokens = [tok.lower() for tok in _re.findall(r'[A-Za-z0-9][A-Za-z0-9\-]{1,15}', raw_target_system) if any(c.isalpha() for c in tok)]
+
+        def _matches_target_system(s: Dict[str, Any]) -> bool:
+            haystack = f"{s.get('model_system', '')} {s.get('organism_cell_line', '')} {s.get('title', '')} {s.get('abstract', '')}".lower()
+            if target_system and target_system in haystack:
+                return True
+            if ascii_model_tokens and any(tok in haystack for tok in ascii_model_tokens):
+                return True
+            return False
+
+        system_studies = [s for s in study_evidence if _matches_target_system(s)]
         if len(system_studies) < 3:
             gap_cat = "POPULATION_GAP" if "clinical" in str(target_model.get("population_or_model", {}).get("model_type", "")).lower() or "human" in str(target_model.get("population_or_model", {}).get("model_type", "")).lower() else "MODEL_GAP"
+            gap_cat_fa = "شکاف جامعه هدف بالینی" if gap_cat == "POPULATION_GAP" else "شکاف مدل آزمایشگاهی هدف"
             identified_gaps.append({
                 "gap_category": gap_cat,
+                "gap_category_fa": gap_cat_fa,
                 "definition": UNIVERSAL_GAP_TAXONOMY.get(gap_cat, UNIVERSAL_GAP_TAXONOMY["MODEL_GAP"]),
-                "evidence_trail": f"Only {len(system_studies)} studies evaluate target system '{target_system}' directly.",
-                "proposed_resolution": "Conduct systematic empirical validation directly within target biological lineage or patient population."
+                "evidence_trail": f"تنها {len(system_studies)} مطالعه پیشین به طور مستقیم سیستم مدل هدف ({raw_target_system or 'مدل هدف'}) را مورد ارزیابی قرار داده‌اند.",
+                "proposed_resolution": "اجرای اعتبارسنجی تجربی نظام‌مند و مستقیم بر روی رده سلولی یا جمعیت هدف با کنترل‌های استاندارد."
             })
 
         # 2. Combination Gap: Check if multi-agent combinations exist
         interventions = target_model.get("interventions_or_exposures", [])
         if len(interventions) > 1:
-            agent_names = [a.get("name", "").lower() for a in interventions]
+            agent_names = [a.get("name", "") for a in interventions if a.get("name")]
+            agent_names_lower = [n.lower() for n in agent_names]
             combo_studies = [
                 s for s in study_evidence
-                if all(a in str(s.get("intervention_agent", "")).lower() or a in str(s.get("title", "")).lower() for a in agent_names)
+                if all(a in f"{s.get('intervention_agent', '')} {s.get('title', '')} {s.get('abstract', '')}".lower() for a in agent_names_lower)
             ]
             if len(combo_studies) == 0:
+                agents_str = " و ".join(agent_names)
                 identified_gaps.append({
                     "gap_category": "COMBINATION_GAP",
+                    "gap_category_fa": "شکاف برهم‌کنش ترکیبی داروها",
                     "definition": UNIVERSAL_GAP_TAXONOMY["COMBINATION_GAP"],
-                    "evidence_trail": f"Within searched databases and specified retrieval windows, no direct empirical study evaluating the simultaneous combination of {', '.join(agent_names)} was identified.",
-                    "proposed_resolution": "Execute formal multi-agent matrix titration and quantitative synergy evaluation."
+                    "evidence_trail": f"در پایگاه‌های اطلاعاتی بررسی‌شده و پنجره زمانی جستجو، هیچ مطالعه تجربی مستقیمی که ترکیب همزمان {agents_str} را ارزیابی کرده باشد، یافت نشد.",
+                    "proposed_resolution": "طراحی ماتریس غلظت‌سنجی چندعامله و محاسبه کمی شاخص ترکیب (CI) و هم‌افزایی فارماکولوژیک."
                 })
 
 
         # 3. Mechanistic Gap
         mechanisms = target_model.get("hypothesized_mechanisms", [])
         for mech in mechanisms:
-            p_name = mech.get("pathway_name", "").lower()
+            p_name_raw = mech.get("pathway_name", "")
+            p_name = p_name_raw.lower()
             matching_studies = [
                 s for s in study_evidence
                 if p_name in str(s.get("primary_findings", "")).lower() or p_name in str(s.get("title", "")).lower()
@@ -84,9 +100,10 @@ class GenericGapDetector:
             if len(matching_studies) < 2:
                 identified_gaps.append({
                     "gap_category": "MECHANISTIC_GAP",
+                    "gap_category_fa": "شکاف مکانیسم سیگنالینگ مولکولی",
                     "definition": UNIVERSAL_GAP_TAXONOMY["MECHANISTIC_GAP"],
-                    "evidence_trail": f"Signaling pathway '{p_name}' has insufficient direct empirical evidence ({len(matching_studies)} studies).",
-                    "proposed_resolution": f"Analyze protein activation, phosphorylation, and cleavage dynamics for pathway '{p_name}'."
+                    "evidence_trail": f"مسیر پیام‌رسانی '{p_name_raw}' دارای شواهد تجربی مستقیم ناکافی در این مدل ({len(matching_studies)} مطالعه) است.",
+                    "proposed_resolution": f"واکاوی کمی فعال‌سازی پروتئین، برش پروتئولیتیک و تغییرات بیان ژن در مسیر '{p_name_raw}'."
                 })
 
         # 4. Safety & Dose Gap
@@ -97,18 +114,20 @@ class GenericGapDetector:
         if len(dose_studies) < len(study_evidence) // 2:
             identified_gaps.append({
                 "gap_category": "DOSE_GAP",
+                "gap_category_fa": "شکاف پنجره دوز-پاسخ و ایمنی",
                 "definition": UNIVERSAL_GAP_TAXONOMY["DOSE_GAP"],
-                "evidence_trail": "Quantitative dose-response boundaries and non-toxic vehicle limits are under-reported.",
-                "proposed_resolution": "Establish rigorous multi-point concentration-response curves within validated non-toxic thresholds."
+                "evidence_trail": "مرزهای کمی منحنی دوز-پاسخ و آستانه غلظت‌های غیرسمی حامل در مطالعات پیشین به طور کامل گزارش نشده است.",
+                "proposed_resolution": "ترسیم منحنی‌های دوز-پاسخ چندنقطه‌ای استاندارد در محدوده غلظت‌های غیرسمی تاییدشده به همراه تعیین شاخص انتخاب‌پذیری (SI)."
             })
 
         # 5. Contradiction Gap
         if contradictions:
             identified_gaps.append({
                 "gap_category": "CONTRADICTION_GAP",
+                "gap_category_fa": "شکاف ناهمگونی و تناقض یافته‌ها",
                 "definition": UNIVERSAL_GAP_TAXONOMY["CONTRADICTION_GAP"],
-                "evidence_trail": f"{len(contradictions)} contextual disagreements or discordant findings identified in prior literature.",
-                "proposed_resolution": "Perform head-to-head benchmarking controlling for cell lineage, exposure time, and assay readouts."
+                "evidence_trail": f"تعداد {len(contradictions)} مورد ناهمگونی یا اختلاف زمینه‌ای در یافته‌های مطالعات پیشین شناسایی گردید.",
+                "proposed_resolution": "اجرای آزمون‌های مقایسه‌ای استاندارد با کنترل دقیق تبار سلولی، زمان مواجهه و تصحیح تداخلات نوری."
             })
 
         # Assign evidence-backed gap importance tier (Phase 17)

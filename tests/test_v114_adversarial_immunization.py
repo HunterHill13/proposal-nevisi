@@ -298,6 +298,59 @@ class TestV114AdversarialImmunization(unittest.TestCase):
         self.assertLessEqual(panel_result.overall_score, 3.5)
         self.assertEqual(panel_result.funding_verdict, "APPROVED_FUNDABLE")
 
+    def test_12_persian_editorial_hygiene_and_bidi_typography(self):
+        """Pillar 12: Guards against raw Boolean syntax, English gap labels, Cat 3 RoB false positives, and Persian digits in English bibliography."""
+        from persian_medical_typography_linter import PersianMedicalTypographyLinter
+
+        data = {
+            "title_fa": "بررسی اثر هم‌افزایی داروی اول و داروی دوم در رده سلولی",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "studies": [
+                {
+                    "pmid": "38572751",
+                    "doi": "10.3322/caac.21834",
+                    "title": "Global cancer statistics 2022: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries",
+                    "authors": ["Bray F", "Laversanne M"],
+                    "year": 2024,
+                    "journal": "CA Cancer J Clin",
+                    "abstract": "Global cancer statistics and incidence.",
+                    "verified": True
+                }
+            ],
+            "research_problem_model": {
+                "framework": "EXPERIMENTAL_IN_VITRO",
+                "target_condition": {"name_fa": "سرطان ریه", "name_en": "Lung Cancer"},
+                "population_or_model": {"primary_system": "رده سلولی هدف"},
+                "interventions_or_exposures": [{"name": "داروی اول"}, {"name": "داروی دوم"}]
+            }
+        }
+        md = ProposalGenerator.assemble_pajooheshyar_28(data)
+        linter = PersianMedicalTypographyLinter()
+        md_linted = linter.format_text("آپوپتوز (Apoptosis) در سلول بررسی شد.\n" + md)
+
+        # 1. No raw Boolean query syntax in Section 2
+        self.assertNotIn("[Mesh]", md_linted)
+        self.assertNotIn("[Title/Abstract]", md_linted)
+        self.assertIn("صفر یافته (0 hits)", md_linted)
+
+        # 2. No English gap enum or English gap sentences in Section 2
+        self.assertNotIn("MODEL_GAP", md_linted)
+        self.assertNotIn("COMBINATION_GAP", md_linted)
+        self.assertNotIn("Only 0 studies", md_linted)
+
+        # 3. No false Cat 3 invalid label or ugly 55-char mid-word truncated English title in Section 3
+        self.assertNotIn("غیرمعتبر (Cat 3)", md_linted)
+        self.assertNotIn("estimates of in...", md_linted)
+        self.assertIn("Bray F و همکاران", md_linted)
+
+        # 4. English bibliography in Section 28 keeps ASCII digits and no duplicate parenthetical English
+        ref_lines = [line for line in md_linted.splitlines() if line.startswith("[1]")]
+        self.assertEqual(len(ref_lines), 1)
+        self.assertIn("2022", ref_lines[0])
+        self.assertIn("2024", ref_lines[0])
+        self.assertNotIn("۲۰۲۲", ref_lines[0])
+        self.assertNotIn("آپوپتوز (Apoptosis) (Apoptosis)", md_linted)
+
 
 if __name__ == "__main__":
     unittest.main()

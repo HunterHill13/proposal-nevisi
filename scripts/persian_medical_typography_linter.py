@@ -114,13 +114,17 @@ class PersianMedicalTypographyLinter:
         transform_count = 0
         rule_logs = []
 
-        # 1. Protect tokens that should never be converted (Math, DOIs, URLs, Citations)
+        # 1. Protect tokens that should never be converted (Math, DOIs, URLs, Citations, Bibliography lines)
         protected_tokens: List[str] = []
         def _protect(match):
             idx = len(protected_tokens)
             protected_tokens.append(match.group(0))
             return f"__TYPO_PROT_{idx}__"
 
+        # Protect bibliography reference lines e.g. [1] Author A... or 1. Author A...
+        current_text = re.sub(r'(?m)^(?:\[\d+\]|\d+\.)\s+[A-Za-z][^\n]+$', _protect, current_text)
+        # Protect inline code blocks `...`
+        current_text = re.sub(r'`[^`\n]+`', _protect, current_text)
         # Protect Display & Inline Math ($$...$$, $...$, \[...\], \(...\))
         current_text = re.sub(r'\$\$[^$]+\$\$|\$[^$\n]+\$', _protect, current_text)
         current_text = re.sub(r'\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)', _protect, current_text)
@@ -146,7 +150,7 @@ class PersianMedicalTypographyLinter:
                     rule_logs.append({"rule": desc, "count": n_subs})
                     current_text = new_text
 
-        # 3. Apply Medical Terminology Rules (First Mention Only)
+        # 3. Apply Medical Terminology Rules (First Mention Only, Skip if already followed by protected paren)
         medical_rules = self.config.get("medical_terms", self.DEFAULT_RULES["medical_terms"])
         for r in medical_rules:
             pat = r.get("pattern", "")
@@ -155,11 +159,17 @@ class PersianMedicalTypographyLinter:
             apply_once = r.get("apply_once", True)
 
             if pat:
-                # Check if already has parentheses e.g. "آپوپتوز (Apoptosis)"
                 if pat in self.seen_medical_terms and apply_once:
                     continue
 
-                # Search and replace only the first occurrence if apply_once
+                # Avoid expanding if already followed by a protected parenthetical token or '('
+                guarded_pat = pat + r'(?!\s*(?:__TYPO_PROT_\d+__|\())'
+
+                # Check if term is already expanded in the text
+                if apply_once and re.search(pat + r'\s*(?:__TYPO_PROT_\d+__|\()', current_text):
+                    self.seen_medical_terms.add(pat)
+                    continue
+
                 def _term_sub(m):
                     term_matched = m.group(0)
                     if apply_once:
@@ -168,7 +178,7 @@ class PersianMedicalTypographyLinter:
                         self.seen_medical_terms.add(pat)
                     return repl
 
-                new_text, n_subs = re.subn(pat, _term_sub, current_text, count=1 if apply_once else 0)
+                new_text, n_subs = re.subn(guarded_pat, _term_sub, current_text, count=1 if apply_once else 0)
                 if n_subs > 0:
                     transform_count += n_subs
                     rule_logs.append({"rule": desc, "count": n_subs})
@@ -178,7 +188,7 @@ class PersianMedicalTypographyLinter:
         if self.config.get("digit_rules", {}).get("enabled", True):
             # Only match standalone numbers or numbers surrounded by Persian letters/spaces
             # Avoid replacing inside formulas with operators =, <, >, ±, etc.
-            digit_pattern = re.compile(r'(?<![=<>±×÷/a-zA-Z_])\b([0-9]+)\b(?![=<>±×÷/a-zA-Z_])')
+            digit_pattern = re.compile(r'(?<![=<>±×÷/a-zA-Z_\-])\b([0-9]+)\b(?![=<>±×÷/a-zA-Z_\-])')
             def _digit_sub(m):
                 return to_persian_digits(m.group(1))
 

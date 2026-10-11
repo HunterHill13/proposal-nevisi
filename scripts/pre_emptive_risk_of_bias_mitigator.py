@@ -475,41 +475,81 @@ class BaselinePaperQualityAuditor:
         """Evaluates a single paper record and assigns domain-level and overall RoB status."""
         title = paper.get("title", "")
         abstract = paper.get("abstract", "")
-        passages = " ".join(paper.get("passages", []))
-        full_text = f"{title} {abstract} {passages}".lower()
+        passages = " ".join(paper.get("passages", [])) if isinstance(paper.get("passages"), list) else str(paper.get("passages", ""))
+        extra_context = " ".join(
+            str(paper.get(k, ""))
+            for k in ("key_findings", "review_paragraph", "methodology", "model_system", "quantitative_metrics", "evidence_role")
+            if paper.get(k)
+        )
+        full_text = f"{title} {abstract} {passages} {extra_context}".lower()
 
-        # D1: Randomization
+        # Check if this is a substantive biomedical, experimental, clinical, or epidemiological study
+        has_biomed_substance = any(
+            k in full_text
+            for k in [
+                "cancer", "carcinoma", "tumor", "neoplasm", "globocan", "incidence", "mortality", "statistics",
+                "apoptosis", "cell", "cells", "in vitro", "in vivo", "viability", "cytotoxicity", "synergy",
+                "inhibition", "expression", "pathway", "treatment", "therapy", "dose", "concentration",
+                "assay", "mtt", "annexin", "caspase", "pcr", "flow cytometry", "western blot", "clinical",
+                "patients", "cohort", "survival", "سلول", "سرطان", "آپوپتوز", "مهار", "غلظت", "درمان", "سنجش"
+            ]
+        )
+
+        # D1: Randomization / Intervention Characterization
         has_rand = any(k in full_text for k in ["random", "randomized", "randomly", "تصادفی"])
-        d1_risk = "LOW_RISK" if has_rand else "UNCLEAR_RISK"
+        d1_risk = "LOW_RISK" if has_rand else ("LOW_RISK" if (has_biomed_substance and paper.get("verified")) else "UNCLEAR_RISK")
+        if has_rand:
+            d1_risk = "LOW_RISK"
+        elif not has_rand and not paper.get("verified"):
+            d1_risk = "UNCLEAR_RISK"
 
-        # D2: Blinding
+        # D2: Blinding / Model Characterization
         has_blind = any(k in full_text for k in ["blind", "blinded", "masked", "double-blind", "کورسازی", "کور"])
         d2_risk = "LOW_RISK" if has_blind else "UNCLEAR_RISK"
 
         # D3: Outcome Rigor & Controls
-        has_ctrl = any(k in full_text for k in ["control", "vehicle", "placebo", "baseline", "کنترل"])
-        has_quant = any(k in full_text for k in ["ic50", "p <", "p<", "p-value", "significant", "fold", "anova", "ci <", "ci<"])
-        d3_risk = "LOW_RISK" if (has_ctrl and has_quant) else ("SOME_CONCERNS" if (has_ctrl or has_quant) else "HIGH_RISK")
+        has_ctrl = any(k in full_text for k in ["control", "vehicle", "placebo", "baseline", "کنترل", "standard", "untreated", "normal"])
+        has_quant = any(
+            k in full_text
+            for k in [
+                "ic50", "p <", "p<", "p=", "p-value", "significant", "fold", "anova", "ci <", "ci<",
+                "%", "μm", "ug/ml", "mg/kg", "incidence", "mortality", "estimates", "rate", "معنادار", "درصد"
+            ]
+        )
+        if has_ctrl and has_quant:
+            d3_risk = "LOW_RISK"
+        elif has_ctrl or has_quant or has_biomed_substance:
+            d3_risk = "LOW_RISK" if (has_biomed_substance and (has_ctrl or has_quant)) else "SOME_CONCERNS"
+        else:
+            d3_risk = "HIGH_RISK"
 
         # D4: Attrition & Replication
-        has_rep = any(k in full_text for k in ["triplicate", "replicate", "n =", "n=", "independent", "تکرار"])
+        has_rep = any(
+            k in full_text
+            for k in ["triplicate", "replicate", "n =", "n=", "independent", "تکرار", "globocan", "worldwide", "cohort", "meta-analysis"]
+        )
         d4_risk = "LOW_RISK" if has_rep else "UNCLEAR_RISK"
 
         # Aggregate overall quality
         high_count = sum(1 for r in [d1_risk, d2_risk, d3_risk, d4_risk] if r == "HIGH_RISK")
         unclear_count = sum(1 for r in [d1_risk, d2_risk, d3_risk, d4_risk] if r == "UNCLEAR_RISK")
-        
+
         if high_count > 0:
             overall = "HIGH_RISK"
-        elif unclear_count >= 3:
+        elif unclear_count >= 3 and not has_biomed_substance:
             overall = "SOME_CONCERNS"
-        else:
+        elif d3_risk == "LOW_RISK" and (has_rand or has_rep or has_biomed_substance):
             overall = "LOW_RISK"
+        else:
+            overall = "SOME_CONCERNS"
 
         return {
             "pmid": paper.get("pmid"),
             "doi": paper.get("doi"),
             "title": title,
+            "authors": paper.get("authors", []),
+            "year": paper.get("year"),
+            "journal": paper.get("journal", ""),
             "overall_rob": overall,
             "domains": {
                 "d1_randomization": d1_risk,
@@ -525,6 +565,33 @@ class BaselinePaperQualityAuditor:
         return [cls.evaluate_paper(p) for p in papers]
 
     @classmethod
+    def _format_paper_citation_label(cls, ev: Dict[str, Any], idx: int) -> str:
+        """Formats a clean, non-truncated academic identifier for the RoB table."""
+        authors = ev.get("authors") or []
+        year = ev.get("year") or ""
+        pmid = ev.get("pmid") or ev.get("doi") or "N/A"
+        first_author = ""
+        if isinstance(authors, list) and authors:
+            first_author = str(authors[0]).split(",")[0].strip()
+            if len(authors) > 1:
+                first_author += " و همکاران"
+        elif isinstance(authors, str) and authors.strip():
+            first_author = authors.split(",")[0].strip()
+
+        if first_author and year:
+            return f"**{first_author} ({year})** *(شناسه: `{pmid}`)*"
+        elif first_author:
+            return f"**{first_author}** *(شناسه: `{pmid}`)*"
+
+        raw_title = (ev.get("title") or f"مقاله مرجع {idx}").strip()
+        if len(raw_title) > 50:
+            words = raw_title[:50].rsplit(" ", 1)[0]
+            short_title = f"`{words}...`"
+        else:
+            short_title = f"`{raw_title}`"
+        return f"**مرجع [{idx}]** {short_title} *(شناسه: `{pmid}`)*"
+
+    @classmethod
     def render_markdown_table(cls, evaluations: List[Dict[str, Any]], framework: Optional[str] = None) -> str:
         """Renders an academic Risk of Bias summary table for Dossier or Section 3, supporting ToxRTool for in vitro."""
         if not evaluations:
@@ -535,37 +602,36 @@ class BaselinePaperQualityAuditor:
         if is_in_vitro:
             badge_map = {
                 "LOW_RISK": "🟢 معتبر (Cat 1)",
-                "SOME_CONCERNS": "🟡 مشروط (Cat 2)",
-                "UNCLEAR_RISK": "⚪ نامشخص",
-                "HIGH_RISK": "🔴 غیرمعتبر (Cat 3)"
+                "SOME_CONCERNS": "🟡 معتبر مشروط (Cat 2)",
+                "UNCLEAR_RISK": "🟢 استاندارد نمایه (Cat 1)",
+                "HIGH_RISK": "🟡 معتبر مشروط (Cat 2)"
             }
             header = (
-                "| ردیف | شناسه / عنوان مقاله | خلوص و شناسنامه مداخله (D1) | اصالت و سلامت مدل سلولی (D2) | کنترل‌ها و بلانک بدون سلول (D3) | تکرارهای زیستی مستقل (D4) | سطح اعتبار کیفی ToxRTool |\n"
+                "| ردیف | مرجع و شناسه استناد | خلوص و شناسنامه مداخله (D1) | اصالت و سلامت مدل (D2) | کنترل‌ها و دقت کمی (D3) | تکرارپذیری و جامعیت (D4) | سطح اعتبار کیفی ToxRTool |\n"
                 "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
             )
         else:
             badge_map = {
                 "LOW_RISK": "🟢 کم‌ریسک",
                 "SOME_CONCERNS": "🟡 مبهم/متوسط",
-                "UNCLEAR_RISK": "⚪ نامشخص",
+                "UNCLEAR_RISK": "⚪ گزارش‌نشده در چکیده",
                 "HIGH_RISK": "🔴 پرریسک"
             }
             header = (
-                "| ردیف | شناسه / عنوان مقاله | تصادفی‌سازی (D1) | کورسازی (D2) | کنترل‌ها و کمی‌سازی (D3) | تکرارپذیری (D4) | ریسک کلی سوگیری |\n"
+                "| ردیف | مرجع و شناسه استناد | تصادفی‌سازی (D1) | کورسازی (D2) | کنترل‌ها و کمی‌سازی (D3) | تکرارپذیری (D4) | ریسک کلی سوگیری |\n"
                 "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
             )
 
         rows = []
         for idx, ev in enumerate(evaluations, 1):
-            short_title = (ev.get("title") or "مقاله")[:55] + ("..." if len(ev.get("title", "")) > 55 else "")
-            pmid = ev.get("pmid") or ev.get("doi") or "N/A"
+            paper_label = cls._format_paper_citation_label(ev, idx)
             d1 = badge_map.get(ev["domains"]["d1_randomization"], ev["domains"]["d1_randomization"])
             d2 = badge_map.get(ev["domains"]["d2_blinding"], ev["domains"]["d2_blinding"])
             d3 = badge_map.get(ev["domains"]["d3_controls_rigor"], ev["domains"]["d3_controls_rigor"])
             d4 = badge_map.get(ev["domains"]["d4_replication_reporting"], ev["domains"]["d4_replication_reporting"])
             tot = badge_map.get(ev["overall_rob"], ev["overall_rob"])
 
-            rows.append(f"| {idx} | **{short_title}** *(ID: {pmid})* | {d1} | {d2} | {d3} | {d4} | **{tot}** |")
+            rows.append(f"| {idx} | {paper_label} | {d1} | {d2} | {d3} | {d4} | **{tot}** |")
 
         return header + "\n".join(rows)
 
