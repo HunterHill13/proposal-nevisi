@@ -128,6 +128,38 @@ MESH_THESAURUS: Dict[str, Dict[str, Any]] = {
         "mesh": "Liposomes",
         "synonyms": ["liposomal delivery", "lipid nanoparticles"],
         "category": "delivery"
+    },
+
+    # Additional Oncology & Pathological Mechanisms
+    "ovarian": {
+        "mesh": "Ovarian Neoplasms",
+        "synonyms": ["ovarian cancer", "ovary cancer", "ovarian carcinoma"],
+        "category": "disease"
+    },
+    "melanoma": {
+        "mesh": "Melanoma",
+        "synonyms": ["malignant melanoma", "cutaneous melanoma"],
+        "category": "disease"
+    },
+    "pancreatic": {
+        "mesh": "Pancreatic Neoplasms",
+        "synonyms": ["pancreatic cancer", "pancreatic carcinoma", "PDAC"],
+        "category": "disease"
+    },
+    "cell_cycle": {
+        "mesh": "Cell Cycle",
+        "synonyms": ["cell cycle arrest", "G0/G1 arrest", "G2/M arrest"],
+        "category": "mechanism"
+    },
+    "metastasis": {
+        "mesh": "Neoplasm Invasiveness",
+        "synonyms": ["cell migration", "cell invasion", "metastasis"],
+        "category": "mechanism"
+    },
+    "angiogenesis": {
+        "mesh": "Neovascularization, Pathologic",
+        "synonyms": ["angiogenesis", "VEGF signaling"],
+        "category": "mechanism"
     }
 }
 
@@ -135,14 +167,20 @@ PERSIAN_TO_CONCEPT_MAP: List[Tuple[str, str]] = [
     (r'سرطان\s+کولون|سرطان\s+روده|کولورکتال', "colorectal"),
     (r'سرطان\s+پستان|سرطان\s+سینه', "breast"),
     (r'سرطان\s+معده', "gastric"),
-    (r'سرطان\s+ریه', "lung"),
+    (r'سرطان\s+ریه', "pulmonary_neoplasms"),
     (r'سرطان\s+پروستات', "prostate"),
     (r'لوسمی|سرطان\s+خون', "leukemia"),
     (r'سرطان\s+کبد|هپاتوسلولار', "hepatocellular"),
     (r'گلیوبلاستوما|تومور\s+مغزی', "glioblastoma"),
+    (r'سرطان\s+تخمدان', "ovarian"),
+    (r'ملانوما|سرطان\s+پوست', "melanoma"),
+    (r'پانکراس|سرطان\s+پانکراس|لوزوالمعده', "pancreatic"),
     (r'آپوپتوز|مرگ\s+برنامه‌ریزی\s*شده', "apoptosis"),
     (r'اتوفاژی', "autophagy"),
     (r'پروپتوز|فروپتوز', "ferroptosis"),
+    (r'چرخه\s+سلولی|توقف\s+چرخه', "cell_cycle"),
+    (r'مهاجرت\s+سلولی|تهاجم\s+سلولی|متاستاز', "metastasis"),
+    (r'رگ‌زایی|آنژیوژنز', "angiogenesis"),
     (r'هم‌افزایی|سینرژی|سینرژیسم', "synergism"),
     (r'مقاومت\s+دارویی|مقاومت\s+به\s+شیمی‌درمانی', "resistance"),
     (r'استرس\s+اکسیداتیو|اکسیدان', "oxidative_stress"),
@@ -220,8 +258,9 @@ class MeSHQueryExpander:
                 terms.append(f'"{s}"[Title/Abstract]')
             clauses.append("(" + " OR ".join(terms) + ")")
 
-        # Add explicit agent/compound clauses
-        agents = list(custom_agents or [])
+        # Add explicit agent/compound clauses (strictly English/ASCII tokens to protect NCBI API)
+        raw_agents = list(custom_agents or [])
+        agents = [ag.strip() for ag in raw_agents if ag and not re.search(r'[\u0600-\u06FF]', ag) and len(ag.strip()) > 1]
         if not agents:
             # Extract Latin/English chemical tokens from topic if not in MeSH
             en_tokens = re.findall(r'[A-Za-z][A-Za-z0-9_\-\+]{2,}', text_or_topic)
@@ -261,7 +300,8 @@ class MeSHQueryExpander:
                 keywords.append(ent["synonyms"][0])
 
         if custom_agents:
-            keywords.extend(custom_agents)
+            clean_custom = [ag.strip() for ag in custom_agents if ag and not re.search(r'[\u0600-\u06FF]', ag) and len(ag.strip()) > 1]
+            keywords.extend(clean_custom)
         else:
             en_tokens = re.findall(r'[A-Za-z][A-Za-z0-9_\-\+]{2,}', text_or_topic)
             for tok in en_tokens:

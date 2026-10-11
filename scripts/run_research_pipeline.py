@@ -87,9 +87,13 @@ class MasterResearchPipeline:
         """Dynamically extracts biomedical search terms and entities from topic without hardcoded topic limitations."""
         if self.keywords:
             unique_terms = list(dict.fromkeys(self.keywords))
+            ascii_terms = [t.strip() for t in unique_terms if not re.search(r'[\u0600-\u06FF]', t) and len(t.strip()) > 1]
+            if not ascii_terms:
+                ascii_terms = ["Biomedical Research", "Cellular Viability"]
             return {
-                "terms": unique_terms,
-                "canonical_query": " AND ".join(unique_terms[:4])
+                "terms": ascii_terms,
+                "all_found_terms": unique_terms,
+                "canonical_query": " AND ".join(ascii_terms[:4])
             }
 
         # Dynamic entity extraction using CompoundEntityNormalizer & Biomedical Ontological mappings
@@ -145,14 +149,17 @@ class MasterResearchPipeline:
             if norm and norm.chemically_defined and norm.normalized_name not in ["Compound", "Natural Compound"]:
                 found_terms.append(norm.normalized_name)
 
-        if not found_terms:
-            found_terms = ["Biomedical Mechanisms", "Cellular Viability", "Therapeutic Effects"]
-
         # De-duplicate preserving order
         unique_terms = list(dict.fromkeys(found_terms))
-        query = " AND ".join(unique_terms[:4])
+        # Ensure only English/ASCII terms are passed to PubMed queries
+        ascii_terms = [t.strip() for t in unique_terms if not re.search(r'[\u0600-\u06FF]', t) and len(t.strip()) > 1]
+        if not ascii_terms:
+            ascii_terms = ["Biomedical Mechanisms", "Cellular Viability", "Therapeutic Effects"]
+
+        query = " AND ".join(ascii_terms[:4])
         return {
-            "terms": unique_terms,
+            "terms": ascii_terms,
+            "all_found_terms": unique_terms,
             "canonical_query": query
         }
 
