@@ -273,6 +273,53 @@ class TestV113Enhancements(unittest.TestCase):
         self.assertEqual(cite_audit["unresolved_placeholders_count"], 0)
         self.assertEqual(cite_audit["total_citations_in_text"], 2)
 
+    def test_docx_no_heading_fallthrough_duplication(self):
+        """Verify DocxBuilder does not duplicate headings or reference items as body paragraphs."""
+        import tempfile
+        import docx
+        from docx_builder import DocxBuilder
+
+        sample_md = (
+            "# عنوان اصلی\n"
+            "## ۲۱. تعیین ابزار گردآوری\n"
+            "توضیحات ابزار گردآوری داده‌ها.\n"
+            "## ۲۸. منابع\n"
+            "[1] Alpha et al. First study. Journal. 2023.\n"
+            "[2] Beta et al. Second study. Nature. 2022.\n"
+        )
+        with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tf:
+            out_docx = tf.name
+
+        try:
+            DocxBuilder.build_docx_from_markdown(sample_md, out_docx)
+            doc = docx.Document(out_docx)
+            texts = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+            # With fallthrough bug, there were 11 paragraphs (each heading and reference appeared twice)
+            # With fix, there are exactly 6 paragraphs
+            self.assertEqual(len(texts), 6)
+            self.assertNotIn("## ۲۱. تعیین ابزار گردآوری", texts)
+            self.assertNotIn("## ۲۸. منابع", texts)
+            self.assertEqual(texts.count("[1] Alpha et al. First study. Journal. 2023."), 1)
+        finally:
+            if os.path.exists(out_docx):
+                os.remove(out_docx)
+
+    def test_equator_no_substring_false_positives(self):
+        """Verify EQUATOR auditor does not falsely flag in vitro cellular study as ARRIVE 2.0 animal study."""
+        from equator_compliance_auditor import EquatorComplianceAuditor
+
+        # Persian text containing common words with substring 'رت' (صورت، قدرت، مهارت) or 'موش' (خاموش)
+        in_vitro_text = {
+            1: "عنوان طرح ارزیابی سلولی",
+            2: "به صورت جامع و با تکیه بر مهارت آزمایشگاهی و قدرت تشخیصی، رده سلولی کشت داده شد. دستگاه پس از سنجش خاموش گردید.",
+            13: "کشت سلول‌ها در پلیت ۹۶ خانه‌ای انجام شد.",
+            15: "سلول‌های سرطان ریه در محیط استاندارد کشت داده شدند.",
+            27: "سنجش زیست‌پذیری سلولی با آزمون MTT و فلوسایتومتری."
+        }
+        guidelines = EquatorComplianceAuditor.detect_applicable_guidelines(in_vitro_text)
+        self.assertIn("OECD_GCCP_CELL_CULTURE", guidelines)
+        self.assertNotIn("ARRIVE_2_0_ANIMAL_STUDIES", guidelines, "In vitro study must NOT trigger ARRIVE 2.0 due to 'صورت' or 'مهارت'")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -138,9 +138,12 @@ class EquatorComplianceAuditor:
         if any(k in all_text for k in qpcr_keywords):
             guidelines.append("MIQE_QPCR_STANDARDS")
 
-        # 3. ARRIVE 2.0 (In Vivo Animal Studies)
-        animal_keywords = ["موش", "رت", "حیوانات آزمایشگاهی", "in vivo", "animal model", "رت‌های", "سوری", "حیوان"]
-        if any(k in all_text for k in animal_keywords):
+        # 3. ARRIVE 2.0 (In Vivo Animal Studies - strictly word-bounded to prevent false positives like 'صورت' or 'مهارت')
+        animal_patterns = [
+            r'(?:^|[^\w\u0600-\u06FF])(?:موش|موش‌های|موش‌ها|رت|رت‌های|رت‌ها|سوری|حیوانات\s+آزمایشگاهی|مدل\s+حیوانی)(?:[^\w\u0600-\u06FF]|$)',
+            r'\b(?:in\s+vivo|animal\s+model|animal\s+studies|mice|rats|murine|rodent)\b'
+        ]
+        if any(re.search(pat, all_text, re.IGNORECASE) for pat in animal_patterns):
             guidelines.append("ARRIVE_2_0_ANIMAL_STUDIES")
 
         # 4. Chemical / Biological Authentication (Always enforced for interventional/compound studies)

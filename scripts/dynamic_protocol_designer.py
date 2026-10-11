@@ -81,8 +81,8 @@ class DynamicProtocolDesigner:
             name = agt.get("name", "مداخله پژوهش") if isinstance(agt, dict) else str(agt)
             variables.append({
                 "name": name,
-                "role": "مستقل (Independent)",
-                "type": "کمی پیوسته (Continuous)",
+                "role": "مستقل",
+                "type": "کمی پیوسته",
                 "operational_definition": f"غلظت و دوز مواجهه با {name} در مدل تجربی",
                 "measurement_method": "تیتراسیون رقت‌های متوالی در شرایط کنترل‌شده",
                 "unit": "میکرومولار / غلظت استاندارد"
@@ -95,8 +95,8 @@ class DynamicProtocolDesigner:
             unit = out.get("measurement_unit", "درصد مهار") if isinstance(out, dict) else "درصد مهار"
             variables.append({
                 "name": name,
-                "role": "وابسته (Dependent)",
-                "type": "کمی پیوسته (Continuous)",
+                "role": "وابسته",
+                "type": "کمی پیوسته",
                 "operational_definition": f"میزان تغییر در شاخص {name} نسبت به گروه کنترل منفی",
                 "measurement_method": "سنجش کمی نوری / الایزا / فلوسایتومتری",
                 "unit": unit
@@ -108,8 +108,8 @@ class DynamicProtocolDesigner:
             cname = comp.get("name", "کنترل پایه") if isinstance(comp, dict) else str(comp)
             variables.append({
                 "name": cname,
-                "role": "کنترل پایه (Baseline Control)",
-                "type": "کیفی رتبه‌ای (Categorical)",
+                "role": "کنترل پایه",
+                "type": "کیفی رتبه‌ای",
                 "operational_definition": f"شرایط پایه فاقد مداخله فعال جهت نرمال‌سازی داده‌ها ({cname})",
                 "measurement_method": "انکوباسیون همزمان در شرایط یکسان با حلال فاقد ماده موثره",
                 "unit": "فاقد واحد (نسبت به کنترل)"
@@ -122,16 +122,16 @@ class DynamicProtocolDesigner:
         if is_in_vitro:
             variables.append({
                 "name": "بلانک بدون سلول (Cell-Free Blank Control)",
-                "role": "کنترل منفی تداخل فنی (Assay Interference Control)",
-                "type": "کیفی اسمی (Categorical)",
+                "role": "کنترل منفی تداخل فنی",
+                "type": "کیفی اسمی",
                 "operational_definition": "محیط کشت حاوی غلظت‌های مداخله فاقد سلول با معرف سنجش جهت کسر احیای شیمیایی مستقیم و تداخل نوری غیرآنزیمی",
                 "measurement_method": "خوانش اسپکتروفتومتری و کسر جذب نوری بلانک از چاهک‌های آزمایش",
                 "unit": "جذب نوری (OD)"
             })
             variables.append({
                 "name": "کنترل حلال ناقل (Vehicle Control)",
-                "role": "کنترل منفی حلال (Vehicle Control)",
-                "type": "کیفی اسمی (Categorical)",
+                "role": "کنترل منفی حلال",
+                "type": "کیفی اسمی",
                 "operational_definition": "محیط کشت حاوی حداکثر غلظت حلال ناقل (DMSO < 0.1%) فاقد ماده موثره جهت تفکیک سمیت حلال از اثر اختصاصی",
                 "measurement_method": "انکوباسیون همگام در شرایط یکسان با گروه‌های مداخله",
                 "unit": "درصد زیست‌پذیری نسبت به کنترل دست‌نخورده"
@@ -140,8 +140,8 @@ class DynamicProtocolDesigner:
         # 4. Confounders
         variables.append({
             "name": "تعداد پاساژ و یکنواختی محیط کشت / شرایط آزمون",
-            "role": "مخدوشگر بالقوه (Confounder)",
-            "type": "کمی گسسته (Discrete)",
+            "role": "مخدوشگر بالقوه",
+            "type": "کمی گسسته",
             "operational_definition": "تغییرات بیولوژیکی ناشی از پیری سلولی یا نوسانات محیط کشت",
             "measurement_method": "استفاده از پاساژهای مشخص و یکسان در تمام تکرارهای زیستی",
             "unit": "شماره پاساژ"

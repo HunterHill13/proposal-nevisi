@@ -53,6 +53,8 @@ def set_p_rtl(p, space_before=2.5, space_after=3.5, line_spacing=1.15, align="bo
 def add_r(p, text, font_name="Dubai", size_pt=11, bold=False, italic=False, color_rgb=(0x00, 0x00, 0x00), is_rtl=True):
     if text is not None:
         text = str(text).replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ')
+        # XML 1.0 valid character filtration: disallow control characters like \x0c, \x08, \x07
+        text = re.sub(r'[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]', '', text)
     run = p.add_run(text)
     run.font.name = font_name
     run.font.size = Pt(size_pt)
@@ -389,14 +391,19 @@ def build_proposal_docx(md_path, output_docx_path, font_name="Dubai"):
 
         if stripped.startswith('# '):
             add_title(doc, stripped[2:])
+            continue
         elif stripped.startswith('## '):
             add_h1(doc, stripped[3:])
+            continue
         elif stripped.startswith('### '):
             add_h2(doc, stripped[4:])
+            continue
         elif stripped.startswith('#### '):
             add_h3(doc, stripped[5:])
+            continue
         elif is_refs and (re.match(r'^\d+\.\s+', stripped) or re.match(r'^\[\d+\]\s*', stripped)):
             add_ref_item(doc, stripped)
+            continue
         # Check for formula blocks ($$...$$, \[...\], n = \frac, CI =, etc.)
         is_formula_line = (
             (stripped.startswith('$$') and stripped.endswith('$$') and len(stripped) > 4) or

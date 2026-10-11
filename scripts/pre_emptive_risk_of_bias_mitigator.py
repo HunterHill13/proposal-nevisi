@@ -492,7 +492,7 @@ class BaselinePaperQualityAuditor:
             d4 = badge_map.get(ev["domains"]["d4_replication_reporting"], ev["domains"]["d4_replication_reporting"])
             tot = badge_map.get(ev["overall_rob"], ev["overall_rob"])
 
-            rows.append(f"| {idx} | **{short_title}**<br>*(ID: {pmid})* | {d1} | {d2} | {d3} | {d4} | **{tot}** |")
+            rows.append(f"| {idx} | **{short_title}** *(ID: {pmid})* | {d1} | {d2} | {d3} | {d4} | **{tot}** |")
 
         return header + "\n".join(rows)
 
