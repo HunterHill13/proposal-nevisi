@@ -3568,15 +3568,16 @@ class EvidenceDrivenParagraphBuilder:
 
     @classmethod
     def synthesize_findings_persian(cls, findings_text: str) -> str:
-        """Translates and synthesizes raw English findings/titles into academic Persian prose."""
+        """Translates and synthesizes raw English findings/titles into academic Persian prose with paper-specific pathways and quantitative figures."""
         if not findings_text or str(findings_text).strip() in ["NOT_REPORTED", ""]:
             return "مداخله مورد نظر اثرات بیولوژیکی معناداری بر فنوتیپ سلولی هدف نشان داده است"
         
+        raw_str = str(findings_text).strip()
         # If already contains Persian characters, return as-is
-        if re.search(r'[\u0600-\u06FF]{3,}', str(findings_text)):
-            return str(findings_text).strip().rstrip(".")
+        if re.search(r'[\u0600-\u06FF]{3,}', raw_str):
+            return raw_str.rstrip(".")
         
-        f_lower = str(findings_text).lower()
+        f_lower = raw_str.lower()
         actions = []
         if any(w in f_lower for w in ["inhibit", "suppress", "decrease", "downregulat", "block", "arrest"]):
             actions.append("مهار رشد و سرکوب تکثیر سلول‌های هدف")
@@ -3592,11 +3593,63 @@ class EvidenceDrivenParagraphBuilder:
             actions.append("کاهش وابسته به دوز زیست‌پذیری و القای سمیت انتخابی")
         if any(w in f_lower for w in ["resist", "overcome"]):
             actions.append("غلبه بر مکانیسم‌های مقاومت دارویی")
-            
-        if actions:
-            return " و ".join(actions) + " به عنوان پیامد محوری مواجهه به اثبات رسید"
-        else:
-            return "تغییرات بیولوژیکی و مولکولی معناداری در شاخص‌های پاتولوژیک هدف گزارش گردید"
+
+        # Extract specific molecular pathways & gene/protein targets mentioned in the paper
+        pathway_patterns = [
+            (r'pi3k\s*/\s*akt\s*/\s*mtor', "PI3K/Akt/mTOR"),
+            (r'pi3k\s*/\s*akt', "PI3K/Akt"),
+            (r'\bampk\b', "AMPK"),
+            (r'mapk\s*/\s*erk|\berk1/2\b|\bmapk\b', "MAPK/ERK"),
+            (r'nf-?[κk]b', "NF-κB"),
+            (r'\bstat3\b', "STAT3"),
+            (r'wnt\s*/\s*[βb]-?catenin', "Wnt/β-catenin"),
+            (r'nrf2\s*/\s*ho-?1|\bnrf2\b', "Nrf2/HO-1"),
+            (r'bax\s*/\s*bcl-?2', "Bax/Bcl-2"),
+            (r'\bbcl-?2\b', "Bcl-2"),
+            (r'\bbax\b', "Bax"),
+            (r'\bcaspase-?3\b|\bcasp3\b', "Caspase-3"),
+            (r'\bcaspase-?9\b|\bcasp9\b', "Caspase-9"),
+            (r'\bparp\b', "PARP"),
+            (r'\bp53\b', "p53"),
+            (r'\bmmp-?9\b', "MMP-9"),
+            (r'\bmmp-?2\b', "MMP-2"),
+            (r'\bvegf\b', "VEGF"),
+            (r'\be-?cadherin\b|\bemt\b', "EMT/E-cadherin"),
+            (r'\begfr\b', "EGFR"),
+            (r'\bkras\b', "KRAS"),
+        ]
+        detected_pathways = []
+        for pat, label in pathway_patterns:
+            if re.search(pat, f_lower):
+                if label == "PI3K/Akt" and "PI3K/Akt/mTOR" in detected_pathways:
+                    continue
+                if label in ("Bax", "Bcl-2") and "Bax/Bcl-2" in detected_pathways:
+                    continue
+                detected_pathways.append(label)
+
+        # Extract paper-specific quantitative figures (IC50, doses, percentages, hours, p-values)
+        quant_details = []
+        ic50_m = re.search(r'\bic50\s*(?:of|=|:|was)?\s*([0-9]+(?:\.[0-9]+)?\s*(?:μm|um|µm|nm|mm|μg/ml|ug/ml|mg/ml))', raw_str, re.IGNORECASE)
+        if ic50_m:
+            quant_details.append(f"IC50 = {ic50_m.group(1)}")
+        dose_matches = re.findall(r'\b([0-9]+(?:\.[0-9]+)?\s*(?:μm|um|µm|nm|μg/ml|ug/ml|mg/ml|mg/kg))\b', raw_str, re.IGNORECASE)
+        for dm in dose_matches[:2]:
+            if not any(dm.lower() in q.lower() for q in quant_details):
+                quant_details.append(f"غلظت {dm}")
+        pct_matches = re.findall(r'\b([0-9]+(?:\.[0-9]+)?\s*%)\b', raw_str)
+        for pm in pct_matches[:2]:
+            quant_details.append(f"تغییر {pm}")
+        hr_matches = re.findall(r'\b([0-9]{1,3}\s*(?:h|hr|hrs|hours))\b', raw_str, re.IGNORECASE)
+        if hr_matches:
+            quant_details.append(f"بازه زمانی {hr_matches[0]}")
+        pval_m = re.search(r'\b(p\s*[<≤=]\s*0\.[0-9]+)\b', raw_str, re.IGNORECASE)
+        if pval_m:
+            quant_details.append(pval_m.group(1))
+
+        base_action = " و ".join(actions) if actions else "تغییرات بیولوژیکی و مولکولی معناداری در شاخص‌های پاتولوژیک هدف"
+        pathway_clause = f" از طریق تعدیل مسیر ({'، '.join(detected_pathways)})" if detected_pathways else ""
+        quant_clause = f" با شاخص‌های کمی ({'؛ '.join(quant_details)})" if quant_details else ""
+        return f"{base_action}{pathway_clause}{quant_clause} به عنوان پیامد محوری مواجهه به اثبات رسید"
 
     @classmethod
     def build_literature_paragraph(
@@ -3691,8 +3744,15 @@ class EvidenceDrivenParagraphBuilder:
             parts.append("یافته‌های به‌دست‌آمده نشان داد که مداخله مورد آزمایش فاقد اثر معنادار آماری (Null Result) در دوزهای استاندارد بوده و اثر بارزی ثبت نگردید.")
         else:
             findings_summary = canonical["qualitative_results"]["summary"]
+            raw_abstract = str(study_record.get("abstract", "")).strip()
             if findings_summary and findings_summary != "NOT_REPORTED":
-                persian_summary = cls.synthesize_findings_persian(findings_summary)
+                source_for_synth = findings_summary
+                if raw_abstract and not re.search(r'[\u0600-\u06FF]{3,}', str(findings_summary)):
+                    source_for_synth = f"{findings_summary} {raw_abstract}"
+                persian_summary = cls.synthesize_findings_persian(source_for_synth)
+                parts.append(f"یافته‌های به‌دست‌آمده حاکی از آن بود که {persian_summary}.")
+            elif raw_abstract:
+                persian_summary = cls.synthesize_findings_persian(raw_abstract)
                 parts.append(f"یافته‌های به‌دست‌آمده حاکی از آن بود که {persian_summary}.")
 
         # Derivative and extract qualification notes

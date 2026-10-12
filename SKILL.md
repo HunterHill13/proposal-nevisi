@@ -76,7 +76,7 @@ description: >
 
 > [!IMPORTANT]
 > **پروتکل قطعی ارکستراسیون دومرحله‌ای با ۴ ساب‌ایجنت تخصصی (Two-Stage 4-Subagent Orchestration Protocol — Inspired by Claude Multi-Agent Research, PaperQA2 & AI-Scientist-v2):**  
-> برای تضمین اصالت علمی ۱۰۰٪، حذف کامل عبارات قالبی، جلوگیری از خطای انتساب استنادی (Citation Drift) و ممانعت از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با ۴ ساب‌ایجنت تخصصی از طریق ابزار `invoke_subagent`** و **موتور حلقه بسته ۸ مرحله‌ای (`DEFAULT_MAX_ITERATIONS = 8`)** اجرا نماید:
+> برای تضمین اصالت علمی ۱۰۰٪، حذف کامل عبارات قالبی، جلوگیری از خطای انتساب استنادی (Citation Drift) و ممانعت از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با ۴ ساب‌ایجنت تخصصی از طریق ابزار `invoke_subagent`** و **موتور حلقه بسته ۱۰ مرحله‌ای (`DEFAULT_MAX_ITERATIONS = 10`)** اجرا نماید:
 >
 > ### مرحله اول (Stage 1: Parallel Pre-Draft Subagents -> `PROPOSAL_SPEC.json`):
 > پیش از اجرای پایپ‌لاین، ابتدا **۲ ساب‌ایجنت تخصصی شواهد و متدولوژی** را به صورت موازی فراخوانی کنید تا مقالات زنده PubMed/Europe PMC/OpenAlex، امتیاز ارتباط و استناد (PaperQA2 RCS 0–10)، و پارامترهای اختصاصی مدل بیماری را استخراج کنند:
@@ -92,7 +92,7 @@ description: >
 >     {
 >       "Role": "Methodology & Biostatistical Anti-Chimera Subagent",
 >       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت طراحی متدولوژی منسجم و ضد کیمرا (Primary Anchor Protocol & Biostatistical Coherence) برای «<موضوع>» هستید. وظیفه شما: ۱. انتخاب یک مطالعه مرجع اصلی (Primary Anchor Study) و تعیین دقیق پروفایل ژنتیکی و محیط کشت استاندارد ATCC اختصاصی رده سلولی یا مدل هدف (<TargetModel>). ۲. طراحی جدول کامل متغیرهای مستقل، وابسته و کنترل (بخش ۱۱) منطبق با تمامی اهداف اختصاصی بخش ۶، و پروتکل دوفازی Chou-Talalay (فاز اول منحنی تک‌دارویی و فاز دوم نسبت ثابت) به همراه کنترل بلانک بدون سلول (Cell-Free Blank)، کنترل مثبت آپوپتوز (Staurosporine 1 μM)، سنجش ارتوگونال برش پروتئولیتیک کاسپاز-۳ (Cleaved Caspase-3 / Annexin V-PI) و دو ژن مرجع MIQE (GAPDH و ACTB). ۳. قفل کردن پارامترهای ریاضی حجم نمونه کل (N=30 در ۱۰ گروه T=9 و ۳ تکرار مستقل B=2، درجات آزادی خطا E=19 در معادله مید) و تحلیل مستقل توان آماری G*Power (f=0.40, 1-β=85.2%) برای درج در `PROPOSAL_SPEC.json`."
+>       "Prompt": "شما ساب‌ایجنت طراحی متدولوژی منسجم و ضد کیمرا (Primary Anchor Protocol & Biostatistical Coherence) برای «<موضوع>» هستید. وظیفه شما: ۱. انتخاب یک مطالعه مرجع اصلی (Primary Anchor Study) و تعیین دقیق پروفایل ژنتیکی و محیط کشت استاندارد ATCC اختصاصی رده سلولی یا مدل هدف (<TargetModel>). ۲. طراحی جدول کامل متغیرهای مستقل، وابسته و کنترل (بخش ۱۱) منطبق با تمامی اهداف اختصاصی بخش ۶، و پروتکل دوفازی Chou-Talalay (فاز اول منحنی تک‌دارویی و فاز دوم نسبت ثابت) به همراه کنترل بلانک بدون سلول (Cell-Free Blank)، کنترل مثبت آپوپتوز (Staurosporine 1 μM)، سنجش ارتوگونال برش پروتئولیتیک کاسپاز-۳ (Cleaved Caspase-3 / Annexin V-PI) و دو ژن مرجع MIQE (GAPDH و ACTB). ۳. قفل کردن پارامترهای ریاضی حجم نمونه کل (N=30 در ۱۰ گروه T=9 و ۳ تکرار مستقل B=2، درجات آزادی خطا E=19 در معادله مید) و تحلیل مستقل توان آماری G*Power (f=0.58, λ=10.1, 1-β=85.2%) برای درج در `PROPOSAL_SPEC.json`."
 >     }
 >   ]
 > })
@@ -104,7 +104,7 @@ description: >
 > ```json
 > {
 >   "keywords": ["<English Agent 1>", "<English Agent 2>", "<English Disease/Cell Line MeSH>"],
->   "max_iterations": 8,
+>   "max_iterations": 10,
 >   "problem_statement_text": "<متن جامع و مستند بخش ۲ با آمار دقیق GLOBOCAN 2022 اختصاصی ارگان هدف و گزارش جستجوی منفی>",
 >   "studies": [
 >     {
@@ -129,13 +129,13 @@ description: >
 > }
 > ```
 >
-> سپس پایپ‌لاین را با پرچم‌های `--spec-file` و `--max-iterations 8` اجرا نمایید:
+> سپس پایپ‌لاین را با پرچم‌های `--spec-file` و `--max-iterations 10` اجرا نمایید:
 >
 > ```powershell
-> uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 8 --output-dir "<پوشه خروجی>"
+> uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 10 --output-dir "<پوشه خروجی>"
 > ```
 >
-> ### مرحله دوم (Stage 2: Post-Draft Closed-Loop Verification with 2 Independent Subagents — Up to 8 Rounds):
+> ### مرحله دوم (Stage 2: Post-Draft Closed-Loop Verification with 2 Independent Subagents — Up to 10 Rounds):
 > **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است ۲ ساب‌ایجنت ممیز پس از نگارش** (`Citation & Claim-Span Verifier Subagent` به سبک `CitationAgent` کلاد و `Post-Draft Blind Adversarial Grant Reviewer Subagent`) را روی فایل واقعی `proposal.md` فراخوانی کند:
 >
 > ```json
@@ -155,8 +155,8 @@ description: >
 > })
 > ```
 >
-> #### حلقه بسته اصلاح و بازبینی تا سقف ۸ راند (`Closed-Loop Critic-Refine up to 8 Iterations`):
-> چنانچه هر یک از دو ساب‌ایجنت مرحله دوم یا موتور نمادین `IterativeRemediationEngine` هرگونه ایراد علمی، استنادی، بیولوژیک یا آماری در `proposal.md` کشف کند، ایجنت اصلی موظف است در یک حلقه بسته (حداکثر تا **۸ راند**؛ `DEFAULT_MAX_ITERATIONS = 8`) فایل `PROPOSAL_SPEC.json` یا بخش‌های مربوطه را جراحی و اصلاح کرده، پایپ‌لاین را مجدداً اجرا نماید و با ابزار `send_message` متن اصلاح‌شده را دوباره به همان ساب‌ایجنت‌های داور بفرستد تا تاییدیه قطعی (`0 Critical Flaws`، `0 Citation Drift` و `APPROVED_FUNDABLE`) صادر گردد.
+> #### حلقه بسته اصلاح و بازبینی تا سقف ۱۰ راند (`Closed-Loop Critic-Refine up to 10 Iterations`):
+> چنانچه هر یک از دو ساب‌ایجنت مرحله دوم یا موتور نمادین `IterativeRemediationEngine` هرگونه ایراد علمی، استنادی، بیولوژیک یا آماری در `proposal.md` کشف کند، ایجنت اصلی موظف است در یک حلقه بسته (حداکثر تا **۱۰ راند**؛ `DEFAULT_MAX_ITERATIONS = 10`) فایل `PROPOSAL_SPEC.json` یا بخش‌های مربوطه را جراحی و اصلاح کرده، پایپ‌لاین را مجدداً اجرا نماید و با ابزار `send_message` متن اصلاح‌شده را دوباره به همان ساب‌ایجنت‌های داور بفرستد تا تاییدیه قطعی (`0 Critical Flaws`، `0 Citation Drift` و `APPROVED_FUNDABLE`) صادر گردد.
 >
 > > [!CAUTION]
 > > **الزام قطعی ارسال کلیدواژه‌های انگلیسی در پرچم `--keywords`:**  

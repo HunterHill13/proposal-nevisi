@@ -210,6 +210,10 @@ class MockGrantReviewPanel:
             else:
                 weaknesses.append("GLOBOCAN_CASE_DEATH_CHECKSUM_ERROR: در استناد به گزارش GLOBOCAN، ارقام دقیق گزارش رسمی ۲۰۲۲ (Bray et al., 2024) متناسب با ارگان هدف درج نشده است.")
                 score += 0.5
+            s28 = sections.get(28, "").lower()
+            if re.search(r'38572751[^\n\.]*(?:محسوب\s+می‌گردد|می‌گردند)\s*\[1\]\.', s2) and s28 and "38572751" not in s28 and "globocan" not in s28:
+                weaknesses.append("GLOBOCAN_CITATION_ATTRIBUTION_DRIFT: در بخش ۲، استناد [1] مستقیماً به جمله آمار GLOBOCAN 2022 (PMID: 38572751) متصل شده است در حالی که منبع [1] در بخش ۲۸ مربوط به گزارش Bray et al. 2024 نیست.")
+                score += 0.4
 
         # Section 2 Audit: Unsubstantiated Novelty Claim without Negative Search Log
         claims_novelty = any(k in s2 for k in ["اولین بار", "اولین مطالعه", "نخستین بار", "نخستین مطالعه", "هیچ مطالعه‌ای", "first-in-class", "برای نخستین"])

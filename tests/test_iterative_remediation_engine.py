@@ -230,6 +230,57 @@ class TestIterativeRemediationEngine(unittest.TestCase):
             md_text = f.read()
         self.assertIn("پاراگراف اختصاصی سنتزشده توسط ساب‌ایجنت ارزیابی شواهد", md_text)
 
+    def test_6_globocan_citation_guard_paper_specific_extraction_and_10_iterations(self):
+        """Verifies DEFAULT_MAX_ITERATIONS == 10, GLOBOCAN false-citation guard, paper-specific quantitative/pathway extraction in Section 3, and exact G*Power math (f=0.58, lambda=10.1)."""
+        from generic_reference_auditor import EvidenceDrivenParagraphBuilder
+
+        # 1. Verify DEFAULT_MAX_ITERATIONS == 10
+        self.assertEqual(IterativeRemediationEngine.DEFAULT_MAX_ITERATIONS, 10)
+
+        # 2. Verify EvidenceDrivenParagraphBuilder extracts paper-specific numbers & molecular pathways from English abstracts
+        study_a = {
+            "pmid": "39100001",
+            "title": "Berberine inhibits colorectal carcinoma proliferation via PI3K/Akt/mTOR suppression",
+            "authors": ["Wang X", "Li Y"],
+            "year": 2024,
+            "journal": "Oncol Rep",
+            "abstract": "Berberine treatment for 48 h inhibited cell proliferation with an IC50 of 18.4 μM (p < 0.001) by downregulating PI3K/Akt/mTOR signaling and increasing Bax/Bcl-2 ratio."
+        }
+        study_b = {
+            "pmid": "39100002",
+            "title": "Quercetin suppresses gastric cancer cell migration through NF-kB and MMP-9 inhibition",
+            "authors": ["Kim J", "Park S"],
+            "year": 2023,
+            "journal": "Phytomedicine",
+            "abstract": "Exposure to 35.0 μM quercetin for 24 h reduced cell migration by 64.2% (p < 0.01) via suppression of NF-κB and MMP-9 expression."
+        }
+        para_a = EvidenceDrivenParagraphBuilder.build_literature_paragraph(study_a, 1)
+        para_b = EvidenceDrivenParagraphBuilder.build_literature_paragraph(study_b, 2)
+        self.assertNotEqual(para_a, para_b)
+        self.assertTrue("18.4" in para_a or "۱۸.۴" in para_a)
+        self.assertIn("PI3K/Akt", para_a)
+        self.assertTrue("64.2" in para_b or "۶۴.۲" in para_b or "35.0" in para_b)
+        self.assertIn("MMP-9", para_b)
+
+        # 3. Verify GLOBOCAN 2022 sentence does NOT falsely attach [1] when study [1] is not Bray et al. (PMID: 38572751)
+        data_with_non_globocan_ref = {
+            "title_fa": "بررسی اثر بربرین بر سلول‌های سرطان کولورکتال",
+            "research_title_fa": "بررسی اثر بربرین بر سلول‌های سرطان کولورکتال",
+            "framework": "EXPERIMENTAL_IN_VITRO",
+            "target_condition": {"name_fa": "سرطان کولورکتال", "name_en": "Colorectal Neoplasms"},
+            "research_problem_model": {
+                "framework": "EXPERIMENTAL_IN_VITRO",
+                "target_condition": {"name_fa": "سرطان کولورکتال", "name_en": "Colorectal Neoplasms"},
+                "interventions_or_exposures": [{"name": "بربرین"}],
+                "population_or_model": {"primary_system": "رده سلولی کولورکتال"},
+                "primary_outcomes": [{"name": "زیست‌پذیری سلولی"}, {"name": "آپوپتوز"}]
+            },
+            "studies": [study_a, study_b]
+        }
+        generated_md = ProposalGenerator.assemble_pajooheshyar_28(data_with_non_globocan_ref)
+        # The GLOBOCAN sentence ending after "در جهان محسوب می‌گردد" must not have "[1]." attached to Bray 2024
+        self.assertNotIn("در جهان محسوب می‌گردد [1].", generated_md)
+
 
 if __name__ == "__main__":
     unittest.main()

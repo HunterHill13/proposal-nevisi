@@ -57,19 +57,19 @@ flowchart TD
         I --> J5["بخش ۲۷ و ۲۸: پروتکل دو فازی چو-تالالای + منابع انگلیسی با ارقام استاندارد"]
     end
 
-    subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح جراحی تا ۸ راند (Symbolic Critic-Refine Loop — Max 8 Rounds)"]
+    subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح جراحی تا ۱۰ راند (Symbolic Critic-Refine Loop — Max 10 Rounds)"]
         J1 & J2 & J3 & J4 & J5 --> R1["MockGrantReviewPanel (داوری ۳ داور تخصصی NIH 1-9)"]
         R1 --> R2{"آیا نیاز به اصلاح دارد؟<br>(Flaws > 0 یا نمره > 2.0)"}
-        R2 -- "بله (نقص بحرانی یا ضعف ساختاری)" --> R3["IterativeRemediationEngine<br>• پچ جراحی تمام ۱۵+ نقص داوران ۱، ۲ و ۳<br>• اصلاح پیوسته تا سقف ۸ راند (DEFAULT_MAX_ITERATIONS=8)"]
+        R2 -- "بله (نقص بحرانی یا ضعف ساختاری)" --> R3["IterativeRemediationEngine<br>• پچ جراحی تمام ۱۵+ نقص داوران ۱، ۲ و ۳<br>• اصلاح پیوسته تا سقف ۱۰ راند (DEFAULT_MAX_ITERATIONS=10)"]
         R3 --> R1
         R2 -- "خیر (اجماع کامل نمادین)" --> DRAFT["تولید پیش‌نویس کامل ۲۸ بخشی<br>proposal.md"]
     end
 
-    subgraph Stage2 ["۵. مرحله دوم: ۲ ساب‌ایجنت ممیز پس از نگارش در حلقه بسته تا ۸ راند (Stage 2: Post-Draft Subagents)"]
+    subgraph Stage2 ["۵. مرحله دوم: ۲ ساب‌ایجنت ممیز پس از نگارش در حلقه بسته تا ۱۰ راند (Stage 2: Post-Draft Subagents)"]
         DRAFT --> CIT["ساب‌ایجنت ۳: ممیز استنادات و اعداد (Citation & Claim-Span Verifier)<br>• تطبیق تک‌تک استنادات [n] در بخش ۲ و ۳ با چکیده واقعی منبع در بخش ۲۸<br>• کشف هرگونه خطای انتساب (Citation Drift) یا عدد فاقد پشتوانه"]
         DRAFT --> BLIND["ساب‌ایجنت ۴: داور کور گرنت (Post-Draft Blind Adversarial Reviewer)<br>• مطالعه خط‌به‌خط فایل واقعی proposal.md در تمام ۲۸ بخش<br>• ممیزی تطابق بیولوژیک، اپیدمیولوژیک و آماری بین بخش‌های ۶، ۱۱، ۱۳، ۱۹، ۲۲ و ۲۷"]
         CIT & BLIND --> BCHECK{"تایید هر دو ساب‌ایجنت ممیز؟<br>(0 خطای علمی / 0 خطای استنادی)"}
-        BCHECK -- "خیر (کشف خطای معنایی/استنادی - تا ۸ راند)" --> BPATCH["اصلاح جراحی PROPOSAL_SPEC.json و بازتولید"]
+        BCHECK -- "خیر (کشف خطای معنایی/استنادی - تا ۱۰ راند)" --> BPATCH["اصلاح جراحی PROPOSAL_SPEC.json و بازتولید"]
         BPATCH --> I
         BCHECK -- "بله (APPROVED_FUNDABLE)" --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
     end
@@ -93,8 +93,8 @@ Full primary-source benchmark details are documented in [`docs/DEEP_RESEARCH_BEN
 | **Anthropic Claude Multi-Agent Research** | Lead Orchestrator + Parallel Subagents + Dedicated `CitationAgent` | Two-Stage 4-Subagent split with a dedicated **Post-Draft Citation & Claim-Span Verifier Subagent** |
 | **OpenAI ChatGPT (o3) Deep Research** | ReAct Browsing + Python Code Execution + Backtracking | Live multi-database retrieval + deterministic Python biostatistical & Crossref verification |
 | **Perplexity Deep Research** | Iterative Query Decomposition + Multi-Hop Retrieval | 16-layer MeSH Boolean query expansion + negative search log (`0 hits` proof) |
-| **FutureHouse `PaperQA2`** | Gather $\rightarrow$ RCS Score (0–10) $\rightarrow$ Quote-Grounded Cite | Quantitative passage extraction (`IC50`, doses, $p$-values) + `farsi_synthesis_summary` preservation |
-| **Sakana AI `AI-Scientist-v2`** | Multi-Round Automated Peer Review + Reflexion | Closed-loop **8-iteration** symbolic + subagent remediation (`DEFAULT_MAX_ITERATIONS = 8`) |
+| **FutureHouse `PaperQA2`** | Gather $\rightarrow$ RCS Score (0–10) $\rightarrow$ Quote-Grounded Cite | Quantitative passage & pathway extraction (`IC50`, doses, $p$-values) + `farsi_synthesis_summary` preservation |
+| **Sakana AI `AI-Scientist-v2`** | Multi-Round Automated Peer Review + Reflexion | Closed-loop **10-iteration** symbolic + subagent remediation (`DEFAULT_MAX_ITERATIONS = 10`) |
 | **Stanford `STORM` / `Co-STORM`** | Multi-Perspective Persona Questioning | 3-Reviewer NIH Study Section (Scientific Premise, Methodology/Biostatistics, Bioethics/Biosafety) |
 | **K-Dense `claude-scientific-writer` & AIPOCH** | Structured IMRaD/Grant Templates + PICO/EQUATOR | 28-section Pajooheshyar completeness + ARRIVE 2.0 / MIQE / ToxRTool / Native Word OMML |
 
