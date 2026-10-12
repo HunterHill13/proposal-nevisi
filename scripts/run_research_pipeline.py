@@ -498,7 +498,7 @@ class MasterResearchPipeline:
                 user_approved=True,
                 journal=s.get("journal", ""),
                 abstract=s.get("abstract", ""),
-                review_paragraph=s.get("review_paragraph"),
+                review_paragraph=s.get("farsi_synthesis_summary") or s.get("review_paragraph"),
                 extra_metadata=s
             )
 

@@ -181,11 +181,14 @@ class ProposalGenerator:
                 
                 # Check for existing curated paragraph, ensuring citation number is synchronized
                 # and verifying zero leaked template placeholders
-                para = s.get("review_paragraph") or s.get("literature_review_paragraph")
+                para = s.get("farsi_synthesis_summary") or s.get("review_paragraph") or s.get("literature_review_paragraph")
                 if para:
                     scan_para = FinalTextSanitizationGate.scan_text(para)
                     if scan_para["is_clean"]:
-                        para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
+                        if re.search(r'\[\d+\]', para):
+                            para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
+                        else:
+                            para = f"{para.strip()} [{cnum}]"
                     else:
                         para = None
 
@@ -620,7 +623,18 @@ class ProposalGenerator:
             lit_paras = []
             for idx, s in enumerate(studies[:25], 1):
                 cnum = s.get("citation_number", idx)
-                para = s.get("review_paragraph") or EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
+                para = s.get("farsi_synthesis_summary") or s.get("review_paragraph") or s.get("literature_review_paragraph")
+                if para:
+                    scan_para = FinalTextSanitizationGate.scan_text(para)
+                    if scan_para["is_clean"]:
+                        if re.search(r'\[\d+\]', para):
+                            para = re.sub(r'\[\d+\]', f'[{cnum}]', para)
+                        else:
+                            para = f"{para.strip()} [{cnum}]"
+                    else:
+                        para = None
+                if not para:
+                    para = EvidenceDrivenParagraphBuilder.build_literature_paragraph(s, cnum, model_dict)
                 lit_paras.append(para)
             lit_content = "\n\n".join(lit_paras)
 
@@ -845,7 +859,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۱۶. محل انجام مطالعه
         # -------------------------------------------------------------
-        sec_16 = data.get("study_setting_text") or extracted_subs.get("3")
+        sec_16 = data.get("study_setting_text") or data.get("study_location_text") or extracted_subs.get("3")
         if not sec_16:
             sec_16 = "آزمایشگاه تحقیقات سلولی و مولکولی و آزمایشگاه جامع تحقیقاتی دانشکده علوم پزشکی."
         md_parts.append("## ۱۶. محل انجام مطالعه\n" + sec_16 + "\n\n---")
@@ -882,7 +896,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۱۹. ابزار های گردآوری اطلاعات
         # -------------------------------------------------------------
-        sec_19 = data.get("instruments_text") or extracted_subs.get("6")
+        sec_19 = data.get("instruments_text") or data.get("data_collection_tools_text") or extracted_subs.get("6")
         if not sec_19:
             sec_19 = (
                 "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا مجهز به فیلترهای استاندارد با اعمال تصحیح بلانک بدون سلول (Cell-Free Blank Correction).\n"
@@ -896,7 +910,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۲۰. تعیین اعتبار ابزار گردآوری
         # -------------------------------------------------------------
-        sec_20 = data.get("validity_text") or extracted_subs.get("7")
+        sec_20 = data.get("validity_text") or data.get("tool_validity_text") or extracted_subs.get("7")
         if not sec_20:
             sec_20 = (
                 "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
@@ -909,7 +923,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۲۱. تعیین ابزار گردآوری
         # -------------------------------------------------------------
-        sec_21 = data.get("reliability_text") or extracted_subs.get("8")
+        sec_21 = data.get("reliability_text") or data.get("tool_reliability_text") or extracted_subs.get("8")
         if not sec_21:
             sec_21 = (
                 "- تامین کلیه کیت‌ها، آنتی‌بادی‌ها و مواد شیمیایی از کمپانی‌های مرجع معتبر (مانند Sigma-Aldrich / Merck / Gibco) با کد کاتالوگ مشخص.\n"
@@ -923,8 +937,8 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۲۲. حجم نمونه و روش محاسبه آن
         # -------------------------------------------------------------
-        sec_22 = data.get("sample_size_text") or extracted_subs.get("9")
-        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\\frac', r'n\s*=', r'Mead', r'Z_']):
+        sec_22 = data.get("sample_size_text") or data.get("sample_size_calculation_text") or extracted_subs.get("9")
+        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\\frac', r'n\s*=', r'Mead', r'Z_', r'E\s*=']):
             if framework in ["EXPERIMENTAL_ANIMAL", "ANIMAL_IN_VIVO"]:
                 # In Vivo Animal: Festing (2002) & ARRIVE Guidelines (Mead's Resource Equation)
                 sec_22 = (
@@ -980,7 +994,7 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         # ۲۴. ملاحظلات اخلاقی در صورت نیاز
         # -------------------------------------------------------------
-        sec_24 = data.get("ethics_text") or extracted_subs.get("11")
+        sec_24 = data.get("ethics_text") or data.get("ethical_considerations_text") or extracted_subs.get("11")
         if not sec_24:
             sec_24 = (
                 "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
