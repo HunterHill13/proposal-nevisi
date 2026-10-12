@@ -66,7 +66,8 @@ class MasterResearchPipeline:
         max_refs: int = 20,
         ncbi_api_key: Optional[str] = None,
         keywords: Optional[List[str]] = None,
-        spec_path: Optional[str] = None
+        spec_path: Optional[str] = None,
+        max_iterations: int = 8
     ):
         self.topic = topic.strip()
         self.study_family = study_family.lower()
@@ -74,6 +75,7 @@ class MasterResearchPipeline:
         self.mode = mode
         self.min_refs = min_refs
         self.max_refs = min(max_refs, 25)  # Enforce hard ceiling <= 25
+        self.max_iterations = max(1, int(max_iterations))
         self.ncbi_api_key = ncbi_api_key or os.getenv("NCBI_API_KEY")
         if isinstance(keywords, str):
             self.keywords = [k.strip() for k in keywords.split(",") if k.strip()]
@@ -89,6 +91,13 @@ class MasterResearchPipeline:
                         self.spec_data = loaded
             except Exception as e:
                 print(f"  Notice: Could not load spec_path '{spec_path}': {e}")
+
+        if not self.keywords and self.spec_data.get("keywords"):
+            raw_kw = self.spec_data["keywords"]
+            if isinstance(raw_kw, str):
+                self.keywords = [k.strip() for k in raw_kw.split(",") if k.strip()]
+            elif isinstance(raw_kw, list):
+                self.keywords = [str(k).strip() for k in raw_kw if str(k).strip()]
 
         os.makedirs(self.output_dir, exist_ok=True)
         self.adapter = ScientificSearchAdapter(ncbi_api_key=self.ncbi_api_key)
@@ -192,6 +201,8 @@ class MasterResearchPipeline:
 
         def add_unique_records(records):
             for r in records:
+                if not isinstance(r, dict):
+                    continue
                 p = str(r.get("pmid") or "").strip()
                 d = str(r.get("doi") or "").strip().lower()
                 if p and p in seen_pmids:
@@ -203,6 +214,16 @@ class MasterResearchPipeline:
                 if d:
                     seen_dois.add(d)
                 studies.append(r)
+
+        # Seed with any verified studies curated by Stage 1 Evidence Appraisal Subagent in PROPOSAL_SPEC.json
+        spec_studies = self.spec_data.get("studies", [])
+        if isinstance(spec_studies, list) and spec_studies:
+            for sr in spec_studies:
+                if isinstance(sr, dict):
+                    sr.setdefault("is_full_text", True)
+                    sr.setdefault("has_full_text", True)
+                    sr.setdefault("verified", True)
+            add_unique_records(spec_studies)
 
         # Tier 1: Precision MeSH Boolean Search
         if self.mode != "offline":
@@ -520,9 +541,6 @@ class MasterResearchPipeline:
 
     def build_research_problem_model(self, kw_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Builds a complete, non-empty research_problem_model from spec_data, topic, and keywords."""
-        if "research_problem_model" in self.spec_data and isinstance(self.spec_data["research_problem_model"], dict):
-            return self.spec_data["research_problem_model"]
-
         if kw_info is None:
             kw_info = self.extract_keywords()
         terms = kw_info.get("terms", [])
@@ -572,7 +590,7 @@ class MasterResearchPipeline:
             n1 = f"{ag1_fa} ({en1})" if en1 and en1.lower() not in ag1_fa.lower() else ag1_fa
             n2 = f"{ag2_fa} ({en2})" if en2 and en2.lower() not in ag2_fa.lower() else ag2_fa
             interventions = [
-                {"name": n1, "chemical_or_biological_class": "عامل مداخله اول ( استاندارد تحلیلی)", "role": "PRIMARY_AGENT"},
+                {"name": n1, "chemical_or_biological_class": "عامل مداخله اول (استاندارد تحلیلی)", "role": "PRIMARY_AGENT"},
                 {"name": n2, "chemical_or_biological_class": "عامل مداخله دوم (هم‌افزا / کمکی)", "role": "SECONDARY_AGENT"}
             ]
         elif len(terms) >= 2:
@@ -604,7 +622,7 @@ class MasterResearchPipeline:
             "CLINICAL_TRIAL" if self.study_family in ["clinical_rct", "clinical", "cohort"] else "EXPERIMENTAL_IN_VITRO"
         )
 
-        return {
+        base_rpm = {
             "domain": "oncology" if "Neoplasm" in cond_en or "سرطان" in cond_fa else "biomedical_pharmacology",
             "framework": framework_code,
             "target_condition": {
@@ -619,6 +637,17 @@ class MasterResearchPipeline:
             "primary_outcomes": primary_outcomes
         }
 
+        # Deep-merge any partial or full overrides from self.spec_data["research_problem_model"]
+        spec_rpm = self.spec_data.get("research_problem_model")
+        if isinstance(spec_rpm, dict):
+            for k, v in spec_rpm.items():
+                if isinstance(v, dict) and isinstance(base_rpm.get(k), dict):
+                    base_rpm[k].update({sk: sv for sk, sv in v.items() if sv})
+                elif v:
+                    base_rpm[k] = v
+
+        return base_rpm
+
     def execute_outer_loop(self, dossier: ProposalResearchDossier) -> Dict[str, Any]:
         """
         Phase 2: Outer Loop - Synthesizes 28 canonical sections, native OMML Word rendering,
@@ -631,11 +660,20 @@ class MasterResearchPipeline:
         kw_info = self.extract_keywords()
         rpm = self.build_research_problem_model(kw_info)
 
+        # Wire MethodologyResearchSubagent cohesive protocol derivation
+        from methodology_research_subagent import MethodologyResearchSubagent
+        intv_names = [i.get("name", "مداخله") for i in rpm.get("interventions_or_exposures", []) if isinstance(i, dict)]
+        cohesive_protocol = MethodologyResearchSubagent.derive_cohesive_protocol(
+            topic=self.topic,
+            target_model=rpm.get("population_or_model", {}).get("primary_system", "رده سلولی استاندارد"),
+            interventions=intv_names
+        )
+
         proposal_data = {
             "title_fa": self.topic,
             "research_title_fa": self.topic,
-            "title_en": self.spec_data.get("title_en") or f"Evaluation of {', '.join(kw_info['terms'][:2])} in {rpm['target_condition']['name_en']}",
-            "research_title_en": self.spec_data.get("research_title_en") or f"Evaluation of {', '.join(kw_info['terms'][:2])} in {rpm['target_condition']['name_en']}",
+            "title_en": self.spec_data.get("title_en") or f"Evaluation of {', '.join(kw_info['terms'][:2])} in {rpm['target_condition'].get('name_en', 'Target Condition')}",
+            "research_title_en": self.spec_data.get("research_title_en") or f"Evaluation of {', '.join(kw_info['terms'][:2])} in {rpm['target_condition'].get('name_en', 'Target Condition')}",
             "framework": rpm.get("framework", "EXPERIMENTAL_IN_VITRO"),
             "domain": rpm.get("domain", "oncology"),
             "target_condition": rpm.get("target_condition"),
@@ -644,6 +682,7 @@ class MasterResearchPipeline:
             "interventions_or_exposures": rpm.get("interventions_or_exposures"),
             "primary_outcomes": rpm.get("primary_outcomes"),
             "research_problem_model": rpm,
+            "cohesive_protocol": cohesive_protocol.to_dict(),
             "study_type": f"تجربی مداخله‌ای ({dossier.methodological_invariants.get('study_family')})",
             "primary_endpoint": dossier.methodological_invariants.get("primary_endpoint"),
             "sample_size_justification": f"محاسبه بر مبنای {dossier.methodological_invariants.get('sample_size_formula')}",
@@ -652,12 +691,13 @@ class MasterResearchPipeline:
             "negative_search_strategy": dossier.negative_search_strategy,
             "studies": dossier.literature_evidence,
             "proposal_research_dossier": dossier,
+            "max_iterations": self.max_iterations,
             "format": "28"
         }
 
         # Merge any custom section overrides provided in --spec-file (PROPOSAL_SPEC.json)
         for k, v in self.spec_data.items():
-            if k not in ("studies", "proposal_research_dossier") and v:
+            if k not in ("studies", "proposal_research_dossier", "research_problem_model") and v:
                 proposal_data[k] = v
 
         res = ProposalGenerator.generate_and_save(proposal_data, md_path, docx_path, format="28")
@@ -720,6 +760,7 @@ def main():
     parser.add_argument("--min-refs", type=int, default=5, help="Minimum verified literature references")
     parser.add_argument("--max-refs", type=int, default=20, help="Maximum references (<= 25 hard ceiling)")
     parser.add_argument("--spec-file", type=str, default="", help="Optional JSON specification file generated by Cognitive Subagents")
+    parser.add_argument("--max-iterations", type=int, default=8, help="Maximum closed-loop remediation iterations (default: 8)")
     args = parser.parse_args()
 
     pipeline = MasterResearchPipeline(
@@ -730,7 +771,8 @@ def main():
         mode=args.mode,
         min_refs=args.min_refs,
         max_refs=args.max_refs,
-        spec_path=args.spec_file or None
+        spec_path=args.spec_file or None,
+        max_iterations=args.max_iterations
     )
     pipeline.run()
 

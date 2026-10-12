@@ -72,54 +72,91 @@ description: >
 
 ---
 
-## ۲. دستورالعمل اجرایی ایجنت هوش مصنوعی (Mandatory Two-Stage Multi-Agent Execution Protocol)
+## ۲. دستورالعمل اجرایی ایجنت هوش مصنوعی (Mandatory Two-Stage 4-Subagent Execution Protocol)
 
 > [!IMPORTANT]
-> **پروتکل قطعی ارکستراسیون دومرحله‌ای ساب‌ایجنت‌های بومی (Two-Stage Native Multi-Agent Orchestration Protocol):**  
-> برای تضمین اصالت علمی، حذف کامل عبارات قالبی و جلوگیری از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با فراخوانی واقعی ابزار `invoke_subagent`** اجرا نماید:
+> **پروتکل قطعی ارکستراسیون دومرحله‌ای با ۴ ساب‌ایجنت تخصصی (Two-Stage 4-Subagent Orchestration Protocol — Inspired by Claude Multi-Agent Research, PaperQA2 & AI-Scientist-v2):**  
+> برای تضمین اصالت علمی ۱۰۰٪، حذف کامل عبارات قالبی، جلوگیری از خطای انتساب استنادی (Citation Drift) و ممانعت از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با ۴ ساب‌ایجنت تخصصی از طریق ابزار `invoke_subagent`** و **موتور حلقه بسته ۸ مرحله‌ای (`DEFAULT_MAX_ITERATIONS = 8`)** اجرا نماید:
 >
-> ### مرحله اول (Stage 1: Pre-Draft Specialist Subagents & `PROPOSAL_SPEC.json`):
-> پیش از اجرای پایپ‌لاین، ابتدا ۲ ساب‌ایجنت تخصصی شواهد و متدولوژی را به صورت موازی فراخوانی کنید تا مقالات زنده PubMed/PMC و پارامترهای اختصاصی مدل بیماری را استخراج کنند:
+> ### مرحله اول (Stage 1: Parallel Pre-Draft Subagents -> `PROPOSAL_SPEC.json`):
+> پیش از اجرای پایپ‌لاین، ابتدا **۲ ساب‌ایجنت تخصصی شواهد و متدولوژی** را به صورت موازی فراخوانی کنید تا مقالات زنده PubMed/Europe PMC/OpenAlex، امتیاز ارتباط و استناد (PaperQA2 RCS 0–10)، و پارامترهای اختصاصی مدل بیماری را استخراج کنند:
 >
 > ```json
 > invoke_subagent({
 >   "Subagents": [
 >     {
->       "Role": "Evidence Appraisal Subagent",
+>       "Role": "Evidence & Quantitative RCS Appraisal Subagent",
 >       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت ارزیابی نقادانه شواهد برای موضوع پروپوزال «<موضوع>» هستید. وظیفه شما: ۱. اجرای جستجوی زنده در پاب‌مد/PMC و استخراج آمار دقیق GLOBOCAN 2022 (Bray et al., 2024) اختصاصی برای ارگان هدف (<TargetOrgan>) و استعلام واقعی تعداد مقالات ترکیب مستقیم داروها. ۲. استخراج مقادیر کمی اختصاصی هر مقاله (IC50، درصد مهار، غلظت، مقدار p) و تدوین پاراگراف فارسی اختصاصی (`farsi_synthesis_summary`) برای هر مقاله. ۳. تفکیک شواهد مستقیم از مبانی نظری موازی و ممانعت از تعمیم مدل‌های نامربوط."
+>       "Prompt": "شما ساب‌ایجنت ارزیابی نقادانه شواهد و امتیازدهی کمی (PaperQA2 Gather-Score-Cite) برای موضوع پروپوزال «<موضوع>» هستید. وظیفه شما: ۱. اجرای جستجوی زنده چندمرحله‌ای در PubMed/Europe PMC/OpenAlex با سرعنوان‌های MeSH انگلیسی و استخراج آمار دقیق GLOBOCAN 2022 (Bray et al., 2024) اختصاصی برای ارگان هدف (<TargetOrgan>) و استعلام واقعی تعداد مقالات ترکیب مستقیم داروها (Negative Boolean Search Log). ۲. امتیازدهی به هر مطالعه (RCS 0-10) و استخراج مقادیر کمی واقعی از متن/چکیده هر مقاله (IC50، دوز، زمان انکوباسیون، درصد مهار، مقدار p، حجم نمونه) و تدوین پاراگراف سنتز فارسی اختصاصی (`farsi_synthesis_summary`) برای هر مقاله در لیست `studies`. ۳. تفکیک شواهد مستقیم مدل هدف از شواهد موازی سایر بافت‌ها جهت پیشگیری از تعمیم نادرست."
 >     },
 >     {
->       "Role": "Methodology & Anti-Chimera Subagent",
+>       "Role": "Methodology & Biostatistical Anti-Chimera Subagent",
 >       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت طراحی متدولوژی منسجم و ضد کیمرا برای «<موضوع>» هستید. وظیفه شما: ۱. تعیین دقیق پروفایل ژنتیکی و محیط کشت استاندارد ATCC اختصاصی رده سلولی هدف (<TargetModel>). ۲. طراحی جدول کامل متغیرهای مستقل، وابسته و کنترل (بخش ۱۱) و پروتکل دوفازی Chou-Talalay به همراه کنترل بلانک بدون سلول (Cell-Free Blank) و دو ژن مرجع MIQE (GAPDH و ACTB). ۳. همگام‌سازی ریاضی حجم نمونه کل (N=30 در ۱۰ گروه و ۳ تکرار مستقل، درجات آزادی بلوک B=2 و خطا E=19) با تحلیل توان G*Power و خروجی ساختاریافته برای فایل PROPOSAL_SPEC.json."
+>       "Prompt": "شما ساب‌ایجنت طراحی متدولوژی منسجم و ضد کیمرا (Primary Anchor Protocol & Biostatistical Coherence) برای «<موضوع>» هستید. وظیفه شما: ۱. انتخاب یک مطالعه مرجع اصلی (Primary Anchor Study) و تعیین دقیق پروفایل ژنتیکی و محیط کشت استاندارد ATCC اختصاصی رده سلولی یا مدل هدف (<TargetModel>). ۲. طراحی جدول کامل متغیرهای مستقل، وابسته و کنترل (بخش ۱۱) منطبق با تمامی اهداف اختصاصی بخش ۶، و پروتکل دوفازی Chou-Talalay (فاز اول منحنی تک‌دارویی و فاز دوم نسبت ثابت) به همراه کنترل بلانک بدون سلول (Cell-Free Blank)، کنترل مثبت آپوپتوز (Staurosporine 1 μM)، سنجش ارتوگونال برش پروتئولیتیک کاسپاز-۳ (Cleaved Caspase-3 / Annexin V-PI) و دو ژن مرجع MIQE (GAPDH و ACTB). ۳. قفل کردن پارامترهای ریاضی حجم نمونه کل (N=30 در ۱۰ گروه T=9 و ۳ تکرار مستقل B=2، درجات آزادی خطا E=19 در معادله مید) و تحلیل مستقل توان آماری G*Power (f=0.40, 1-β=85.2%) برای درج در `PROPOSAL_SPEC.json`."
 >     }
 >   ]
 > })
 > ```
 >
-> پس از دریافت خروجی این دو ساب‌ایجنت، ایجنت اصلی خروجی آن‌ها را در فایل `<پوشه خروجی>/PROPOSAL_SPEC.json` ذخیره کرده و پایپ‌لاین پایتون را با پرچم `--spec-file` اجرا می‌نماید:
+> #### ساختار استاندارد فایل `PROPOSAL_SPEC.json` (با ادغام عمیق خودکار در پایپ‌لاین):
+> ایجنت اصلی خروجی دو ساب‌ایجنت مرحله اول را در فایل `<پوشه خروجی>/PROPOSAL_SPEC.json` ذخیره می‌کند. پایپ‌لاین `run_research_pipeline.py` به صورت خودکار (`Deep-Merge`) فیلدهای `keywords`، مقالات و پاراگراف‌های `studies[].farsi_synthesis_summary`، `research_problem_model`، و پروتکل ضدکیمرای `MethodologyResearchSubagent` را بدون حذف هیچ داده‌ای ادغام می‌نماید:
 >
-> ```powershell
-> uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --output-dir "<پوشه خروجی>"
+> ```json
+> {
+>   "keywords": ["<English Agent 1>", "<English Agent 2>", "<English Disease/Cell Line MeSH>"],
+>   "max_iterations": 8,
+>   "problem_statement_text": "<متن جامع و مستند بخش ۲ با آمار دقیق GLOBOCAN 2022 اختصاصی ارگان هدف و گزارش جستجوی منفی>",
+>   "studies": [
+>     {
+>       "study_id": "PMID:12345678",
+>       "pmid": "12345678",
+>       "doi": "10.xxxx/xxxxx",
+>       "title": "Exact English Title from PubMed",
+>       "authors": "Author A et al.",
+>       "year": 2024,
+>       "journal": "Journal Name",
+>       "abstract": "Full English abstract text...",
+>       "farsi_synthesis_summary": "در مطالعه بنیادین Author و همکاران (۲۰۲۴) بر روی رده سلولی ... نشان داده شد که ... (IC50 = ... μM, p < 0.01)؛ محدودیت روش‌شناختی این مطالعه عدم بررسی ... بود که در طرح حاضر پوشش داده می‌شود."
+>     }
+>   ],
+>   "research_problem_model": {
+>     "framework": "EXPERIMENTAL_IN_VITRO",
+>     "target_condition": {"name_fa": "<نام فارسی بیماری>", "name_en": "<English MeSH Condition>"},
+>     "interventions_or_exposures": [{"name": "<مداخله اول>"}, {"name": "<مداخله دوم>"}],
+>     "population_or_model": {"primary_system": "<رده سلولی بدخیم هدف>", "control_system": "<رده سلولی نرمال شاهد>"},
+>     "primary_outcomes": [{"name": "زیست‌پذیری سلولی (MTT)"}, {"name": "آپوپتوز (Annexin V/PI و Cleaved Caspase-3)"}]
+>   }
+> }
 > ```
 >
-> ### مرحله دوم (Stage 2: Post-Draft Blind Adversarial Grant Reviewer Subagent Loop):
-> **بسیار حیاتی:** ساب‌ایجنت داور (`Adversarial Mock Grant Reviewer`) هرگز نباید قبل از تولید متن پروپوزال و در خلأ اجرا شود! بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است** ساب‌ایجنت داور کور را روی فایل واقعی `proposal.md` فراخوانی کند:
+> سپس پایپ‌لاین را با پرچم‌های `--spec-file` و `--max-iterations 8` اجرا نمایید:
+>
+> ```powershell
+> uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 8 --output-dir "<پوشه خروجی>"
+> ```
+>
+> ### مرحله دوم (Stage 2: Post-Draft Closed-Loop Verification with 2 Independent Subagents — Up to 8 Rounds):
+> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است ۲ ساب‌ایجنت ممیز پس از نگارش** (`Citation & Claim-Span Verifier Subagent` به سبک `CitationAgent` کلاد و `Post-Draft Blind Adversarial Grant Reviewer Subagent`) را روی فایل واقعی `proposal.md` فراخوانی کند:
 >
 > ```json
 > invoke_subagent({
 >   "Subagents": [
 >     {
->       "Role": "Post-Draft Blind Adversarial Grant Reviewer",
+>       "Role": "Citation & Claim-Span Verifier Subagent",
 >       "TypeName": "research",
->       "Prompt": "شما داور ارشد، مستقل و سخت‌گیر گرنت‌های علمی (Blind External AI Critic) هستید. فایل واقعی تولیدشده در مسیر `<پوشه خروجی>/proposal.md` را خط‌به‌خط بخوانید و ممیزی کنید: ۱. آیا آمار اپیدمیولوژیک بخش ۲ دقیقاً مربوط به سرطان/بیماری عنوان طرح است یا آمار سرطان ریه به اشتباه کپی شده است؟ ۲. آیا ادعای 0 hits یا تناقض مطالعات در بخش ۲ با مقالات واقعی بخش ۳ و ۲۸ همخوانی دارد؟ ۳. آیا در بخش ۳ مقادیر کمی اختصاصی هر مقاله ذکر شده یا جملات قالبی تکرار شده‌اند؟ ۴. آیا جدول متغیرهای بخش ۱۱ کامل است و حجم نمونه بخش ۲۲ (N=30) دقیقاً با تعداد گروه‌های بخش ۲۷ و پارامترهای ریاضی G*Power همخوانی دارد؟ ۵. آیا ویژگی‌های ژنتیکی و محیط کشت رده سلولی در بخش ۱۵ از نظر بیولوژیک دقیقاً متعلق به همان رده سلولی است؟ در صورت مشاهده هرگونه خطا، لیست دقیق بخش‌ها و اصلاحات لازم را برگردانید."
+>       "Prompt": "شما ساب‌ایجنت راستی‌آزمای استنادات و گزاره‌های کمی (Citation & Claim-Span Verifier به سبک Claude CitationAgent و PaperQA2) هستید. فایل `<پوشه خروجی>/proposal.md` و `<پوشه خروجی>/PROPOSAL_RESEARCH_DOSSIER.json` را بخوانید و تک‌تک استنادات `[n]` در بخش‌های ۲ و ۳ را با چکیده و متادیتای واقعی منبع شماره `n` در بخش ۲۸ تطبیق دهید: ۱. آیا نام نویسنده، سال انتشار، مدل زیستی و اعداد گزارش‌شده (IC50، دوز، درصد مهار) در متن فارسی دقیقاً در چکیده مقاله `[n]` وجود دارد؟ ۲. آیا مطالعه‌ای از بافت دیگر به اشتباه به عنوان اثبات مستقیم روی رده سلولی هدف معرفی شده است؟ هرگونه عدم تطابق (Citation Drift یا عدد فاقد پشتوانه) را با شماره دقیق بخش و شماره رفرنس گزارش کنید."
+>     },
+>     {
+>       "Role": "Post-Draft Blind Adversarial Grant Reviewer Subagent",
+>       "TypeName": "research",
+>       "Prompt": "شما داور ارشد، مستقل و سخت‌گیر گرنت‌های علمی (Blind External AI Critic) هستید. فایل واقعی تولیدشده در مسیر `<پوشه خروجی>/proposal.md` را خط‌به‌خط در تمامی ۲۸ بخش ممیزی کنید: ۱. آیا آمار اپیدمیولوژیک GLOBOCAN 2022 در بخش ۲ دقیقاً مربوط به ارگان/سرطان عنوان طرح است؟ ۲. آیا در بخش ۳ برای هر مقاله پاراگراف تحلیلی اختصاصی با اعداد واقعی نوشته شده است؟ ۳. آیا جدول متغیرهای بخش ۱۱ تمامی اهداف اختصاصی بخش ۶ را پوشش می‌دهد؟ ۴. آیا حجم نمونه بخش ۲۲ (N=30, B=2, T=9, E=19) دقیقاً با تعداد گروه‌های بخش ۲۷ و تحلیل توان G*Power همخوانی دارد؟ ۵. آیا در بخش‌های ۱۳، ۱۹ و ۲۷ پروتکل دوفازی Chou-Talalay، کنترل Cell-Free Blank، کنترل مثبت آپوپتوز، برش پروتئولیتیک Cleaved Caspase-3 و دو ژن مرجع MIQE (GAPDH و ACTB) رعایت شده‌اند؟ در صورت مشاهده هرگونه ایراد، لیست دقیق اصلاحات لازم را برگردانید."
 >     }
 >   ]
 > })
 > ```
 >
-> چنانچه ساب‌ایجنت داور کور (Post-Draft Blind Reviewer) هرگونه ایراد علمی، بیولوژیک، آماری یا نگارشی در `proposal.md` کشف کند، ایجنت اصلی موظف است فایل `PROPOSAL_SPEC.json` یا بخش‌های مربوطه را اصلاح کرده، پایپ‌لاین را مجدداً اجرا نماید و با ابزار `send_message` متن اصلاح‌شده را دوباره به همان ساب‌ایجنت داور بفرستد تا تاییدیه قطعی (`0 Critical Flaws` و `APPROVED_FUNDABLE`) صادر گردد.
+> #### حلقه بسته اصلاح و بازبینی تا سقف ۸ راند (`Closed-Loop Critic-Refine up to 8 Iterations`):
+> چنانچه هر یک از دو ساب‌ایجنت مرحله دوم یا موتور نمادین `IterativeRemediationEngine` هرگونه ایراد علمی، استنادی، بیولوژیک یا آماری در `proposal.md` کشف کند، ایجنت اصلی موظف است در یک حلقه بسته (حداکثر تا **۸ راند**؛ `DEFAULT_MAX_ITERATIONS = 8`) فایل `PROPOSAL_SPEC.json` یا بخش‌های مربوطه را جراحی و اصلاح کرده، پایپ‌لاین را مجدداً اجرا نماید و با ابزار `send_message` متن اصلاح‌شده را دوباره به همان ساب‌ایجنت‌های داور بفرستد تا تاییدیه قطعی (`0 Critical Flaws`، `0 Citation Drift` و `APPROVED_FUNDABLE`) صادر گردد.
 >
 > > [!CAUTION]
 > > **الزام قطعی ارسال کلیدواژه‌های انگلیسی در پرچم `--keywords`:**  

@@ -27,24 +27,24 @@ It completely eliminates AI literature hallucination, Frankenstein/chimera metho
 
 ---
 
-### End-to-End System Architecture & Execution Flow
+### End-to-End System Architecture & 4-Subagent Closed-Loop Flow
 
 ```mermaid
 flowchart TD
-    subgraph Stage1 ["۱. مرحله اول: ساب‌ایجنت‌های تخصصی پیش از نگارش (Stage 1: Pre-Draft Subagents)"]
+    subgraph Stage1 ["۱. مرحله اول: ۲ ساب‌ایجنت تخصصی پیش از نگارش (Stage 1: Parallel Pre-Draft Subagents)"]
         A["کاربر: عنوان پژوهش به فارسی + کلیدواژه‌های انگلیسی"] --> B["MeSHQueryExpander<br>• نگاشت به سرعنوان‌های MeSH<br>• فیلتر ۱۰۰٪ کاراکترهای غیرلاتین"]
-        B --> S1["ساب‌ایجنت ارزیابی شواهد (Evidence Appraisal)<br>• استخراج مقالات زنده PubMed/PMC<br>• آمار اختصاصی ارگان هدف در GLOBOCAN 2022<br>• استخراج مقادیر کمی (IC50, p-value)"]
-        B --> S2["ساب‌ایجنت متدولوژی ضد کیمرا (Methodology & Anti-Chimera)<br>• پروفایل ژنتیکی و محیط کشت ATCC اختصاصی مدل<br>• جدول متغیرهای بخش ۱۱ (مستقل/وابسته/کنترل)<br>• همگام‌سازی حجم نمونه N=30 با G*Power"]
-        S1 & S2 --> SPEC["تولید فایل مشخصات اختصاصی طرح<br>PROPOSAL_SPEC.json (--spec-file)"]
+        B --> S1["ساب‌ایجنت ۱: ارزیابی کمی شواهد (Evidence & Quantitative RCS Subagent)<br>• جستجوی چندمرحله‌ای PubMed / Europe PMC / OpenAlex<br>• امتیازدهی PaperQA2 RCS (0-10) و استخراج مقادیر کمی (IC50, p-value)<br>• آمار اختصاصی ارگان هدف در GLOBOCAN 2022 + تدوین farsi_synthesis_summary"]
+        B --> S2["ساب‌ایجنت ۲: متدولوژی ضد کیمرا (Methodology & Anti-Chimera Subagent)<br>• انتخاب مطالعه مرجع اصلی (Primary Anchor Protocol)<br>• پروفایل ژنتیکی و محیط کشت ATCC اختصاصی مدل + جدول متغیرهای بخش ۱۱<br>• قفل ریاضی حجم نمونه (N=30, B=2, T=9, E=19) با تحلیل توان G*Power"]
+        S1 & S2 --> SPEC["ادغام عمیق بدون اتلاف در فایل مشخصات طرح<br>PROPOSAL_SPEC.json (--spec-file Deep-Merge)"]
     end
 
-    subgraph InnerLoop ["۲. حلقه بهینه‌سازی درونی: استخراج و پلمپ شواهد (Inner Loop)"]
-        SPEC --> D["ScientificSearchAdapter (جستجوی فدرال برخط)"]
+    subgraph InnerLoop ["۲. حلقه بهینه‌سازی درونی: استخراج، ادغام و پلمپ شواهد (Inner Loop)"]
+        SPEC --> D["ScientificSearchAdapter + حفظ کامل مقالات ساب‌ایجنت"]
         D --> D1["NCBI PubMed (E-Search, E-Summary, E-Fetch XML)"]
-        D --> D2["Europe PMC REST API"]
+        D --> D2["Europe PMC & OpenAlex REST API"]
         D1 & D2 --> E["FullTextRetrievalEngine (واکشی متن کامل JATS XML)"]
         E --> F["LiveDoiCrossrefVerifier (ممیزی برخط DOI در Crossref)"]
-        F --> G["استخراج گزیده‌های متنی و شاخص‌های کمی (Quantitative Grounding)"]
+        F --> G["Quantitative Grounding + MethodologyResearchSubagent Wiring"]
         G --> H["پلمپ تغییرناپذیر پرونده پژوهش<br>PROPOSAL_RESEARCH_DOSSIER.json / .md<br>(ARA Seal Level 2 - ممیزی ۶ بعدی)"]
     end
 
@@ -52,23 +52,24 @@ flowchart TD
         H --> I["ProposalGenerator (موتور تدوین ۲۸ بخشی)"]
         I --> J1["بخش ۲: بیان مسئله + آمار GLOBOCAN 2022 اختصاصی ارگان هدف"]
         I --> J2["بخش ۳: مرور منابع + شاخص‌های کمی اختصاصی هر مقاله + جدول ToxRTool فارسی"]
-        I --> J3["بخش ۱۱ و ۱۵: جدول کامل متغیرها + شناسنامه ژنتیکی و محیط کشت اختصاصی"]
+        I --> J3["بخش ۱۱ و ۱۵: جدول کامل متغیرها (همگام با بخش ۶) + شناسنامه ژنتیکی ATCC"]
         I --> J4["بخش ۲۲: حجم نمونه همگام (N=30, B=2, E=19) + پارامتر غیرمرکزی λ=10.1 در G*Power"]
         I --> J5["بخش ۲۷ و ۲۸: پروتکل دو فازی چو-تالالای + منابع انگلیسی با ارقام استاندارد"]
     end
 
-    subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح پیوسته (Symbolic Critic-Refine)"]
-        J1 & J2 & J3 & J4 & J5 --> R1["MockGrantReviewPanel (داوری گرنت NIH 1-9)"]
+    subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح جراحی تا ۸ راند (Symbolic Critic-Refine Loop — Max 8 Rounds)"]
+        J1 & J2 & J3 & J4 & J5 --> R1["MockGrantReviewPanel (داوری ۳ داور تخصصی NIH 1-9)"]
         R1 --> R2{"آیا نیاز به اصلاح دارد؟<br>(Flaws > 0 یا نمره > 2.0)"}
-        R2 -- "بله (ایراد بحرانی)" --> R3["IterativeRemediationEngine<br>• پچ جراحی بخش هدف (Surgical Patcher)<br>• اصلاح تا ۵ راند پیوسته"]
+        R2 -- "بله (نقص بحرانی یا ضعف ساختاری)" --> R3["IterativeRemediationEngine<br>• پچ جراحی تمام ۱۵+ نقص داوران ۱، ۲ و ۳<br>• اصلاح پیوسته تا سقف ۸ راند (DEFAULT_MAX_ITERATIONS=8)"]
         R3 --> R1
-        R2 -- "خیر (اجماع کامل)" --> DRAFT["تولید پیش‌نویس کامل ۲۸ بخشی<br>proposal.md"]
+        R2 -- "خیر (اجماع کامل نمادین)" --> DRAFT["تولید پیش‌نویس کامل ۲۸ بخشی<br>proposal.md"]
     end
 
-    subgraph Stage2 ["۵. مرحله دوم: داور کور پس از تولید درفت (Stage 2: Post-Draft Blind Reviewer)"]
-        DRAFT --> BLIND["ساب‌ایجنت داور کور گرنت (Post-Draft Blind Adversarial Reviewer)<br>• مطالعه خط‌به‌خط فایل واقعی proposal.md<br>• ممیزی تطابق بیولوژیک، اپیدمیولوژیک و آماری بین ۲۸ بخش"]
-        BLIND --> BCHECK{"تایید داور کور؟<br>(0 خطای علمی/منطقی)"}
-        BCHECK -- "خیر (کشف خطای معنایی)" --> BPATCH["اصلاح PROPOSAL_SPEC.json و بازتولید"]
+    subgraph Stage2 ["۵. مرحله دوم: ۲ ساب‌ایجنت ممیز پس از نگارش در حلقه بسته تا ۸ راند (Stage 2: Post-Draft Subagents)"]
+        DRAFT --> CIT["ساب‌ایجنت ۳: ممیز استنادات و اعداد (Citation & Claim-Span Verifier)<br>• تطبیق تک‌تک استنادات [n] در بخش ۲ و ۳ با چکیده واقعی منبع در بخش ۲۸<br>• کشف هرگونه خطای انتساب (Citation Drift) یا عدد فاقد پشتوانه"]
+        DRAFT --> BLIND["ساب‌ایجنت ۴: داور کور گرنت (Post-Draft Blind Adversarial Reviewer)<br>• مطالعه خط‌به‌خط فایل واقعی proposal.md در تمام ۲۸ بخش<br>• ممیزی تطابق بیولوژیک، اپیدمیولوژیک و آماری بین بخش‌های ۶، ۱۱، ۱۳، ۱۹، ۲۲ و ۲۷"]
+        CIT & BLIND --> BCHECK{"تایید هر دو ساب‌ایجنت ممیز؟<br>(0 خطای علمی / 0 خطای استنادی)"}
+        BCHECK -- "خیر (کشف خطای معنایی/استنادی - تا ۸ راند)" --> BPATCH["اصلاح جراحی PROPOSAL_SPEC.json و بازتولید"]
         BPATCH --> I
         BCHECK -- "بله (APPROVED_FUNDABLE)" --> L["Master Release Gate (۴۳ معیار کنترل کیفیت)"]
     end
@@ -80,6 +81,22 @@ flowchart TD
         L --> M4["MOCK_GRANT_REVIEW & REVISION_AUDIT_TRAIL"]
     end
 ```
+
+---
+
+### Benchmark Comparison: Frontier AI Deep Research & GitHub Scientific Skills
+
+Full primary-source benchmark details are documented in [`docs/DEEP_RESEARCH_BENCHMARK_AND_SUBAGENT_ARCHITECTURE.md`](docs/DEEP_RESEARCH_BENCHMARK_AND_SUBAGENT_ARCHITECTURE.md).
+
+| Architecture / Framework | Core Paradigm | Key Strength Adopted in `proposal-nevisi` |
+| :--- | :--- | :--- |
+| **Anthropic Claude Multi-Agent Research** | Lead Orchestrator + Parallel Subagents + Dedicated `CitationAgent` | Two-Stage 4-Subagent split with a dedicated **Post-Draft Citation & Claim-Span Verifier Subagent** |
+| **OpenAI ChatGPT (o3) Deep Research** | ReAct Browsing + Python Code Execution + Backtracking | Live multi-database retrieval + deterministic Python biostatistical & Crossref verification |
+| **Perplexity Deep Research** | Iterative Query Decomposition + Multi-Hop Retrieval | 16-layer MeSH Boolean query expansion + negative search log (`0 hits` proof) |
+| **FutureHouse `PaperQA2`** | Gather $\rightarrow$ RCS Score (0–10) $\rightarrow$ Quote-Grounded Cite | Quantitative passage extraction (`IC50`, doses, $p$-values) + `farsi_synthesis_summary` preservation |
+| **Sakana AI `AI-Scientist-v2`** | Multi-Round Automated Peer Review + Reflexion | Closed-loop **8-iteration** symbolic + subagent remediation (`DEFAULT_MAX_ITERATIONS = 8`) |
+| **Stanford `STORM` / `Co-STORM`** | Multi-Perspective Persona Questioning | 3-Reviewer NIH Study Section (Scientific Premise, Methodology/Biostatistics, Bioethics/Biosafety) |
+| **K-Dense `claude-scientific-writer` & AIPOCH** | Structured IMRaD/Grant Templates + PICO/EQUATOR | 28-section Pajooheshyar completeness + ARRIVE 2.0 / MIQE / ToxRTool / Native Word OMML |
 
 ---
 

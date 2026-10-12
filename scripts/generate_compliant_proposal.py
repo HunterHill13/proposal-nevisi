@@ -1113,12 +1113,12 @@ class ProposalGenerator:
         review_result = MockGrantReviewPanel.conduct_panel_review(md_content, data)
         remediation_res = None
         
-        # If panel requires revision, run closed-loop iterative surgical remediation (up to 5 rounds)
+        # If panel requires revision, run closed-loop iterative surgical remediation (up to DEFAULT_MAX_ITERATIONS=8 rounds)
         if review_result.funding_verdict != "APPROVED_FUNDABLE" or review_result.critical_flaws_count > 0:
             remediation_res = IterativeRemediationEngine.remediate_proposal(
                 md_content=md_content,
                 proposal_data=data,
-                max_iterations=5,
+                max_iterations=int(data.get("max_iterations", IterativeRemediationEngine.DEFAULT_MAX_ITERATIONS)),
                 output_dir=review_dir
             )
             md_content = remediation_res["final_markdown"]
