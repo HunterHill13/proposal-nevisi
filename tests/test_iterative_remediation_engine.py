@@ -7,6 +7,7 @@ Proposal-Nevisi Engine v11.4.1 (Cognitive Multi-Agent Architecture)
 
 import os
 import sys
+import json
 import tempfile
 import unittest
 
@@ -318,6 +319,48 @@ class TestIterativeRemediationEngine(unittest.TestCase):
         self.assertTrue(res["is_approved"])
         self.assertLessEqual(res["final_review"]["overall_score"], 1.5)
         self.assertEqual(res["final_review"]["critical_flaws_count"], 0)
+
+    def test_8_e2e_pipeline_with_spec_file_and_remediation_consensus(self):
+        """Validates that running MasterResearchPipeline with spec data triggers outer loop remediation and converges."""
+        from run_research_pipeline import MasterResearchPipeline
+        with tempfile.TemporaryDirectory() as tmpdir:
+            spec_path = os.path.join(tmpdir, "SPEC.json")
+            spec_data = {
+                "keywords": ["Metformin", "Resveratrol", "Breast Neoplasms"],
+                "max_iterations": 5,
+                "problem_statement_text": "بیان مسئله مدل‌سازی شده همراه با آمار رسمی سرطان پستان ۲.۳۰ میلیون مورد جدید (Bray et al., 2024) و منفی بودن جستجوی پاب‌مد.",
+                "studies": [
+                    {
+                        "study_id": "PMID:39749050",
+                        "pmid": "39749050",
+                        "doi": "10.7759/cureus.75047",
+                        "title": "Synergistic Anticancer Efficacy of Curcumin and Doxorubicin Combination Treatment Inducing S-phase Cell Cycle Arrest in Triple-Negative Breast Cancer Cells: An In Vitro Study",
+                        "authors": "Sarkar E et al.",
+                        "year": 2024,
+                        "journal": "Cureus",
+                        "abstract": "Synergistic effect observed with combination index CI = 0.65 in breast cancer cells.",
+                        "farsi_synthesis_summary": "در مطالعه سرکار و همکاران (۲۰۲۴) نشان داده شد که ترکیب دارویی دارای شاخص ترکیبی CI = ۰.۶۵ است."
+                    }
+                ]
+            }
+            with open(spec_path, "w", encoding="utf-8") as f:
+                json.dump(spec_data, f, ensure_ascii=False, indent=2)
+
+            pipeline = MasterResearchPipeline(
+                topic="بررسی اثر هم‌افزایی متفورمین و رسوراترول بر آپوپتوز سلول‌های سرطان پستان",
+                keywords=["Metformin", "Resveratrol", "Breast Neoplasms"],
+                output_dir=tmpdir,
+                spec_path=spec_path,
+                max_iterations=5,
+                mode="offline"
+            )
+            res = pipeline.run()
+            self.assertEqual(res.get("status"), "PASS")
+            self.assertTrue(os.path.exists(res.get("md_path", "")))
+            self.assertTrue(os.path.exists(res.get("docx_path", "")))
+            mgr = res.get("mock_grant_review", {})
+            self.assertLessEqual(mgr.get("overall_score", 9.0), 1.5)
+            self.assertEqual(mgr.get("critical_flaws_count", -1), 0)
 
 
 if __name__ == "__main__":
