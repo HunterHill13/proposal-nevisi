@@ -1033,7 +1033,12 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_27 = data.get("step_by_step_procedure_text") or extracted_subs.get("14")
         if not sec_27:
-            sec_27 = (
+            cp_dict = data.get("cohesive_protocol") or {}
+            cp_sec27 = cp_dict.get("formatted_sections_fa", {}).get(27) or cp_dict.get("formatted_sections_fa", {}).get("27")
+            if cp_sec27:
+                sec_27 = cp_sec27
+            else:
+                sec_27 = (
                 "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در محیط‌های اختصاصی مصوب ATCC در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
                 "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی به همراه چاهک‌های بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر احیای مستقیم و تداخل نوری.\n"
                 "۳. فاز اول (تک‌دارویی و منحنی‌های دوز-پاسخ منفرد): ارزیابی غلظت‌های منفرد هر مداخله در ۵ الی ۷ رقت متوالی (Serial Dilutions) جهت ترسیم منحنی اثر-دوز، محاسبه دقیق مقادیر IC50، شیب منحنی اثر متوالی (m) و دوز اثر میانه (Dm) با همبستگی خطی (r > 0.95).\n"
