@@ -281,6 +281,44 @@ class TestIterativeRemediationEngine(unittest.TestCase):
         # The GLOBOCAN sentence ending after "در جهان محسوب می‌گردد" must not have "[1]." attached to Bray 2024
         self.assertNotIn("در جهان محسوب می‌گردد [1].", generated_md)
 
+    def test_7_reviewer_weaknesses_and_exceptional_ceiling_convergence(self):
+        """Verifies surgical remediation of Reviewer 1/2/3 weaknesses (Sections 2, 4, 9, 12, 23, 24, 25, 26, 27) to converge to NIH Exceptional Tier <= 1.5."""
+        self.assertEqual(IterativeRemediationEngine.TARGET_SCORE_CEILING, 1.5)
+        raw_md = ProposalGenerator.assemble_pajooheshyar_28(self.mock_proposal_data)
+
+        # Corrupt multiple sections with weaknesses and flaws across Reviewer 1, 2, and 3
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            raw_md, 4, lambda t: "## 4. اهمیت وضرورت تحقیق\nکوتاه.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 9, lambda t: "## 9. فرضیات و سوالات\nبررسی اثر دارو.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 12, lambda t: "## 12. جدول زمان بندی و مراحل اجرا\nزمان‌بندی کلی.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 23, lambda t: "## 23. روش تجزیه و تحلیل داده\nتحلیل داده‌ها.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 24, lambda t: "## 24. ملاحظلات اخلاقی در صورت نیاز\nرعایت اخلاق.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 25, lambda t: "## 25. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\nایمنی.\n---\n"
+        )
+        corrupted = SurgicalSectionPatcher.patch_section_content(
+            corrupted, 26, lambda t: "## 26. مشکلات و محدودیت ها\nمحدودیت.\n---\n"
+        )
+
+        res = IterativeRemediationEngine.remediate_proposal(
+            md_content=corrupted,
+            proposal_data=self.mock_proposal_data,
+            max_iterations=10,
+            output_dir=self.output_dir
+        )
+        self.assertTrue(res["is_approved"])
+        self.assertLessEqual(res["final_review"]["overall_score"], 1.5)
+        self.assertEqual(res["final_review"]["critical_flaws_count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
