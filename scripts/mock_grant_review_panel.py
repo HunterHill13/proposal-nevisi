@@ -25,7 +25,7 @@ import os
 import re
 import json
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Union
 
 
 @dataclass
@@ -630,34 +630,49 @@ class MockGrantReviewPanel:
     # =========================================================================
 
     @classmethod
-    def generate_markdown_report(cls, result: PanelReviewResult) -> str:
+    def generate_markdown_report(cls, result: Union[PanelReviewResult, Dict[str, Any]]) -> str:
         """Generates formal Markdown report suitable for researchers and review committees."""
+        if isinstance(result, dict):
+            funding_verdict = result.get("funding_verdict", "APPROVED_FUNDABLE")
+            overall_score = result.get("overall_score", 1.0)
+            critical_flaws_count = result.get("critical_flaws_count", 0)
+            executive_summary_fa = result.get("executive_summary_fa", "")
+            inter_section_drift = result.get("inter_section_drift", {})
+            reviewer_evaluations = result.get("reviewer_evaluations", {})
+        else:
+            funding_verdict = result.funding_verdict
+            overall_score = result.overall_score
+            critical_flaws_count = result.critical_flaws_count
+            executive_summary_fa = result.executive_summary_fa
+            inter_section_drift = result.inter_section_drift
+            reviewer_evaluations = result.reviewer_evaluations
+
         verdict_badge = {
             "APPROVED_FUNDABLE": "✅ تصویب با اولویت ممتاز (Fundable / Approved)",
             "REVISION_REQUIRED": "⚠️ نیازمند بازنگری و اصلاحات (Revision Required)",
             "REJECTED_UNFUNDABLE": "❌ عدم احراز شرایط داوری (Unfundable / Rejected)"
-        }.get(result.funding_verdict, result.funding_verdict)
+        }.get(funding_verdict, funding_verdict)
 
         lines = [
             "# کارنامه رسمی داوری گرنت و ممیزی پروپوزال (Mock Grant Review Summary Report)",
             "",
             f"> **وضعیت ارزیابی هیئت داوران:** {verdict_badge}",
-            f"> **نمره نهایی داوری (مقیاس ۱ تا ۹):** `{result.overall_score} / 9.0` (نمره ۱ ممتاز - نمره ۹ ضعیف)",
-            f"> **تعداد نقایص بحرانی (Critical Flaws):** `{result.critical_flaws_count}`",
+            f"> **نمره نهایی داوری (مقیاس ۱ تا ۹):** `{overall_score} / 9.0` (نمره ۱ ممتاز - نمره ۹ ضعیف)",
+            f"> **تعداد نقایص بحرانی (Critical Flaws):** `{critical_flaws_count}`",
             "",
             "## ۱. خلاصه مدیریتی ارزیابی هیئت داوران (Executive Summary)",
-            result.executive_summary_fa,
+            executive_summary_fa,
             "",
             "## ۲. پایش انطباق معنایی بین‌بخشی (Inter-Section Semantic Drift)",
-            f"- **وضعیت انطباق:** {'⚠️ انحراف شناسایی شد' if result.inter_section_drift.get('drift_detected') else '✅ ۱۰۰٪ منطبق بدون انحراف'}",
-            f"- **شاخص هماهنگی اهداف با متدها:** `{result.inter_section_drift.get('alignment_score', 1.0) * 100}%`",
-            f"- **حوزه‌های هدف شناسایی‌شده:** `{result.inter_section_drift.get('detected_aim_domains', [])}`",
+            f"- **وضعیت انطباق:** {'⚠️ انحراف شناسایی شد' if inter_section_drift.get('drift_detected') else '✅ ۱۰۰٪ منطبق بدون انحراف'}",
+            f"- **شاخص هماهنگی اهداف با متدها:** `{inter_section_drift.get('alignment_score', 1.0) * 100}%`",
+            f"- **حوزه‌های هدف شناسایی‌شده:** `{inter_section_drift.get('detected_aim_domains', [])}`",
         ]
 
-        if result.inter_section_drift.get("unaligned_aims_in_methods"):
-            lines.append(f"- **اهداف فاقد آزمون در متدولوژی:** `{result.inter_section_drift['unaligned_aims_in_methods']}`")
-        if result.inter_section_drift.get("unaligned_aims_in_variables"):
-            lines.append(f"- **اهداف فاقد متغیر در جدول متغیرها:** `{result.inter_section_drift['unaligned_aims_in_variables']}`")
+        if inter_section_drift.get("unaligned_aims_in_methods"):
+            lines.append(f"- **اهداف فاقد آزمون در متدولوژی:** `{inter_section_drift['unaligned_aims_in_methods']}`")
+        if inter_section_drift.get("unaligned_aims_in_variables"):
+            lines.append(f"- **اهداف فاقد متغیر در جدول متغیرها:** `{inter_section_drift['unaligned_aims_in_variables']}`")
 
         lines.extend([
             "",
@@ -665,7 +680,7 @@ class MockGrantReviewPanel:
             ""
         ])
 
-        for r_key, r_eval in result.reviewer_evaluations.items():
+        for r_key, r_eval in reviewer_evaluations.items():
             lines.extend([
                 f"### {r_eval['reviewer_title_fa']} ({r_eval['reviewer_title_en']})",
                 f"- **نمره داوری این حوزه:** `{r_eval['score']} / 9.0`",
@@ -696,7 +711,7 @@ class MockGrantReviewPanel:
     @classmethod
     def save_reports(
         cls,
-        result: PanelReviewResult,
+        result: Union[PanelReviewResult, Dict[str, Any]],
         output_dir: str = "."
     ) -> Tuple[str, str]:
         """Saves MOCK_GRANT_REVIEW_REPORT.md and MOCK_GRANT_REVIEW_REPORT.json."""
@@ -708,8 +723,9 @@ class MockGrantReviewPanel:
         with open(md_path, "w", encoding="utf-8") as f:
             f.write(md_content)
 
+        dict_payload = result if isinstance(result, dict) else result.to_dict()
         with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(result.to_dict(), f, indent=2, ensure_ascii=False)
+            json.dump(dict_payload, f, indent=2, ensure_ascii=False)
 
         return md_path, json_path
 

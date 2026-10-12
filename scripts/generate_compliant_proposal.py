@@ -1175,7 +1175,7 @@ class ProposalGenerator:
             "validation": val_result,
             "readiness": readiness_res.to_dict(),
             "completeness": completeness_res.to_dict() if completeness_res else None,
-            "mock_grant_review": review_result.to_dict(),
+            "mock_grant_review": review_result if isinstance(review_result, dict) else review_result.to_dict(),
             "mock_grant_review_md": review_md_path,
             "mock_grant_review_json": review_json_path,
             "revision_audit_trail": remediation_res["audit_trail"] if remediation_res else None,
