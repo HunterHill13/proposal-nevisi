@@ -1,15 +1,16 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture & Autonomous Proposal Pipeline (v11.4.1)
-### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری چندایجنت شناختی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۴.۱)
+### Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture & Autonomous Proposal Pipeline (v11.5.1)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری چندایجنت شناختی، ضدتشخیص هوش مصنوعی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۵.۱)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 479/479 Passed](https://img.shields.io/badge/Unified%20Tests-479%2F479%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 496/496 Passed](https://img.shields.io/badge/Unified%20Tests-496%2F496%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
 [![Architecture: Cognitive Multi-Agent](https://img.shields.io/badge/Architecture-Cognitive%20Multi--Agent-blueviolet.svg)](#cognitive-multi-agent-architecture)
 [![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
+[![Anti-AI Humanizer: v11.5](https://img.shields.io/badge/Anti--AI%20Humanizer-DataInvariantGate%20%26%20Burstiness-darkgreen.svg)](#scientific-academic-humanizer)
 [![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
 
 ---
@@ -19,9 +20,9 @@
 ---
 
 <a name="english"></a>
-## English Documentation (v11.4.1)
+## English Documentation (v11.5.1)
 
-**Proposal-Nevisi (v11.4.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.4.1 introduces the Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
+**Proposal-Nevisi (v11.5.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.5.1 integrates Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
 
 It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
@@ -214,7 +215,7 @@ The engine enforces 43 fail-closed release criteria before approving proposals:
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness
 
-The engine includes 24 comprehensive test suites with **477 / 477 tests passing (100% Pass Rate)**:
+The engine includes 26 comprehensive test suites with **496 / 496 tests passing (100% Pass Rate)**:
 
 ```powershell
 uv run python tests/run_all_tests.py
@@ -227,37 +228,40 @@ uv run python tests/run_all_tests.py
 - **Suite 5: Mutation Testing Layer (`test_mutations.py`)** - 10 deliberate scientific defects with 100% kill score.
 - **Suite 6: v11.4.1 Adversarial Immunization Suite (`test_v114_adversarial_immunization.py`)** - 11 tests verifying DOI Crossref verification, ToxRTool quality assessment, GLOBOCAN checksums, Mead degrees of freedom, and Chou-Talalay two-phase protocol.
 - **Suite 7: Closed-Loop Iterative Remediation Suite (`test_iterative_remediation_engine.py`)** - 3 tests auditing surgical section patching, multi-round convergence, and fail-closed consensus gating.
-- **Suites 8–24:** Property invariants, schema audits, EQUATOR compliance, RoB-2 mitigation, OMML math engines, typography linters, and Pillar 1-5 hardening.
+- **Suite 8: Scientific Academic Humanizer & Anti-AI Engine Suite (`test_scientific_academic_humanizer.py`)** - 8 tests verifying `DataInvariantGate` fail-closed entity locking, 30+ Persian AI cliches eradication, and sentence length burstiness calibration ($\sigma \ge 8.0$).
+- **Suite 9: Dossier Persistence & CLI Suite (`test_dossier_persistence_and_cli.py`)** - 3 tests verifying round-trip JSON serialization, CLI runner for mock grant reviews, and section patcher.
+- **Suites 10–26:** Property invariants, schema audits, EQUATOR compliance, RoB-2 mitigation, OMML math engines, typography linters, and Pillar 1-5 hardening.
 
 ---
 
 <a name="فارسی"></a>
-## مستندات فارسی (نسخه ۱۱.۴.۱)
+## مستندات فارسی (نسخه ۱۱.۵.۱)
 
-پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۱.۴.۱)** یک سیستم خودکار، پیشرفته، شناختی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است.
+پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۱.۵.۱)** یک سیستم خودکار، پیشرفته، شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است.
 
-نسخه ۱۱.۴.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک و بیواستاتیک را به صورت قطعی ریشه‌کن کرده است.
+نسخه ۱۱.۵.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور علمی ضدتشخیص هوش مصنوعی و انسانی‌ساز آکادمیک (ScientificAcademicHumanizer v11.5)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک، بیواستاتیک و تکیه‌کلام‌های هوش مصنوعی را به صورت قطعی ریشه‌کن کرده است.
 
 ---
 
-### قابلیت‌های کلیدی و نوین نسخه ۱۱.۴.۱:
+### قابلیت‌های کلیدی و نوین نسخه ۱۱.۵.۱:
 
-1. **موتور چرخه بسته داوری و اصلاح پیوسته (`IterativeRemediationEngine`):**
-   - جایگزینی داوری تک‌مرحله‌ای باز (Open-Loop) با لوپ بسته بازخورد و اصلاح پیوسته (تا ۵ راند).
-   - پچ‌کردن جراحی بخش‌های آسیب‌دیده با `SurgicalSectionPatcher` بدون دستکاری سایر بخش‌های تاییدشده.
-   - اعمال فیوز توقف قطعی (Fail-Closed Circuit Breaker) در صورت عدم احراز نمره ممتاز (< 2.0) و عدم تایید اجماعی هیئت داوران.
-   - ثبت شفاف کارنامه حسابرسی اصلاحات در `REVISION_AUDIT_TRAIL.md` و `.json`.
-2. **استعلام برخط شناسه‌های DOI و ممیزی عنوان مقاله (`LiveDoiCrossrefVerifier`):**
+1. **موتور علمی ضدتشخیص هوش مصنوعی و انسانی‌ساز آکادمیک (`ScientificAcademicHumanizer`):**
+   - پالایش قطعی سبک‌سنجی و ریشه‌کنی بیش از ۳۰ تکیه‌کلام رایج هوش مصنوعی در نگارش فارسی (مانند «در دنیای امروز»، «شایان ذکر است»، «نه تنها... بلکه...»، «نقش بسزایی دارد») و جایگزینی با افعال دقیق آزمایشگاهی.
+   - کالیبراسیون واریانس و ریتم طول جملات با انحراف معیار هدفمند ($\sigma \ge 8.0$) جهت از بین بردن یکنواختی ماشینی.
+   - استقرار دروازه قطعی `DataInvariantGate` برای حفاظت ۱۰۰٪ و بدون دستکاری از تمامی مقادیر کمی، دوزها، مقادیر p، فواصل اطمینان CI، شناسه‌های PMID/DOI و نمادهای ژنی با بازگشت خودکار (Rollback) در صورت بروز هرگونه مغایرت.
+2. **اتصال عمیق ساب‌ایجنت‌های شناختی از طریق `PROPOSAL_SPEC.json`:**
+   - ادغام بدون اتلاف (Deep-Merge) خروجی ساب‌ایجنت‌های مرحله اول در پایپ‌لاین تولید پروپوزال شامل مقالات منتخب، پاراگراف‌های سنتز فارسی اختصاصی هر مقاله (`farsi_synthesis_summary`)، مدل مسئله پژوهش و پروتکل متدولوژی.
+3. **موتور چرخه بسته داوری و اصلاح پیوسته (`IterativeRemediationEngine`):**
+   - چرخه بسته بازخورد و اصلاح پیوسته تا سقف ۱۰ دور با پچ جراحی بخش‌های دارای نقص و تولید کارنامه شفاف `REVISION_AUDIT_TRAIL.md`.
+4. **استعلام برخط شناسه‌های DOI و ممیزی عنوان مقاله (`LiveDoiCrossrefVerifier`):**
    - اتصال مستقیم به سرورهای رسمی Crossref جهت راستی‌آزمایی عنوان مقاله در برابر شناسه ثبت‌شده.
-   - ممانعت قطعی از خطای لغزش ارقام انتهای DOI (تطابق رشته عنوان با آستانه تشابه حداقل ۴۰٪ و صدور خطای بحرانی در صورت مغایرت).
-3. **سنتز ۱۰۰٪ فارسی و آکادمیک بخش ۳ (مرور منابع):**
-   - استقرار متد `synthesize_findings_persian` جهت ترجمه و سنتز مفهومی افعال و مکانیزم‌های زیستی (مهار رشد، آپوپتوز، استرس اکسیداتیو، مهاجرت سلولی، مقاومت دارویی).
-   - حذف کامل نشت عناوین یا جملات خام انگلیسی در گیومه‌ها.
-4. **همسویی دقیق بیواستاتیک در معادله مید ($B=2, E=19$):**
-   - محاسبه دقیق درجات آزادی اثر بلوک‌بندی آزمایشگاهی برای ۳ روز کاری مستقل ($B = k_{\text{blocks}} - 1 = 3 - 1 = 2$).
-   - انطباق درجات آزادی خطای آزمون با بازه استاندارد جهانی ($E = 30 - 2 - 9 = 19 \in [10, 20]$).
-   - تفکیک قطعی معادله مید از تحلیل مستقل توان آزمون ANOVA دوطرفه در G*Power با توان ۸۵.۲٪ ($1 - \beta = 0.852$).
-5. **جایگزینی RoB-2 بالینی با ابزار استاندارد سلولی ToxRTool / NTP OHAT:**
+5. **سنتز ۱۰۰٪ فارسی و آکادمیک بخش ۳ (مرور منابع):**
+   - استقرار متد `synthesize_findings_persian` جهت ترجمه و سنتز مفهومی افعال و مکانیزم‌های زیستی بدون نشت متن انگلیسی.
+6. **همسویی دقیق بیواستاتیک در معادله مید ($B=2, E=19$):**
+   - محاسبه دقیق درجات آزادی اثر بلوک‌بندی آزمایشگاهی برای ۳ روز کاری مستقل ($B = 3 - 1 = 2$) و انطباق خطای آزمون با بازه استاندارد ($E = 19$).
+   - تفکیک قطعی معادله مید از تحلیل توان فاکتوریل در G*Power با توان ۸۵.۲٪.
+7. **امکان ارزیابی مستقل از خط فرمان و بازنگری سریع (`--reuse-dossier`):**
+   - ممیزی مستقیم فایل مارک‌داون پروپوزال با خط فرمان `mock_grant_review_panel.py` و استفاده مجدد از پرونده شواهد پلمپ‌شده برای تسریع بازبینی‌ها.
    - حذف خطای اعمال ابزار کارآزمایی بالینی انسانی (Cochrane RoB-2) روی مطالعات کشت سلولی آزمایشگاهی.
    - ارزیابی ۵ دامنه اختصاصی سمیت و زیستایی برون‌تن (مستندسازی ماده، خلوص، شرایط آزمون، اعتبار بیولوژیک و پایایی).
 6. **چک‌سام دقیق آمار رسمی سرطان GLOBOCAN 2022/2024:**
@@ -278,28 +282,41 @@ uv run python tests/run_all_tests.py
 
 ### راهنمای اجرای سریع (خط فرمان)
 
-اجرای کامل پایپ‌لاین تحقیق و نگارش پروپوزال با یک دستور واحد:
+اجرای کامل پایپ‌لاین تحقیق، ادغام خروجی ساب‌ایجنت‌ها و نگارش پروپوزال:
 
 ```powershell
-uv run python scripts/run_research_pipeline.py --topic "عنوان کامل پژوهش شما به فارسی" --keywords "English Agent1, English Agent2, Target Condition" --output-dir "./output"
-```
-
-#### نمونه دستور اجرا:
-```powershell
+# ۱. اجرای کامل همراه با فایل مشخصات ساب‌ایجنت‌های مرحله اول (PROPOSAL_SPEC.json)
 uv run python scripts/run_research_pipeline.py `
-  --topic "مقایسه اثر همزمان فوکوئیدان با پمترکسد بر مهار رشد سلول‌های سرطان ریه" `
-  --keywords "Fucoidan, Pemetrexed, Non-Small Cell Lung Carcinoma" `
-  --study-family "in_vitro" `
+  --topic "بررسی اثر هم‌افزایی متفورمین و بربرین بر القای آپوپتوز در رده سلولی سرطان کولورکتال" `
+  --keywords "Metformin, Berberine, Colorectal Neoplasms" `
+  --spec-file "./output/PROPOSAL_SPEC.json" `
+  --max-iterations 10 `
+  --burstiness-target 8.5 `
   --output-dir "./output"
+
+# ۲. بازتولید سریع و بازبینی در مرحله دوم بدون تکرار سرچ پاب‌مد (--reuse-dossier)
+uv run python scripts/run_research_pipeline.py `
+  --topic "بررسی اثر هم‌افزایی متفورمین و بربرین بر القای آپوپتوز در رده سلولی سرطان کولورکتال" `
+  --spec-file "./output/PROPOSAL_SPEC.json" `
+  --reuse-dossier `
+  --output-dir "./output"
+
+# ۳. ارزیابی مستقیم و مستقل فایل مارک‌داون با هیئت داوران گرنت (NIH 1-9)
+uv run python scripts/mock_grant_review_panel.py "./output/proposal.md"
+
+# ۴. کامپایل مستقیم فایل Word با فرمول‌های بومی OMML ریاضی
+uv run python scripts/docx_builder.py "./output/proposal.md" "./output/proposal.docx"
 ```
 
 #### اسناد خروجی تولیدشده در پوشه خروجی:
-1. `proposal.docx`: فایل نهایی Word پروپوزال شامل ۲۸ بخش کامل پژوهشیار، فرمول‌های OMML، جداول متغیرها، گانت چارت و بدون تیترهای تکراری.
+1. `proposal.docx`: فایل نهایی Word پروپوزال شامل ۲۸ بخش کامل پژوهشیار، فرمول‌های بومی OMML، جداول متغیرها و بدون هرگونه تکیه‌کلام هوش مصنوعی.
 2. `proposal.md`: متن کامل پروپوزال به فرمت مارک‌داون یکپارچه.
 3. `PROPOSAL_RESEARCH_DOSSIER.json` و `.md`: پرونده شواهد پلمپ‌شده شامل قطعات استخراج‌شده از متن کامل مقالات.
 4. `MOCK_GRANT_REVIEW_REPORT.md` و `.json`: کارنامه داوری گرنت به سبک NIH.
-5. `EQUATOR_COMPLIANCE_AUDIT.md` و `.json`: کارنامه انطباق با گایدلاین‌های بین‌المللی پژوهش (ARRIVE, MIQE, GCCP).
-6. `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`: جدول جامع مهار سوگیری‌های مطالعاتی (ToxRTool / RoB-2 / SYRCLE).
+5. `REVISION_AUDIT_TRAIL.md` و `.json`: کارنامه دورهای بازبینی و پچ‌های جراحی هیئت داوران تا سقف ۱۰ دور.
+6. `HUMANIZATION_AUDIT_REPORT.md` و `.json`: کارنامه ممیزی ضدتشخیص هوش مصنوعی، پالایش کلیشه‌ها و انحراف معیار طول جملات.
+7. `EQUATOR_COMPLIANCE_AUDIT.md` و `.json`: کارنامه انطباق با گایدلاین‌های بین‌المللی پژوهش (ARRIVE, MIQE, GCCP).
+8. `RISK_OF_BIAS_MITIGATION_REPORT.md` و `.json`: جدول جامع مهار سوگیری‌های مطالعاتی (ToxRTool / RoB-2 / SYRCLE).
 
 ---
 
