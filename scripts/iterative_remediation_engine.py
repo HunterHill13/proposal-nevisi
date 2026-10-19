@@ -420,7 +420,8 @@ class IterativeRemediationEngine:
                     "APOPTOSIS_POSITIVE_CONTROL_MISSING", "CASPASE3_MRNA_INSUFFICIENCY",
                     "CASPASE3_TRANSCRIPTIONAL_PRIMING_CONFLATION", "ASSAY_INTERFERENCE_DEFECT",
                     "ASSAY_INTERFERENCE_ADVISORY", "CELL_FREE_BLANK_INTERFERENCE_MISSING",
-                    "MIQE_COMPLIANCE_DEFECT", "INTER_SECTION_DRIFT"
+                    "MIQE_COMPLIANCE_DEFECT", "INTER_SECTION_DRIFT",
+                    "گروه‌های کنترل منفی", "کنترل منفی", "کنترل‌های زیستی پایه", "کنترل‌های آزمایشگاهی"
                 ]
             ):
                 def patch_sec_27(text: str) -> str:
@@ -431,6 +432,8 @@ class IterativeRemediationEngine:
                             "**فاز اول (منحنی‌های دوز-پاسخ منفرد و تک‌دارویی):** ارزیابی رقت متوالی ۵ الی ۷ نقطه‌ای جهت استخراج دقیق IC50 منفرد، شیب منحنی ($m$) و دوز اثر میانه ($D_m$).\n"
                             "**فاز دوم (تیمار ترکیبی با نسبت ثابت):** طراحی ماتریس ترکیبی بر مبنای مضارب هم‌توان IC50 و محاسبه شاخص ترکیبی (CI) در نرم‌افزار CompuSyn."
                         )
+                    if "کنترل منفی" not in t and "negative control" not in t.lower():
+                        t += "\n\n▪ **گروه‌های کنترل منفی و حلال (Negative & Vehicle Controls):** تعبیه گروه کنترل منفی (سلول‌های تیمارنشده در محیط کشت استاندارد) و گروه کنترل حلال (حاوی DMSO کمتر از ۰.۱ درصد) جهت پایش عدم سمیت حامل دارویی."
                     if "استاروسپورین" not in t and "staurosporine" not in t.lower():
                         t += "\n\n▪ **کنترل مثبت استاندارد آپوپتوز:** تعبیه گروه کنترل مثبت استاروسپورین ۱ میکرومولار (Staurosporine 1 μM) جهت اعتبارسنجی فلوسایتومتری Annexin V-FITC/PI."
                     if "برش پروتئولیتیک" not in t and "cleaved" not in t.lower():
@@ -444,7 +447,7 @@ class IterativeRemediationEngine:
                     return t
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 27, patch_sec_27)
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 19, patch_sec_27)
-                applied_patches.append("Sections 19 & 27: Enforced 2-phase Chou-Talalay, Staurosporine positive control, Cleaved Caspase-3/Annexin V, Cell-Free Blank & MIQE dual reference genes")
+                applied_patches.append("Sections 19 & 27: Enforced 2-phase Chou-Talalay, Negative/Vehicle & Staurosporine positive control, Cleaved Caspase-3/Annexin V, Cell-Free Blank & MIQE dual reference genes")
 
             # Patch Section 23: Statistical Analysis & Factorial Interaction
             if any("روش تجزیه و تحلیل داده" in f for f in all_issues):

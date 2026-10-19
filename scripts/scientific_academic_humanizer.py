@@ -615,8 +615,13 @@ class ScientificAcademicHumanizer:
     """
 
     # Proposal section numbers targeted for narrative humanization (Pajooheshyar 28 Canonical)
-    # Excludes purely quantitative / formula / bullet sections: 20 (Variables), 22 (Sample Size), 23 (Statistical Tests)
-    TARGET_SECTIONS_28 = [3, 4, 5, 6, 7, 8, 9, 19, 24, 26]
+    # Target narrative sections: 2 (Problem Statement), 3 (Literature Review), 4 (Significance),
+    # 6,7,8 (Objectives), 9 (Hypotheses), 10 (Achievements), 13 (Methodology Narrative),
+    # 21 (Work Protocol), 24 (Ethics), 26 (Limitations)
+    # Excludes purely quantitative / formula / bullet sections: 1 (Title), 5 (Definitions), 11 (Var Table),
+    # 12 (Schedule), 14-20 (Technical Checklists), 22 (Sample Size), 23 (Statistical Tests),
+    # 25 (Biosafety Check), 27 (Lab Invariants), 28 (References)
+    TARGET_SECTIONS_28 = [2, 3, 4, 6, 7, 8, 9, 10, 13, 21, 24, 26]
     # Legacy 14 section mappings
     TARGET_SECTIONS_14 = [2, 3, 4, 5, 6, 9]
 
