@@ -2,15 +2,16 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, humanization, and Word (.docx) publication engine (v11.4.1 Cognitive Multi-Agent Architecture). Operates across diverse biomedical domains
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v11.5 Cognitive Multi-Agent Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
-  Cell-Free Blank interference controls, and passes a unified 473-assertion test suite.
+  ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
+  Cell-Free Blank interference controls, and passes a unified 493-assertion test suite.
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.4.1)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v11.5)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -25,12 +26,13 @@ description: >
 >    - **داور ۲ (روش‌شناسی، بیواستاتیک و ضد کیمرا):** ممیزی عدم تناقض فرمول حجم نمونه با $n=3$، کنترل بلانک بدون سلول (Cell-Free Blank) در تترازولیوم، و تفکیک تکرارهای زیستی مستقل از تکنیکال.
 >    - **داور ۳ (اخلاق و ایمنی زیستی):** استانداردهای BSL-2 و منشور ۳۱ گانه اخلاق زیستی کشور.
 
-نسخه ۱۱.۴ موارد بنیادین زیر را تضمین می‌کند:
+نسخه ۱۱.۵ موارد بنیادین زیر را تضمین می‌کند:
 - **ستون ۱ (Canonical Reference Lock & Live Verification Gate):** بازنویسی و تطبیق ۱۰۰ درصدی تمام اقلام فراداده‌ای مراجع مستقیماً از پاسخ خام API های رسمی PubMed / Crossref بدون اتکا به حافظه فرار ذهنی.
 - **ستون ۲ (FullTextRetrievalEngine & Deep Reading Architecture):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML با پارس دقیق `itertext()` و تفکیک دقیق فصول متدولوژی و نتایج.
 - **ستون ۳ (MethodologyResearchSubagent & Cohesive Protocol Engine):** پیشگیری قطعی از ترکیب وصله‌پینه‌ای متدهای ناهمخوان و ایجاد پروتکل‌های آزمایشگاهی هارمونیک با کنترل‌های تداخل فتومتری (۵۷۰ و ۶۳۰ نانومتر).
 - **ستون ۴ (Biostatistical Coherence & Mead's Resource Equation):** توجیه ریاضی $n=3$ در طرح‌های فاکتوریل بر مبنای $E = N - B - T = 30 - 2 - 9 = 19 \in [10, 20]$ (با درجات آزادی بلوک ۳ روز کاری مستقل $B=3-1=2$) و تحلیل مستقل توان ANOVA فاکتوریل در G*Power با توان ۸۵.۲٪.
 - **ستون ۵ (Adversarial Mock Grant Review Panel):** رد خودکار (`REVISION_REQUIRED`) در صورت مشاهده هرگونه انحراف معنایی مقالات یا تناقض آماری تا زمان اصلاح کامل توسط ایجنت.
+- **ستون ۶ (Scientific Academic Humanizer & Anti-AI-Detection Engine v11.5):** موتور ضدتشخیص و انسانی‌ساز علمی دو لایه (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و گزارش تحلیلی Audit Report).
 
 ---
 

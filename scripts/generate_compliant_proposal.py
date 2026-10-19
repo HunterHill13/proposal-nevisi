@@ -49,6 +49,10 @@ try:
     from proposal_research_dossier import ProposalResearchDossier
     from epistemic_rigor_auditor import EpistemicRigorAuditor
     from iterative_remediation_engine import IterativeRemediationEngine
+    try:
+        from scientific_academic_humanizer import ScientificAcademicHumanizer
+    except ImportError:
+        ScientificAcademicHumanizer = None
 except ImportError:
     scripts_dir = os.path.dirname(__file__)
     sys.path.insert(0, scripts_dir)
@@ -78,6 +82,10 @@ except ImportError:
     from proposal_research_dossier import ProposalResearchDossier
     from epistemic_rigor_auditor import EpistemicRigorAuditor
     from iterative_remediation_engine import IterativeRemediationEngine
+    try:
+        from scientific_academic_humanizer import ScientificAcademicHumanizer
+    except ImportError:
+        ScientificAcademicHumanizer = None
 
 class ProposalGenerator:
     """Universal proposal generator coordinating generic synthesis engines."""
@@ -1118,6 +1126,24 @@ class ProposalGenerator:
         except Exception:
             pass
 
+        # 3.7 Apply Scientific Academic Humanizer & Anti-AI-Detection Engine
+        humanizer_report = None
+        humanizer_md_path = None
+        humanizer_json_path = None
+        enable_humanize = data.get("humanize", True)
+        if str(enable_humanize).lower() not in ["false", "0", "no"]:
+            try:
+                from scientific_academic_humanizer import ScientificAcademicHumanizer
+                target_burst = float(data.get("burstiness_target", 8.5))
+                humanizer = ScientificAcademicHumanizer(target_burstiness=target_burst)
+                fmt_for_hum = "14" if is_14_legacy else "28"
+                md_content, humanizer_report = humanizer.humanize_proposal_markdown(
+                    md_content,
+                    format_type=fmt_for_hum
+                )
+            except Exception as e:
+                print(f"  Notice: ScientificAcademicHumanizer encountered: {e}")
+
         # 4. Scan for forbidden placeholder tokens (Fail-Closed Sanitization Gate)
         scan_res = FinalTextSanitizationGate.scan_text(md_content)
         if not scan_res["is_clean"]:
@@ -1184,6 +1210,16 @@ class ProposalGenerator:
             dossier.export_json(dossier_json_path)
             dossier.export_markdown(dossier_md_path)
 
+        # Conduct Humanization Audit Report Saving
+        if humanizer_report:
+            try:
+                from scientific_academic_humanizer import ScientificAcademicHumanizer
+                humanizer_json_path, humanizer_md_path = ScientificAcademicHumanizer.save_audit_report(
+                    humanizer_report, output_dir=review_dir
+                )
+            except Exception:
+                pass
+
         final_status = "PASS"
         if not is_14_legacy and completeness_res:
             final_status = "PASS" if completeness_res.can_proceed else "FAIL"
@@ -1209,6 +1245,9 @@ class ProposalGenerator:
             "dossier_audit": dossier_report,
             "dossier_md": dossier_md_path,
             "dossier_json": dossier_json_path,
+            "humanization_audit": humanizer_report,
+            "humanization_audit_md": humanizer_md_path,
+            "humanization_audit_json": humanizer_json_path,
             "md_path": md_path,
             "docx_path": docx_path,
             "status": final_status,
@@ -1220,6 +1259,8 @@ def main():
     parser.add_argument("--fixture", type=str, help="Path to fixture or proposal data JSON")
     parser.add_argument("--output-md", type=str, help="Path to output Markdown file")
     parser.add_argument("--output-docx", type=str, help="Path to output Word DOCX file")
+    parser.add_argument("--no-humanize", action="store_true", help="Disable anti-AI humanization pass")
+    parser.add_argument("--burstiness-target", type=float, default=8.5, help="Target sentence length std dev (default: 8.5)")
     args = parser.parse_args()
 
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
@@ -1236,6 +1277,11 @@ def main():
     with open(fixture_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
+    if args.no_humanize:
+        data["humanize"] = False
+    if args.burstiness_target:
+        data["burstiness_target"] = args.burstiness_target
+
     md_out = args.output_md or os.path.join(base_dir, "proposal", "MEDICAL_PROPOSAL_LUPEOL_NDV.md")
     docx_out = args.output_docx or os.path.join(base_dir, "proposal", "MEDICAL_PROPOSAL_LUPEOL_NDV.docx")
 
@@ -1243,6 +1289,8 @@ def main():
     print("Proposal Generation Status:", res["status"])
     print("Markdown:", res["md_path"])
     print("Word DOCX:", res["docx_path"])
+    if res.get("humanization_audit_md"):
+        print("Humanization Audit:", res["humanization_audit_md"])
 
 CompliantProposalGenerator = ProposalGenerator
 
