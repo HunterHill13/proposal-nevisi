@@ -260,6 +260,31 @@ class ProposalResearchDossier:
             "audit_report": self.audit_report
         }
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "ProposalResearchDossier":
+        """Deserializes a ProposalResearchDossier instance from a dictionary."""
+        dossier = cls(topic=data.get("topic", ""), domain=data.get("domain", "Biomedical Science"))
+        dossier.created_at = data.get("created_at", dossier.created_at)
+        dossier.sealed_at = data.get("sealed_at")
+        dossier.is_sealed = bool(data.get("is_sealed", False))
+        dossier.hypotheses = data.get("hypotheses", dossier.hypotheses)
+        dossier.methodological_invariants = data.get("methodological_invariants", dossier.methodological_invariants)
+        dossier.biological_entities = data.get("biological_entities", [])
+        dossier.literature_evidence = data.get("literature_evidence", [])
+        dossier.literature_rob_evaluations = data.get("literature_rob_evaluations", [])
+        dossier.contradictory_evidence = data.get("contradictory_evidence", [])
+        dossier.limitations_and_boundaries = data.get("limitations_and_boundaries", [])
+        dossier.negative_search_strategy = data.get("negative_search_strategy")
+        dossier.audit_report = data.get("audit_report")
+        return dossier
+
+    @classmethod
+    def load_json(cls, json_path: str) -> "ProposalResearchDossier":
+        """Loads and deserializes a ProposalResearchDossier from a JSON file."""
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return cls.from_dict(data)
+
     def export_json(self, output_path: str) -> str:
         """Exports the dossier to a JSON file."""
         os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)

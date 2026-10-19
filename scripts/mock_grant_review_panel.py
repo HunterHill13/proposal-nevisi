@@ -22,6 +22,7 @@ Generates MOCK_GRANT_REVIEW_REPORT.md and MOCK_GRANT_REVIEW_REPORT.json.
 """
 
 import os
+import sys
 import re
 import json
 from dataclasses import dataclass, field
@@ -730,5 +731,56 @@ class MockGrantReviewPanel:
         return md_path, json_path
 
 
+def main():
+    import argparse
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+    parser = argparse.ArgumentParser(description="Mock Grant Review Panel Auditor (NIH 1-9 Scoring & Rigor Gate)")
+    parser.add_argument("proposal_md", help="Path to proposal Markdown file (.md)")
+    parser.add_argument("--spec-file", default=None, help="Optional path to PROPOSAL_SPEC.json")
+    parser.add_argument("--output-dir", default=None, help="Optional directory to save review reports")
+    args = parser.parse_args()
+
+    if not os.path.exists(args.proposal_md):
+        print(f"Error: File not found: {args.proposal_md}")
+        sys.exit(1)
+
+    with open(args.proposal_md, "r", encoding="utf-8") as f:
+        md_text = f.read()
+
+    proposal_data = {}
+    if args.spec_file and os.path.exists(args.spec_file):
+        with open(args.spec_file, "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+            if isinstance(loaded, dict):
+                proposal_data = loaded
+
+    res = MockGrantReviewPanel.conduct_panel_review(md_text, proposal_data)
+    print("=" * 70)
+    print("MOCK GRANT REVIEW PANEL AUDIT RESULT")
+    print("=" * 70)
+    print(f"Overall NIH Score : {res.overall_score} / 9.0 (1.0 = Exceptional, 9.0 = Poor)")
+    print(f"Funding Verdict   : {res.funding_verdict}")
+    print(f"Can Proceed       : {res.can_proceed}")
+    print(f"Critical Flaws    : {res.critical_flaws_count}")
+    if res.critical_flaws:
+        for fl in res.critical_flaws:
+            print(f"  * [CRITICAL] {fl}")
+    else:
+        print("  * Zero Critical Flaws Detected (Passed Gate).")
+    print("=" * 70)
+
+    if args.output_dir:
+        md_p, js_p = MockGrantReviewPanel.save_reports(res, args.output_dir)
+        print(f"Reports saved to:\n  ▪ {md_p}\n  ▪ {js_p}")
+
+
 if __name__ == "__main__":
-    print("MockGrantReviewPanel loaded successfully.")
+    if len(sys.argv) > 1:
+        main()
+    else:
+        print("MockGrantReviewPanel loaded successfully.")

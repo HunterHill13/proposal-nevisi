@@ -69,7 +69,8 @@ class MasterResearchPipeline:
         spec_path: Optional[str] = None,
         max_iterations: int = 10,
         humanize: bool = True,
-        burstiness_target: float = 8.5
+        burstiness_target: float = 8.5,
+        reuse_dossier: bool = False
     ):
         self.topic = topic.strip()
         self.study_family = study_family.lower()
@@ -80,6 +81,7 @@ class MasterResearchPipeline:
         self.max_iterations = max(1, int(max_iterations))
         self.humanize = humanize
         self.burstiness_target = float(burstiness_target)
+        self.reuse_dossier = reuse_dossier
         self.ncbi_api_key = ncbi_api_key or os.getenv("NCBI_API_KEY")
         if isinstance(keywords, str):
             self.keywords = [k.strip() for k in keywords.split(",") if k.strip()]
@@ -192,6 +194,16 @@ class MasterResearchPipeline:
         Phase 1: Inner Loop - Evidence discovery, verification, passage grounding,
         and epistemic sealing.
         """
+        # 0. Check if existing sealed dossier can be reused (Rapid Closed-Loop Refinement)
+        dossier_json = os.path.join(self.output_dir, "PROPOSAL_RESEARCH_DOSSIER.json")
+        if self.reuse_dossier and os.path.exists(dossier_json):
+            print(f"  ▪ Reusing existing sealed research dossier from: {dossier_json}")
+            try:
+                loaded_dossier = ProposalResearchDossier.load_json(dossier_json)
+                return loaded_dossier
+            except Exception as e:
+                print(f"  Notice: Could not load existing dossier, proceeding with fresh discovery: {e}")
+
         print(f"\n[PHASE 1: INNER LOOP] Initiating Evidence Discovery for: '{self.topic}'")
         kw_info = self.extract_keywords()
         query = kw_info["canonical_query"]
@@ -804,6 +816,7 @@ def main():
     parser.add_argument("--max-iterations", type=int, default=10, help="Maximum closed-loop remediation iterations (default: 10)")
     parser.add_argument("--no-humanize", action="store_true", help="Disable anti-AI humanization pass")
     parser.add_argument("--burstiness-target", type=float, default=8.5, help="Target sentence length std dev (default: 8.5)")
+    parser.add_argument("--reuse-dossier", action="store_true", help="Reuse existing PROPOSAL_RESEARCH_DOSSIER.json from output directory to skip retrieval during closed-loop refinement")
     args = parser.parse_args()
 
     pipeline = MasterResearchPipeline(
@@ -817,7 +830,8 @@ def main():
         spec_path=args.spec_file or None,
         max_iterations=args.max_iterations,
         humanize=not args.no_humanize,
-        burstiness_target=args.burstiness_target
+        burstiness_target=args.burstiness_target,
+        reuse_dossier=args.reuse_dossier
     )
     pipeline.run()
 
