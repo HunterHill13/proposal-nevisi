@@ -2,16 +2,16 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v12.0 Cognitive Multi-Agent Architecture). Operates across diverse biomedical domains
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v12.1 Multi-Domain Polymorphic & Cognitive Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 521-assertion test suite.
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 529-assertion test suite (100% PASS).
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v12.0 - نسخه مجهز به موتور گراف استنادی و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v12.1 - نسخه پلی‌مورفیک چنددامنه‌ای مجهز به موتور گراف استنادی، شبکه مفاهیم زیست‌پزشکی و پشتیبانی کامل از مطالعات نظام سلامت، اپیدمیولوژی و بالینی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -80,6 +80,29 @@ description: >
 > [!IMPORTANT]
 > **پروتکل قطعی ارکستراسیون دومرحله‌ای با ۴ ساب‌ایجنت تخصصی (Two-Stage 4-Subagent Orchestration Protocol — Inspired by Claude Multi-Agent Research, PaperQA2 & AI-Scientist-v2):**  
 > برای تضمین اصالت علمی ۱۰۰٪، حذف کامل عبارات قالبی، جلوگیری از خطای انتساب استنادی (Citation Drift) و ممانعت از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با ۴ ساب‌ایجنت تخصصی از طریق ابزار `invoke_subagent`** و **موتور حلقه بسته ۱۰ مرحله‌ای (`DEFAULT_MAX_ITERATIONS = 10`)** اجرا نماید:
+>
+> [!CAUTION]
+> ### 🛑 الزامات قطعی عدم دور زدن پایپ‌لاین و پشتیبانی چنددامنه‌ای (Multi-Domain Polymorphism v12.1)
+> **هرگز و تحت هیچ شرایطی پایپ‌لاین پیش‌فرض (`run_research_pipeline.py`) یا ساب‌ایجنت‌ها را کنار نگذارید!**  
+> اگر موضوع طرح غیرآزمایشگاهی باشد (مانند نظام سلامت، هزینه‌های کمرشکن CHE، پرداخت از جیب OOP، مطالعات مشاهده‌ای، یا کارآزمایی‌های بالینی)، ایجنت **نباید** پایپ‌لاین را دور بزند یا به صورت دستی و متنی پروپوزال بنویسد.
+> 
+> پایپ‌لاین در نسخه ۱۲.۱ به طور کاملاً خودکار نوع مطالعه (`study_family`) را از عنوان طرح یا پرچم `--study-family` تشخیص داده و تمامی ۲۸ بخش را به صورت پلی‌مورفیک تنظیم می‌کند:
+> 
+> | نوع مطالعه (`study_family`) | جامعه و مدل هدف | ابزار و روش گردآوری | حجم نمونه (بخش ۲۲) | مدل تحلیل آماری (بخش ۲۳) |
+> | :--- | :--- | :--- | :--- | :--- |
+> | **نظام سلامت و اقتصاد سلامت** (`health_systems`) | بیماران و خانوارهای مراجعه‌کننده | پرسشنامه WHO WHS & NHA و تطبیق با HIS بیمارستان | فرمول کوکران با ضریب اثر طرح ($DEFF=1.5, n=642$) | رگرسیون لجستیک چندمتغیره (AOR) و شاخص تمرکز کاکوانی (Stata/R) |
+> | **اپیدمیولوژی مشاهده‌ای** (`epidemiological`) | جمعیت هدف و گروه شاهد مبتنی بر جامعه | چک‌لیست معتبر STROBE و سامانه پرونده الکترونیک | فرمول کوکران مطالعات شیوع ($n=428$) | رگرسیون لجستیک چندمتغیره و تحلیل‌های تعدیل‌شده در SPSS/R |
+> | **کارآزمایی بالینی انسان** (`clinical_rct`) | بیماران واجد معیارهای ورود به مطالعه | پروتکل استاندارد GCP و فرم‌های eCRF | فرمول چو و وانگ ($n=128$) | تحلیل قصد درمان (ITT) و آزمون ANCOVA بر پایه CONSORT |
+> | **مدل حیوانی درون‌تنی** (`in_vivo`) | جوندگان آزمایشگاهی استاندارد | مداخله با سرنگ کالیبره و پاتولوژی | معادله تخصیص منابع مید ($E=N-B-T$) بر پایه ARRIVE 2.0 | Repeated Measures ANOVA و آزمون Log-Rank بقا |
+> | **کشت سلولی برون‌تن** (`in_vitro`) | رده‌های سلولی استاندارد ATCC | پلیت ۹۶، فلوسایتومتری، Real-Time PCR | معادله مید ($E=19$) و تحلیل توان فاکتوریل (G*Power) | آنالیز واریانس دوطرفه فاکتوریل و Chou-Talalay در CompuSyn |
+> 
+> **چرا دور زدن پایپ‌لاین منجر به شکست کامل کار می‌شود؟**
+> با کنار رفتن رانر اصلی، زنجیره تولید خودکار گراف قطع شده و فایل‌های حیاتی زیر تولید **نخواهند شد**:
+> ۱. `LITERATURE_CITATION_GRAPH.json` (گراف کامل روابط استنادی مقالات)
+> ۲. `LITERATURE_CITATION_GRAPH.html` (ویژوالایزر تحت وب اینتراکتیو با Cytoscape.js)
+> ۳. `BIOMEDICAL_CONCEPT_GRAPH.json` (شبکه ارتباطی مفاهیم و شاخص‌های سلامت CHE/OOP/ICER/QALY)
+> ۴. `claim_entailment_audit.json` (ممیزی قفل‌بسته گزاره‌های علمی علیه توهم)
+> ۵. سند Word رسمی با فرمول‌های بومی OMML ورد و استایل‌شیت پژوهشیار (`proposal.docx`).
 >
 > ### مرحله اول (Stage 1: Parallel Pre-Draft Subagents -> `PROPOSAL_SPEC.json`):
 > پیش از اجرای پایپ‌لاین، ابتدا **۲ ساب‌ایجنت تخصصی شواهد و متدولوژی** را به صورت موازی فراخوانی کنید تا مقالات زنده PubMed/Europe PMC/OpenAlex، امتیاز ارتباط و استناد (PaperQA2 RCS 0–10)، و پارامترهای اختصاصی مدل بیماری را استخراج کنند:

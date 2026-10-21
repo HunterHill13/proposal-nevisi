@@ -315,9 +315,11 @@ class MockGrantReviewPanel:
             "viability_cytotoxicity": ["زیست‌پذیری", "سمیت", "mtt", "زنده‌مانی", "cytotox", "viability", "ic50"],
             "apoptosis_cell_death": ["آپوپتوز", "مرگ سلولی", "کاسپاز", "caspase", "apoptosis", "annexin"],
             "migration_invasion": ["مهاجرت", "تهاجم", "خراش", "scratch", "wound", "migration", "invasion"],
-            "synergy_combination": ["هم‌افزایی", "سینرژی", "چو", "تالالی", "ci", "synerg", "combination index"],
-            "gene_protein_expression": ["بیان ژن", "پروتئین", "rt-pcr", "pcr", "western", "الایزا", "elisa", "expression"],
-            "cell_cycle": ["چرخه سلولی", "cell cycle", "sub-g1", "فاز"]
+            "synergy_combination": ["هم‌افزایی", "سینرژی", "چو-تالالای", "chou-talalay", "compusyn", "synergyfinder", "combination index"],
+            "gene_protein_expression": ["بیان ژن", "پروتئین", "rt-pcr", "real-time pcr", "western blot", "الایزا", "elisa"],
+            "cell_cycle": ["چرخه سلولی", "cell cycle", "sub-g1"],
+            "health_economics_che": ["کمرشکن", "che", "هزینه", "مخارج", "oop", "فقرزایی", "out-of-pocket", "financial catastrophe"],
+            "risk_factors_epidemiology": ["عوامل خطر", "پیش‌بینی‌کننده", "رگرسیون", "odds ratio", "نسبت شانس", "ریسک"]
         }
 
         detected_aims = []
@@ -399,7 +401,7 @@ class MockGrantReviewPanel:
         s14 = sections.get(14, "")
         is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
         full_text_lower = " ".join(sections.values()).lower()
-        if is_in_vitro and ("rob-2" in full_text_lower or "rob 2" in full_text_lower or "cochrane" in full_text_lower):
+        if is_in_vitro and bool(re.search(r"\b(rob-?2|cochrane\s+rob|cochrane\s+risk\s+of\s+bias)\b", full_text_lower)):
             if not any(k in full_text_lower for k in ["toxrtool", "ntp ohat", "givimp", "ecvam"]):
                 critical_flaws.append("ROB2_IN_VITRO_MISAPPLICATION: ابزار RoB-2 ککرین اختصاصاً برای کارآزمایی‌های بالینی انسانی تصادفی‌سازی‌شده طراحی شده است. برای مطالعات سلولی برون‌تن (In Vitro)، استفاده از RoB-2 فاقد وجاهت روش‌شناختی است و باید از چارچوب‌های استاندارد ToxRTool یا NTP OHAT استفاده شود.")
                 score += 1.5
@@ -422,7 +424,7 @@ class MockGrantReviewPanel:
                 strengths.append("سنجش ارتوگونال فعال‌سازی کاسپاز-۳ از طریق برش پروتئینی یا فلوسایتومتری Annexin V/PI تضمین شده است.")
 
         # 7. Chou-Talalay Synergy 2-Phase Protocol Rigor
-        has_synergy = any(k in methods_text for k in ["هم‌افزایی", "سینرژی", "چو", "تالالی", "ci", "chou", "compusyn", "synergyfinder"])
+        has_synergy = any(k in methods_text for k in ["هم‌افزایی", "سینرژی", "چو-تالالای", "chou-talalay", "compusyn", "synergyfinder"]) or bool(re.search(r"\bcombination\s+index\b", methods_text))
         if has_synergy:
             has_phase1 = any(k in methods_text for k in ["فاز اول", "منحنی‌های دوز-پاسخ منفرد", "دوز-پاسخ تک‌دارویی", "تک‌دارویی", "monotherapy", "serial dilution", "رقت متوالی", "ic50 منفرد", "شیب m"])
             if not has_phase1:
@@ -446,7 +448,8 @@ class MockGrantReviewPanel:
         s22_lower = s22.lower()
         has_ttest_formula = bool(re.search(r'\\frac\{2\(z', s22_lower) or re.search(r'2\(z_\{?1-\\alpha', s22_lower))
         claims_n3 = bool(re.search(r'n\s*=\s*3', s22_lower) or "۳ تکرار" in s22 or "3 biological" in s22_lower)
-        has_mead_or_factorial = bool("mead" in s22_lower or "resource equation" in s22_lower or "factorial" in s22_lower or "واریانس دوطرفه" in s22)
+        has_cochran = "کوکران" in s22 or "cochran" in s22_lower
+        has_mead_or_factorial = bool("mead" in s22_lower or "resource equation" in s22_lower or "factorial" in s22_lower or "واریانس دوطرفه" in s22 or has_cochran)
 
         has_mead = "mead" in s22_lower or "resource equation" in s22_lower or "معادله مید" in s22 or "معادله تخصیص منابع" in s22
         if has_mead:

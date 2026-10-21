@@ -108,6 +108,41 @@ class MasterResearchPipeline:
             elif isinstance(raw_kw, list):
                 self.keywords = [str(k).strip() for k in raw_kw if str(k).strip()]
 
+        # Domain Polymorphism Auto-detection (Harmonize study_family from topic or spec)
+        if self.spec_data.get("study_family"):
+            self.study_family = str(self.spec_data["study_family"]).lower()
+        elif self.spec_data.get("research_problem_model", {}).get("framework"):
+            fw = str(self.spec_data["research_problem_model"]["framework"]).upper()
+            if "HEALTH_SYSTEM" in fw or "HEALTH_POLICY" in fw or "ECONOM" in fw:
+                self.study_family = "health_systems"
+            elif "EPIDEMIOLOG" in fw or "OBSERVATIONAL" in fw:
+                self.study_family = "epidemiological"
+            elif "CLINICAL" in fw:
+                self.study_family = "clinical_rct"
+            elif "ANIMAL" in fw or "IN_VIVO" in fw:
+                self.study_family = "in_vivo"
+
+        # Auto-detect from topic if defaulted to in_vitro or auto
+        t_lower = self.topic.lower()
+        if self.study_family in ["in_vitro", "auto", ""] or not self.study_family:
+            if any(k in t_lower for k in [
+                "هزینه", "کمرشکن", "پرداخت از جیب", "اقتصاد سلامت", "نظام سلامت", "بیمه",
+                "che", "oop", "health expenditure", "catastrophic", "out-of-pocket",
+                "health system", "health policy", "icer", "qaly", "daly", "equity", "عدالت در سلامت"
+            ]):
+                self.study_family = "health_systems"
+            elif any(k in t_lower for k in [
+                "مقطعی", "مورد-شاهدی", "شیوع", "همه‌گیرشناسی", "عوامل خطر", "بررسی پیمایشی",
+                "cross-sectional", "case-control", "prevalence", "incidence", "risk factors"
+            ]) and not any(k in t_lower for k in ["رده سلولی", "cell line", "in vitro"]):
+                self.study_family = "epidemiological"
+            elif any(k in t_lower for k in [
+                "کارآزمایی بالینی", "clinical trial", "rct", "مداخله بالینی", "فاز ۱", "فاز ۲", "فاز ۳"
+            ]):
+                self.study_family = "clinical_rct"
+            elif any(k in t_lower for k in ["موش", "رت", "in vivo", "حيوان", "xenograft", "حیوانات"]):
+                self.study_family = "in_vivo"
+
         os.makedirs(self.output_dir, exist_ok=True)
         self.adapter = ScientificSearchAdapter(ncbi_api_key=self.ncbi_api_key)
         self.fulltext_engine = FullTextRetrievalEngine(adapter=self.adapter)
@@ -427,19 +462,67 @@ class MasterResearchPipeline:
         interventions_list = rpm.get("interventions_or_exposures", [])
         cond_fa = rpm.get("target_condition", {}).get("name_fa", "بیماری هدف")
         sys_fa = rpm.get("population_or_model", {}).get("primary_system", "سیستم مدل")
-        if len(interventions_list) >= 2:
+        
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+            a1_name = interventions_list[0].get("name", "عوامل ساختاری و بیمه‌ای") if interventions_list else "عوامل ساختاری و بیمه‌ای"
+            h0_text = f"عوامل زمینه‌ای، وضعیت بیمه‌ای و الگوی بیماری تفاوت معنی‌داری در شیوع هزینه‌های کمرشکن سلامت (CHE) و میزان پرداخت از جیب (OOP) در {sys_fa} ایجاد نمی‌کنند."
+            h1_text = f"عوامل اجتماعی-اقتصادی، پوشش بیمه‌ای ناکافی و نوع خدمات درمانی به عنوان پیش‌بینی‌کننده‌های معنادار مواجهه با هزینه‌های کمرشکن سلامت (CHE > 40% CTP) و افزایش سهم پرداخت از جیب (OOP) در {sys_fa} عمل می‌کنند."
+            rationale_text = f"ارزیابی شاخص‌های حفاظت مالی و عدالت در هزینه‌کردهای خانوارها در مواجهه با {cond_fa} منطبق بر استانداردهای WHO."
+        elif self.study_family in ["epidemiological", "observational"]:
+            a1_name = interventions_list[0].get("name", "مواجهه هدف") if interventions_list else "مواجهه هدف"
+            h0_text = f"ارتباط آماری معنی‌داری بین {a1_name} و بروز یا شیوع پیامدهای مرتبط با {cond_fa} در {sys_fa} وجود ندارد."
+            h1_text = f"{a1_name} به صورت آماری معنی‌دار به عنوان عامل پیش‌بینی‌کننده یا تعیین‌کننده مستقل پیامد در {sys_fa} عمل می‌کند."
+            rationale_text = f"سنجش میزان شیوع و متغیرهای مرتبط با بار بیماری {cond_fa} بر پایه راهنمای STROBE."
+        elif self.study_family in ["clinical_rct", "clinical"]:
+            a1_name = interventions_list[0].get("name", "مداخله بالینی") if interventions_list else "مداخله بالینی"
+            h0_text = f"تجویز {a1_name} تفاوت معنی‌داری در پیامدهای اولیه بالینی و بقای بیماران نسبت به گروه کنترل استاندارد ایجاد نمی‌کند."
+            h1_text = f"تجویز {a1_name} موجب بهبود معنی‌دار بالینی و آماری در پیامد اولیه و کنترل بیماری نسبت به گروه کنترل می‌شود."
+            rationale_text = f"ارزیابی اثربخشی و ایمنی رژیم درمانی در بیماران مبتلا به {cond_fa} بر مبنای استاندارد CONSORT."
+        elif len(interventions_list) >= 2:
             a1_name = interventions_list[0].get("name", "مداخله اول")
             a2_name = interventions_list[1].get("name", "مداخله دوم")
             h0_text = f"مواجهه همزمان با {a1_name} و {a2_name} تفاوت معنی‌داری در شاخص ترکیب (CI) و درصد آپوپتوز در {sys_fa} نسبت به تک‌درمانی ایجاد نمی‌کند."
             h1_text = f"مواجهه همزمان با {a1_name} و {a2_name} دارای اثر هم‌افزایی فارماکولوژیک (CI < 1.0) در مهار زیست‌پذیری و القای آپوپتوز در {sys_fa} است."
+            rationale_text = f"تعدیل مسیرهای پیام‌رسانی مرگ برنامه‌ریزی‌شده سلولی در {cond_fa}."
         else:
             a1_name = interventions_list[0].get("name", "مداخله") if interventions_list else "مداخله"
             h0_text = f"مواجهه با {a1_name} تفاوت معنی‌داری در شاخص‌های زیست‌پذیری و آپوپتوز در {sys_fa} نسبت به گروه کنترل ایجاد نمی‌کند."
             h1_text = f"مواجهه با {a1_name} به صورت وابسته به دوز و زمان موجب مهار تکثیر و القای آپوپتوز در {sys_fa} می‌شود."
-        dossier.set_hypotheses(h0=h0_text, h1=h1_text, rationale=f"تعدیل مسیرهای پیام‌رسانی مرگ برنامه‌ریزی‌شده سلولی در {cond_fa}.")
+            rationale_text = f"تعدیل مسیرهای پیام‌رسانی مرگ برنامه‌ریزی‌شده سلولی در {cond_fa}."
+        dossier.set_hypotheses(h0=h0_text, h1=h1_text, rationale=rationale_text)
 
         # Methodological Invariants (strictly synchronized with Section 22 & Section 27)
-        if self.study_family in ["in_vivo", "animal"]:
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+            dossier.set_methodological_invariants(
+                study_family="Health Systems & Policy (Health Economics)",
+                primary_endpoint="شیوع هزینه‌های کمرشکن سلامت (CHE > 40% CTP) و سهم پرداخت از جیب (OOP)",
+                sample_size_formula="Cochran's Formula for Proportions with Cluster Design Effect (DEFF = 1.5)",
+                target_n=642,
+                statistical_test="Multivariable Logistic Regression & Kakwani Concentration Index",
+                alpha=0.05,
+                power=0.85
+            )
+        elif self.study_family in ["epidemiological", "observational"]:
+            dossier.set_methodological_invariants(
+                study_family="Epidemiological Observational (Cross-Sectional)",
+                primary_endpoint="شیوع پیامد، نسبت شانس تعدیل‌شده (AOR) و فواصل اطمینان ۹۵٪",
+                sample_size_formula="Cochran's Formula for Observational Surveys",
+                target_n=428,
+                statistical_test="Multivariable Logistic Regression with STROBE Compliance",
+                alpha=0.05,
+                power=0.85
+            )
+        elif self.study_family in ["clinical_rct", "clinical"]:
+            dossier.set_methodological_invariants(
+                study_family="Clinical Trial (Randomized Controlled Trial)",
+                primary_endpoint="بهبود معنادار بالینی در پیامد اولیه بر پایه MCID و بقای کلی",
+                sample_size_formula="Chow et al. (2017) Two-Sample Parallel Power Formula",
+                target_n=80,
+                statistical_test="Independent t-test, ANCOVA, and Intention-to-Treat (ITT) Analysis",
+                alpha=0.05,
+                power=0.80
+            )
+        elif self.study_family in ["in_vivo", "animal"]:
             dossier.set_methodological_invariants(
                 study_family="In Vivo Animal Efficacy",
                 primary_endpoint="کاهش حجم تومور (mm3) و بقای کلی در حیوانات مدل",
@@ -460,25 +543,58 @@ class MasterResearchPipeline:
                 power=0.852
             )
 
-        # Biological Entities (Dynamically extracted from topic / spec)
+        # Biological / Population Entities (Dynamically extracted from topic / spec)
         terms = kw_info.get("terms", [])
-        model_name = rpm.get("population_or_model", {}).get("primary_system") or (terms[-1] if terms else "Cellular Model")
-        dossier.add_biological_entity(
-            name=f"{model_name}",
-            entity_type="Cell Line / Biological Model",
-            identifier="ATCC Authenticated Standard (RRID Validated)",
-            purity="STR Authenticated, Mycoplasma-free",
-            source="Certified Biological Repository"
-        )
-        for intv in interventions_list[:2]:
-            intv_name = intv.get("name", "Therapeutic Compound")
+        model_name = rpm.get("population_or_model", {}).get("primary_system") or (terms[-1] if terms else "Target Model / Population")
+        
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
             dossier.add_biological_entity(
-                name=f"{intv_name}",
-                entity_type=intv.get("chemical_or_biological_class", "Pharmaceutical Active Ingredient"),
-                identifier="Analytical Standard Reference",
-                purity=">=95% Analytical Standard",
-                source="Certified Chemical Repository"
+                name=f"{model_name}",
+                entity_type="Household & Patient Population",
+                identifier="WHO World Health Survey (WHS) & NHA Standard",
+                purity="Representative Multi-stage Stratified Cluster Sample",
+                source="Hospital Information System (HIS) & Household Surveys"
             )
+            dossier.add_biological_entity(
+                name="Catastrophic Health Expenditure (CHE) & Out-of-Pocket (OOP)",
+                entity_type="Health Economics Endpoint Metric",
+                identifier="WHO Financial Protection Standard (10% Total & 40% CTP)",
+                purity="Direct Medical & Non-Medical Out-of-Pocket Expenses",
+                source="Standardized Survey & Validated Accounting Audit"
+            )
+        elif self.study_family in ["epidemiological", "observational"]:
+            dossier.add_biological_entity(
+                name=f"{model_name}",
+                entity_type="Human Observational Cohort / Sample",
+                identifier="STROBE Standardized Population Registry",
+                purity="Randomized Representative Sample with Informed Consent",
+                source="Clinical Registry & Structured Questionnaire"
+            )
+        elif self.study_family in ["clinical_rct", "clinical"]:
+            dossier.add_biological_entity(
+                name=f"{model_name}",
+                entity_type="Human Clinical Trial Cohort",
+                identifier="CONSORT / GCP Registered Trial Sample",
+                purity="Eligibility Criteria Verified with Allocation Concealment",
+                source="Clinical Hospital Recruitment with Informed Consent"
+            )
+        else:
+            dossier.add_biological_entity(
+                name=f"{model_name}",
+                entity_type="Cell Line / Biological Model",
+                identifier="ATCC Authenticated Standard (RRID Validated)",
+                purity="STR Authenticated, Mycoplasma-free",
+                source="Certified Biological Repository"
+            )
+            for intv in interventions_list[:2]:
+                intv_name = intv.get("name", "Therapeutic Compound")
+                dossier.add_biological_entity(
+                    name=f"{intv_name}",
+                    entity_type=intv.get("chemical_or_biological_class", "Pharmaceutical Active Ingredient"),
+                    identifier="Analytical Standard Reference",
+                    purity=">=95% Analytical Standard",
+                    source="Certified Chemical Repository"
+                )
 
         # Literature Evidence with Contextual Semantic Tier Classification
         direct_combo_count = 0
@@ -588,6 +704,17 @@ class MasterResearchPipeline:
             cit_engine = CitationGraphEngine(topic_query=self.topic, offline_mode=(self.mode == "mock"))
             concept_engine = BiomedicalConceptGraph(topic_context=self.topic)
 
+            # Build rich known entity dictionary for concept graph grounding
+            known_dict: Dict[str, List[str]] = {}
+            if kw_info.get("terms"):
+                known_dict["KEYWORD"] = kw_info["terms"]
+            if rpm.get("target_condition", {}).get("name_en"):
+                known_dict["DISEASE"] = [rpm["target_condition"]["name_en"]]
+            for intv in rpm.get("interventions_or_exposures", []):
+                iname = intv.get("name")
+                if iname:
+                    known_dict.setdefault("INTERVENTION", []).append(iname)
+
             for idx, st in enumerate(studies):
                 pid = str(st.get("pmid") or st.get("doi") or f"STUDY_{idx+1}")
                 is_seed = (idx == 0)
@@ -599,7 +726,8 @@ class MasterResearchPipeline:
                 concept_engine.ingest_paper_abstract(
                     paper_id=node_id,
                     title=st.get("title", ""),
-                    abstract=st.get("abstract", "")
+                    abstract=st.get("abstract", ""),
+                    known_entities=known_dict
                 )
 
             cit_engine.compute_bibliographic_coupling(threshold=0.1)
@@ -660,9 +788,16 @@ class MasterResearchPipeline:
                 cond_fa, cond_en = c_fa, c_en
                 break
 
-        # 2. Extract target biological system / cell line
+        # 2. Extract target biological system / model / population
         cell_match = re.findall(r'\b(?:HCT-?116|HT-?29|SW-?480|Caco-?2|MDA-?MB-?231|SK-?BR-?3|T-?47D|AGS|MKN-?45|PC-?3|DU-?145|LNCaP|U-?87|SH-?SY5Y|K-?562|HL-?60|HeLa|HEK-?293|NIH-?3T3|WI-?38|VERO|RAW264\.7|[A-Z]{2,5}-?\d{1,4})\b', combined_topic_kw)
-        if cell_match:
+        
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+            primary_sys = f"جامعه خانوارها و بیماران مبتلا به {cond_fa} مراجعه‌کننده به مراکز درمانی"
+        elif self.study_family in ["epidemiological", "observational"]:
+            primary_sys = f"جامعه هدف بیماران و جمعیت مواجهه با {cond_fa}"
+        elif self.study_family in ["clinical_rct", "clinical"]:
+            primary_sys = f"بیماران واجد معیارهای ورود به مطالعه مبتلا به {cond_fa}"
+        elif cell_match:
             unique_cells = list(dict.fromkeys(cell_match))
             primary_sys = f"رده سلولی {' و '.join(unique_cells)}"
         elif self.study_family in ["in_vivo", "animal"]:
@@ -685,7 +820,7 @@ class MasterResearchPipeline:
                 {"name": n2, "chemical_or_biological_class": "عامل مداخله دوم (هم‌افزا / کمکی)", "role": "SECONDARY_AGENT"}
             ]
         elif len(terms) >= 2:
-            non_disease_terms = [t for t in terms if not any(w in t.lower() for w in ["neoplasm", "cancer", "carcinoma", "disease", "diabetes", "apoptosis", "synergism"])]
+            non_disease_terms = [t for t in terms if not any(w in t.lower() for w in ["neoplasm", "cancer", "carcinoma", "disease", "diabetes", "apoptosis", "synergism", "che", "oop"])]
             if len(non_disease_terms) >= 2:
                 interventions = [
                     {"name": non_disease_terms[0], "chemical_or_biological_class": "عامل مداخله اول", "role": "PRIMARY_AGENT"},
@@ -696,25 +831,57 @@ class MasterResearchPipeline:
                     {"name": non_disease_terms[0], "chemical_or_biological_class": "عامل مداخله اصلی", "role": "PRIMARY_AGENT"}
                 ]
         if not interventions:
-            interventions = [
-                {"name": terms[0] if terms else "مداخله اول", "chemical_or_biological_class": "ترکیب فعال زیستی", "role": "PRIMARY_AGENT"},
-                {"name": terms[1] if len(terms) > 1 else "مداخله دوم", "chemical_or_biological_class": "عامل درمانی کمکی", "role": "SECONDARY_AGENT"}
-            ]
+            if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+                interventions = [
+                    {"name": "هزینه‌های کمرشکن سلامت (CHE)", "chemical_or_biological_class": "شاخص اقتصاد سلامت", "role": "PRIMARY_OUTCOME_VARIABLE"},
+                    {"name": "پرداخت مستقیم از جیب (OOP)", "chemical_or_biological_class": "شاخص بار مالی سلامت", "role": "SECONDARY_OUTCOME_VARIABLE"}
+                ]
+            else:
+                interventions = [
+                    {"name": terms[0] if terms else "مداخله اول", "chemical_or_biological_class": "ترکیب فعال زیستی", "role": "PRIMARY_AGENT"},
+                    {"name": terms[1] if len(terms) > 1 else "مداخله دوم", "chemical_or_biological_class": "عامل درمانی کمکی", "role": "SECONDARY_AGENT"}
+                ]
 
         # 4. Primary outcomes
-        primary_outcomes = [
-            {"name": "درصد زیست‌پذیری سلولی و غلظت مهارکننده نیمی از حداکثر (IC50)", "type": "VIABILITY", "measurement_unit": "درصد (%) و میکرومولار (μM)"},
-            {"name": "شاخص ترکیب فارماکولوژیک (Combination Index; CI) و شاخص انتخاب‌پذیری (SI)", "type": "SYNERGY", "measurement_unit": "شاخص بی‌بعد (CI و SI)"},
-            {"name": "درصد مرگ برنامه‌ریزی‌شده سلولی (آپوپتوز زودرس و دیررس)", "type": "APOPTOSIS", "measurement_unit": "درصد سلول‌های Annexin V+/PI"},
-            {"name": "سطح بیان نسبی ژن‌های مسیر آپوپتوز و فعالیت برش کاسپاز-۳", "type": "GENE_EXPRESSION", "measurement_unit": "Fold Change (2^-ΔΔCt)"}
-        ]
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+            primary_outcomes = [
+                {"name": "شیوع خانوارهای مواجه با هزینه‌های کمرشکن سلامت (CHE بر پایه آستانه‌های ۱۰٪ کل و ۴۰٪ ظرفیت پرداخت)", "type": "CHE_INCIDENCE", "measurement_unit": "درصد (%)"},
+                {"name": "میانگین و سهم پرداخت مستقیم از جیب (OOP) از کل هزینه‌های درمانی مستقیم و غیرمستقیم", "type": "OOP_SHARE", "measurement_unit": "ریال / درصد (%)"},
+                {"name": "نسبت شانس تعدیل‌شده (AOR) عوامل اجتماعی-اقتصادی موثر بر مواجهه با CHE در رگرسیون لجستیک", "type": "REGRESSION_ODDS_RATIO", "measurement_unit": "AOR (95% CI)"},
+                {"name": "شاخص تمرکز کاکوانی (Kakwani Index) و منحنی لورنز جهت سنجش نابرابری در توزیع بار مالی سلامت", "type": "EQUITY_INDEX", "measurement_unit": "Concentration Index (-1 to +1)"}
+            ]
+        elif self.study_family in ["epidemiological", "observational"]:
+            primary_outcomes = [
+                {"name": "میزان شیوع نقطه‌ای و دوره‌ای پیامد هدف", "type": "PREVALENCE", "measurement_unit": "درصد (%) و فاصله اطمینان ۹۵٪"},
+                {"name": "نسبت شانس تعدیل‌شده (Adjusted Odds Ratio; AOR)", "type": "ODDS_RATIO", "measurement_unit": "AOR (95% CI)"},
+                {"name": "شاخص‌های خطر نسبی (Relative Risk / Hazard Ratio)", "type": "RELATIVE_RISK", "measurement_unit": "RR / HR (95% CI)"}
+            ]
+        else:
+            primary_outcomes = [
+                {"name": "درصد زیست‌پذیری سلولی و غلظت مهارکننده نیمی از حداکثر (IC50)", "type": "VIABILITY", "measurement_unit": "درصد (%) و میکرومولار (μM)"},
+                {"name": "شاخص ترکیب فارماکولوژیک (Combination Index; CI) و شاخص انتخاب‌پذیری (SI)", "type": "SYNERGY", "measurement_unit": "شاخص بی‌بعد (CI و SI)"},
+                {"name": "درصد مرگ برنامه‌ریزی‌شده سلولی (آپوپتوز زودرس و دیررس)", "type": "APOPTOSIS", "measurement_unit": "درصد سلول‌های Annexin V+/PI"},
+                {"name": "سطح بیان نسبی ژن‌های مسیر آپوپتوز و فعالیت برش کاسپاز-۳", "type": "GENE_EXPRESSION", "measurement_unit": "Fold Change (2^-ΔΔCt)"}
+            ]
 
-        framework_code = "EXPERIMENTAL_ANIMAL" if self.study_family in ["in_vivo", "animal"] else (
-            "CLINICAL_TRIAL" if self.study_family in ["clinical_rct", "clinical", "cohort"] else "EXPERIMENTAL_IN_VITRO"
-        )
+        if self.study_family in ["health_systems", "health_policy", "health_economics"]:
+            framework_code = "HEALTH_SYSTEMS_AND_HEALTH_POLICY"
+            domain_name = "health_economics_and_policy"
+        elif self.study_family in ["epidemiological", "observational"]:
+            framework_code = "EPIDEMIOLOGICAL_OBSERVATIONAL"
+            domain_name = "epidemiology"
+        elif self.study_family in ["clinical_rct", "clinical", "cohort"]:
+            framework_code = "CLINICAL_TRIAL"
+            domain_name = "clinical_medicine"
+        elif self.study_family in ["in_vivo", "animal"]:
+            framework_code = "EXPERIMENTAL_ANIMAL"
+            domain_name = "experimental_animal"
+        else:
+            framework_code = "EXPERIMENTAL_IN_VITRO"
+            domain_name = "oncology" if "Neoplasm" in cond_en or "سرطان" in cond_fa else "biomedical_pharmacology"
 
         base_rpm = {
-            "domain": "oncology" if "Neoplasm" in cond_en or "سرطان" in cond_fa else "biomedical_pharmacology",
+            "domain": domain_name,
             "framework": framework_code,
             "target_condition": {
                 "name_fa": cond_fa,

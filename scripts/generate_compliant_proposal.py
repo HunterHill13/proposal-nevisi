@@ -691,8 +691,15 @@ class ProposalGenerator:
             for out in model_dict.get("primary_outcomes", []):
                 oname = out.get("name") if isinstance(out, dict) else str(out)
                 defs.append(f"▪ **{oname}:** شاخص پیامد اصلی تعیین‌شده جهت ارزیابی پاسخ زیستی.")
-            if len(interventions) >= 2:
+            fw_upper = str(framework).upper()
+            is_pharma_synergy = fw_upper in ["EXPERIMENTAL_IN_VITRO", "COMBINATION_PHARMACOLOGY"] and not any(k in fw_upper for k in ["HEALTH_SYSTEM", "HEALTH_POLICY", "ECONOM", "EPIDEMIOLOG", "OBSERVATIONAL"])
+            if len(interventions) >= 2 and is_pharma_synergy:
                 defs.append(f"▪ **شاخص ترکیب (Combination Index; CI):** معیار کمی استاندارد سنجش برهم‌کنش فارماکولوژیک:\n{SynergyMetricConfig.get_unified_narrative_fa()}")
+            elif "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                defs.append(
+                    "▪ **هزینه‌های کمرشکن سلامت (Catastrophic Health Expenditures; CHE):** بر اساس تعریف رسمی سازمان جهانی بهداشت (WHO)، زمانی رخ می‌دهد که مجموع هزینه‌های مستقیم درمانی پرداخت‌شده توسط خانوار از ۱۰ درصد کل مخارج یا ۴۰ درصد ظرفیت پرداخت (Capacity to Pay: CTP) فراتر رود.\n\n"
+                    "▪ **پرداخت مستقیم از جیب (Out-of-Pocket; OOP):** پرداخت‌های مستقیم خانوار در زمان دریافت خدمات سلامت شامل هزینه‌های مستقیم پزشکی و غیرپزشکی بدون پوشش بیمه."
+                )
             def_text = "\n\n".join(defs) if defs else "واژگان تخصصی و متغیرهای اصلی پژوهش مطابق استانداردهای بین‌المللی تعریف شده‌اند."
         md_parts.append("## ۵. تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)\n" + def_text + "\n\n---")
 
@@ -792,16 +799,28 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         meth_overview = data.get("methodology_overview_text")
         if not meth_overview:
-            is_in_vitro = any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell", "سلول"])
-            bias_framework = "ToxRTool / NTP OHAT In Vitro Data Quality Framework" if is_in_vitro else "Cochrane RoB-2 / SYRCLE"
-            meth_overview = (
-                f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری ({bias_framework}) طراحی گردیده است. "
-                f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده، "
-                f"تخصیص شرایط آزمایشی و تیمارها به صورت تصادفی ساختاریافته (Randomized Block Design) و با کدگذاری نمونه‌ها (Coded Vials / Allocation Concealment) توسط ناظر مستقل، "
-                f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
-                f"سنجش‌های بیولوژیک با کورسازی ارزیاب و اپراتور دستگاه نسبت به گروه‌ها (Blinded Outcome Assessment)، "
-                f"و در نهایت تحلیل آماری و مدلسازی برهم‌کنش فارماکولوژیک می‌باشد."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            meth_overview = cp_dict.get("formatted_sections_fa", {}).get(13) or cp_dict.get("formatted_sections_fa", {}).get("13")
+        if not meth_overview:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                meth_overview = (
+                    f"طرح پژوهشی حاضر یک مطالعه کاربردی-مقطعی توصیفی-تحلیلی در حوزه اقتصاد سلامت و سیاست‌گذاری سلامت است "
+                    f"که جهت ارزیابی مواجهه با هزینه‌های کمرشکن سلامت (CHE) و پرداخت‌های مستقیم از جیب (OOP) بر روی جامعه هدف بیماران مبتلا به {cond_name} اجرا می‌گردد. "
+                    f"گردآوری داده‌ها با پرسشنامه استاندارد WHO WHS و تطبیق صورتحساب‌های بستری با سامانه اطلاعات بیمارستانی (HIS) انجام شده "
+                    f"و عوامل موثر با رگرسیون لجستیک چندمتغیره و نابرابری توزیع با شاخص تمرکز تحلیل می‌گردد."
+                )
+            else:
+                is_in_vitro = any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell", "سلول"])
+                bias_framework = "ToxRTool / NTP OHAT In Vitro Data Quality Framework" if is_in_vitro else "Cochrane RoB-2 / SYRCLE"
+                meth_overview = (
+                    f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری ({bias_framework}) طراحی گردیده است. "
+                    f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده، "
+                    f"تخصیص شرایط آزمایشی و تیمارها به صورت تصادفی ساختاریافته (Randomized Block Design) و با کدگذاری نمونه‌ها (Coded Vials / Allocation Concealment) توسط ناظر مستقل، "
+                    f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
+                    f"سنجش‌های بیولوژیک با کورسازی ارزیاب و اپراتور دستگاه نسبت به گروه‌ها (Blinded Outcome Assessment)، "
+                    f"و در نهایت تحلیل آماری و مدلسازی برهم‌کنش فارماکولوژیک می‌باشد."
+                )
         md_parts.append("## ۱۳. روش اجرا\n" + meth_overview + "\n\n---")
 
         # -------------------------------------------------------------
@@ -809,7 +828,20 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_14 = data.get("study_design_text") or extracted_subs.get("1")
         if not sec_14:
-            sec_14 = f"مطالعه بنیادی-کاربردی از نوع تجربی آزمایشگاهی در شرایط برون‌تن (In Vitro Experimental Study)."
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_14 = cp_dict.get("formatted_sections_fa", {}).get(14) or cp_dict.get("formatted_sections_fa", {}).get("14")
+        if not sec_14:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_14 = "مطالعه کاربردی-مقطعی مبتنی بر جامعه از نوع توصیفی-تحلیلی و اقتصاد سلامت (Cross-sectional Health Systems & Health Economics Study)."
+            elif "EPIDEMIOL" in fw_upper or "OBSERV" in fw_upper:
+                sec_14 = "مطالعه مشاهده‌ای تحلیلی مقطعی مبتنی بر جمعیت (Observational Analytical Cross-Sectional Study)."
+            elif "CLINICAL" in fw_upper or "RCT" in fw_upper:
+                sec_14 = "کارآزمایی بالینی تصادفی‌سازی‌شده کنترل‌دار دوسوکور (Double-blind Randomized Controlled Trial: RCT)."
+            elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper:
+                sec_14 = "مطالعه تجربی مداخله‌ای پیش‌بالینی در مدل حیوانی درون‌تنی (In Vivo Animal Experimental Study)."
+            else:
+                sec_14 = f"مطالعه بنیادی-کاربردی از نوع تجربی آزمایشگاهی در شرایط برون‌تن (In Vitro Experimental Study)."
         md_parts.append("## ۱۴. نوع مطالعه\n" + sec_14 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -817,51 +849,68 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_15 = data.get("study_population_text") or extracted_subs.get("2")
         if not sec_15:
-            # Generate PICO/PECO structured matrix aligned with study design
-            is_clinical = framework in ["PICO", "CLINICAL_TRIAL", "COHORT"] or any(k in str(framework).lower() for k in ["human", "patient", "clinical"])
-            framework_label = "PICO" if is_clinical else "PECO"
-            pop_label = "جامعه بیماران / جمعیت هدف (Population)" if is_clinical else "سیستم سلولی / مدل بیولوژیک (Population/Model)"
-            exp_label = "مداخله دارویی / بالینی (Intervention)" if is_clinical else "مواجهه / مداخله تجربی (Exposure/Intervention)"
-            comp_label = "گروه کنترل / دارونما (Comparator/Placebo)" if is_clinical else "کنترل منفی / حلال ناقل (Comparator/Vehicle)"
-            out_label = "پیامدهای اولیه و بالینی (Primary Outcomes)" if is_clinical else "پیامدهای مولکولی و آپوپتوز (Outcomes)"
-
-            outcomes_list = model_dict.get("primary_outcomes", [])
-            outcomes_str = "، ".join(o.get("name") if isinstance(o, dict) else str(o) for o in outcomes_list) if outcomes_list else "زیست‌پذیری، آپوپتوز و شاخص‌های مولکولی"
-            interventions_str = " و ".join(ag.get("name") if isinstance(ag, dict) else str(ag) for ag in interventions) if interventions else "مداخلات تجربی طرح"
-
-            pico_table = (
-                f"▪ **چارچوب ساختارمند متدولوژی ({framework_label} Framework):**\n\n"
-                f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
-                f"| :--- | :--- |\n"
-                f"| **P ({pop_label})** | {sys_name} تهیه شده از بانک‌های معتبر زیستی با احراز هویت ژنتیکی و کنترل سالم بافتی |\n"
-                f"| **I/E ({exp_label})** | مواجهه زمان‌بندی‌شده و غلظت‌سنجی {interventions_str} با خلوص تاییدشده |\n"
-                f"| **C ({comp_label})** | گروه دست‌نخورده، کنترل منفی حلال ناقل (DMSO < 0.1%) و کنترل بدون سلول |\n"
-                f"| **O ({out_label})** | {outcomes_str} |\n\n"
-            )
-            sys_cond_lower = f"{sys_name} {cond_name} {cond_en} {fa_title}".lower()
-            if any(k in sys_cond_lower for k in ["ریه", "nsclc", "h1299", "p53-null", "f-12k"]):
-                het_text = (
-                    "به منظور ارزیابی وابستگی مکانیسم اثر به مسیرهای تنظیمی کلیدی، رده‌های سلولی بر مبنای تفاوت در وضعیت موتاسیونی ژن‌های هدف "
-                    "(نظیر وضعیت موتاسیونی ژن‌های انکوژنیک و پروتئین p53 وحشی در مقایسه با رده سلولی فاقد p53 یا p53-null) انتخاب شده‌اند. "
-                    "همچنین رده سلولی نرمال دیپلوئید به عنوان مدل کنترلی غیربدخیم جهت تعیین شاخص انتخاب‌پذیری (Selectivity Index: SI) مورد استفاده قرار می‌گیرد.\n\n"
-                    "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
-                    "به منظور حفظ ویژگی‌های فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت اختصاصی توصیه شده توسط ATCC "
-                    "(بر پایه شناسنامه بیولوژیک در محیط‌های F-12K، EMEM یا RPMI-1640 به همراه ۱۰٪ سرم جنین گاوی FBS و ۱٪ پنی‌سیلین-استرپتومایسین) کشت داده می‌شوند."
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_15 = cp_dict.get("formatted_sections_fa", {}).get(15) or cp_dict.get("formatted_sections_fa", {}).get("15")
+        if not sec_15:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_15 = (
+                    f"جامعه آماری پژوهش حاضر شامل کلیه بیماران مبتلا به {cond_name} و خانوارهای تحت پوشش آنها می‌باشد که در بازه زمانی اجرای مطالعه به بیمارستان‌ها و مراکز تشخیصی-درمانی منتخب مراجعه نموده‌اند.\n\n"
+                    f"▪ **چارچوب ساختارمند متدولوژی (PECO Framework):**\n\n"
+                    f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
+                    f"| :--- | :--- |\n"
+                    f"| **P (Population)** | بیماران مبتلا به {cond_name} و خانوارهای تحت سرپرستی |\n"
+                    f"| **E (Exposure)** | مواجهه با بار مالی و هزینه‌های درمانی (خدمات بستری، سرپایی، دارویی) |\n"
+                    f"| **C (Comparator)** | مقایسه دهک‌های درآمدی/هزینه‌ای و وضعیت پوشش بیمه پایه و تکمیلی |\n"
+                    f"| **O (Outcomes)** | نرخ مواجهه با هزینه‌های کمرشکن سلامت (CHE) و سهم پرداخت از جیب (OOP) |\n\n"
+                    f"نمونه‌گیری به شیوه خوشه‌ای چندمرحله‌ای با تخصیص متناسب در بین مراکز درمانی دولتی و خصوصی انجام خواهد شد."
                 )
             else:
-                het_text = (
-                    f"به منظور ارزیابی دقیق مکانیسم اثر و وابستگی پاسخ به مسیرهای پیام‌رسانی درون‌سلولی، {sys_name} بر مبنای شناسنامه ژنتیکی و پروفایل موتاسیونی مسیرهای تنظیمی کلیدی (نظیر وضعیت ژن‌های سرکوبگر تومور p53 و مسیرهای بقای سلولی) انتخاب گردیده است. "
-                    "همچنین رده سلولی نرمال هم‌بافت به عنوان مدل کنترلی غیربدخیم جهت محاسبه دقیق شاخص انتخاب‌پذیری (Selectivity Index: SI = IC50 Normal / IC50 Target) مورد استفاده قرار می‌گیرد.\n\n"
-                    "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
-                    "به منظور حفظ پایداری فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت پایه اختصاصی مصوب بانک سلولی مرجع (ATCC) "
-                    "(نظیر محیط‌های استاندارد DMEM یا RPMI-1640 غنی‌شده با ۱۰٪ سرم جنین گاوی FBS غیرفعال‌شده با حرارت و ۱٪ آنتی‌بیوتیک پنی‌سیلین-استرپتومایسین در دمای ۳۷ درجه سانتی‌گراد و ۵٪ CO2) کشت داده می‌شود."
+                # Generate PICO/PECO structured matrix aligned with study design
+                is_clinical = framework in ["PICO", "CLINICAL_TRIAL", "COHORT"] or any(k in str(framework).lower() for k in ["human", "patient", "clinical"])
+                framework_label = "PICO" if is_clinical else "PECO"
+                pop_label = "جامعه بیماران / جمعیت هدف (Population)" if is_clinical else "سیستم سلولی / مدل بیولوژیک (Population/Model)"
+                exp_label = "مداخله دارویی / بالینی (Intervention)" if is_clinical else "مواجهه / مداخله تجربی (Exposure/Intervention)"
+                comp_label = "گروه کنترل / دارونما (Comparator/Placebo)" if is_clinical else "کنترل منفی / حلال ناقل (Comparator/Vehicle)"
+                out_label = "پیامدهای اولیه و بالینی (Primary Outcomes)" if is_clinical else "پیامدهای مولکولی و آپوپتوز (Outcomes)"
+
+                outcomes_list = model_dict.get("primary_outcomes", [])
+                outcomes_str = "، ".join(o.get("name") if isinstance(o, dict) else str(o) for o in outcomes_list) if outcomes_list else "زیست‌پذیری، آپوپتوز و شاخص‌های مولکولی"
+                interventions_str = " و ".join(ag.get("name") if isinstance(ag, dict) else str(ag) for ag in interventions) if interventions else "مداخلات تجربی طرح"
+
+                pico_table = (
+                    f"▪ **چارچوب ساختارمند متدولوژی ({framework_label} Framework):**\n\n"
+                    f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
+                    f"| :--- | :--- |\n"
+                    f"| **P ({pop_label})** | {sys_name} تهیه شده از بانک‌های معتبر زیستی با احراز هویت ژنتیکی و کنترل سالم بافتی |\n"
+                    f"| **I/E ({exp_label})** | مواجهه زمان‌بندی‌شده و غلظت‌سنجی {interventions_str} با خلوص تاییدشده |\n"
+                    f"| **C ({comp_label})** | گروه دست‌نخورده، کنترل منفی حلال ناقل (DMSO < 0.1%) و کنترل بدون سلول |\n"
+                    f"| **O ({out_label})** | {outcomes_str} |\n\n"
                 )
-            sec_15 = (
-                pico_table +
-                f"مدل زیستی و سیستم هدف مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی.\n\n"
-                "▪ **مبنای تبارشناسی ژنتیکی رده‌های سلولی (Molecular Heterogeneity Rationale):**\n" +
-                het_text
-            )
+                sys_cond_lower = f"{sys_name} {cond_name} {cond_en} {fa_title}".lower()
+                if any(k in sys_cond_lower for k in ["ریه", "nsclc", "h1299", "p53-null", "f-12k"]):
+                    het_text = (
+                        "به منظور ارزیابی وابستگی مکانیسم اثر به مسیرهای تنظیمی کلیدی، رده‌های سلولی بر مبنای تفاوت در وضعیت موتاسیونی ژن‌های هدف "
+                        "(نظیر وضعیت موتاسیونی ژن‌های انکوژنیک و پروتئین p53 وحشی در مقایسه با رده سلولی فاقد p53 یا p53-null) انتخاب شده‌اند. "
+                        "همچنین رده سلولی نرمال دیپلوئید به عنوان مدل کنترلی غیربدخیم جهت تعیین شاخص انتخاب‌پذیری (Selectivity Index: SI) مورد استفاده قرار می‌گیرد.\n\n"
+                        "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
+                        "به منظور حفظ ویژگی‌های فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت اختصاصی توصیه شده توسط ATCC "
+                        "(بر پایه شناسنامه بیولوژیک در محیط‌های F-12K، EMEM یا RPMI-1640 به همراه ۱۰٪ سرم جنین گاوی FBS و ۱٪ پنی‌سیلین-استرپتومایسین) کشت داده می‌شوند."
+                    )
+                else:
+                    het_text = (
+                        f"به منظور ارزیابی دقیق مکانیسم اثر و وابستگی پاسخ به مسیرهای پیام‌رسانی درون‌سلولی، {sys_name} بر مبنای شناسنامه ژنتیکی و پروفایل موتاسیونی مسیرهای تنظیمی کلیدی (نظیر وضعیت ژن‌های سرکوبگر تومور p53 و مسیرهای بقای سلولی) انتخاب گردیده است. "
+                        "همچنین رده سلولی نرمال هم‌بافت به عنوان مدل کنترلی غیربدخیم جهت محاسبه دقیق شاخص انتخاب‌پذیری (Selectivity Index: SI = IC50 Normal / IC50 Target) مورد استفاده قرار می‌گیرد.\n\n"
+                        "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
+                        "به منظور حفظ پایداری فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت پایه اختصاصی مصوب بانک سلولی مرجع (ATCC) "
+                        "(نظیر محیط‌های استاندارد DMEM یا RPMI-1640 غنی‌شده با ۱۰٪ سرم جنین گاوی FBS غیرفعال‌شده با حرارت و ۱٪ آنتی‌بیوتیک پنی‌سیلین-استرپتومایسین در دمای ۳۷ درجه سانتی‌گراد و ۵٪ CO2) کشت داده می‌شود."
+                    )
+                sec_15 = (
+                    pico_table +
+                    f"مدل زیستی و سیستم هدف مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی.\n\n"
+                    "▪ **مبنای تبارشناسی ژنتیکی رده‌های سلولی (Molecular Heterogeneity Rationale):**\n" +
+                    het_text
+                )
         md_parts.append("## ۱۵. جامعه مورد مطالعه\n" + sec_15 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -869,7 +918,16 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_16 = data.get("study_setting_text") or data.get("study_location_text") or extracted_subs.get("3")
         if not sec_16:
-            sec_16 = "آزمایشگاه تحقیقات سلولی و مولکولی و آزمایشگاه جامع تحقیقاتی دانشکده علوم پزشکی."
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_16 = cp_dict.get("formatted_sections_fa", {}).get(16) or cp_dict.get("formatted_sections_fa", {}).get("16")
+        if not sec_16:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper or "EPIDEMIOL" in fw_upper or "CLINICAL" in fw_upper:
+                sec_16 = "بیمارستان‌ها، مراکز درمانی، درمانگاه‌های تخصصی سرپایی و مراکز جامع خدمات سلامت منتخب تحت پوشش دانشگاه علوم پزشکی."
+            elif "IN_VIVO" in fw_upper:
+                sec_16 = "مرکز نگهداری و پرورش حیوانات آزمایشگاهی و آزمایشگاه فیزیولوژی و فارماکولوژی دانشکده علوم پزشکی."
+            else:
+                sec_16 = "آزمایشگاه تحقیقات سلولی و مولکولی و آزمایشگاه جامع تحقیقاتی دانشکده علوم پزشکی."
         md_parts.append("## ۱۶. محل انجام مطالعه\n" + sec_16 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -877,14 +935,26 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_17 = data.get("inclusion_criteria_text") or extracted_subs.get("4")
         if not sec_17:
-            sec_17 = (
-                "- تطابق کامل با ویژگی‌های جمعیت/مدل بر مبنای چارچوب PICO/PECO مطالعه.\n"
-                "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
-                "- احراز هویت ژنتیکی سلول‌ها با پروفایل STR (Short Tandem Repeat) جهت تضمین اصالت و عدم آلودگی متقاطع.\n"
-                "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی (غربالگری شده با آزمون PCR مایکوپلاسما).\n"
-                "- استفاده از سلول‌ها در محدوده پاساژ استاندارد (پاساژهای بین ۳ الی ۱۰) جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
-                "- مواد مداخله با درجه خلوص آنالیتیکال استاندارد (Analytical Standard با خلوص بالای ۹۵٪ از کمپانی‌های معتبر)."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_17 = cp_dict.get("formatted_sections_fa", {}).get(17) or cp_dict.get("formatted_sections_fa", {}).get("17")
+        if not sec_17:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_17 = (
+                    f"- تشخیص قطعی بیماری {cond_name} مستند به پرونده پزشکی و گزارش پاتولوژی معتبر.\n"
+                    "- گذشت حداقل ۳ ماه از آغاز مراحل درمانی فعال (شیمی‌درمانی، رادیوتراپی یا بستری جراحی).\n"
+                    "- سکونت خانوار در حوزه جغرافیایی تحت پوشش پژوهش.\n"
+                    "- اعلام رضایت آگاهانه کتبی جهت شرکت در مصاحبه و تکمیل پرسشنامه توسط بیمار یا سرپرست قانونی خانوار."
+                )
+            else:
+                sec_17 = (
+                    "- تطابق کامل با ویژگی‌های جمعیت/مدل بر مبنای چارچوب PICO/PECO مطالعه.\n"
+                    "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
+                    "- احراز هویت ژنتیکی سلول‌ها با پروفایل STR (Short Tandem Repeat) جهت تضمین اصالت و عدم آلودگی متقاطع.\n"
+                    "- سلول‌های فاقد هرگونه آلودگی باکتریایی، قارچی و مایکوپلاسمایی (غربالگری شده با آزمون PCR مایکوپلاسما).\n"
+                    "- استفاده از سلول‌ها در محدوده پاساژ استاندارد (پاساژهای بین ۳ الی ۱۰) جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
+                    "- مواد مداخله با درجه خلوص آنالیتیکال استاندارد (Analytical Standard با خلوص بالای ۹۵٪ از کمپانی‌های معتبر)."
+                )
         md_parts.append("## ۱۷. معیار های ورود به مطالعه\n" + sec_17 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -892,13 +962,25 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_18 = data.get("exclusion_criteria_text") or extracted_subs.get("5")
         if not sec_18:
-            sec_18 = (
-                "- مشاهده هرگونه آلودگی میکروبی یا تغییرات ریخت‌شناسی غیرمعمول در چاهک‌های کشت.\n"
-                "- افت زیست‌پذیری کنترل منفی سلولی به کمتر از ۹۰ درصد در طول دوره آزمایش.\n"
-                "- وجود خطای تفاضل ضریب تغییرات (CV) بالاتر از ۱۵ درصد میان تکرارهای تکنیکی یک گروه.\n"
-                "- حذف چاهک‌های دارای نقص فنی آشکار مطابق معیارهای از پیش تعریف‌شده بدون انتخاب گزینشی داده‌ها.\n"
-                "- شناسایی و مدیریت داده‌های پرت (Outliers) بر مبنای آزمون آماری گرابز (Grubbs' Test) در سطح معناداری ۰.۰۱ و عدم اعمال حذف سلیقه‌ای."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_18 = cp_dict.get("formatted_sections_fa", {}).get(18) or cp_dict.get("formatted_sections_fa", {}).get("18")
+        if not sec_18:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_18 = (
+                    "- عدم تمایل یا انصراف بیمار یا سرپرست خانوار در هر مرحله از تکمیل پرسشنامه.\n"
+                    "- ناقص بودن بیش از ۲۰ درصد از اقلام هزینه‌ای کلیدی بدون امکان راستی‌آزمایی متقابل با سامانه اطلاعات بیمارستانی (HIS).\n"
+                    "- دریافت خدمات درمانی در خارج از کشور در طول دوره ارزیابی.\n"
+                    "- فوت بیمار قبل از امکان اعتبارسنجی صورتحساب‌های درمانی."
+                )
+            else:
+                sec_18 = (
+                    "- مشاهده هرگونه آلودگی میکروبی یا تغییرات ریخت‌شناسی غیرمعمول در چاهک‌های کشت.\n"
+                    "- افت زیست‌پذیری کنترل منفی سلولی به کمتر از ۹۰ درصد در طول دوره آزمایش.\n"
+                    "- وجود خطای تفاضل ضریب تغییرات (CV) بالاتر از ۱۵ درصد میان تکرارهای تکنیکی یک گروه.\n"
+                    "- حذف چاهک‌های دارای نقص فنی آشکار مطابق معیارهای از پیش تعریف‌شده بدون انتخاب گزینشی داده‌ها.\n"
+                    "- شناسایی و مدیریت داده‌های پرت (Outliers) بر مبنای آزمون آماری گرابز (Grubbs' Test) در سطح معناداری ۰.۰۱ و عدم اعمال حذف سلیقه‌ای."
+                )
         md_parts.append("## ۱۸. معیار های خروج از مطالعه\n" + sec_18 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -906,13 +988,24 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_19 = data.get("instruments_text") or data.get("data_collection_tools_text") or extracted_subs.get("6")
         if not sec_19:
-            sec_19 = (
-                "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا مجهز به فیلترهای استاندارد با اعمال تصحیح بلانک بدون سلول (Cell-Free Blank Correction).\n"
-                "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد جهت تفکیک آپوپتوز و نکروز با رنگ‌آمیزی دوتایی Annexin V-FITC / PI.\n"
-                "- کیت سنجش فعالیت آنزیمی یا برش فعال کاسپاز-۳ (Cleaved Caspase-3 Activity / Western Blot) جهت اثبات عملکردی فعال‌سازی آبشار پروتئولیتیک آپوپتوز.\n"
-                "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ جهت آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay).\n"
-                "- سیستم Real-Time PCR جهت سنجش بیان کمی ژن‌ها و نرم‌افزارهای تحلیلی GraphPad Prism و CompuSyn."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_19 = cp_dict.get("formatted_sections_fa", {}).get(19) or cp_dict.get("formatted_sections_fa", {}).get("19")
+        if not sec_19:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_19 = (
+                    "- پرسشنامه استاندارد ارزیابی هزینه‌های سلامت و بهره‌مندی از خدمات درمانی (برگرفته از WHO World Health Survey و NHA).\n"
+                    "- چک‌لیست استخراج داده‌های هزینه‌ای از پرونده‌های الکترونیک سلامت و سامانه اطلاعات بیمارستانی (HIS).\n"
+                    "- نرم‌افزارهای تحلیلی آماری و اقتصاد سلامت Stata 17 و R 4.3 جهت مدلسازی چندمتغیره و استخراج شاخص تمرکز."
+                )
+            else:
+                sec_19 = (
+                    "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا مجهز به فیلترهای استاندارد با اعمال تصحیح بلانک بدون سلول (Cell-Free Blank Correction).\n"
+                    "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد جهت تفکیک آپوپتوز و نکروز با رنگ‌آمیزی دوتایی Annexin V-FITC / PI.\n"
+                    "- کیت سنجش فعالیت آنزیمی یا برش فعال کاسپاز-۳ (Cleaved Caspase-3 Activity / Western Blot) جهت اثبات عملکردی فعال‌سازی آبشار پروتئولیتیک آپوپتوز.\n"
+                    "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ جهت آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay).\n"
+                    "- سیستم Real-Time PCR جهت سنجش بیان کمی ژن‌ها و نرم‌افزارهای تحلیلی GraphPad Prism و CompuSyn."
+                )
         md_parts.append("## ۱۹. ابزار های گردآوری اطلاعات\n" + sec_19 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -920,18 +1013,32 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_20 = data.get("validity_text") or data.get("tool_validity_text") or extracted_subs.get("7")
         if not sec_20:
-            sec_20 = (
-                "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
-                "- ارزیابی کمّی و کیفی RNA استخراج‌شده با اسپکتروفتومتر نانودراپ (نسبت A260/A280 بین ۱.۸ الی ۲.۰) و شاخص سلامت RNA (RIN >= 7).\n"
-                "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب (Melting Curve) با کارایی تکثیر استاندارد ۹۰ الی ۱۱۰ درصد.\n"
-                "- احراز هویت سلولی با آنالیز پروفایل STR و استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_20 = cp_dict.get("formatted_sections_fa", {}).get(20) or cp_dict.get("formatted_sections_fa", {}).get("20")
+        if not sec_20:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_20 = (
+                    "- ارزیابی روایی صوری و محتوایی کمی با محاسبه نسبت روایی محتوا (CVR) و شاخص روایی محتوا (CVI) توسط پانل خبرگان اقتصاد سلامت و متخصصان انکولوژی.\n"
+                    "- اجرای مطالعه مقدماتی (Pilot) بر روی ۳۰ خانوار جهت اطمینان از وضوح، روانی و فهم دقیق سوالات پرسشنامه.\n"
+                    "- بازبینی روزانه پرسشنامه‌های تکمیل‌شده توسط ناظر علمی پروژه."
+                )
+            else:
+                sec_20 = (
+                    "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
+                    "- ارزیابی کمّی و کیفی RNA استخراج‌شده با اسپکتروفتومتر نانودراپ (نسبت A260/A280 بین ۱.۸ الی ۲.۰) و شاخص سلامت RNA (RIN >= 7).\n"
+                    "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب (Melting Curve) با کارایی تکثیر استاندارد ۹۰ الی ۱۱۰ درصد.\n"
+                    "- احراز هویت سلولی با آنالیز پروفایل STR و استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد."
+                )
         md_parts.append("## ۲۰. تعیین اعتبار ابزار گردآوری\n" + sec_20 + "\n\n---")
 
         # -------------------------------------------------------------
         # ۲۱. تعیین ابزار گردآوری
         # -------------------------------------------------------------
         sec_21 = data.get("reliability_text") or data.get("tool_reliability_text") or extracted_subs.get("8")
+        if not sec_21:
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_21 = cp_dict.get("formatted_sections_fa", {}).get(21) or cp_dict.get("formatted_sections_fa", {}).get("21")
         if not sec_21:
             sec_21 = (
                 "- تامین کلیه کیت‌ها، آنتی‌بادی‌ها و مواد شیمیایی از کمپانی‌های مرجع معتبر (مانند Sigma-Aldrich / Merck / Gibco) با کد کاتالوگ مشخص.\n"
@@ -946,22 +1053,47 @@ class ProposalGenerator:
         # ۲۲. حجم نمونه و روش محاسبه آن
         # -------------------------------------------------------------
         sec_22 = data.get("sample_size_text") or data.get("sample_size_calculation_text") or extracted_subs.get("9")
-        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\\frac', r'n\s*=', r'Mead', r'Z_', r'E\s*=']):
-            if framework in ["EXPERIMENTAL_ANIMAL", "ANIMAL_IN_VIVO"]:
+        if not sec_22:
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_22 = cp_dict.get("formatted_sections_fa", {}).get(22) or cp_dict.get("formatted_sections_fa", {}).get("22")
+
+        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\frac', r'n\s*=', r'Mead', r'Z_', r'E\s*=']):
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                # Health Systems & Policy (Health Economics): Cochran's Formula with Design Effect
+                sec_22 = (
+                    "تعیین حجم نمونه بر مبنای استاندارد بین‌المللی فرمول کوکران برای متغیرهای کیفی-نسبتی با لحاظ ضریب اثر طرح خوشه‌ای (DEFF) صورت پذیرفته است:\n\n"
+                    r"$$n = \frac{Z_{1-\alpha/2}^2 \cdot p(1-p)}{d^2} \times DEFF$$"
+                    "\n\nدر این رابطه $Z_{1-\alpha/2} = 1.96$ معادل سطح اطمینان ۹۵٪، $p = 0.50$ به عنوان محافظه‌کارانه‌ترین نسبت جهت حصول بیشینه واریانس و بزرگ‌ترین حجم نمونه ایمن، "
+                    "و $d = 0.05$ دقت مطلوب برآورد (خطای مجاز ۵٪) است. "
+                    "بر این اساس حجم نمونه پایه $n_{base} = \frac{1.96^2 \times 0.50 \times (1 - 0.50)}{0.05^2} = 384.16 \approx 385$ خانوار/بیمار حاصل می‌گردد. "
+                    "با در نظر گرفتن ضریب اثر طرح خوشه‌ای ($DEFF = 1.5$) ناشی از نمونه‌گیری خوشه‌ای چندمرحله‌ای، حجم نمونه به $n_{cluster} = 385 \times 1.5 = 577.5 \approx 578$ نفر افزایش می‌یابد. "
+                    "نهایتاً با لحاظ ۱۰٪ احتمال عدم پاسخ یا پرسشنامه‌های مخدوش، حجم نمونه نهایی به صورت زیر تثبیت می‌گردد:\n\n"
+                    r"$$n_{final} = \frac{n_{cluster}}{1 - 0.10} = \frac{578}{0.90} \approx 642 \text{ خانوار/بیمار}$$"
+                )
+            elif "EPIDEMIOLOG" in fw_upper or "OBSERVATIONAL" in fw_upper:
+                # Observational Epidemiology: Cochran's Formula for Observational Surveys
+                sec_22 = (
+                    "محاسبه حجم نمونه بر مبنای فرمول استاندارد کوکران برای مطالعات مشاهده‌ای صورت پذیرفته است:\n\n"
+                    r"$$n = \frac{Z_{1-\alpha/2}^2 \cdot P(1-P)}{d^2}$$"
+                    "\n\nدر این رابطه $Z = 1.96$ معادل اطمینان ۹۵٪، $P = 0.50$ برای حصول بیشترین حجم نمونه و $d = 0.05$ دقت برآورد است. "
+                    "حجم پایه ۳۸۵ نفر محاسبه شده و با احتساب ۱۰٪ ریزش، تعداد نهایی به ۴۲۸ شرکت‌کننده تعدیل می‌گردد."
+                )
+            elif framework in ["EXPERIMENTAL_ANIMAL", "ANIMAL_IN_VIVO"] or "ANIMAL" in fw_upper:
                 # In Vivo Animal: Festing (2002) & ARRIVE Guidelines (Mead's Resource Equation)
                 sec_22 = (
                     "تعیین حجم نمونه در مطالعه حیوانی بر مبنای راهنمای بین‌المللی ARRIVE Guidelines و معادله تخصیص منابع فستینگ (Festing & Altman, 2002; Festing, 2006) انجام می‌پذیرد:\n\n"
                     r"$$E = N - B - T$$"
                     "\n\nدر این رابطه، $N$ کل حیوانات آزمایشگاهی، $B$ اثر بلوک‌بندی و $T$ درجات آزادی تیمارها است. "
-                    "طبق استاندارد جهانی Festing، مقدار درجات آزادی خطا ($E$) باید در بازه $10 \le E \le 20$ قرار گیرد تا هم توان آماری آزمون ($1-\\beta \ge 0.80$) تضمین گردد و هم از هدررفت اخلاقی حیوانات جلوگیری شود. "
+                    "طبق استاندارد جهانی Festing، مقدار درجات آزادی خطا ($E$) باید در بازه $10 \le E \le 20$ قرار گیرد تا هم توان آماری آزمون ($1-\beta \ge 0.80$) تضمین گردد و هم از هدررفت اخلاقی حیوانات جلوگیری شود. "
                     "با فرض ۴ بازوی آزمایشی و ۶ سر حیوان در هر گروه ($N = 24$)، مقدار $E = 24 - 1 - 3 = 20$ حاصل می‌شود. با احتساب ۱۰٪ نرخ تلفات احتمالی ($Attrition Rate$)، حجم نهایی نمونه‌ها تثبیت می‌گردد."
                 )
-            elif framework in ["PICO", "CLINICAL_TRIAL", "COHORT", "HUMAN"]:
+            elif framework in ["PICO", "CLINICAL_TRIAL", "COHORT", "HUMAN"] or "CLINICAL" in fw_upper:
                 # Clinical Trial / Human Cohort: Chow et al. (2017) Sample Size Calculations in Clinical Research
                 sec_22 = (
                     "محاسبه حجم نمونه بر اساس استاندارد مرجع کارآزمایی‌های بالینی چو و وانگ (Chow, Shao, Wang, & Lokhnygina, 2017 - *Sample Size Calculations in Clinical Research*) جهت مقایسه دو گروه موازی انجام می‌پذیرد:\n\n"
                     r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2} = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2}$$"
-                    "\n\nدر این معادله با در نظر گرفتن توان آماری ۸۰٪ ($1-\\beta = 0.80$ معادل $Z_{1-\\beta} = 0.84$)، ضریب خطای نوع اول دوطرفه ۵٪ ($\\alpha = 0.05$ معادل $Z_{1-\\alpha/2} = 1.96$) و اندازه اثر استاندارد کوهن ($Cohen's\\ d = \\Delta / \\sigma$) بر مبنای تفاوت حداقل معنادار بالینی (MCID) مستخرج از کارآزمایی‌های پایه، حجم نمونه محاسبه و با لحاظ ۱۰٪ احتمال ریزش نمونه‌ها تعدیل می‌گردد."
+                    "\n\nدر این معادله با در نظر گرفتن توان آماری ۸۰٪ ($1-\beta = 0.80$ معادل $Z_{1-\beta} = 0.84$)، ضریب خطای نوع اول دوطرفه ۵٪ ($\alpha = 0.05$ معادل $Z_{1-\alpha/2} = 1.96$) و اندازه اثر استاندارد کوهن ($Cohen's\ d = \Delta / \sigma$) بر مبنای تفاوت حداقل معنادار بالینی (MCID) مستخرج از کارآزمایی‌های پایه، حجم نمونه محاسبه و با لحاظ ۱۰٪ احتمال ریزش نمونه‌ها تعدیل می‌گردد."
                 )
             else:
                 # In Vitro Cellular: NIH Guidelines (NOT-OD-15-103), Nature Reproducibility Standards, Festing & Mead (2006)
@@ -987,16 +1119,30 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_23 = data.get("statistical_analysis_text") or extracted_subs.get("10")
         if not sec_23:
-            ci_explanation = ""
-            if len(interventions) >= 2:
-                ci_explanation = f"\n- تفسیر و طبقه‌بندی ریاضی شاخص ترکیب (CI) بر اساس استاندارد واحد:\n{SynergyMetricConfig.get_unified_narrative_fa()}"
-            sec_23 = (
-                "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
-                "- تحلیل مقایسه میانگین‌ها و ارزیابی اثر متقابل غلظت‌ها با آنالیز واریانس دوطرفه فاکتوریل (Two-way Factorial ANOVA with interaction effect) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
-                "- کمی‌سازی نسبی بیان ژن‌ها مطابق فرمول استاندارد لیواک ($2^{-\\Delta\\Delta C_t}$) با نرمال‌سازی همزمان نسبت به حداقل دو ژن مرجع داخلی پایدار (GAPDH و ACTB) منطبق با استانداردهای MIQE.\n"
-                f"- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).{ci_explanation}\n"
-                "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_23 = cp_dict.get("formatted_sections_fa", {}).get(23) or cp_dict.get("formatted_sections_fa", {}).get("23")
+        if not sec_23:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_23 = (
+                    "- گزارش شاخص‌های آمار توصیفی (فراوانی، درصد، میانگین، انحراف معیار و صدک‌های هزینه‌ای).\n"
+                    "- آزمون شاپیرو-ویلک جهت بررسی توزیع نرمال متغیرهای مالی و استفاده از آزمون‌های ناپارامتری (من-ویتنی و کروسکال-والیس) در صورت چولگی داده‌ها.\n"
+                    "- محاسبه نسبت خانوارهای مواجه با هزینه‌های کمرشکن سلامت (CHE) بر مبنای رویکرد رسمی سازمان جهانی بهداشت (WHO: 10% total spending & 40% capacity to pay).\n"
+                    "- تحلیل عوامل پیش‌بینی‌کننده با مدل رگرسیون لجستیک چندمتغیره (Multivariable Logistic Regression) و گزارش نسبت‌های شانس تعدیل‌شده (Adjusted Odds Ratio: AOR) به همراه فاصله اطمینان ۹۵٪.\n"
+                    "- ارزیابی نابرابری در توزیع بار مالی از طریق محاسبه شاخص تمرکز (Concentration Index) و رسم منحنی تمرکز (Concentration Curve).\n"
+                    "- تحلیل‌های آماری در نرم‌افزارهای Stata نسخه ۱۷ یا R نسخه ۴.۳ انجام شده و سطح معنی‌داری p < 0.05 لحاظ خواهد شد."
+                )
+            else:
+                ci_explanation = ""
+                if len(interventions) >= 2:
+                    ci_explanation = f"\n- تفسیر و طبقه‌بندی ریاضی شاخص ترکیب (CI) بر اساس استاندارد واحد:\n{SynergyMetricConfig.get_unified_narrative_fa()}"
+                sec_23 = (
+                    "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
+                    "- تحلیل مقایسه میانگین‌ها و ارزیابی اثر متقابل غلظت‌ها با آنالیز واریانس دوطرفه فاکتوریل (Two-way Factorial ANOVA with interaction effect) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
+                    "- کمی‌سازی نسبی بیان ژن‌ها مطابق فرمول استاندارد لیواک ($2^{-\Delta\Delta C_t}$) با نرمال‌سازی همزمان نسبت به حداقل دو ژن مرجع داخلی پایدار (GAPDH و ACTB) منطبق با استانداردهای MIQE.\n"
+                    f"- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).{ci_explanation}\n"
+                    "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
+                )
         md_parts.append("## ۲۳. روش تجزیه و تحلیل داده\n" + sec_23 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1004,12 +1150,24 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_24 = data.get("ethics_text") or data.get("ethical_considerations_text") or extracted_subs.get("11")
         if not sec_24:
-            sec_24 = (
-                "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
-                "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی و ثبت دقیق اصالت نمونه‌ها.\n"
-                "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و پیش‌ثبت پروتکل مطالعه (Pre-registration) در سامانه مصوب پژوهشیار و پلتفرم دسترسی آزاد OSF پیش از آغاز فاز آزمایشگاهی.\n"
-                "- تعهد به عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه و رعایت بیانیه هلسینکی."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_24 = cp_dict.get("formatted_sections_fa", {}).get(24) or cp_dict.get("formatted_sections_fa", {}).get("24")
+        if not sec_24:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper or "EPIDEMIOL" in fw_upper:
+                sec_24 = (
+                    "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه علوم پزشکی.\n"
+                    "- اخذ رضایت‌آگاهانه کتبی از بیماران یا سرپرستان قانونی خانوار پس از تبیین کامل اهداف و اختیاری بودن مشارکت.\n"
+                    "- حفظ اکید محرمانگی هویت و داده‌های اقتصادی و بالینی خانوارها با کدگذاری ناشناس (De-identified Coding).\n"
+                    "- انطباق کامل با موازین بیانیه هلسینکی و دستورالعمل‌های کشوری حفاظت از داده‌های سلامت."
+                )
+            else:
+                sec_24 = (
+                    "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
+                    "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی و ثبت دقیق اصالت نمونه‌ها.\n"
+                    "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و پیش‌ثبت پروتکل مطالعه (Pre-registration) در سامانه مصوب پژوهشیار و پلتفرم دسترسی آزاد OSF پیش از آغاز فاز آزمایشگاهی.\n"
+                    "- تعهد به عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه و رعایت بیانیه هلسینکی."
+                )
         md_parts.append("## ۲۴. ملاحظلات اخلاقی در صورت نیاز\n" + sec_24 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1017,11 +1175,22 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_25 = data.get("biosafety_text") or extracted_subs.get("12")
         if not sec_25:
-            sec_25 = (
-                "- انجام کلیه آزمایش‌های کشت سلولی و زیستی منحصراً در آزمایشگاه سطح ایمنی زیستی ۲ (BSL-2) زیر هودهای لامینار کلاس ۲.\n"
-                "- اتوکلاو نمودن و بی‌خطرسازی کلیه پسماندهای عفونی و پساب‌ها پیش از خروج طبق پروتکل‌های حفاظت زیستی دانشگاه.\n"
-                "- استفاده الزامی اپراتور از تجهیزات حفاظت فردی کامل (PPE شامل دستکش، گان، ماسک و محافظ صورت)."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_25 = cp_dict.get("formatted_sections_fa", {}).get(25) or cp_dict.get("formatted_sections_fa", {}).get("25")
+        if not sec_25:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper or "EPIDEMIOL" in fw_upper:
+                sec_25 = (
+                    "- حفاظت از امنیت داده‌های الکترونیک و پایگاه‌های اطلاعاتی با استانداردهای رمزنگاری (AES-256).\n"
+                    "- محدودسازی سطح دسترسی به فایل‌های خام پرسشنامه‌ها صرفاً به مجری اصلی طرح.\n"
+                    "- نگهداری امن و خرد کردن اسناد فیزیکی و کاغذی مصاحبه‌ها پس از ثبت نهایی و اعتبارسنجی دیجیتال با سامانه HIS."
+                )
+            else:
+                sec_25 = (
+                    "- انجام کلیه آزمایش‌های کشت سلولی و زیستی منحصراً در آزمایشگاه سطح ایمنی زیستی ۲ (BSL-2) زیر هودهای لامینار کلاس ۲.\n"
+                    "- اتوکلاو نمودن و بی‌خطرسازی کلیه پسماندهای عفونی و پساب‌ها پیش از خروج طبق پروتکل‌های حفاظت زیستی دانشگاه.\n"
+                    "- استفاده الزامی اپراتور از تجهیزات حفاظت فردی کامل (PPE شامل دستکش، گان، ماسک و محافظ صورت)."
+                )
         md_parts.append("## ۲۵. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\n" + sec_25 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1029,11 +1198,22 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         sec_26 = data.get("limitations_text") or extracted_subs.get("13")
         if not sec_26:
-            sec_26 = (
-                "- چالش حلالیت آبی ترکیبات: کنترل دقیق حلال ناقل (DMSO < 0.1%) جهت ممانعت از سمیت پس‌زمینه حلال.\n"
-                "- نوسانات حساسیت در پاساژهای سلولی: محدودسازی پاساژهای سلولی بین ۳ الی ۱۰ و رصد پیوسته مورفولوژی و غربالگری دوره‌ای مایکوپلاسما.\n"
-                "- مرزهای تعمیم‌پذیری بالینی (Translational Boundaries): اثبات اثرات سیتوتوکسیک و شاخص انتخاب‌پذیری مطلوب در مدل‌های برون‌تن تک‌لایه‌ای (In Vitro)، صرفاً یک فرضیه پیش‌بالینی اولیه است و هرگونه استنتاج قطعی پیرامون کاهش عوارض ارگانی (نظیر سمیت کلیوی یا خونی) در بیماران، مستلزم ارزیابی‌های فارماکوکینتیک درون‌تنی (In Vivo) و کارآزمایی‌های بالینی آینده می‌باشد."
-            )
+            cp_dict = data.get("cohesive_protocol") or {}
+            sec_26 = cp_dict.get("formatted_sections_fa", {}).get(26) or cp_dict.get("formatted_sections_fa", {}).get("26")
+        if not sec_26:
+            fw_upper = str(framework).upper()
+            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                sec_26 = (
+                    "- سوگیری یادآوری در اعلام هزینه‌ها (Recall Bias): کنترل از طریق محدودسازی دوره یادآوری سرپایی به ۱ ماه و تطبیق هزینه‌های بستری با اسناد رسمی صورتحساب HIS.\n"
+                    "- عدم تمایل احتمالی برخی خانوارها به افشای دقیق درآمدها: مهار با استفاده از روش محاسبه مخارج مصرفی خانوار (Consumption Expenditure) به جای درآمد اعلامی طبق راهنمای رسمی بانک جهانی و WHO.\n"
+                    "- عدم دسترسی یکپارچه به تعرفه‌های خدمات در تمام مراکز درمانی بخش خصوصی و لزوم استعلام مستقیم فاکتورها."
+                )
+            else:
+                sec_26 = (
+                    "- چالش حلالیت آبی ترکیبات: کنترل دقیق حلال ناقل (DMSO < 0.1%) جهت ممانعت از سمیت پس‌زمینه حلال.\n"
+                    "- نوسانات حساسیت در پاساژهای سلولی: محدودسازی پاساژهای سلولی بین ۳ الی ۱۰ و رصد پیوسته مورفولوژی و غربالگری دوره‌ای مایکوپلاسما.\n"
+                    "- مرزهای تعمیم‌پذیری بالینی (Translational Boundaries): اثبات اثرات سیتوتوکسیک و شاخص انتخاب‌پذیری مطلوب در مدل‌های برون‌تن تک‌لایه‌ای (In Vitro)، صرفاً یک فرضیه پیش‌بالینی اولیه است و هرگونه استنتاج قطعی پیرامون کاهش عوارض ارگانی (نظیر سمیت کلیوی یا خونی) در بیماران، مستلزم ارزیابی‌های فارماکوکینتیک درون‌تنی (In Vivo) و کارآزمایی‌های بالینی آینده می‌باشد."
+                )
         md_parts.append("## ۲۶. مشکلات و محدودیت ها\n" + sec_26 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1046,17 +1226,28 @@ class ProposalGenerator:
             if cp_sec27:
                 sec_27 = cp_sec27
             else:
-                sec_27 = (
-                "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در محیط‌های اختصاصی مصوب ATCC در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
-                "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی به همراه چاهک‌های بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر احیای مستقیم و تداخل نوری.\n"
-                "۳. فاز اول (تک‌دارویی و منحنی‌های دوز-پاسخ منفرد): ارزیابی غلظت‌های منفرد هر مداخله در ۵ الی ۷ رقت متوالی (Serial Dilutions) جهت ترسیم منحنی اثر-دوز، محاسبه دقیق مقادیر IC50، شیب منحنی اثر متوالی (m) و دوز اثر میانه (Dm) با همبستگی خطی (r > 0.95).\n"
-                "۴. فاز دوم (طراحی ترکیبی Chou-Talalay): اعمال غلظت‌های ترکیبی با نسبت‌های ثابت هم‌توان (Constant Ratio: 0.25x, 0.5x, 1.0x, 2.0x, 4.0x IC50) بر پایه مقادیر مستخرج از فاز اول، در کنار گروه کنترل منفی حلال ناقل (DMSO < 0.1%) در مقاطع ۲۴، ۴۸ و ۷۲ ساعت.\n"
-                "۵. سنجش زیست‌پذیری با آزمون متابولیک (MTT) و تصحیح جذب نوری نسبت به بلانک بدون سلول.\n"
-                "۶. اعتبارسنجی ارتوگونال آپوپتوز با فلوسایتومتری Annexin V-FITC / PI و کنترل مثبت استاندارد آپوپتوز (استاروسپورین ۱ میکرومولار) جهت تفکیک مراحل اولیه و تاخیری آپوپتوز از نکروز غیراختصاصی.\n"
-                "۷. ارزیابی فعال‌سازی آبشار کاسپاز با سنجش برش پروتئولیتیک پروکاسپاز-۳ به قطعات فعال ۱۷ و ۱۲ کیلودالتونی جهت تایید فعال‌سازی پروتئینی همگام با رصد تغییرات بیان mRNA در Real-Time PCR.\n"
-                "۸. اجرای آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay) جهت ارزیابی توان بقای نامحدود سلولی طبق پروتکل استاندارد نیچر (Franken et al. 2006).\n"
-                "۹. ثبت داده‌های کمی و مدلسازی ریاضی هم‌افزایی با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder)."
-            )
+                fw_upper = str(framework).upper()
+                if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                    sec_27 = (
+                        "۱. بومی‌سازی و اعتبارسنجی ابزار سنجش هزینه‌های سلامت (برگرفته از WHO WHS و NHA) و تعیین روایی و پایایی در مطالعه راهنما.\n"
+                        "۲. اجرای نمونه‌گیری تصادفی خوشه‌ای چندمرحله‌ای در مراکز درمانی دولتی و خصوصی منتخب تا سقف حجم نمونه مصوب ($n = 642$).\n"
+                        "۳. انجام مصاحبه‌های چهره‌به‌چهره ساختارمند با بیماران یا سرپرستان خانوار و ثبت دقیق هزینه‌های مستقیم درمانی، مستقیم غیردرمانی و غیرمستقیم.\n"
+                        "۴. اعتبارسنجی متقابل داده‌های هزینه‌ای بستری با استعلام صورتحساب‌های رسمی از سامانه اطلاعات بیمارستانی (HIS) جهت مهار سوگیری یادآوری.\n"
+                        "۵. پاکسازی، ممیزی و ورود دوگانه داده‌ها و مدیریت مقادیر گمشده با روش‌های استاندارد آماری.\n"
+                        "۶. مدلسازی اقتصاد سلامت در Stata/R، محاسبه شاخص‌های CHE و OOP، برازش رگرسیون لجستیک چندمتغیره و رسم منحنی تمرکز کاکوانی."
+                    )
+                else:
+                    sec_27 = (
+                        "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در محیط‌های اختصاصی مصوب ATCC در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
+                        "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی به همراه چاهک‌های بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر احیای مستقیم و تداخل نوری.\n"
+                        "۳. فاز اول (تک‌دارویی و منحنی‌های دوز-پاسخ منفرد): ارزیابی غلظت‌های منفرد هر مداخله در ۵ الی ۷ رقت متوالی (Serial Dilutions) جهت ترسیم منحنی اثر-دوز، محاسبه دقیق مقادیر IC50، شیب منحنی اثر متوالی (m) و دوز اثر میانه (Dm) با همبستگی خطی (r > 0.95).\n"
+                        "۴. فاز دوم (طراحی ترکیبی Chou-Talalay): اعمال غلظت‌های ترکیبی با نسبت‌های ثابت هم‌توان (Constant Ratio: 0.25x, 0.5x, 1.0x, 2.0x, 4.0x IC50) بر پایه مقادیر مستخرج از فاز اول، در کنار گروه کنترل منفی حلال ناقل (DMSO < 0.1%) در مقاطع ۲۴، ۴۸ و ۷۲ ساعت.\n"
+                        "۵. سنجش زیست‌پذیری با آزمون متابولیک (MTT) و تصحیح جذب نوری نسبت به بلانک بدون سلول.\n"
+                        "۶. اعتبارسنجی ارتوگونال آپوپتوز با فلوسایتومتری Annexin V-FITC / PI و کنترل مثبت استاندارد آپوپتوز (استاروسپورین ۱ میکرومولار) جهت تفکیک مراحل اولیه و تاخیری آپوپتوز از نکروز غیراختصاصی.\n"
+                        "۷. ارزیابی فعال‌سازی آبشار کاسپاز با سنجش برش پروتئولیتیک پروکاسپاز-۳ به قطعات فعال ۱۷ و ۱۲ کیلودالتونی جهت تایید فعال‌سازی پروتئینی همگام با رصد تغییرات بیان mRNA در Real-Time PCR.\n"
+                        "۸. اجرای آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay) جهت ارزیابی توان بقای نامحدود سلولی طبق پروتکل استاندارد نیچر (Franken et al. 2006).\n"
+                        "۹. ثبت داده‌های کمی و مدلسازی ریاضی هم‌افزایی با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder)."
+                    )
         md_parts.append("## ۲۷. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات\n" + sec_27 + "\n\n---")
 
         # -------------------------------------------------------------

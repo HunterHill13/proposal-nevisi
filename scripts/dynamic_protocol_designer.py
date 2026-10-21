@@ -8,6 +8,7 @@ and coherent Statistical Analysis Plans tailored strictly to the Research Proble
 """
 
 import json
+import re
 from typing import Dict, List, Any, Optional, Tuple
 
 STUDY_TIMELINE_TEMPLATES = {
@@ -123,9 +124,14 @@ class DynamicProtocolDesigner:
             })
 
 
-        # 3b. In Vitro Quality & Interference Controls (v9.2 Pillar 5: AssayInterferencePolicy)
-        framework = model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
-        is_in_vitro = (framework in ["EXPERIMENTAL_IN_VITRO", "MECHANISTIC"]) or any("cell" in str(v).lower() for v in model_dict.values())
+        # 3b. Quality & Interference Controls / Confounders by Domain
+        framework = str(model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")).upper()
+        is_health_sys = any(k in framework for k in ["HEALTH_SYSTEM", "HEALTH_POLICY", "ECONOM"])
+        is_epidemiol = any(k in framework for k in ["EPIDEMIOL", "OBSERV"])
+        is_clinical = any(k in framework for k in ["CLINICAL", "RCT"])
+        is_non_lab = is_health_sys or is_epidemiol or is_clinical
+        is_in_vitro = not is_non_lab and ((framework in ["EXPERIMENTAL_IN_VITRO", "MECHANISTIC"]) or bool(re.search(r'\bcell[-_ ]?lines?\b', str(model_dict).lower())))
+
         if is_in_vitro:
             variables.append({
                 "name": "بلانک بدون سلول (Cell-Free Blank Control)",
@@ -143,16 +149,41 @@ class DynamicProtocolDesigner:
                 "measurement_method": "انکوباسیون همگام در شرایط یکسان با گروه‌های مداخله",
                 "unit": "درصد زیست‌پذیری نسبت به کنترل دست‌نخورده"
             })
-
-        # 4. Confounders
-        variables.append({
-            "name": "تعداد پاساژ و یکنواختی محیط کشت / شرایط آزمون",
-            "role": "مخدوشگر بالقوه",
-            "type": "کمی گسسته",
-            "operational_definition": "تغییرات بیولوژیکی ناشی از پیری سلولی یا نوسانات محیط کشت",
-            "measurement_method": "استفاده از پاساژهای مشخص و یکسان در تمام تکرارهای زیستی",
-            "unit": "شماره پاساژ"
-        })
+            # 4. Confounders for Lab
+            variables.append({
+                "name": "تعداد پاساژ و یکنواختی محیط کشت / شرایط آزمون",
+                "role": "مخدوشگر بالقوه (Confounder)",
+                "type": "کمی گسسته",
+                "operational_definition": "تغییرات بیولوژیکی ناشی از پیری سلولی یا نوسانات محیط کشت",
+                "measurement_method": "استفاده از پاساژهای مشخص و یکسان در تمام تکرارهای زیستی",
+                "unit": "شماره پاساژ"
+            })
+        elif is_health_sys:
+            variables.append({
+                "name": "پوشش بیمه‌ای پایه و تکمیلی (Health Insurance Coverage)",
+                "role": "متغیر مستقل / تعدیل‌کننده",
+                "type": "کیفی اسمی",
+                "operational_definition": "برخورداری بیمار یا خانوار از بیمه‌های درمانی پایه و بیمه تکمیلی تجاری",
+                "measurement_method": "پرسشنامه ساختارمند و تطبیق با دفترچه درمانی",
+                "unit": "وضعیت پوشش (دارد/ندارد)"
+            })
+            variables.append({
+                "name": "عوامل مخدوش‌کننده اقتصادی-اجتماعی (SES Confounders)",
+                "role": "مخدوشگر بالقوه (Confounder)",
+                "type": "ترکیبی",
+                "operational_definition": "عوامل اثرگذار شامل بعد خانوار، دهک درآمدی، سطح تحصیلات سرپرست و مرحله بالینی بیماری",
+                "measurement_method": "پرسشنامه استاندارد WHO WHS و استعلام اطلاعات بالینی از سامانه HIS",
+                "unit": "رتبه‌ای / پیوسته"
+            })
+        else:
+            variables.append({
+                "name": "عوامل مخدوش‌کننده دموگرافیک و بالینی (Confounders)",
+                "role": "مخدوشگر بالقوه (Confounder)",
+                "type": "ترکیبی",
+                "operational_definition": "سن، جنس، شاخص توده بدنی (BMI) و سوابق بیماری‌های زمینه‌ای شرکت‌کنندگان",
+                "measurement_method": "چک‌لیست استاندارد استخراج داده‌ها و اندازه‌گیری‌های بالینی",
+                "unit": "پیوسته و رتبه‌ای"
+            })
 
         return variables
 

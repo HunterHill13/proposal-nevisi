@@ -377,18 +377,39 @@ class IterativeRemediationEngine:
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 12, patch_sec_12)
                 applied_patches.append("Section 12: Injected structured phased Gantt schedule table")
 
+            # Detect study domain/framework
+            fw_str = str(proposal_data.get("framework") or proposal_data.get("research_problem_model", {}).get("framework", "")).upper()
+            is_health_sys = any(k in fw_str for k in ["HEALTH_SYSTEM", "HEALTH_POLICY", "ECONOM"])
+            is_epidemiol = any(k in fw_str for k in ["EPIDEMIOL", "OBSERV"])
+            is_clinical = any(k in fw_str for k in ["CLINICAL", "RCT"])
+            is_non_lab = is_health_sys or is_epidemiol or is_clinical
+
             # Patch Section 11: Empty Variable Table or Inter-Section Variable Drift
             if any(k in f for f in all_issues for k in ["EMPTY_VARIABLE_TABLE", "INTER_SECTION_DRIFT"]):
                 from dynamic_protocol_designer import DynamicProtocolDesigner
                 model_dict = proposal_data.get("research_problem_model") or proposal_data
                 rebuilt_vars = DynamicProtocolDesigner.generate_variable_table(model_dict)
                 rebuilt_var_md = DynamicProtocolDesigner.render_variable_table_markdown(rebuilt_vars)
-                extra_rows = (
-                    "\n| شاخص ترکیبی هم‌افزایی دارویی (Combination Index - CI) | وابسته | کمی پیوسته | محاسبه معادله چو-تالالای در نرم‌افزار CompuSyn (CI < 1 هم‌افزایی) |"
-                    "\n| میزان بیان نسبی ژن و پروتئین هدف (RT-qPCR / Western Blot) | وابسته | کمی پیوسته | Fold Change بر اساس فرمول $2^{-\\Delta\\Delta C_t}$ و دانسیتومتری باند پروتئینی |"
-                    "\n| درصد سلول‌های آپوپتوتیک و فعالیت کاسپاز (Annexin V/PI) | وابسته | کمی پیوسته | درصد سلول‌های Annexin V+/PI- و برش پروتئولیتیک کاسپاز در فلوسایتومتری |"
-                    "\n| توزیع فازهای چرخه سلولی (Cell Cycle Sub-G1) و مهاجرت سلولی (Scratch Assay) | وابسته | کمی پیوسته | فلوسایتومتری چرخه سلولی و درصد بسته شدن خراش سلولی |"
-                )
+                if is_health_sys:
+                    extra_rows = (
+                        "\n| مخارج کمرشکن سلامت (Catastrophic Health Expenditure - CHE) | وابسته | کیفی دوحالته | وقوع مخارج سلامت >= ۴۰٪ ظرفیت پرداخت خانوار (WHO Standard) |"
+                        "\n| پرداخت‌های مستقیم از جیب (Out-of-Pocket - OOP) | وابسته | کمی پیوسته | مجموع مخارج درمانی و غیردرمانی مستخرج از پرسشنامه و HIS |"
+                        "\n| وضعیت پوشش بیمه پایه و تکمیلی | مستقل | کیفی اسمی | داشتن بیمه پایه و بیمه تکمیلی تجاری |"
+                        "\n| شاخص وضعیت اقتصادی-اجتماعی (SES) | تعدیل‌کننده | رتبه‌ای | دهک‌های هزینه‌ای خانوار بر پایه مخارج مصرفی |"
+                    )
+                elif is_epidemiol or is_clinical:
+                    extra_rows = (
+                        "\n| پیامد اولیه هدف | وابسته | کیفی دوحالته | ثبت بر مبنای معیارهای استاندارد تشخیصی بالینی |"
+                        "\n| متغیرهای مواجهه و مداخله | مستقل | کمی یا رتبه‌ای | شدت و مدت مواجهه طبق چک‌لیست STROBE |"
+                        "\n| متغیرهای مخدوش‌کننده دموگرافیک | تعدیل‌کننده | پیوسته / اسمی | سن، جنسیت و بیماری‌های زمینه‌ای |"
+                    )
+                else:
+                    extra_rows = (
+                        "\n| شاخص ترکیبی هم‌افزایی دارویی (Combination Index - CI) | وابسته | کمی پیوسته | محاسبه معادله چو-تالالای در نرم‌افزار CompuSyn (CI < 1 هم‌افزایی) |"
+                        "\n| میزان بیان نسبی ژن و پروتئین هدف (RT-qPCR / Western Blot) | وابسته | کمی پیوسته | Fold Change بر اساس فرمول $2^{-\\Delta\\Delta C_t}$ و دانسیتومتری باند پروتئینی |"
+                        "\n| درصد سلول‌های آپوپتوتیک و فعالیت کاسپاز (Annexin V/PI) | وابسته | کمی پیوسته | درصد سلول‌های Annexin V+/PI- و برش پروتئولیتیک کاسپاز در فلوسایتومتری |"
+                        "\n| توزیع فازهای چرخه سلولی (Cell Cycle Sub-G1) و مهاجرت سلولی (Scratch Assay) | وابسته | کمی پیوسته | فلوسایتومتری چرخه سلولی و درصد بسته شدن خراش سلولی |"
+                    )
 
                 def patch_sec_11(text: str) -> str:
                     lines = text.strip().splitlines()
@@ -398,7 +419,7 @@ class IterativeRemediationEngine:
                 applied_patches.append("Section 11: Regenerated complete Independent, Dependent, and Control variable table aligned with Specific Aims")
 
             # Patch In Vitro RoB-2 Misapplication across sections
-            if any("ROB2_IN_VITRO_MISAPPLICATION" in f for f in all_issues):
+            if any("ROB2_IN_VITRO_MISAPPLICATION" in f for f in all_issues) and not is_non_lab:
                 secs_present = SurgicalSectionPatcher.split_into_sections(current_md)
                 for s_num in list(secs_present.keys()):
                     if s_num == 0:
@@ -412,15 +433,15 @@ class IterativeRemediationEngine:
                     current_md = SurgicalSectionPatcher.patch_section_content(current_md, s_num, patch_rob2)
                 applied_patches.append("Methodology Sections: Replaced clinical Cochrane RoB-2 with in vitro ToxRTool / NTP OHAT framework")
 
-            # Patch Section 27 & 19: Chou-Talalay Two-Phase Protocol, Apoptosis Positive Control, Cleaved Caspase-3, Cell-Free Blank & MIQE
-            if any(
+            # Patch Section 27 & 19: Methodology & Protocol Rigor by Domain
+            if not is_non_lab and any(
                 k in f for f in all_issues
                 for k in [
                     "CHOU_TALALAY_PROTOCOL_INCOMPLETE", "CHOU_TALALAY_MONOTHERAPY_CURVE_MISSING",
                     "APOPTOSIS_POSITIVE_CONTROL_MISSING", "CASPASE3_MRNA_INSUFFICIENCY",
                     "CASPASE3_TRANSCRIPTIONAL_PRIMING_CONFLATION", "ASSAY_INTERFERENCE_DEFECT",
                     "ASSAY_INTERFERENCE_ADVISORY", "CELL_FREE_BLANK_INTERFERENCE_MISSING",
-                    "MIQE_COMPLIANCE_DEFECT", "INTER_SECTION_DRIFT",
+                    "MIQE_COMPLIANCE_DEFECT",
                     "گروه‌های کنترل منفی", "کنترل منفی", "کنترل‌های زیستی پایه", "کنترل‌های آزمایشگاهی"
                 ]
             ):
@@ -449,46 +470,75 @@ class IterativeRemediationEngine:
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 19, patch_sec_27)
                 applied_patches.append("Sections 19 & 27: Enforced 2-phase Chou-Talalay, Negative/Vehicle & Staurosporine positive control, Cleaved Caspase-3/Annexin V, Cell-Free Blank & MIQE dual reference genes")
 
-            # Patch Section 23: Statistical Analysis & Factorial Interaction
+            # Patch Section 23: Statistical Analysis by Domain
             if any("روش تجزیه و تحلیل داده" in f for f in all_issues):
                 def patch_sec_23(text: str) -> str:
                     t = text
-                    if "anova" not in t.lower() or "فاکتوریل" not in t:
-                        t += (
-                            "\n\n▪ **مدل آماری و تحلیل برهم‌کنش فاکتوریل:**\n"
-                            "پس از بررسی نرمال بودن توزیع داده‌ها با آزمون Shapiro-Wilk و همگنی واریانس‌ها با آزمون Levene، "
-                            "مقایسه گروه‌ها و ارزیابی اثر متقابل (Interaction Effect) از طریق آنالیز واریانس دوطرفه فاکتوریل (Two-Way Factorial ANOVA) و آزمون تعقیبی Tukey HSD در سطح معناداری $p < 0.05$ با نرم‌افزارهای GraphPad Prism و SPSS و تحلیل شاخص CI در CompuSyn انجام می‌شود."
-                        )
+                    if is_health_sys:
+                        if "لجستیک" not in t or "تمرکز" not in t:
+                            t += (
+                                "\n\n▪ **مدل آماری و اقتصاد سلامت:**\n"
+                                "پس از بررسی پیش‌فرض‌های آماری، برآورد شیوع CHE بر پایه روش‌شناسی رسمی WHO (آستانه‌های ۱۰٪ کل مخارج و ۴۰٪ ظرفیت پرداخت) انجام شده، "
+                                "عوامل خطر و پیش‌بینی‌کننده‌ها با مدل رگرسیون لجستیک چندمتغیره (Multivariable Logistic Regression) و محاسبه نسبت‌های شانس تعدیل‌شده (AOR) به همراه فاصله اطمینان ۹۵٪ تحلیل گشته "
+                                "و نابرابری در توزیع بار مالی با محاسبه شاخص تمرکز (Concentration Index) و رسم منحنی تمرکز در نرم‌افزارهای Stata v17 یا R v4.3 با سطح معناداری $p < 0.05$ ارزیابی می‌شود."
+                            )
+                    elif is_epidemiol:
+                        if "لجستیک" not in t:
+                            t += (
+                                "\n\n▪ **مدل رگرسیون اپیدمیولوژیک:**\n"
+                                "تحلیل‌های آماری با آمار توصیفی و آزمون‌های دومتغیره (کای‌دو/تی) آغاز شده و ارزیابی نهایی عوامل همراه و مخدوش‌کننده با مدل رگرسیون لجستیک چندمتغیره و استخراج نسبت شانس تعدیل‌شده (AOR) با فواصل اطمینان ۹۵٪ در سطح $p < 0.05$ صورت می‌پذیرد."
+                            )
+                    else:
+                        if "anova" not in t.lower() or "فاکتوریل" not in t:
+                            t += (
+                                "\n\n▪ **مدل آماری و تحلیل برهم‌کنش فاکتوریل:**\n"
+                                "پس از بررسی نرمال بودن توزیع داده‌ها با آزمون Shapiro-Wilk و همگنی واریانس‌ها با آزمون Levene، "
+                                "مقایسه گروه‌ها و ارزیابی اثر متقابل (Interaction Effect) از طریق آنالیز واریانس دوطرفه فاکتوریل (Two-Way Factorial ANOVA) و آزمون تعقیبی Tukey HSD در سطح معناداری $p < 0.05$ با نرم‌افزارهای GraphPad Prism و SPSS و تحلیل شاخص CI در CompuSyn انجام می‌شود."
+                            )
                     return t
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 23, patch_sec_23)
-                applied_patches.append("Section 23: Added Two-Way Factorial ANOVA, normality/homogeneity tests, and CompuSyn CI analysis")
+                applied_patches.append("Section 23: Added domain-specific multivariable regression and statistical modeling")
 
             # Patch Section 24 & 25: Bioethics & Biosafety Protocols
             if any("ملاحظات اخلاقی" in f for f in all_issues):
                 def patch_sec_24(text: str) -> str:
                     t = text
                     if len(t) < 180 or "کمیته" not in t:
-                        t += (
-                            "\n\n▪ **انطباق با منشور اخلاق پژوهش زیست‌پزشکی:**\n"
-                            "کلیه مراحل این پژوهش آزمایشگاهی منطبق بر اصول منشور ۳۱ گانه اخلاق در پژوهش‌های زیست‌پزشکی کشور و دستورالعمل‌های کمیته ملی اخلاق در پژوهش‌های علوم پزشکی انجام می‌پذیرد؛ "
-                            "رده‌های سلولی از بانک‌های سلولی معتبر تهیه شده و صداقت علمی در ثبت و گزارش بدون سوگیری داده‌ها و مدیریت پسماندهای زیستی کاملاً رعایت می‌گردد."
-                        )
+                        if is_non_lab:
+                            t += (
+                                "\n\n▪ **انطباق با موازین اخلاق در پژوهش زیست‌پزشکی:**\n"
+                                "طرح پژوهشی حاضر پس از اخذ کد مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی و بر اساس اصول بیانیه هلسینکی اجرا می‌گردد؛ "
+                                "مشارکت کلیه داوطلبان کاملاً آگاهانه و داوطلبانه بوده و اصل محرمانگی داده‌ها و رازداری اقتصادی با کدگذاری ناشناس اکیداً تضمین می‌شود."
+                            )
+                        else:
+                            t += (
+                                "\n\n▪ **انطباق با منشور اخلاق پژوهش زیست‌پزشکی:**\n"
+                                "کلیه مراحل این پژوهش آزمایشگاهی منطبق بر اصول منشور ۳۱ گانه اخلاق در پژوهش‌های زیست‌پزشکی کشور و دستورالعمل‌های کمیته ملی اخلاق در پژوهش‌های علوم پزشکی انجام می‌پذیرد؛ "
+                                "رده‌های سلولی از بانک‌های سلولی معتبر تهیه شده و صداقت علمی در ثبت و گزارش بدون سوگیری داده‌ها و مدیریت پسماندهای زیستی کاملاً رعایت می‌گردد."
+                            )
                     return t
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 24, patch_sec_24)
                 applied_patches.append("Section 24: Expanded biomedical ethics compliance according to national 31-point charter")
 
-            if any("ایمنی زیستی" in f for f in all_issues):
+            if any("ایمنی زیستی" in f for f in all_issues) or (is_non_lab and any("امنیت" in f for f in all_issues)):
                 def patch_sec_25(text: str) -> str:
                     t = text
                     if len(t) < 180:
-                        t += (
-                            "\n\n▪ **پروتکل ایمنی زیستی (BSL-2) و مدیریت پسماند:**\n"
-                            "کلیه مراحل و دست‌ورزی‌های کشت سلولی زیر هود لامینار کلاس II (Biosafety Level 2) با استفاده کامل از تجهیزات حفاظت فردی (PPE) انجام شده "
-                            "و پسماندهای بیولوژیک و شیمیایی پس از غیرفعال‌سازی با هیپوکلریت سدیم و اتوکلاو در دمای ۱۲۱ درجه سانتی‌گراد طبق ضوابط ایمنی زیستی امحا می‌شوند."
-                        )
+                        if is_non_lab:
+                            t += (
+                                "\n\n▪ **امنیت و حفاظت از داده‌های سلامت:**\n"
+                                "کلیه داده‌های پژوهش در پایگاه‌های الکترونیک امن رمزنگاری‌شده (AES-256) با دسترسی محدود صرفاً برای محقق اصلی ذخیره شده "
+                                "و فرم‌های کاغذی پس از اتمام کنترل کیفیت به صورت کاملاً ایمن امحاء خواهند شد."
+                            )
+                        else:
+                            t += (
+                                "\n\n▪ **پروتکل ایمنی زیستی (BSL-2) و مدیریت پسماند:**\n"
+                                "کلیه مراحل و دست‌ورزی‌های کشت سلولی زیر هود لامینار کلاس II (Biosafety Level 2) با استفاده کامل از تجهیزات حفاظت فردی (PPE) انجام شده "
+                                "و پسماندهای بیولوژیک و شیمیایی پس از غیرفعال‌سازی با هیپوکلریت سدیم و اتوکلاو در دمای ۱۲۱ درجه سانتی‌گراد طبق ضوابط ایمنی زیستی امحا می‌شوند."
+                            )
                     return t
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 25, patch_sec_25)
-                applied_patches.append("Section 25: Expanded BSL-2 biosafety containment and biohazard waste disposal protocols")
+                applied_patches.append("Section 25: Expanded biosafety / data security protocols")
 
             # Patch Section 15: ATCC Media & Molecular Heterogeneity
             if any(k in f for f in all_issues for k in ["MOLECULAR_HETEROGENEITY_ABSENT", "ATCC_MEDIA_MISMATCH"]):
