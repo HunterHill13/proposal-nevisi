@@ -51,6 +51,9 @@ from mock_grant_review_panel import MockGrantReviewPanel
 from equator_compliance_auditor import EquatorComplianceAuditor
 from pre_emptive_risk_of_bias_mitigator import PreEmptiveRiskOfBiasMitigator
 from generic_reference_auditor import GenericReferenceAuditor
+from citation_graph_engine import CitationGraphEngine
+from biomedical_concept_graph import BiomedicalConceptGraph
+from graph_entailment_gate import GraphEntailmentGate
 
 
 class MasterResearchPipeline:
@@ -578,6 +581,52 @@ class MasterResearchPipeline:
         dossier.export_markdown(dossier_md)
         print(f"  ▪ Exported Dossier JSON: {dossier_json}")
         print(f"  ▪ Exported Dossier Markdown: {dossier_md}")
+
+        # 4. Construct Literature Citation Graph & Interactive Cytoscape HTML Visualizer (v12.0 Engine)
+        print(f"  ▪ Constructing Literature Citation Graph & Concept Network (v12.0 Engine)...")
+        try:
+            cit_engine = CitationGraphEngine(topic_query=self.topic, offline_mode=(self.mode == "mock"))
+            concept_engine = BiomedicalConceptGraph(topic_context=self.topic)
+
+            for idx, st in enumerate(studies):
+                pid = str(st.get("pmid") or st.get("doi") or f"STUDY_{idx+1}")
+                is_seed = (idx == 0)
+                node_id = cit_engine.add_work_node(st, is_seed=is_seed)
+                if idx > 0:
+                    prev_id = str(studies[idx-1].get("pmid") or studies[idx-1].get("doi") or f"STUDY_{idx}")
+                    cit_engine.add_citation_edge(node_id, prev_id, "CITES")
+
+                concept_engine.ingest_paper_abstract(
+                    paper_id=node_id,
+                    title=st.get("title", ""),
+                    abstract=st.get("abstract", "")
+                )
+
+            cit_engine.compute_bibliographic_coupling(threshold=0.1)
+            cit_engine.compute_personalized_pagerank()
+            cit_engine.compute_hits_scores()
+            cit_engine.compute_adamic_adar_proximity()
+
+            graph_json = os.path.join(self.output_dir, "LITERATURE_CITATION_GRAPH.json")
+            graph_html = os.path.join(self.output_dir, "LITERATURE_CITATION_GRAPH.html")
+            concept_json = os.path.join(self.output_dir, "BIOMEDICAL_CONCEPT_GRAPH.json")
+
+            cit_engine.save_json(graph_json)
+            cit_engine.generate_cytoscape_html(graph_html)
+            concept_engine.save_json(concept_json)
+            print(f"  ✅ Exported Citation Graph JSON: {graph_json}")
+            print(f"  ✅ Exported Cytoscape Visualizer HTML: {graph_html}")
+            print(f"  ✅ Exported Biomedical Concept Graph JSON: {concept_json}")
+
+            entail_gate = GraphEntailmentGate(cit_engine.to_dict(), concept_engine.to_dict())
+            audit_json = os.path.join(self.output_dir, "claim_entailment_audit.json")
+            with open(dossier_md, "r", encoding="utf-8") as f_md:
+                dossier_md_content = f_md.read()
+            dossier_text = {"DOSSIER_SUMMARY": dossier_md_content}
+            entail_gate.audit_full_proposal(dossier_text, output_audit_path=audit_json)
+            print(f"  ✅ Exported Claim Entailment Audit: {audit_json}")
+        except Exception as e:
+            print(f"  Notice: Citation graph construction encountered warning: {e}")
 
         return dossier
 
