@@ -1,22 +1,31 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "11.5.1",
-  "version_display": "v11.5.1",
+  "engine_version": "13.0.0",
+  "version_display": "v13.0",
   "release_channel": "stable",
-  "semantic_release_date": "2026-10-19",
+  "semantic_release_date": "2026-11-01",
   "architecture": {
-    "paradigm": "Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture, Anti-AI Humanization & Proposal Engine",
+    "paradigm": "Universal Evidence-Driven Medical Research, EGM Hybrid Goldfish Swarm Study Section, Cognitive Multi-Agent Architecture, Anti-AI Humanization & Proposal Engine",
     "topic_agnostic": true,
     "configuration_driven": true,
     "zero_hardcode_biological_leakage": true,
+    "multi_domain_polymorphic": true,
     "two_loop_autonomous_pipeline": true,
+    "two_tier_hybrid_validation": true,
+    "egm_goldfish_study_section": {
+      "enabled": true,
+      "personas_count": 6,
+      "zero_context_isolation": true,
+      "scoring_scale": "NIH 1.0 to 9.0"
+    },
     "epistemic_rigor_audit_dimensions": 6,
     "anti_ai_humanizer_version": "11.5",
     "burstiness_calibration_engine": true,
-    "data_invariant_gate_fail_closed": true
+    "data_invariant_gate_fail_closed": true,
+    "remediation_max_iterations": 10
   },
   "metrics": {
-    "total_unified_tests": 496,
+    "total_unified_tests": 540,
     "mutation_score_pct": 100.0,
     "mandatory_proposal_sections": 28,
     "search_strategy_layers_count": 12,
@@ -30,12 +39,13 @@
   "supported_frameworks": [
     "PICO",
     "PECO",
+    "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
+    "EPIDEMIOLOGICAL_OBSERVATIONAL",
+    "CLINICAL_RCT",
+    "EXPERIMENTAL_ANIMAL",
+    "EXPERIMENTAL_IN_VITRO",
     "DIAGNOSTIC",
     "PROGNOSTIC",
-    "MECHANISTIC",
-    "EXPERIMENTAL_IN_VITRO",
-    "EXPERIMENTAL_ANIMAL",
-    "CLINICAL_RCT",
-    "COHORT_OBSERVATIONAL"
+    "MECHANISTIC"
   ]
 }

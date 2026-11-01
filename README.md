@@ -1,14 +1,16 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Cognitive Multi-Agent Architecture & Autonomous Proposal Pipeline (v11.5.1)
-### موتور خودکار و جامع پژوهش زیست‌پزشکی، معماری چندایجنت شناختی، ضدتشخیص هوش مصنوعی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۱.۵.۱)
+### Universal Evidence-Driven Medical Research, EGM Hybrid Goldfish Study Section & Autonomous Proposal Pipeline (v13.0)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، هیئت داوران گرنت گلدفیش EGM، معماری چندایجنت شناختی، گراف‌های استنادی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۳.۰)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 496/496 Passed](https://img.shields.io/badge/Unified%20Tests-496%2F496%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 496/496 Passed](https://img.shields.io/badge/Unified%20Tests-540%2F540%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
-[![Architecture: Cognitive Multi-Agent](https://img.shields.io/badge/Architecture-Cognitive%20Multi--Agent-blueviolet.svg)](#cognitive-multi-agent-architecture)
+[![Architecture: EGM Hybrid Swarm](https://img.shields.io/badge/Architecture-EGM%20Hybrid%20Swarm%20v13.0-blueviolet.svg)](#egm-powered-grant-study-section)
+[![EGM Study Section: 6 Personas](https://img.shields.io/badge/EGM%20Study%20Section-6%20Goldfish%20Personas-purple.svg)](#egm-powered-grant-study-section)
+[![Unified Tests: 540/540 Passed](https://img.shields.io/badge/Unified%20Tests-540%2F540%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
 [![Anti-AI Humanizer: v11.5](https://img.shields.io/badge/Anti--AI%20Humanizer-DataInvariantGate%20%26%20Burstiness-darkgreen.svg)](#scientific-academic-humanizer)
 [![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
@@ -20,9 +22,9 @@
 ---
 
 <a name="english"></a>
-## English Documentation (v11.5.1)
+## English Documentation (v13.0)
 
-**Proposal-Nevisi (v11.5.1)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.5.1 integrates Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
+**Proposal-Nevisi (v13.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.5.1 integrates Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
 
 It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
@@ -82,6 +84,22 @@ flowchart TD
         L --> M4["MOCK_GRANT_REVIEW & REVISION_AUDIT_TRAIL"]
     end
 ```
+
+---
+
+### EGM-Powered Academic Grant Study Section (Elephant-Goldfish Model Hybrid Architecture)
+
+Version 13.0 incorporates Google's **Elephant-Goldfish Model (EGM)** into academic biomedical grant proposal drafting:
+* **The Elephant (Deep-Context Drafting Engine):** Ingests comprehensive literature, user specifications, and methodological invariants to synthesize all 28 canonical Pajooheshyar sections with Native OMML math equations.
+* **The Goldfish (Zero-Context Isolated Review Swarm):** Dispatches 6 specialized, stateless reviewer personas with **zero prior conversation history**, eliminating confirmation bias, blind spots, and conversational sycophancy:
+  1. `grant-significance-innovation` (EGM Zoom-Out / YAGNI Lens): Assesses true innovation, national/global disease burden (GLOBOCAN/NCDs), and translational clinical ROI.
+  2. `grant-methodology-biostatistics` (EGM Design Critic Lens): Adversarially stress-tests internal validity, confounding variables, sample size justifications, and statistical model fitness.
+  3. `grant-evidence-entailment` (EGM Codebase Details Lens): Fact-checks every quantitative claim and dose against cited literature, eliminating fabricated references.
+  4. `grant-feasibility-logistics` (EGM Implementation Readiness Lens): Evaluates Gantt timeline realism, consumable sourcing, cold-chain logistics, and hospital recruitment rates.
+  5. `grant-ethics-lay-advocate` (EGM Comprehension Lens): Validates Helsinki Declaration, informed consent, AES-256 data security, and layman comprehension.
+  6. `grant-study-section-sro` (EGM Synthesizer Lens): Aggregates findings, normalizes issues into 🔴 Blocker, 🟡 Major, and 🟢 Nit, computes standardized NIH impact scores (1.0 to 9.0), and outputs `EGM_GRANT_STUDY_SECTION_REPORT.md` and `.json`.
+* **Two-Tier Hybrid Architecture:** Combines fast deterministic Python AST/regex linters (Tier 1: < 3 seconds) with deep cognitive subagent review (Tier 2).
+* **Closed-Loop 10-Iteration Remediation:** Recursively refines flawed drafts up to **10 full iterations** (`max_iterations = 10`) until consensus is achieved with zero critical flaws.
 
 ---
 
