@@ -4,13 +4,16 @@
 pre_emptive_risk_of_bias_mitigator.py - Pre-emptive Risk of Bias (RoB) Mitigation Engine
 Proposal-Nevisi Engine v10.2 (Universal Biomedical Architecture)
 
-Enforces international standards for pre-emptive experimental bias mitigation
-based on Cochrane RoB-2 (Clinical/Translational) and SYRCLE (Preclinical Animal/In Vitro):
-1. Domain 1: Selection Bias (Random sequence generation & allocation concealment)
-2. Domain 2: Performance Bias (Blinded administration & randomized positional layout)
-3. Domain 3: Detection Bias (Blinded outcome assessment / masked operator evaluation)
-4. Domain 4: Attrition Bias (Pre-hoc exclusion criteria & complete outcome data accounting)
-5. Domain 5: Reporting Bias (Pre-registration on OSF/IRCT & selective reporting guard)
+Enforces international standards for pre-emptive experimental and observational bias mitigation:
+- Cochrane RoB-2 (Clinical Trials / Human RCTs)
+- SYRCLE / ToxRTool / GIVIMP (Preclinical Animal / In Vitro Cellular)
+- QUADAS-2 / STARD (Diagnostic Accuracy & Biomarker Studies - Spectrum Bias Guard)
+- STROBE / Newcastle-Ottawa (Observational Epidemiological & Health Systems Studies)
+1. Domain 1: Selection Bias (Random sequence / Allocation concealment / Consecutive sampling / Sampling frame)
+2. Domain 2: Performance Bias (Environmental uniformity / Index test protocol / Standardized interviewers)
+3. Domain 3: Detection Bias (Blinded outcome assessment / Reference standard independence / HIS objective audit)
+4. Domain 4: Attrition Bias (Pre-hoc exclusion criteria / Diagnostic flow & timing / Missing data handling)
+5. Domain 5: Reporting Bias (Pre-registration / Multivariable confounder adjustment / Selective reporting guard)
 
 Scoring:
 - "LOW_RISK": Rigorous mitigation protocol explicitly documented.
@@ -111,13 +114,103 @@ class PreEmptiveRiskOfBiasMitigator:
     # DOMAIN EVALUATORS (Cochrane RoB-2 & SYRCLE Standards)
     # =========================================================================
 
+
     @classmethod
-    def evaluate_selection_bias(cls, sections: Dict[int, str]) -> BiasDomainEvaluation:
-        """Domain 1: Selection Bias (Random sequence generation & allocation concealment)."""
-        methods_text = f"{sections.get(13, '')} {sections.get(15, '')} {sections.get(22, '')} {sections.get(27, '')}".lower()
+    def detect_study_family(cls, sections: Dict[int, str], context: Optional[Dict[str, Any]] = None) -> str:
+        """Detects the study family from context or sections for adaptive RoB auditing."""
+        if context:
+            sf = context.get("study_family") or context.get("framework")
+            if sf:
+                sf_lower = str(sf).lower()
+                if any(k in sf_lower for k in ["diagnostic", "biomarker", "stard", "quadas"]):
+                    return "diagnostic"
+                if any(k in sf_lower for k in ["health_system", "health_policy", "health_econom", "che", "oop"]):
+                    return "health_systems"
+                if any(k in sf_lower for k in ["epidemiolog", "observational", "strobe", "cross-sectional", "cohort"]):
+                    return "epidemiological"
+                if any(k in sf_lower for k in ["clinical", "rct", "consort", "trial"]):
+                    return "clinical_rct"
+                if any(k in sf_lower for k in ["animal", "in_vivo", "arrive"]):
+                    return "in_vivo"
+                if any(k in sf_lower for k in ["in_vitro", "cellular", "cell", "gccp"]):
+                    return "in_vitro"
+
+        s14 = sections.get(14, "").lower()
+        s13 = sections.get(13, "").lower()
+        s15 = sections.get(15, "").lower()
+        s1 = sections.get(1, "").lower()
+        combined = f"{s1} {s14} {s13} {s15}"
+
+        if any(k in combined for k in ["تشخیصی", "diagnostic", "quadas", "stard", "roc", "حساسیت و ویژگی"]):
+            return "diagnostic"
+        if any(k in combined for k in ["هزینه", "کمرشکن", "نظام سلامت", "اقتصاد سلامت", "che", "oop", "بیمه"]):
+            return "health_systems"
+        if any(k in combined for k in ["مقطعی", "کوهورت", "مورد-شاهدی", "همه‌گیرشناسی", "strobe", "شیوع"]):
+            return "epidemiological"
+        if any(k in combined for k in ["کارآزمایی بالینی", "clinical trial", "rct", "consort", "بیماران"]):
+            return "clinical_rct"
+        if any(k in combined for k in ["حیوان", "موش", "رت", "in vivo", "animal", "arrive"]):
+            return "in_vivo"
+        return "in_vitro"
+
+    @classmethod
+    def evaluate_selection_bias(
+        cls,
+        sections: Dict[int, str],
+        study_family: str = "in_vitro"
+    ) -> BiasDomainEvaluation:
+        """Domain 1: Selection Bias (QUADAS-2 Spectrum Bias / STROBE Sampling / RoB-2 Randomization)."""
+        methods_text = f"{sections.get(13, '')} {sections.get(15, '')} {sections.get(17, '')} {sections.get(22, '')} {sections.get(27, '')}".lower()
         strengths = []
         vulnerabilities = []
 
+        # 1. Diagnostic Accuracy Archetype (QUADAS-2 Domain 1: Patient Selection & Spectrum Bias Guard)
+        if study_family == "diagnostic":
+            has_consecutive = any(t in methods_text for t in ["متوالی", "consecutive", "مشکوک", "شک بالینی", "کلیه مراجعه‌کنندگان", "diagnostic dilemma"])
+            has_case_control = any(t in methods_text for t in ["شاهد سالم در برابر بیمار شدید", "مورد-شاهدی تشخیصی", "داوطلبان سالم"])
+            if has_consecutive and not has_case_control:
+                risk = "LOW_RISK"
+                strengths.append("نمونه‌گیری متوالی (Consecutive Sampling) از جامعه بیماران دارای شک بالینی جهت حذف کامل سوگیری طیف (Spectrum Bias) بر پایه استاندارد QUADAS-2 پیش‌بینی شده است.")
+            elif has_consecutive:
+                risk = "SOME_CONCERNS"
+                strengths.append("نمونه‌گیری متوالی قید شده است اما پرهیز از مقایسه موارد شدید با افراد سالم نیازمند شفاف‌سازی بیشتر است.")
+                vulnerabilities.append("احتمال سوگیری طیف (Spectrum Bias) در صورت ورود داوطلبان سالم به عنوان گروه شاهد آزمون تشخیصی.")
+            else:
+                risk = "HIGH_RISK"
+                vulnerabilities.append("فاقد نمونه‌گیری متوالی از بیماران مشکوک به بیماری؛ خطر سوگیری شدید طیف (Spectrum Bias) و بیش‌برآوردی حساسیت و ویژگی وجود دارد.")
+
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_1_SELECTION_BIAS",
+                domain_title_fa="سوگیری انتخاب و سوگیری طیف (QUADAS-2 Patient Selection & Spectrum Bias)",
+                domain_title_en="Selection Bias: Spectrum Bias Guard & Consecutive Enrollment (QUADAS-2)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="درج صریح روش نمونه‌گیری متوالی از بیماران دارای شک بالینی در بخش‌های ۱۵، ۱۷ و ۲۷ جهت رفع سوگیری طیف الزامی است."
+            )
+
+        # 2. Observational & Health Systems Archetypes (STROBE Sampling Frame)
+        if study_family in ["health_systems", "epidemiological"]:
+            has_prob_sampling = any(t in methods_text for t in ["طبقه‌بندی", "خوشه‌ای", "چندمرحله‌ای", "stratified", "cluster", "تصادفی سیستماتیک", "جامعه هدف"])
+            has_rand = any(t in methods_text for t in ["تصادفی", "randomization", "random", "نمونه‌گیری تصادفی"])
+            if has_prob_sampling or has_rand:
+                risk = "LOW_RISK"
+                strengths.append("طراحی نمونه‌گیری طبقه‌بندی‌شده چندمرحله‌ای/تصادفی با لحاظ ضریب اثر طرح جهت تضمین تعمیم‌پذیری و حذف سوگیری انتخاب بر پایه راهنمای STROBE.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("استفاده از نمونه‌گیری در دسترس در یک مرکز درمانی؛ خطر سوگیری انتخاب وجود دارد و تعمیم‌پذیری نیازمند تعدیل با ضریب طرح است.")
+
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_1_SELECTION_BIAS",
+                domain_title_fa="سوگیری انتخاب و چارچوب نمونه‌گیری (STROBE Selection & Sampling Frame)",
+                domain_title_en="Selection Bias: Multi-Stage Representative Sampling (STROBE)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="قید چارچوب نمونه‌گیری احتمالی طبقه‌بندی‌شده و محاسبه اثر طرح (DEFF) در بخش ۱۵ و ۲۲ توصیه می‌شود."
+            )
+
+        # 3. Clinical RCT, In Vivo Animal & In Vitro Cellular (Cochrane RoB-2 & SYRCLE)
         has_rand = any(t in methods_text for t in ["تصادفی", "تخصیص تصادفی", "randomization", "random", "بلوک‌بندی", "randomized block"])
         has_conceal = any(t in methods_text for t in ["تخصیص پنهان", "پنهان‌سازی", "کدگذاری", "coded vials", "allocation concealment", "ویال‌های کدگذاری‌شده"])
 
@@ -143,11 +236,51 @@ class PreEmptiveRiskOfBiasMitigator:
         )
 
     @classmethod
-    def evaluate_performance_bias(cls, sections: Dict[int, str]) -> BiasDomainEvaluation:
+    def evaluate_performance_bias(
+        cls,
+        sections: Dict[int, str],
+        study_family: str = "in_vitro"
+    ) -> BiasDomainEvaluation:
         """Domain 2: Performance Bias (Environmental uniformity & random plate/cage placement)."""
         methods_text = f"{sections.get(13, '')} {sections.get(16, '')} {sections.get(20, '')} {sections.get(27, '')}".lower()
         strengths = []
         vulnerabilities = []
+
+        if study_family == "diagnostic":
+            has_index_proto = any(t in methods_text for t in ["پروتکل استاندارد", "کیت کالیبره", "دستورالعمل سازنده", "نقطه برش", "cut-off"])
+            if has_index_proto:
+                risk = "LOW_RISK"
+                strengths.append("اجرای آزمون شاخص تشخیصی با پروتکل استانداردسازی‌شده و نقطه برش از پیش تعیین‌شده بر پایه راهنمای STARD.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("تعریف پروتکل اجرای آزمون شاخص و نقطه برش بهینه نیازمند استانداردسازی بیشتر است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_2_PERFORMANCE_BIAS",
+                domain_title_fa="سوگیری اجرای آزمون شاخص (QUADAS-2 Index Test Conduct)",
+                domain_title_en="Performance Bias: Standardized Index Test Execution (QUADAS-2)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="استانداردسازی پروتکل آزمون شاخص و نقطه برش در بخش ۱۳ و ۱۹ قید گردد."
+            )
+
+        if study_family in ["health_systems", "epidemiological"]:
+            has_survey_proto = any(t in methods_text for t in ["who", "پرسشنامه استاندارد", "آموزش پرسشگران", "راهنمای مصاحبه", "یکسان‌سازی"])
+            if has_survey_proto or "کنترل" in methods_text:
+                risk = "LOW_RISK"
+                strengths.append("یکنواختی در گردآوری داده‌ها با استفاده از پرسشنامه معتبر و پروتکل همگن مصاحبه بر پایه STROBE.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("پروتکل آموزش پرسشگران و یکسان‌سازی فرآیند مصاحبه نیازمند تفصیل است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_2_PERFORMANCE_BIAS",
+                domain_title_fa="سوگیری عملکرد و متغیرهای مداخله‌گر (Performance / Information Bias)",
+                domain_title_en="Performance Bias: Standardized Data Collection (STROBE)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="قید پروتکل آموزش پرسشگران و یکسان‌سازی ابزار در بخش ۱۳ الزامی است."
+            )
 
         has_layout = any(t in methods_text for t in ["چاهک", "موقعیت چاهک", "edge effect", "یکنواختی محیطی", "توزیع پلیت", "پلیت‌ها", "randomized layout", "پوزیشن"])
         has_uniform = any(t in methods_text for t in ["شرایط یکسان", "همگن", "کنترل دما", "انکوباتور", "شرایط یکنواخت", "همزمان"])
@@ -280,9 +413,10 @@ class PreEmptiveRiskOfBiasMitigator:
     ) -> RiskOfBiasAuditResult:
         """Conducts full 5-domain Cochrane/SYRCLE Pre-emptive Risk of Bias audit."""
         sections = cls.parse_sections(proposal_input)
+        sf = cls.detect_study_family(sections, context=context)
 
-        d1 = cls.evaluate_selection_bias(sections)
-        d2 = cls.evaluate_performance_bias(sections)
+        d1 = cls.evaluate_selection_bias(sections, study_family=sf)
+        d2 = cls.evaluate_performance_bias(sections, study_family=sf)
         d3 = cls.evaluate_detection_bias(sections)
         d4 = cls.evaluate_attrition_bias(sections)
         d5 = cls.evaluate_reporting_bias(sections)

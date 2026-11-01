@@ -237,6 +237,12 @@ class ProposalGenerator:
             except Exception:
                 pass
 
+            # 3. Epistemic Caveat & Publication Bias Transparency (Principle 28)
+            dossier_obj = data.get("proposal_research_dossier")
+            caveat = getattr(dossier_obj, "negative_findings_caveat", None) if dossier_obj else data.get("negative_findings_caveat")
+            if caveat:
+                cross_synthesis_paragraphs.append(f"\n\n### شفافیت معرفت‌شناختی و مهار سوگیری انتشار (Epistemic Transparency)\n{caveat}")
+
             full_lit_review = "\n\n".join(lit_paragraphs) + "\n\n" + "\n\n".join(cross_synthesis_paragraphs)
             md_parts.append(full_lit_review)
         else:
@@ -658,6 +664,15 @@ class ProposalGenerator:
                 )
             except Exception:
                 pass
+
+            # Append Epistemic Caveat & Publication Bias Transparency (Principle 28)
+            dossier_obj = data.get("proposal_research_dossier")
+            caveat = getattr(dossier_obj, "negative_findings_caveat", None) if dossier_obj else data.get("negative_findings_caveat")
+            if caveat:
+                lit_content += (
+                    "\n\n### شفافیت معرفت‌شناختی و مهار سوگیری انتشار (Epistemic Transparency)\n\n"
+                    + caveat
+                )
 
         tkg_synth = data.get("temporal_knowledge_graph_synthesis")
         tkg_header = ""

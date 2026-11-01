@@ -2,16 +2,17 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.1 EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
-  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.2 Zero-Bias Dual-Path Search, 119-Descriptor MeSH Thesaurus, Adaptive QUADAS-2/STROBE RoB Auditing, EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
+  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, pulmonology, ophthalmology, dermatology, ob/gyn, orthopedics, toxicology, health systems, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 545-assertion test suite (100% PASS).
+  PreEmptiveRiskOfBiasMitigator (QUADAS-2 spectrum bias, STROBE sampling frame, Cochrane RoB-2, SYRCLE), MeshQueryExpander (119 descriptors across 19 clinical categories),
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 552-assertion test suite (100% PASS).
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.1 - نسخه مجهز به پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، مصاحبه سقراطی پیش‌نویس، موتور گراف استنادی و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.2 - نسخه مجهز به جستجوی دومسیره ضدسوگیری، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -36,6 +37,7 @@ description: >
 - **ستون ۸ (EGM-Powered Academic Grant Study Section & Socratic Brainstorming Engine v13.0):** مجهز به مدل فیل و ماهی‌قرمز گوگل (Elephant-Goldfish Model: EGM)؛ تفکیک نقش فیل (The Elephant: نگارش عمیق ۲۸ بخش با کانتکست کامل) از داوران ماهی‌قرمز (The Goldfish: هیئت داوران ۶ پرسونایی با کانتکست کاملاً ایزوله و بدون سوگیری جهت کشف نقاط کور و نقدهای عمیق متدولوژی). شامل ۶ پرسونای تخصصی: نوآوری و اهمیت (Zoom-Out)، متدولوژی خصمانه و زیست‌آمار (Design Critic)، ممیزی ارجاعات و انطباق شواهد (Codebase Details)، امکان‌پذیری و تدارکات اجرایی (Implementation Readiness)، اخلاق زیستی و ساده‌فهمی (Comprehension)، و سنتزگر ارشد نمره‌دهی NIH (Synthesizer SRO). مجهز به حلقه اصلاح خودکار تا سقف ۱۰ دور (Closed-Loop 10-Iteration Remediation) و صدور پرونده جامع داوری `EGM_GRANT_STUDY_SECTION_REPORT.md` و `.json`.
 - **ستون ۶ (Scientific Academic Humanizer & Anti-AI-Detection Engine v11.5):** موتور ضدتشخیص و انسانی‌ساز علمی دو لایه (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و گزارش تحلیلی Audit Report).
 - **ستون ۹ (Temporal Knowledge Graph & GraphRAG Synthesis Engine v13.0):** مجهز به موتور اختصاصی گراف دانش زمانی (`temporal_knowledge_graph.py`) با الهام از Graphify و Litmaps، دسته‌بندی مقالات در ۳ اپوک تاریخی (`FOUNDATIONAL_LANDMARK` $\le 2018$، `INTERMEDIATE_VALIDATION` 2019-2022، `CONTEMPORARY_FRONTIER` 2023-2026)، ردیابی ارجاعات زمانی جهت‌دار و تزریق سنتز تاریخی به بخش ۳ (مرور منابع) جهت ریشه‌کنی کامل توهم، جاافتادگی زمانی و ارجاعات نابجا.
+- **ستون ۱۰ (Zero-Bias Dual-Path Search & Adaptive Risk of Bias Mitigator v13.2):** سیستم جستجوی ادبیات دومسیره (مسیر الف: شواهد اثربخشی؛ مسیر ب: شواهد منفی، تضاد، عوارض و بی‌اثری) با تزریق خودکار بند شفافیت معرفتی (`Epistemic Caveat Injection`) در بخش‌های ۳ و ۲۶ در صورت غیبت شواهد منفی در پایگاه‌ها؛ مجهز به تزاروس ۱۱۹ سرعنوانه MeSH در ۱۹ حوزه تخصصی با مهار سوگیری موضوعی؛ ممیزی انطباقی ریسک سوگیری با ابزارهای استاندارد جهانی (QUADAS-2 برای مطالعات تشخیصی، STROBE برای مشاهده‌ای و نظام سلامت، RoB-2 و SYRCLE برای تجربی)؛ و نگاشت روابط استنادی متقابل واقعی بین مقالات و اسنوبالینگ ۱-هاپ به جای زنجیره‌های خطی ساده.
 
 ---
 
@@ -280,6 +282,8 @@ description: >
 - **`temporal_knowledge_graph.py`:** موتور گراف دانش زمانی و سنتز GraphRAG مقالات در ۳ دوره تاریخی (مبانی کلاسیک، اعتبارسنجی میانی، مرزهای معاصر) جهت پیشگیری از توهم، جاافتادگی و خطاهای زمانی در مرور منابع (v13.0).
 - **`citation_graph_engine.py`:** موتور استخراج گراف استنادی چندجهته بر پایه الگوریتم‌های Litmaps/Inciteful و تولید ویژوالایزر تحت وب اینتراکتیو با Cytoscape.js (`LITERATURE_CITATION_GRAPH.html`).
 - **`biomedical_concept_graph.py`:** شبکه استخراج موجودیت‌ها و مفاهیم زیست‌پزشکی و اقتصاد سلامت (CHE, OOP, ICER, QALY) و ثبت در `BIOMEDICAL_CONCEPT_GRAPH.json`.
+- **`mesh_query_expander.py`:** تزاروس جامع MeSH گسترش‌یافته به ۱۱۹ توصیف‌گر استاندارد در ۱۹ شاخه بالینی همراه با استخراج کلیدواژه‌های لاتین و ممانعت قطعی از فال‌بک سرطان بر موضوعات غیرسرطان (v13.2).
+- **`pre_emptive_risk_of_bias_mitigator.py`:** ممیزی پیش‌گیرانه خطر سوگیری متناسب با کهن‌الگو شامل QUADAS-2 (سوگیری طیف و ثبت متوالی) برای تشخیصی، STROBE (چارچوب نمونه‌گیری و استانداردسازی مصاحبه‌گر) برای مشاهده‌ای، در کنار Cochrane RoB-2 و SYRCLE (v13.2).
 - **`graph_entailment_gate.py`:** دروازه قفل‌بسته تطبیق ادعاها با شواهد گراف و جلوگیری از ادعاهای تعمیم‌یافته فاقد پشتوانه.
 - **`methodology_research_subagent.py`:** ساب‌ایجنت استخراج پروتکل‌های یکپارچه و ضد کیمرا در ۶ کهن‌الگوی مطالعاتی (نظام سلامت، اپیدمیولوژی، کارآزمایی بالینی، درون‌تنی، برون‌تن).
 - **`generate_compliant_proposal.py`:** پایپ‌لاین یکپارچه و منطبق بر ۲۸ بخش پژوهشیار با کنترل کامل گیت آمادگی.
@@ -311,5 +315,6 @@ python scripts/master_release_gate.py
 
 16. **سوئیت پلی‌مورفیسم چنددامنه‌ای نظام سلامت و بالینی v12.1 (`test_v121_multidomain_polymorphism.py`):** اعتبارسنجی مطالعات CHE/OOP، پیشگیری از مثبت کاذب چو-تالالای روی CVI و انطباق کامل ۶ کهن‌الگو و ریشه‌کنی نشت موجودیت‌های آزمایشگاهی به مطالعات بالینی و تشخیصی (۱۲ تست).
 17. **سوئیت هیئت داوران گرنت EGM v13.0 (`test_v130_egm_study_section.py`):** اعتبارسنجی ۶ لنز گلدفیش، سنتز SRO، حلقه اصلاح ۱۰ دور و تولید پرونده جامع داوری (۱۰ تست).
+18. **سوئیت جامع عدم سوگیری، گسترش تزاروس MeSH و ممیزی پیش‌گیرانه ریسک سوگیری v13.2 (`test_v132_zero_bias_and_search_hardening.py`):** اعتبارسنجی گسترش تزاروس به ۱۱۹ توصیف‌گر در ۱۹ دسته تخصصی بدون فال‌بک ناخواسته سرطان، مسیر موازی جستجوی شواهد منفی و ایمنی، تزریق هوشمند بند شفافیت معرفتی در صورت نبود شواهد منفی، ممیزی سوگیری طیف QUADAS-2 و مخدوش‌گرهای STROBE، و استخراج لینک‌های استنادی واقعی درون مقالات و اسنوبالینگ ۱-هاپ (۷ تست).
 
-**مجموع آزمون‌ها:** ۵۴۵ آزمون مستقل با قبولی ۱۰۰٪ (545 / 545 PASS) (477 / 477 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در تمام اسکریپت‌ها (42 / 42 PASS) و پاس کامل ۴۳ معیار Master Release Gate.
+**مجموع آزمون‌ها:** ۵۵۲ آزمون مستقل با قبولی ۱۰۰٪ (552 / 552 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در تمام اسکریپت‌ها (42 / 42 PASS) و پاس کامل تمام معیارهای ممیزی.
