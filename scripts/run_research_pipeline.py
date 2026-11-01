@@ -970,6 +970,12 @@ class MasterResearchPipeline:
         rob_risk = rob.get('overall_risk', rob.get('composite_score', 'N/A'))
 
         print(f"  ✅ Mock Grant Review Panel completed (NIH Score: {mgr_score}/9.0, Verdict: {mgr_verdict})")
+        egm_sec = mgr.get("egm_study_section", {})
+        if egm_sec:
+            egm_score = egm_sec.get("overall_nih_score", mgr_score)
+            egm_blockers = egm_sec.get("total_blockers", 0)
+            egm_majors = egm_sec.get("total_majors", 0)
+            print(f"  🏛️ EGM Goldfish Grant Study Section completed (NIH: {egm_score}/9.0, Blockers: {egm_blockers}, Majors: {egm_majors})")
         print(f"  ✅ EQUATOR Compliance Audit passed (Score: {eq_score}/100)")
         print(f"  ✅ Risk of Bias Mitigation completed (Risk Level: {rob_risk})")
 
@@ -1008,6 +1014,9 @@ class MasterResearchPipeline:
         print(f"▪ Proposal Markdown (28 Sections): {results['md_path']}")
         print(f"▪ Proposal Word Document (DOCX): {results['docx_path']}")
         print(f"▪ Mock Grant Review Panel: {results.get('mock_grant_review_md')}")
+        egm_rep_md = os.path.join(self.output_dir, "EGM_GRANT_STUDY_SECTION_REPORT.md")
+        if os.path.exists(egm_rep_md):
+            print(f"▪ EGM Grant Study Section Report: {egm_rep_md}")
         if results.get('revision_audit_trail_md'):
             print(f"▪ Revision Audit Trail: {results.get('revision_audit_trail_md')}")
         print(f"▪ EQUATOR Compliance Audit: {results.get('equator_audit_md')}")

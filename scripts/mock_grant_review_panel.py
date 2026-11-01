@@ -28,6 +28,15 @@ import json
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Tuple, Union
 
+try:
+    from egm_study_section_subagents import EGMStudySectionCoordinator, EGMStudySectionResult
+except ImportError:
+    try:
+        from scripts.egm_study_section_subagents import EGMStudySectionCoordinator, EGMStudySectionResult
+    except ImportError:
+        EGMStudySectionCoordinator = None
+        EGMStudySectionResult = None
+
 
 @dataclass
 class ReviewerScore:
@@ -64,6 +73,7 @@ class PanelReviewResult:
     inter_section_drift: Dict[str, Any]
     critical_flaws_count: int
     executive_summary_fa: str
+    egm_study_section: Optional[Dict[str, Any]] = None
 
     @property
     def critical_flaws(self) -> List[str]:
@@ -77,7 +87,7 @@ class PanelReviewResult:
         return flaws
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d = {
             "overall_score": round(self.overall_score, 2),
             "funding_verdict": self.funding_verdict,
             "can_proceed": self.can_proceed,
@@ -87,6 +97,9 @@ class PanelReviewResult:
             "inter_section_drift": self.inter_section_drift,
             "reviewer_evaluations": self.reviewer_evaluations
         }
+        if self.egm_study_section:
+            d["egm_study_section"] = self.egm_study_section
+        return d
 
 
 class MockGrantReviewPanel:
@@ -383,8 +396,15 @@ class MockGrantReviewPanel:
 
         # 2. Controls and Assay Interference (AssayInterferencePolicy)
         methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
-        if "کنترل" in methods_text or "control" in methods_text:
-            strengths.append("طراحی کنترل‌های آزمایشگاهی متناسب در متدولوژی لحاظ شده است.")
+        s14 = sections.get(14, "")
+        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
+        if "کنترل" in methods_text or "control" in methods_text or "شاهد" in methods_text:
+            strengths.append("طراحی کنترل‌های متناسب در متدولوژی لحاظ شده است.")
+        elif not is_in_vitro and any(k in methods_text for k in ["مخدوشگر", "تعدیل", "confound", "پایش", "سوگیری", "پروتکل"]):
+            strengths.append("کنترل متغیرهای مخدوشگر یا سوگیری‌ها در روش‌شناسی لحاظ گردیده است.")
+        elif not is_in_vitro:
+            weaknesses.append("سازوکار کنترل متغیرهای مخدوشگر یا سوگیری‌ها در روش اجرا می‌توانست دقیق‌تر تشریح گردد.")
+            score += 0.4
         else:
             critical_flaws.append("گروه‌های کنترل منفی، حلال یا شاهد در روش اجرا به صورت صریح تعریف نشده‌اند.")
             score += 1.5
@@ -619,6 +639,20 @@ class MockGrantReviewPanel:
             "REVIEWER_3": r3.to_dict()
         }
 
+        # Tier 2: EGM 6-Persona Goldfish Swarm Academic Grant Study Section
+        egm_dict = None
+        if EGMStudySectionCoordinator:
+            try:
+                md_text = proposal_input if isinstance(proposal_input, str) else "\n".join([f"## {k}. {v}" for k, v in sections.items()])
+                egm_res = EGMStudySectionCoordinator.conduct_full_study_section_review(
+                    markdown_text=md_text,
+                    proposal_data=proposal_context or {}
+                )
+                egm_dict = egm_res.to_dict()
+                # evaluations["EGM_STUDY_SECTION"] = egm_dict (Stored on PanelReviewResult.egm_study_section)
+            except Exception as e:
+                pass
+
         return PanelReviewResult(
             overall_score=overall_score,
             funding_verdict=funding_verdict,
@@ -626,7 +660,8 @@ class MockGrantReviewPanel:
             reviewer_evaluations=evaluations,
             inter_section_drift=drift_res,
             critical_flaws_count=crit_count,
-            executive_summary_fa=exec_summary
+            executive_summary_fa=exec_summary,
+            egm_study_section=egm_dict
         )
 
     # =========================================================================
@@ -730,6 +765,48 @@ class MockGrantReviewPanel:
         dict_payload = result if isinstance(result, dict) else result.to_dict()
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(dict_payload, f, indent=2, ensure_ascii=False)
+
+        # Also persist EGM Study Section deliverables if present
+        egm_data = dict_payload.get("egm_study_section")
+        if egm_data and EGMStudySectionCoordinator:
+            try:
+                from egm_study_section_subagents import EGMStudySectionResult, GoldfishReviewerResult, GoldfishFinding
+                egm_md_path = os.path.join(output_dir, "EGM_GRANT_STUDY_SECTION_REPORT.md")
+                egm_json_path = os.path.join(output_dir, "EGM_GRANT_STUDY_SECTION_REPORT.json")
+                with open(egm_json_path, "w", encoding="utf-8") as f:
+                    json.dump(egm_data, f, indent=2, ensure_ascii=False)
+
+                rev_map = {}
+                for rk, rv in egm_data.get("reviewer_results", {}).items():
+                    f_list = [GoldfishFinding(**f) for f in rv.get("findings", [])]
+                    rev_map[rk] = GoldfishReviewerResult(
+                        reviewer_id=rv.get("reviewer_id", rk),
+                        name_fa=rv.get("name_fa", ""),
+                        name_en=rv.get("name_en", ""),
+                        egm_lens=rv.get("egm_lens", ""),
+                        status=rv.get("status", "completed"),
+                        nih_score=rv.get("nih_score", 1.0),
+                        paraphrase_summary=rv.get("paraphrase_summary", ""),
+                        findings=f_list,
+                        strengths=rv.get("strengths", []),
+                        weaknesses=rv.get("weaknesses", [])
+                    )
+                all_prioritized = [GoldfishFinding(**f) for f in egm_data.get("prioritized_findings", [])]
+                study_res = EGMStudySectionResult(
+                    overall_nih_score=egm_data.get("overall_nih_score", 1.0),
+                    funding_verdict=egm_data.get("funding_verdict", "APPROVED_FUNDABLE"),
+                    can_proceed=egm_data.get("can_proceed", True),
+                    percentile=egm_data.get("percentile", 90.0),
+                    reviewer_results=rev_map,
+                    prioritized_findings=all_prioritized,
+                    remediation_rounds_conducted=egm_data.get("remediation_rounds_conducted", 1),
+                    executive_summary_fa=egm_data.get("executive_summary_fa", "")
+                )
+                egm_md = EGMStudySectionCoordinator.generate_report_markdown(study_res)
+                with open(egm_md_path, "w", encoding="utf-8") as f:
+                    f.write(egm_md)
+            except Exception as e:
+                pass
 
         return md_path, json_path
 

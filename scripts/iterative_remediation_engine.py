@@ -102,7 +102,20 @@ class SurgicalSectionPatcher:
         """Applies a targeted patching function to a specific canonical section."""
         secs = cls.split_into_sections(markdown_text)
         if section_num not in secs:
-            return markdown_text
+            fa_num = "".join("۰۱۲۳۴۵۶۷۸۹"[int(d)] for d in str(section_num))
+            sec_title = MANDATORY_28_SECTIONS[section_num - 1] if 1 <= section_num <= len(MANDATORY_28_SECTIONS) else f"بخش {section_num}"
+            default_content = f"## {fa_num}. {sec_title}\n"
+            new_content = patch_fn(default_content)
+            secs[section_num] = {
+                "header": f"## {fa_num}. {sec_title}",
+                "content": new_content,
+                "start": len(markdown_text),
+                "end": len(markdown_text) + len(new_content)
+            }
+            lead = ""
+            if 1 in secs and secs[1]["start"] > 0:
+                lead = markdown_text[:secs[1]["start"]]
+            return cls.reassemble_sections(secs, original_lead=lead)
         old_sec = secs[section_num]["content"]
         new_sec = patch_fn(old_sec)
         secs[section_num]["content"] = new_sec
@@ -204,6 +217,15 @@ class IterativeRemediationEngine:
                 if isinstance(r_eval, dict):
                     weaknesses.extend(r_eval.get("weaknesses", []))
             all_issues = flaws + weaknesses
+            # Ingest EGM Study Section findings if present
+            egm_data = getattr(panel_review, "egm_study_section", None) or panel_review.reviewer_evaluations.get("EGM_STUDY_SECTION")
+            if egm_data and isinstance(egm_data, dict):
+                for f_item in egm_data.get("prioritized_findings", []):
+                    issue_code = f_item.get("issue_name", "")
+                    if issue_code:
+                        all_issues.append(issue_code)
+                        if f_item.get("severity") == "Blocker":
+                            flaws.append(f"EGM_BLOCKER_{issue_code}")
             flaw_count = len(flaws)
             verdict = panel_review.funding_verdict
 
@@ -237,7 +259,7 @@ class IterativeRemediationEngine:
             # Patch Section 22: Biostatistical Block Degrees of Freedom, Sample Size Contradiction & Mead Power
             if any(
                 k in f for f in all_issues
-                for k in ["BIOSTATISTICAL_BLOCK_DF_ERROR", "BIOSTATISTICAL_MEAD_POWER_CONFLATION", "BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION", "حجم نمونه"]
+                for k in ["BIOSTATISTICAL_BLOCK_DF_ERROR", "BIOSTATISTICAL_MEAD_POWER_CONFLATION", "BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION", "MISSING_SAMPLE_SIZE_FORMULA", "حجم نمونه"]
             ):
                 def patch_sec_22(text: str) -> str:
                     t = text
@@ -269,7 +291,8 @@ class IterativeRemediationEngine:
                     "GLOBOCAN_CASE_DEATH_CHECKSUM_ERROR", "OUTDATED_EPIDEMIOLOGY",
                     "GLOBOCAN_CITATION_ATTRIBUTION_DRIFT",
                     "UNBOUNDED_EPISTEMIC_NOVELTY", "UNBOUNDED_COSMIC_NOVELTY_CLAIM",
-                    "UNSUBSTANTIATED_NOVELTY_CLAIM", "بیان مسئله"
+                    "UNSUBSTANTIATED_NOVELTY_CLAIM", "MISSING_EPIDEMIOLOGICAL_BURDEN_JUSTIFICATION",
+                    "SPARSE_PROBLEM_STATEMENT", "بیان مسئله"
                 ]
             ):
                 globo_block, globo_markers = cls._get_organ_globocan_text(proposal_data, current_md)
@@ -329,7 +352,7 @@ class IterativeRemediationEngine:
                 applied_patches.append("Section 3: Augmented literature review depth and added explicit parallel mechanistic rationale framing")
 
             # Patch Section 4: Significance & Clinical/Translational Justification
-            if any("ضرورت و اهمیت تحقیق" in f for f in all_issues):
+            if any(k in f for f in all_issues for k in ["ضرورت و اهمیت تحقیق", "VAGUE_INNOVATION_STATEMENT"]):
                 def patch_sec_4(text: str) -> str:
                     t = text
                     if len(t) < 350:
@@ -360,7 +383,7 @@ class IterativeRemediationEngine:
                 applied_patches.append("Section 9: Articulated balanced testable hypotheses and quantitative research questions")
 
             # Patch Section 12: Structured Gantt Schedule Table
-            if any("جدول زمان‌بندی" in f for f in all_issues):
+            if any(k in f for f in all_issues for k in ["جدول زمان‌بندی", "INCOMPLETE_GANTT_TIMELINE"]):
                 def patch_sec_12(text: str) -> str:
                     t = text
                     if "|" not in t:
@@ -500,7 +523,7 @@ class IterativeRemediationEngine:
                 applied_patches.append("Section 23: Added domain-specific multivariable regression and statistical modeling")
 
             # Patch Section 24 & 25: Bioethics & Biosafety Protocols
-            if any("ملاحظات اخلاقی" in f for f in all_issues):
+            if any(k in f for f in all_issues for k in ["ملاحظات اخلاقی", "MISSING_BIOETHICS_COMPLIANCE_PROTOCOL"]):
                 def patch_sec_24(text: str) -> str:
                     t = text
                     if len(t) < 180 or "کمیته" not in t:
@@ -520,7 +543,7 @@ class IterativeRemediationEngine:
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 24, patch_sec_24)
                 applied_patches.append("Section 24: Expanded biomedical ethics compliance according to national 31-point charter")
 
-            if any("ایمنی زیستی" in f for f in all_issues) or (is_non_lab and any("امنیت" in f for f in all_issues)):
+            if any("ایمنی زیستی" in f for f in all_issues) or (is_non_lab and any("امنیت" in f for f in all_issues)) or any("WEAK_DATA_CONFIDENTIALITY_PLAN" in f for f in all_issues):
                 def patch_sec_25(text: str) -> str:
                     t = text
                     if len(t) < 180:
@@ -552,6 +575,25 @@ class IterativeRemediationEngine:
                     return t
                 current_md = SurgicalSectionPatcher.patch_section_content(current_md, 15, patch_sec_15)
                 applied_patches.append("Section 15: Articulated molecular heterogeneity rationale and Selectivity Index")
+
+            # Patch Section 16: Research Location and Sites
+            if any(k in f for f in all_issues for k in ["UNSPECIFIED_STUDY_LOCATION", "محل انجام مطالعه"]):
+                def patch_sec_16(text: str) -> str:
+                    t = text
+                    if len(t.strip()) < 30 or "دانشگاه" not in t:
+                        if is_health_sys:
+                            t += (
+                                "\n\n▪ **محل اجرای طرح و مراکز درمانی همکار:**\n"
+                                "این مطالعه در بیمارستان‌های آموزشی-درمانی و مراکز جامع سلامت تابعه دانشگاه علوم پزشکی انجام می‌پذیرد."
+                            )
+                        else:
+                            t += (
+                                "\n\n▪ **محل اجرای طرح و آزمایشگاه‌های همکار:**\n"
+                                "کلیه آزمایش‌های تجربی و کشت‌های سلولی در آزمایشگاه تحقیقاتی مرکزی و پژوهشکده زیست‌پزشکی دانشگاه با تجهیزات استاندارد انجام خواهد شد."
+                            )
+                    return t
+                current_md = SurgicalSectionPatcher.patch_section_content(current_md, 16, patch_sec_16)
+                applied_patches.append("Section 16: Designated approved university research laboratories and clinical study sites")
 
             # Patch Section 26: Translational Boundary Hedging & Limitations Depth
             if any(k in f for f in all_issues for k in ["TRANSLATIONAL_OVER_EXTRAPOLATION", "محدودیت‌های احتمالی پژوهش"]):

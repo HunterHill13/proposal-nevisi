@@ -2,16 +2,16 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v12.1 Multi-Domain Polymorphic & Cognitive Architecture). Operates across diverse biomedical domains
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.0 EGM-Powered Academic Grant Study Section & Cognitive Swarm Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 529-assertion test suite (100% PASS).
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 540-assertion test suite (100% PASS).
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v12.1 - نسخه پلی‌مورفیک چنددامنه‌ای مجهز به موتور گراف استنادی، شبکه مفاهیم زیست‌پزشکی و پشتیبانی کامل از مطالعات نظام سلامت، اپیدمیولوژی و بالینی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.0 - نسخه مجهز به هیئت داوران گرنت گلدفیش EGM، مصاحبه سقراطی پیش‌نویس، موتور گراف استنادی و شبکه مفاهیم زیست‌پزشکی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -33,6 +33,7 @@ description: >
 - **ستون ۴ (Biostatistical Coherence & Mead's Resource Equation):** توجیه ریاضی $n=3$ در طرح‌های فاکتوریل بر مبنای $E = N - B - T = 30 - 2 - 9 = 19 \in [10, 20]$ (با درجات آزادی بلوک ۳ روز کاری مستقل $B=3-1=2$) و تحلیل مستقل توان ANOVA فاکتوریل در G*Power با توان ۸۵.۲٪.
 - **ستون ۵ (Adversarial Mock Grant Review Panel):** رد خودکار (`REVISION_REQUIRED`) در صورت مشاهده هرگونه انحراف معنایی مقالات یا تناقض آماری تا زمان اصلاح کامل توسط ایجنت.
 - **ستون ۷ (Dual-Layer Citation & Concept Graph Engine v12.0):** مجهز به موتور اختصاصی `CitationGraphEngine` بر پایه الگوریتم‌های Litmaps و Inciteful (فرمول Adamic/Adar برای کشف کارهای داغ معاصر و Personalized PageRank متمرکز بر سیدها)، ساخت گراف تعاملی Cytoscape.js (`LITERATURE_CITATION_GRAPH.html`)، استخراج مفاهیم زیستی (`BiomedicalConceptGraph`) و دروازه قفل‌بسته ضدتوهم و ضدکلی‌گویی (`GraphEntailmentGate`) با ۵۲۱ تست موفق.
+- **ستون ۸ (EGM-Powered Academic Grant Study Section & Socratic Brainstorming Engine v13.0):** مجهز به مدل فیل و ماهی‌قرمز گوگل (Elephant-Goldfish Model: EGM)؛ تفکیک نقش فیل (The Elephant: نگارش عمیق ۲۸ بخش با کانتکست کامل) از داوران ماهی‌قرمز (The Goldfish: هیئت داوران ۶ پرسونایی با کانتکست کاملاً ایزوله و بدون سوگیری جهت کشف نقاط کور و نقدهای عمیق متدولوژی). شامل ۶ پرسونای تخصصی: نوآوری و اهمیت (Zoom-Out)، متدولوژی خصمانه و زیست‌آمار (Design Critic)، ممیزی ارجاعات و انطباق شواهد (Codebase Details)، امکان‌پذیری و تدارکات اجرایی (Implementation Readiness)، اخلاق زیستی و ساده‌فهمی (Comprehension)، و سنتزگر ارشد نمره‌دهی NIH (Synthesizer SRO). مجهز به حلقه اصلاح خودکار تا سقف ۱۰ دور (Closed-Loop 10-Iteration Remediation) و صدور پرونده جامع داوری `EGM_GRANT_STUDY_SECTION_REPORT.md` و `.json`.
 - **ستون ۶ (Scientific Academic Humanizer & Anti-AI-Detection Engine v11.5):** موتور ضدتشخیص و انسانی‌ساز علمی دو لایه (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و گزارش تحلیلی Audit Report).
 
 ---

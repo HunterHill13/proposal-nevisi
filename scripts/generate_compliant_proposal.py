@@ -1424,6 +1424,8 @@ class ProposalGenerator:
             "mock_grant_review": review_result if isinstance(review_result, dict) else review_result.to_dict(),
             "mock_grant_review_md": review_md_path,
             "mock_grant_review_json": review_json_path,
+            "egm_grant_review_md": os.path.join(review_dir, "EGM_GRANT_STUDY_SECTION_REPORT.md"),
+            "egm_grant_review_json": os.path.join(review_dir, "EGM_GRANT_STUDY_SECTION_REPORT.json"),
             "revision_audit_trail": remediation_res["audit_trail"] if remediation_res else None,
             "revision_audit_trail_md": remediation_res["audit_trail_md"] if remediation_res else None,
             "revision_audit_trail_json": remediation_res["audit_trail_json"] if remediation_res else None,
