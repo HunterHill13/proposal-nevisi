@@ -659,8 +659,16 @@ class ProposalGenerator:
             except Exception:
                 pass
 
+        tkg_synth = data.get("temporal_knowledge_graph_synthesis")
+        tkg_header = ""
+        if tkg_synth and isinstance(tkg_synth, dict) and tkg_synth.get("chronological_narrative"):
+            tkg_header = "### سیر زمانی تکامل شواهد و تحلیل افق‌های سه‌گانه دانش (Temporal Evidence Trajectory)\n" + tkg_synth["chronological_narrative"] + "\n\n### سنتز تفکیکی مقالات پایه و مطالعات مرتبط\n"
+
         if not lit_content:
             lit_content = "شواهد تجربی و مطالعات پیشین مرتبط با متغیرهای پژوهش به صورت جامع مورد تحلیل و بررسی قرار گرفته‌اند."
+        else:
+            lit_content = tkg_header + lit_content
+
         md_parts.append("## ۳. مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)\n" + lit_content + "\n\n---")
 
         # -------------------------------------------------------------

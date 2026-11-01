@@ -4,13 +4,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 496/496 Passed](https://img.shields.io/badge/Unified%20Tests-540%2F540%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 541/541 Passed](https://img.shields.io/badge/Unified%20Tests-541%2F541%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
 [![Architecture: EGM Hybrid Swarm](https://img.shields.io/badge/Architecture-EGM%20Hybrid%20Swarm%20v13.0-blueviolet.svg)](#egm-powered-grant-study-section)
 [![EGM Study Section: 6 Personas](https://img.shields.io/badge/EGM%20Study%20Section-6%20Goldfish%20Personas-purple.svg)](#egm-powered-grant-study-section)
-[![Unified Tests: 540/540 Passed](https://img.shields.io/badge/Unified%20Tests-540%2F540%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Unified Tests: 541/541 Passed](https://img.shields.io/badge/Unified%20Tests-541%2F541%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
 [![Anti-AI Humanizer: v11.5](https://img.shields.io/badge/Anti--AI%20Humanizer-DataInvariantGate%20%26%20Burstiness-darkgreen.svg)](#scientific-academic-humanizer)
 [![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
@@ -24,7 +24,7 @@
 <a name="english"></a>
 ## English Documentation (v13.0)
 
-**Proposal-Nevisi (v13.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v11.5.1 integrates Two-Stage Cognitive Multi-Agent Architecture (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$), Organ-Specific GLOBOCAN 2022 Checksums, and 13-Pillar Adversarial Review Immunization**.
+**Proposal-Nevisi (v13.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v13.0 integrates the Elephant-Goldfish Model (EGM) Grant Study Section, Multi-Domain Polymorphism across 6 Research Archetypes, the Temporal Knowledge Graph & GraphRAG Synthesis Engine (Pillar 9), Two-Stage Cognitive Multi-Agent Orchestration (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), and the Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$)**.
 
 It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
@@ -36,8 +36,8 @@ It completely eliminates AI literature hallucination, Frankenstein/chimera metho
 flowchart TD
     subgraph Stage1 ["۱. مرحله اول: ۲ ساب‌ایجنت تخصصی پیش از نگارش (Stage 1: Parallel Pre-Draft Subagents)"]
         A["کاربر: عنوان پژوهش به فارسی + کلیدواژه‌های انگلیسی"] --> B["MeSHQueryExpander<br>• نگاشت به سرعنوان‌های MeSH<br>• فیلتر ۱۰۰٪ کاراکترهای غیرلاتین"]
-        B --> S1["ساب‌ایجنت ۱: ارزیابی کمی شواهد (Evidence & Quantitative RCS Subagent)<br>• جستجوی چندمرحله‌ای PubMed / Europe PMC / OpenAlex<br>• امتیازدهی PaperQA2 RCS (0-10) و استخراج مقادیر کمی (IC50, p-value)<br>• آمار اختصاصی ارگان هدف در GLOBOCAN 2022 + تدوین farsi_synthesis_summary"]
-        B --> S2["ساب‌ایجنت ۲: متدولوژی ضد کیمرا (Methodology & Anti-Chimera Subagent)<br>• انتخاب مطالعه مرجع اصلی (Primary Anchor Protocol)<br>• پروفایل ژنتیکی و محیط کشت ATCC اختصاصی مدل + جدول متغیرهای بخش ۱۱<br>• قفل ریاضی حجم نمونه (N=30, B=2, T=9, E=19) با تحلیل توان G*Power"]
+        B --> S1["ساب‌ایجنت ۱: ارزیابی کمی شواهد (Evidence & Quantitative RCS Subagent)<br>• جستجوی چندمرحله‌ای PubMed / Europe PMC / OpenAlex<br>• امتیازدهی PaperQA2 RCS (0-10) و استخراج مقادیر کمی (AOR, CHE, IC50, p-value)<br>• بار بیماری (GLOBOCAN / WHO GBD / نظام سلامت) + تدوین farsi_synthesis_summary"]
+        B --> S2["ساب‌ایجنت ۲: متدولوژی ضد کیمرا (Methodology & Anti-Chimera Subagent)<br>• مطالعه مرجع اصلی (Primary Anchor Protocol) در ۶ کهن‌الگو (STROBE/CONSORT/ARRIVE/GCCP/STARD/WHO)<br>• جدول متغیرهای بخش ۱۱ + کنترل‌های اختصاصی و مشخصات مدل/جامعه<br>• قفل ریاضی حجم نمونه (کوکران و DEFF / چو و وانگ / معادله مید E=19 و G*Power)"]
         S1 & S2 --> SPEC["ادغام عمیق بدون اتلاف در فایل مشخصات طرح<br>PROPOSAL_SPEC.json (--spec-file Deep-Merge)"]
     end
 
@@ -53,11 +53,11 @@ flowchart TD
 
     subgraph OuterLoop ["۳. حلقه نگارش بیرونی: تدوین ۲۸ بخش پژوهشیار (Outer Loop)"]
         H --> I["ProposalGenerator (موتور تدوین ۲۸ بخشی)"]
-        I --> J1["بخش ۲: بیان مسئله + آمار GLOBOCAN 2022 اختصاصی ارگان هدف"]
-        I --> J2["بخش ۳: مرور منابع + شاخص‌های کمی اختصاصی هر مقاله + جدول ToxRTool فارسی"]
-        I --> J3["بخش ۱۱ و ۱۵: جدول کامل متغیرها (همگام با بخش ۶) + شناسنامه ژنتیکی ATCC"]
-        I --> J4["بخش ۲۲: حجم نمونه همگام (N=30, B=2, E=19) + پارامتر غیرمرکزی λ=10.1 در G*Power"]
-        I --> J5["بخش ۲۷ و ۲۸: پروتکل دو فازی چو-تالالای + منابع انگلیسی با ارقام استاندارد"]
+        I --> J1["بخش ۲: بیان مسئله + بار بیماری متناسب با موضوع (GLOBOCAN / WHO GBD / نظام سلامت) و سرچ منفی"]
+        I --> J2["بخش ۳: مرور منابع + سنتز گراف دانش زمانی (TKG) در ۳ اپوک تاریخی + شاخص‌های کمی"]
+        I --> J3["بخش ۱۱ و ۱۵: جدول کامل متغیرها (همگام با بخش ۶) + جامعه یا مدل هدف"]
+        I --> J4["بخش ۲۲: حجم نمونه همگام با فرمول ریاضی معتبر (کوکران و DEFF / چو و وانگ / معادله مید)"]
+        I --> J5["بخش ۲۷ و ۲۸: متدولوژی استاندارد اجرایی و منابع ونکوور با ارقام معتبر"]
     end
 
     subgraph RemediationLoop ["۴. چرخه بسته داوری نمادین و اصلاح جراحی تا ۱۰ راند (Symbolic Critic-Refine Loop — Max 10 Rounds)"]
@@ -100,6 +100,35 @@ Version 13.0 incorporates Google's **Elephant-Goldfish Model (EGM)** into academ
   6. `grant-study-section-sro` (EGM Synthesizer Lens): Aggregates findings, normalizes issues into 🔴 Blocker, 🟡 Major, and 🟢 Nit, computes standardized NIH impact scores (1.0 to 9.0), and outputs `EGM_GRANT_STUDY_SECTION_REPORT.md` and `.json`.
 * **Two-Tier Hybrid Architecture:** Combines fast deterministic Python AST/regex linters (Tier 1: < 3 seconds) with deep cognitive subagent review (Tier 2).
 * **Closed-Loop 10-Iteration Remediation:** Recursively refines flawed drafts up to **10 full iterations** (`max_iterations = 10`) until consensus is achieved with zero critical flaws.
+
+---
+
+### Multi-Domain Polymorphism: 6 Research Archetypes Matrix (v12.1 / v13.0)
+
+Proposal-Nevisi is **100% topic- and domain-agnostic**, automatically adapting its 28-section schema, reporting guidelines, sample size formulas, and statistical models across 6 distinct biomedical research archetypes:
+
+| Research Archetype (`study_family`) | Target Population / Model | Reporting Guideline | Sample Size Formula (Sec 22) | Primary Statistical Analysis Plan (Sec 23) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Health Systems & Policy** (`health_systems`) | Patient households, clinical registries, HIS data | WHO Guidelines / CHE / OOP | Cochran with Design Effect ($DEFF=1.5, n=642$) | Multivariable Logistic Regression (AOR), Kakwani Index (Stata/R) |
+| **Observational Epidemiology** (`epidemiological`) | Population cohorts, community controls | STROBE Statement | Cochran Prevalence Formula ($n=428$) | Multivariable Logistic / Cox Proportional Hazards Regression (SPSS/R) |
+| **Human Clinical Trial** (`clinical_rct`) | Eligible patient cohorts meeting criteria | CONSORT 2010 / ICH-GCP | Chow & Wang Superiority/Equivalence ($n=128$) | Intention-to-Treat (ITT), Mixed-Effects Models & ANCOVA |
+| **In Vivo Animal Study** (`in_vivo`) | Standardized laboratory rodents | ARRIVE 2.0 Guidelines | Mead's Resource Equation ($E=N-B-T$) | Repeated Measures ANOVA, Kaplan-Meier / Log-Rank Survival |
+| **In Vitro Laboratory** (`in_vitro`) | ATCC authenticated cell lines | OECD GCCP & MIQE | Mead's Equation ($E=19, B=2$) & Factorial G*Power | Two-Way Factorial ANOVA, Chou-Talalay Median-Effect & CI |
+| **Diagnostic & Biomarker** (`diagnostic`) | Prospective clinical suspected cases | STARD 2015 Statement | Buderer Diagnostic Accuracy Formula | Sensitivity, Specificity, ROC-AUC Curve, Youden's Index |
+
+---
+
+### Temporal Knowledge Graph & GraphRAG Synthesis Engine (Pillar 9 - v13.0)
+
+To resolve **LLM context degradation, chronological forgetting, and citation hallucination**, Proposal-Nevisi integrates a native, zero-dependency `TemporalKnowledgeGraph` engine (`scripts/temporal_knowledge_graph.py`) inspired by Graphify and Litmaps:
+
+1. **Three Historical Epochs:**
+   - `FOUNDATIONAL_LANDMARK` ($\le 2018$): First-principles theoretical papers, seminal mathematical models, and cornerstone guidelines.
+   - `INTERMEDIATE_VALIDATION` ($2019-2022$): Replication cohorts, method standardization, and intermediate clinical trials.
+   - `CONTEMPORARY_FRONTIER` ($2023-2026$): State-of-the-art evidence, active clinical gaps, and current guidelines.
+2. **Directed Chronological Citation Edges:** Tracks both forward citation propagation and backward intellectual lineage, strictly preventing chronological anachronisms.
+3. **GraphRAG Synthesis Injection:** Automatically compiles a synthesized chronological narrative directly into Section 3 (Literature Review), ensuring historical depth and zero temporal drift.
+4. **Exported Artifacts:** Produces `TEMPORAL_KNOWLEDGE_GRAPH.md` (interactive visual markdown summary) and `TEMPORAL_KNOWLEDGE_GRAPH.json` (computable graph with epoch node partitions).
 
 ---
 
@@ -184,6 +213,10 @@ flowchart LR
    - Converts LaTeX formulas directly into Microsoft Word native Office Math Markup Language (`<m:oMath>`), eliminating raw LaTeX leakage in `.docx` files.
 7. **Persian Medical Typography Linter (`scripts/persian_medical_typography_linter.py`):**
    - Strictly enforces Persian Zero-Width Non-Joiner (ZWNJ), Persian numerals in prose, and bilingual expansion for medical acronyms on first mention.
+8. **EGM Hybrid Grant Study Section (`scripts/egm_study_section_subagents.py`):**
+   - Implements Google's Elephant-Goldfish Model with 6 zero-context isolated reviewer personas, NIH 1-9 scoring, and closed-loop iterative remediation up to 10 rounds.
+9. **Temporal Knowledge Graph & GraphRAG Synthesis (`scripts/temporal_knowledge_graph.py`):**
+   - Constructs a 3-epoch chronological knowledge graph ($\le 2018$, $2019-2022$, $2023-2026$) tracking directed citation lineages, eliminating literature hallucination, forgetting, and anachronisms.
 
 ---
 
@@ -233,7 +266,7 @@ The engine enforces 43 fail-closed release criteria before approving proposals:
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness
 
-The engine includes 26 comprehensive test suites with **496 / 496 tests passing (100% Pass Rate)**:
+The engine includes 27 comprehensive test suites with **541 / 541 tests passing (100% Pass Rate)**:
 
 ```powershell
 uv run python tests/run_all_tests.py
@@ -253,9 +286,9 @@ uv run python tests/run_all_tests.py
 ---
 
 <a name="فارسی"></a>
-## مستندات فارسی (نسخه ۱۱.۵.۱)
+## مستندات فارسی (نسخه ۱۳.۰)
 
-پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۱.۵.۱)** یک سیستم خودکار، پیشرفته، شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است.
+پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۳.۰)** یک سیستم خودکار، پیشرفته، چندایجنت، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، بهداشت، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است. این سیستم کاملاً مستقل از موضوع (Domain-Agnostic) بوده و از ۶ کهن‌الگوی پژوهشی (نظام سلامت و اقتصاد سلامت، اپیدمیولوژی، کارآزمایی بالینی، مدل حیوانی، آزمایشگاهی برون‌تن و تشخیصی) پشتیبانی می‌کند.
 
 نسخه ۱۱.۵.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور علمی ضدتشخیص هوش مصنوعی و انسانی‌ساز آکادمیک (ScientificAcademicHumanizer v11.5)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک، بیواستاتیک و تکیه‌کلام‌های هوش مصنوعی را به صورت قطعی ریشه‌کن کرده است.
 
@@ -340,40 +373,40 @@ uv run python scripts/docx_builder.py "./output/proposal.md" "./output/proposal.
 
 ### ۲۸ بخش مصوب سامانه پژوهشیار (وزارت بهداشت)
 
-۱. **موضوع** (عنوان فارسی و انگلیسی)  
-۲. **بیان مسئله** (Problem Statement تحلیلی با بار بیماری GLOBOCAN 2022/2024 و سرچ منفی)  
-۳. **مرور بر منابع** (پیشینه پژوهش با سنتز نقادانه ۱۰۰٪ فارسی بر پایه مقالات متن کامل)  
-۴. **اهمیت و ضرورت تحقیق**  
-۵. **تعریف واژه‌ها**  
-۶. **اهداف جزئی**  
-۷. **اهداف کلی**  
-۸. **اهداف کاربردی**  
-۹. **فرضیات و سوالات پژوهش**  
-۱۰. **دستاوردها**  
-۱۱. **جدول متغیرها** (مستقل، وابسته، مداخله‌گر، مقیاس و نقش)  
-۱۲. **جدول زمان‌بندی و مراحل اجرا** (گانت چارت)  
-۱۳. **روش اجرا** (چارچوب کلی متدولوژی)  
-۱۴. **نوع مطالعه**  
-۱۵. **جامعه مورد مطالعه** (مدل زیستی، رده سلولی، تبارشناسی ژنتیکی ATCC)  
-۱۶. **محل انجام مطالعه**  
-۱۷. **معیارهای ورود به مطالعه**  
-۱۸. **معیارهای خروج از مطالعه**  
-۱۹. **ابزارهای گردآوری اطلاعات** (دستگاه‌ها، کیت‌ها، کاسپاز فعال و انکسین)  
-۲۰. **تعیین اعتبار ابزار گردآوری** (روایی و کالیبراسیون)  
-۲۱. **تعیین ابزار گردآوری** (پایایی، ضرایب تغییرات CV و ۳ تکرار مستقل)  
-۲۲. **حجم نمونه و روش محاسبه آن** (معادله تخصیص منابع مید $E = 30 - 2 - 9 = 19$ و توان فاکتوریل G*Power)  
-۲۳. **روش تجزیه و تحلیل داده‌ها** (Two-Way Factorial ANOVA، مدل اثرات متقابل و حدود CI)  
-۲۴. **ملاحظات اخلاقی و کدهای اخلاق زیستی**  
-۲۵. **نحوه رعایت نکات امنیتی و حفاظت پروژه** (سطح ایمنی BSL-2)  
-۲۶. **مشکلات و محدودیت‌ها** (چالش‌های تکنیکال، مرزهای برون‌یابی بالینی و راهکارها)  
-۲۷. **روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع‌آوری اطلاعات** (پروتکل دو فازی چو-تالالای و بلانک بدون سلول)  
-۲۸. **منابعی که استفاده شد** (فهرست کامل منابع بر اساس سبک ونکوور و ترتیب ظهور)
+۱. **موضوع** (عنوان فارسی و انگلیسی مصوب طرح)  
+۲. **بیان مسئله** (Problem Statement تحلیلی با بار بیماری بین‌المللی/ملی و استعلام جستجوی منفی)  
+۳. **مرور بر منابع** (پیشینه پژوهش با سنتز گراف دانش زمانی در ۳ دوره تاریخی و تحلیل نقادانه فارسی)  
+۴. **اهمیت و ضرورت تحقیق** (توجیه علمی، بالینی، سیاست‌گذاری و اقتصادی)  
+۵. **تعریف واژه‌ها** (تعاریف نظری و عملیاتی متغیرها و اصطلاحات کلیدی)  
+۶. **اهداف جزئی** (اهداف اختصاصی مرحله‌ای و سنجش‌پذیر)  
+۷. **اهداف کلی** (هدف غایی و تعیین‌کننده طرح)  
+۸. **اهداف کاربردی** (کاربردهای ملموس در نظام سلامت، بالین و صنعت داروسازی)  
+۹. **فرضیات و سوالات پژوهش** (فرضیه‌ها و پرسش‌های پژوهشی متناظر با اهداف)  
+۱۰. **دستاوردها** (خروجی‌های دانشی، مقالات علمی، شواهد سیاستی یا دانش فنی)  
+۱۱. **جدول متغیرها** (مستقل، وابسته، مداخله‌گر/مخدوش‌گر، نوع، مقیاس و نقش متدولوژیک)  
+۱۲. **جدول زمان‌بندی و مراحل اجرا** (گانت چارت فازبندی‌شده زمانی)  
+۱۳. **روش اجرا** (چارچوب کلی متدولوژی متناظر با گایدلاین‌های جهانی STROBE/CONSORT/ARRIVE/GCCP/WHO)  
+۱۴. **نوع مطالعه** (نظام سلامت، مشاهده‌ای، کارآزمایی بالینی، مدل حیوانی، سلولی برون‌تن یا تشخیصی)  
+۱۵. **جامعه مورد مطالعه** (جمعیت انسانی، بیماران، مدل حیوانی استاندارد یا رده سلولی احراز هویت شده)  
+۱۶. **محل انجام مطالعه** (مراکز تحقیقاتی، بیمارستان‌ها، دانشگاه یا فیلد پژوهش)  
+۱۷. **معیارهای ورود به مطالعه** (شرایط احراز نمونه‌ها، بیماران یا مدل‌ها)  
+۱۸. **معیارهای خروج از مطالعه** (شرایط حذف، انصراف یا افت شاخص‌ها)  
+۱۹. **ابزارهای گردآوری اطلاعات** (پرسشنامه‌های استاندارد، سامانه‌های اطلاعاتی HIS، کیت‌ها و تجهیزات آزمایشگاهی)  
+۲۰. **تعیین اعتبار ابزار گردآوری** (روایی صوری، محتوایی، سازه و کالیبراسیون تجهیزات)  
+۲۱. **تعیین ابزار گردآوری** (پایایی، آلفای کرونباخ، قابلیت تکرارپذیری، پایایی آزمون-بازآزمون یا تکرارهای زیستی)  
+۲۲. **حجم نمونه و روش محاسبه آن** (فرمول ریاضی استاندارد کوکران/چو و وانگ/معادله مید با توان آماری شفاف)  
+۲۳. **روش تجزیه و تحلیل داده‌ها** (مدل‌های رگرسیون، ANOVA فاکتوریل، تحلیل بقا، مدل‌های برهم‌کنش و نرم‌افزارها)  
+۲۴. **ملاحظات اخلاقی و کدهای اخلاق زیستی** (کد اخلاق، رضایت آگاهانه، محرمانگی داده‌ها و منشور ۳۱ گانه کشوری)  
+۲۵. **نحوه رعایت نکات امنیتی و حفاظت پروژه** (سطح ایمنی زیستی BSL، مدیریت پسماند یا امنیت داده‌ها AES-256)  
+۲۶. **مشکلات و محدودیت‌ها** (چالش‌های اجرایی، عوامل مخدوش‌گر، مرزهای تعمیم‌پذیری و راهکارهای مهار)  
+۲۷. **روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع‌آوری اطلاعات** (پروتکل گام‌به‌گام اجرایی و کنترل‌های روش)  
+۲۸. **منابعی که استفاده شد** (فهرست کامل منابع بر اساس سبک ونکوور و به ترتیب ظهور در متن)
 
 ---
 
 ### وضعیت آزمون‌های کنترل کیفیت نرم‌افزاری
 
-سیستم دارای ۲۴ سوئیت آزمون مستقل با **۴۷۷ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
+سیستم دارای ۲۷ سوئیت آزمون مستقل با **۵۴۱ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
 
 ```powershell
 uv run python tests/run_all_tests.py

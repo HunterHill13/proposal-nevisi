@@ -385,6 +385,20 @@ class EGMStudySectionCoordinator:
                 rationale_recommendation="جایگزینی ادعاهای کلی با گزاره‌های استنادی دقیق همراه با مقادیر کمی و ذکر نویسندگان."
             ))
 
+        # Audit Vector 3: Temporal Trajectory & Chronological Grounding (Graphify Pillar)
+        has_temporal_flow = bool(re.search(r'(سال\s+\d{4}|پیشینه|سیر\s+زمانی|مطالعات\s+اخیر|تحقیقات\s+گذشته|تکامل|افق|خط\s+زمانی|timeline)', sec3.lower()))
+        if has_temporal_flow:
+            strengths.append("تنظیم خط سیر زمانی شواهد بر پایه تکامل تاریخی و پیشینه علمی مقالات (Temporal Graphify)")
+        else:
+            findings.append(GoldfishFinding(
+                issue_name="MISSING_TEMPORAL_EVIDENCE_TRAJECTORY",
+                severity="Nit",
+                reviewer_lens="grant-evidence-entailment",
+                affected_scope="بخش ۳ (مرور منابع)",
+                discrepancy_description="مرور منابع فاقد سیر تکامل زمانی مشخص و تفکیک مقالات پایه‌ای از مطالعات معاصر است.",
+                rationale_recommendation="تنظیم مرور منابع در سه افق زمانی (مقالات پایه‌ای، مطالعات میانی و شواهد خط‌مقدم معاصر)."
+            ))
+
         score = 1.0
         score += sum(1.5 for f in findings if f.severity == "Blocker")
         score += sum(0.6 for f in findings if f.severity == "Major")

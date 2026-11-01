@@ -54,6 +54,7 @@ from generic_reference_auditor import GenericReferenceAuditor
 from citation_graph_engine import CitationGraphEngine
 from biomedical_concept_graph import BiomedicalConceptGraph
 from graph_entailment_gate import GraphEntailmentGate
+from temporal_knowledge_graph import TemporalKnowledgeGraph
 
 
 class MasterResearchPipeline:
@@ -753,6 +754,14 @@ class MasterResearchPipeline:
             dossier_text = {"DOSSIER_SUMMARY": dossier_md_content}
             entail_gate.audit_full_proposal(dossier_text, output_audit_path=audit_json)
             print(f"  ✅ Exported Claim Entailment Audit: {audit_json}")
+
+            # 5. Construct Directed Temporal Knowledge Graph & GraphRAG Synthesis
+            tkg = TemporalKnowledgeGraph(topic_query=self.topic)
+            tkg.build_from_studies(studies)
+            tkg_md, tkg_json = tkg.save_reports(self.output_dir)
+            self.temporal_kg = tkg
+            print(f"  ✅ Exported Temporal Knowledge Graph Report: {tkg_md}")
+            print(f"  ✅ Exported Temporal Knowledge Graph JSON: {tkg_json}")
         except Exception as e:
             print(f"  Notice: Citation graph construction encountered warning: {e}")
 
@@ -927,6 +936,25 @@ class MasterResearchPipeline:
             interventions=intv_names
         )
 
+        tkg_synth = None
+        if hasattr(self, "temporal_kg") and self.temporal_kg:
+            tkg_synth = self.temporal_kg.get_chronological_synthesis()
+        elif os.path.exists(os.path.join(self.output_dir, "TEMPORAL_KNOWLEDGE_GRAPH.json")):
+            try:
+                with open(os.path.join(self.output_dir, "TEMPORAL_KNOWLEDGE_GRAPH.json"), "r", encoding="utf-8") as f_tk:
+                    tkg_data = json.load(f_tk)
+                    tkg_synth = tkg_data.get("chronological_synthesis")
+            except Exception:
+                pass
+        elif hasattr(dossier, "literature_evidence") and dossier.literature_evidence:
+            try:
+                tkg = TemporalKnowledgeGraph(topic_query=self.topic)
+                tkg.build_from_studies(dossier.literature_evidence)
+                self.temporal_kg = tkg
+                tkg_synth = tkg.get_chronological_synthesis()
+            except Exception:
+                pass
+
         proposal_data = {
             "title_fa": self.topic,
             "research_title_fa": self.topic,
@@ -952,7 +980,8 @@ class MasterResearchPipeline:
             "max_iterations": self.max_iterations,
             "humanize": self.humanize,
             "burstiness_target": self.burstiness_target,
-            "format": "28"
+            "format": "28",
+            "temporal_knowledge_graph_synthesis": tkg_synth
         }
 
         # Merge any custom section overrides provided in --spec-file (PROPOSAL_SPEC.json)
@@ -1017,6 +1046,9 @@ class MasterResearchPipeline:
         egm_rep_md = os.path.join(self.output_dir, "EGM_GRANT_STUDY_SECTION_REPORT.md")
         if os.path.exists(egm_rep_md):
             print(f"▪ EGM Grant Study Section Report: {egm_rep_md}")
+        tkg_rep_md = os.path.join(self.output_dir, "TEMPORAL_KNOWLEDGE_GRAPH.md")
+        if os.path.exists(tkg_rep_md):
+            print(f"▪ Temporal Knowledge Graph Report: {tkg_rep_md}")
         if results.get('revision_audit_trail_md'):
             print(f"▪ Revision Audit Trail: {results.get('revision_audit_trail_md')}")
         print(f"▪ EQUATOR Compliance Audit: {results.get('equator_audit_md')}")
