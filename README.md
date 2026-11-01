@@ -1,16 +1,17 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, EGM Hybrid Goldfish Study Section & Autonomous Proposal Pipeline (v13.0)
-### موتور خودکار و جامع پژوهش زیست‌پزشکی، هیئت داوران گرنت گلدفیش EGM، معماری چندایجنت شناختی، گراف‌های استنادی و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۳.۰)
+### Universal Evidence-Driven Medical Research, EGM Hybrid Goldfish Study Section & Autonomous Proposal Pipeline (v13.2)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، هیئت داوران گرنت گلدفیش EGM، جستجوی دومسیره ضدسوگیری، تزاروس ۱۱۹ عنوانی MeSH، ممیزی تطبیقی QUADAS-2/STROBE و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۳.۲)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Unified Tests: 541/541 Passed](https://img.shields.io/badge/Unified%20Tests-541%2F541%20Passed-success.svg)](#unified-multi-tier-test-harness)
-[![Master Release Gate: 43/43 Passed](https://img.shields.io/badge/Master%20Gate-43%2F43%20Passed-success.svg)](#master-release-gate-43-criteria)
+[![Unified Tests: 552/552 Passed](https://img.shields.io/badge/Unified%20Tests-552%2F552%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Master Release Gate: Passed](https://img.shields.io/badge/Master%20Gate-100%25%20Verified-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
-[![Architecture: EGM Hybrid Swarm](https://img.shields.io/badge/Architecture-EGM%20Hybrid%20Swarm%20v13.0-blueviolet.svg)](#egm-powered-grant-study-section)
+[![Architecture: Zero--Bias%20%26%20EGM%20Swarm%20v13.2](https://img.shields.io/badge/Architecture-Zero--Bias%20%26%20EGM%20Swarm%20v13.2-blueviolet.svg)](#egm-powered-grant-study-section)
+[![MeSH Thesaurus: 119 Descriptors](https://img.shields.io/badge/MeSH%20Thesaurus-119%20Descriptors%20in%2019%20Fields-blue.svg)](#mesh-thesaurus-expansion)
 [![EGM Study Section: 6 Personas](https://img.shields.io/badge/EGM%20Study%20Section-6%20Goldfish%20Personas-purple.svg)](#egm-powered-grant-study-section)
-[![Unified Tests: 541/541 Passed](https://img.shields.io/badge/Unified%20Tests-541%2F541%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Zero Bias: Dual--Path Search](https://img.shields.io/badge/Zero%20Bias-Dual--Path%20Search%20%26%20Epistemic%20Caveat-darkgreen.svg)](#zero-bias-dual-path-search)
 [![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
 [![Anti-AI Humanizer: v11.5](https://img.shields.io/badge/Anti--AI%20Humanizer-DataInvariantGate%20%26%20Burstiness-darkgreen.svg)](#scientific-academic-humanizer)
 [![ARA Seal Level 2: Epistemic Rigor](https://img.shields.io/badge/Epistemic%20Rigor-6D%20Audited-green.svg)](#epistemic-rigor-auditor)
@@ -22,9 +23,9 @@
 ---
 
 <a name="english"></a>
-## English Documentation (v13.0)
+## English Documentation (v13.2)
 
-**Proposal-Nevisi (v13.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v13.0 integrates the Elephant-Goldfish Model (EGM) Grant Study Section, Multi-Domain Polymorphism across 6 Research Archetypes, the Temporal Knowledge Graph & GraphRAG Synthesis Engine (Pillar 9), Two-Stage Cognitive Multi-Agent Orchestration (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), and the Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$)**.
+**Proposal-Nevisi (v13.2)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v13.2 integrates Zero-Bias Dual-Path Literature Search (Efficacy + Safety/Contradiction/Null) with automated Epistemic Caveat Injection, an Expanded MeSH Thesaurus (119 descriptors across 19 clinical categories), Adaptive Risk of Bias Auditing (QUADAS-2 Domain 1 for diagnostic studies, STROBE representative sampling frame for observational studies, alongside Cochrane RoB-2 and SYRCLE), the Elephant-Goldfish Model (EGM) Grant Study Section, Multi-Domain Polymorphism across 6 Research Archetypes, True Citation Graph Edge Mapping & 1-Hop Snowballing, Two-Stage Cognitive Multi-Agent Orchestration (`Pre-Draft Specialist Subagents -> PROPOSAL_SPEC.json` + `Post-Draft Blind Adversarial Reviewer Loop`), and the Scientific Academic Humanizer & Anti-AI Detection Engine (DataInvariantGate fail-closed preservation with sentence burstiness $\sigma \ge 8.0$)**.
 
 It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
@@ -286,9 +287,11 @@ uv run python tests/run_all_tests.py
 ---
 
 <a name="فارسی"></a>
-## مستندات فارسی (نسخه ۱۳.۰)
+## مستندات فارسی (نسخه ۱۳.۲)
 
-پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۳.۰)** یک سیستم خودکار، پیشرفته، چندایجنت، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، بهداشت، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است. این سیستم کاملاً مستقل از موضوع (Domain-Agnostic) بوده و از ۶ کهن‌الگوی پژوهشی (نظام سلامت و اقتصاد سلامت، اپیدمیولوژی، کارآزمایی بالینی، مدل حیوانی، آزمایشگاهی برون‌تن و تشخیصی) پشتیبانی می‌کند.
+پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۳.۲)** یک سیستم خودکار، پیشرفته، چندایجنت، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، بهداشت، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است. این سیستم کاملاً مستقل از موضوع (Domain-Agnostic) بوده و از ۶ کهن‌الگوی پژوهشی (نظام سلامت و اقتصاد سلامت، اپیدمیولوژی، کارآزمایی بالینی، مدل حیوانی، آزمایشگاهی برون‌تن و تشخیصی) پشتیبانی می‌کند.
+
+نسخه ۱۳.۲ به **سیستم جستجوی دومسیره ضدسوگیری (Zero-Bias Dual-Path Search)** با تزریق هوشمند بند شفافیت معرفتی (`Epistemic Caveat Injection`)، **تزاروس گسترش‌یافته MeSH شامل ۱۱۹ توصیف‌گر استاندارد در ۱۹ شاخه تخصصی پزشکی**، **ممیزی انطباقی ریسک سوگیری بر پایه QUADAS-2 (سوگیری طیف) و STROBE (چارچوب نمونه‌گیری)**، **گراف استنادی متقابل چندجهته و اسنوبالینگ ۱-هاپ** و **سوئیت آزمون ۵۵۲ تستی (۱۰۰٪ قبولی)** مجهز شده است.
 
 نسخه ۱۱.۵.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور علمی ضدتشخیص هوش مصنوعی و انسانی‌ساز آکادمیک (ScientificAcademicHumanizer v11.5)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک، بیواستاتیک و تکیه‌کلام‌های هوش مصنوعی را به صورت قطعی ریشه‌کن کرده است.
 
