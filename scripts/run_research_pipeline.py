@@ -802,9 +802,11 @@ class MasterResearchPipeline:
         
         if self.study_family in ["health_systems", "health_policy", "health_economics"]:
             primary_sys = f"جامعه خانوارها و بیماران مبتلا به {cond_fa} مراجعه‌کننده به مراکز درمانی"
+        elif self.study_family in ["diagnostic", "biomarker"]:
+            primary_sys = f"بیماران مشکوک به {cond_fa} مراجعه‌کننده جهت ارزیابی تشخیصی"
         elif self.study_family in ["epidemiological", "observational"]:
             primary_sys = f"جامعه هدف بیماران و جمعیت مواجهه با {cond_fa}"
-        elif self.study_family in ["clinical_rct", "clinical"]:
+        elif self.study_family in ["clinical_rct", "clinical", "cohort"]:
             primary_sys = f"بیماران واجد معیارهای ورود به مطالعه مبتلا به {cond_fa}"
         elif cell_match:
             unique_cells = list(dict.fromkeys(cell_match))
@@ -845,6 +847,11 @@ class MasterResearchPipeline:
                     {"name": "هزینه‌های کمرشکن سلامت (CHE)", "chemical_or_biological_class": "شاخص اقتصاد سلامت", "role": "PRIMARY_OUTCOME_VARIABLE"},
                     {"name": "پرداخت مستقیم از جیب (OOP)", "chemical_or_biological_class": "شاخص بار مالی سلامت", "role": "SECONDARY_OUTCOME_VARIABLE"}
                 ]
+            elif self.study_family in ["diagnostic", "biomarker"]:
+                interventions = [
+                    {"name": terms[0] if terms else "آزمون شاخص تشخیصی (Index Test)", "chemical_or_biological_class": "کیت یا بیومارکر تشخیصی", "role": "INDEX_TEST"},
+                    {"name": terms[1] if len(terms) > 1 else "آزمون استاندارد مرجع (Reference Standard)", "chemical_or_biological_class": "استاندارد طلایی تشخیصی", "role": "REFERENCE_STANDARD"}
+                ]
             else:
                 interventions = [
                     {"name": terms[0] if terms else "مداخله اول", "chemical_or_biological_class": "ترکیب فعال زیستی", "role": "PRIMARY_AGENT"},
@@ -859,11 +866,30 @@ class MasterResearchPipeline:
                 {"name": "نسبت شانس تعدیل‌شده (AOR) عوامل اجتماعی-اقتصادی موثر بر مواجهه با CHE در رگرسیون لجستیک", "type": "REGRESSION_ODDS_RATIO", "measurement_unit": "AOR (95% CI)"},
                 {"name": "شاخص تمرکز کاکوانی (Kakwani Index) و منحنی لورنز جهت سنجش نابرابری در توزیع بار مالی سلامت", "type": "EQUITY_INDEX", "measurement_unit": "Concentration Index (-1 to +1)"}
             ]
+        elif self.study_family in ["diagnostic", "biomarker"]:
+            primary_outcomes = [
+                {"name": "حساسیت تشخیصی (Diagnostic Sensitivity) و ویژگی (Specificity) با فاصله اطمینان ۹۵٪", "type": "SENSITIVITY_SPECIFICITY", "measurement_unit": "درصد (%)"},
+                {"name": "ارزش اخباری مثبت (PPV) و ارزش اخباری منفی (NPV) و نسبت‌های احتمال (LR+/LR-)", "type": "PREDICTIVE_VALUES", "measurement_unit": "درصد (%) و نسبت"},
+                {"name": "سطح زیر منحنی مشخصه عملکرد تشخیصی (AUC-ROC) و خطای استاندارد", "type": "ROC_AUC", "measurement_unit": "AUC (0-1)"},
+                {"name": "نقطه برش بهینه (Optimal Cut-off Point) بر مبنای بیشینه شاخص یودن", "type": "YOUDEN_INDEX", "measurement_unit": "مقدار عددی بیومارکر"}
+            ]
         elif self.study_family in ["epidemiological", "observational"]:
             primary_outcomes = [
                 {"name": "میزان شیوع نقطه‌ای و دوره‌ای پیامد هدف", "type": "PREVALENCE", "measurement_unit": "درصد (%) و فاصله اطمینان ۹۵٪"},
                 {"name": "نسبت شانس تعدیل‌شده (Adjusted Odds Ratio; AOR)", "type": "ODDS_RATIO", "measurement_unit": "AOR (95% CI)"},
                 {"name": "شاخص‌های خطر نسبی (Relative Risk / Hazard Ratio)", "type": "RELATIVE_RISK", "measurement_unit": "RR / HR (95% CI)"}
+            ]
+        elif self.study_family in ["clinical_rct", "clinical", "cohort"]:
+            primary_outcomes = [
+                {"name": "بهبود معنادار بالینی در پیامد اولیه بیماری", "type": "PRIMARY_CLINICAL_ENDPOINT", "measurement_unit": "نمره استاندارد بالینی"},
+                {"name": "شیوع و شدت رخدادهای نامطلوب درمانی (Adverse Events)", "type": "SAFETY_OUTCOME", "measurement_unit": "فراوانی و درصد (%)"},
+                {"name": "پایبندی به درمان و نرخ بقای بدون پیشرفت بیماری", "type": "SURVIVAL_OR_ADHERENCE", "measurement_unit": "ماه / درصد (%)"}
+            ]
+        elif self.study_family in ["in_vivo", "animal"]:
+            primary_outcomes = [
+                {"name": "درصد مهار رشد ضایعه یا تغییرات حجم تومور در مدل حیوانی", "type": "IN_VIVO_TUMOR_INHIBITION", "measurement_unit": "درصد مهار (%) و میلی‌متر مکعب"},
+                {"name": "تغییرات وزن بدن، رفتار و شاخص‌های سلامت عمومی حیوان", "type": "ANIMAL_WELFARE", "measurement_unit": "گرم (g) و نمره بالینی"},
+                {"name": "سطح بیومارکرهای سرمی و آسیب‌شناسی بافتی ارگان‌های هدف (H&E)", "type": "HISTOPATHOLOGY", "measurement_unit": "درجه پاتولوژیک و نانوگرم بر میلی‌لیتر"}
             ]
         else:
             primary_outcomes = [
@@ -876,6 +902,9 @@ class MasterResearchPipeline:
         if self.study_family in ["health_systems", "health_policy", "health_economics"]:
             framework_code = "HEALTH_SYSTEMS_AND_HEALTH_POLICY"
             domain_name = "health_economics_and_policy"
+        elif self.study_family in ["diagnostic", "biomarker"]:
+            framework_code = "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"
+            domain_name = "diagnostic_medicine"
         elif self.study_family in ["epidemiological", "observational"]:
             framework_code = "EPIDEMIOLOGICAL_OBSERVATIONAL"
             domain_name = "epidemiology"
@@ -932,8 +961,9 @@ class MasterResearchPipeline:
         intv_names = [i.get("name", "مداخله") for i in rpm.get("interventions_or_exposures", []) if isinstance(i, dict)]
         cohesive_protocol = MethodologyResearchSubagent.derive_cohesive_protocol(
             topic=self.topic,
-            target_model=rpm.get("population_or_model", {}).get("primary_system", "رده سلولی استاندارد"),
-            interventions=intv_names
+            target_model=rpm.get("population_or_model", {}).get("primary_system", "مدل هدف پژوهش"),
+            interventions=intv_names,
+            context={"study_family": self.study_family, "framework": rpm.get("framework")}
         )
 
         tkg_synth = None
@@ -969,10 +999,25 @@ class MasterResearchPipeline:
             "primary_outcomes": rpm.get("primary_outcomes"),
             "research_problem_model": rpm,
             "cohesive_protocol": cohesive_protocol.to_dict(),
-            "study_type": f"تجربی مداخله‌ای ({dossier.methodological_invariants.get('study_family')})",
+            "study_type": (
+                cohesive_protocol.formatted_sections_fa.get(14) or
+                ("مطالعه کاربردی-مقطعی اقتصاد سلامت" if self.study_family in ["health_systems", "health_policy", "health_economics"]
+                 else "مطالعه ارزیابی دقت تشخیصی و بیومارکر" if self.study_family in ["diagnostic", "biomarker"]
+                 else "مطالعه مشاهده‌ای تحلیلی مقطعی" if self.study_family in ["epidemiological", "observational"]
+                 else "کارآزمایی بالینی تصادفی‌سازی‌شده کنترل‌دار" if self.study_family in ["clinical_rct", "clinical", "cohort"]
+                 else "مطالعه تجربی پیش‌بالینی درون‌تنی حیوانی" if self.study_family in ["in_vivo", "animal"]
+                 else f"تجربی مداخله‌ای ({dossier.methodological_invariants.get('study_family', 'in_vitro')})")
+            ),
             "primary_endpoint": dossier.methodological_invariants.get("primary_endpoint"),
             "sample_size_justification": f"محاسبه بر مبنای {dossier.methodological_invariants.get('sample_size_formula')}",
-            "target_population": rpm.get("population_or_model", {}).get("primary_system", "رده‌های سلولی استاندارد احراز هویت شده"),
+            "target_population": rpm.get("population_or_model", {}).get("primary_system") or (
+                "جامعه خانوارها و بیماران مراجعه‌کننده به مراکز درمانی" if self.study_family in ["health_systems", "health_policy", "health_economics"]
+                else "بیماران مشکوک مراجعه‌کننده جهت ارزیابی تشخیصی" if self.study_family in ["diagnostic", "biomarker"]
+                else "جامعه هدف بیماران و جمعیت عمومی در معرض خطر" if self.study_family in ["epidemiological", "observational"]
+                else "بیماران واجد معیارهای ورود به کارآزمایی بالینی" if self.study_family in ["clinical_rct", "clinical", "cohort"]
+                else "حیوانات آزمایشگاهی استاندارد" if self.study_family in ["in_vivo", "animal"]
+                else "رده‌های سلولی استاندارد احراز هویت شده"
+            ),
             "statistical_analysis_plan": dossier.methodological_invariants.get("statistical_test"),
             "negative_search_strategy": dossier.negative_search_strategy,
             "studies": dossier.literature_evidence,
@@ -1064,7 +1109,7 @@ def main():
     parser = argparse.ArgumentParser(description="Proposal-Nevisi Autonomous Two-Loop Pipeline")
     parser.add_argument("--topic", type=str, required=True, help="Biomedical research topic in Persian or English")
     parser.add_argument("--keywords", type=str, default="", help="Comma-separated English search terms or MeSH headings (optional)")
-    parser.add_argument("--study-family", type=str, default="in_vitro", help="Study design family (in_vitro, in_vivo, clinical_rct, cohort)")
+    parser.add_argument("--study-family", type=str, default="in_vitro", help="Study design family (in_vitro, in_vivo, clinical_rct, cohort, epidemiological, health_systems, diagnostic)")
     parser.add_argument("--output-dir", type=str, default="./output", help="Directory where artifacts are exported")
     parser.add_argument("--mode", type=str, default="auto", help="Execution mode (auto, live, offline)")
     parser.add_argument("--min-refs", type=int, default=5, help="Minimum verified literature references")

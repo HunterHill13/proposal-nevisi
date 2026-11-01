@@ -275,5 +275,124 @@ class TestV121MultiDomainPolymorphism(unittest.TestCase):
             self.assertNotIn("سنجش زیست‌پذیری با آزمون متابولیک (MTT)", md_text)
 
 
+    def test_09_diagnostic_accuracy_cohesive_protocol(self):
+        """Verifies MethodologyResearchSubagent derives a pure diagnostic accuracy protocol."""
+        res = MethodologyResearchSubagent.derive_cohesive_protocol(
+            topic="ارزیابی دقت تشخیصی بیومارکر سرمی الف در مقایسه با استاندارد طلایی پاتولوژی در بیماران مبتلا به سرطان معده",
+            target_model="بیماران مشکوک به سرطان معده",
+            interventions=["بیومارکر الف", "آزمون پاتولوژی"],
+            context={"study_family": "diagnostic"}
+        )
+
+        self.assertEqual(res.archetype, "DIAGNOSTIC_ACCURACY_AND_BIOMARKER")
+        self.assertEqual(res.coherence_score, 1.0)
+
+        sec22 = res.formatted_sections_fa[22]
+        self.assertIn("Buderer", res.sample_size_biostatistics["sample_size_formula_name"])
+        self.assertIn("بودرر", sec22)
+        self.assertTrue("725" in sec22 or "۷۲۵" in sec22)
+        self.assertNotIn("Mead's Resource Equation", sec22)
+
+        sec23 = res.formatted_sections_fa[23]
+        self.assertIn("منحنی مشخصه عملکرد تشخیصی (ROC Curve)", sec23)
+        self.assertIn("شاخص یودن", sec23)
+        self.assertIn("حساسیت", sec23)
+        self.assertIn("ویژگی", sec23)
+        self.assertNotIn("Two-Way Factorial ANOVA", sec23)
+        self.assertNotIn("CompuSyn", sec23)
+
+        sec27 = res.formatted_sections_fa[27]
+        self.assertIn("بیانیه STARD 2015", sec27)
+        self.assertNotIn("MTT", sec27)
+        self.assertNotIn("کاسپاز", sec27)
+
+    def test_10_clinical_trial_cohesive_protocol(self):
+        """Verifies MethodologyResearchSubagent derives a pure CONSORT clinical trial protocol."""
+        res = MethodologyResearchSubagent.derive_cohesive_protocol(
+            topic="کارآزمایی بالینی تصادفی‌سازی‌شده دوسوکور مقایسه رژیم مداخله‌ای با دارونما",
+            target_model="بیماران مبتلا به بیماری هدف",
+            interventions=["داروی مداخله‌ای", "دارونما"],
+            context={"study_family": "clinical"}
+        )
+
+        self.assertEqual(res.archetype, "CLINICAL_TRIAL_OR_COHORT")
+        sec22 = res.formatted_sections_fa[22]
+        self.assertIn("چو و وانگ", sec22)
+        self.assertNotIn("Mead's Resource Equation", sec22)
+
+        sec23 = res.formatted_sections_fa[23]
+        self.assertIn("Intention-to-Treat", sec23)
+        self.assertIn("ANCOVA", sec23)
+
+        sec27 = res.formatted_sections_fa[27]
+        self.assertIn("CONSORT", sec27)
+        self.assertIn("IRCT", sec27)
+        self.assertNotIn("MTT", sec27)
+        self.assertNotIn("CompuSyn", sec27)
+
+    def test_11_in_vivo_animal_model_cohesive_protocol(self):
+        """Verifies MethodologyResearchSubagent derives a pure ARRIVE 2.0 animal protocol."""
+        res = MethodologyResearchSubagent.derive_cohesive_protocol(
+            topic="ارزیابی اثر مداخله الف بر مدل موش بیماری تجربی",
+            target_model="موش‌های آزمایشگاهی Balb/c",
+            interventions=["مداخله الف", "حلال نرمال سالین"],
+            context={"study_family": "in_vivo"}
+        )
+
+        self.assertEqual(res.archetype, "IN_VIVO_ANIMAL_MODEL")
+        sec22 = res.formatted_sections_fa[22]
+        self.assertIn("فستینگ", sec22)
+        self.assertIn("E = N - B - T", sec22)
+
+        sec23 = res.formatted_sections_fa[23]
+        self.assertIn("Repeated Measures Two-Way ANOVA", sec23)
+
+        sec27 = res.formatted_sections_fa[27]
+        self.assertIn("اتانازی اخلاقی", sec27)
+        self.assertIn("خانه حیوانات", sec27)
+        self.assertNotIn("MTT", sec27)
+        self.assertNotIn("CompuSyn", sec27)
+
+    def test_12_zero_leakage_across_all_non_invitro_markdown(self):
+        """Verifies complete eradication of in vitro entity leakage across all 5 non-in-vitro archetypes."""
+        non_invitro_families = [
+            ("health_systems", "HEALTH_SYSTEMS_AND_HEALTH_POLICY"),
+            ("diagnostic", "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"),
+            ("epidemiological", "EPIDEMIOLOGICAL_OBSERVATIONAL"),
+            ("clinical", "CLINICAL_TRIAL_OR_COHORT"),
+            ("in_vivo", "IN_VIVO_ANIMAL_MODEL")
+        ]
+
+        forbidden_leakage_terms = ["MTT", "کاسپاز", "CompuSyn", "Chou-Talalay", "H1299", "p53-null"]
+
+        for fam, fw in non_invitro_families:
+            cohesive_proto = MethodologyResearchSubagent.derive_cohesive_protocol(
+                topic=f"پژوهش آزمایشی در حوزه {fam}",
+                target_model="جامعه هدف مطالعه",
+                context={"study_family": fam, "framework": fw}
+            )
+
+            data = {
+                "title_fa": f"طرح پژوهشی جامع در زمینه {fam}",
+                "framework": fw,
+                "domain": "general_medicine",
+                "cohesive_protocol": cohesive_proto.to_dict(),
+                "target_condition": {"name_fa": "بیماری هدف", "name_en": "Target Disease"},
+                "population_or_model": {"primary_system": "جامعه هدف آزمایشی"},
+                "interventions": [{"name": "مداخله الف"}, {"name": "مداخله ب"}],
+                "primary_outcomes": [{"name": "پیامد اول"}, {"name": "پیامد دوم"}],
+                "studies": []
+            }
+
+            md_content = CompliantProposalGenerator.assemble_pajooheshyar_28(data)
+
+            for term in forbidden_leakage_terms:
+                self.assertNotIn(
+                    term,
+                    md_content,
+                    f"Entity leakage detected: '{term}' found in proposal generated for {fam} ({fw})!"
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

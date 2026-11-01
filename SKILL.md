@@ -2,16 +2,16 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.0 EGM-Powered Academic Grant Study Section & Cognitive Swarm Architecture). Operates across diverse biomedical domains
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.1 EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 540-assertion test suite (100% PASS).
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 545-assertion test suite (100% PASS).
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.0 - نسخه مجهز به هیئت داوران گرنت گلدفیش EGM، مصاحبه سقراطی پیش‌نویس، موتور گراف استنادی و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.1 - نسخه مجهز به پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، مصاحبه سقراطی پیش‌نویس، موتور گراف استنادی و شبکه مفاهیم زیست‌پزشکی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -309,7 +309,7 @@ python scripts/master_release_gate.py
 14. **سوئیت هاردنینگ علمی و اعتبارسنجی ۲۸ بخشی v9.1 (`test_v91_hardening.py`):** اعتبارسنجی ساختار ۲۸ بخشی، گیت جامعیت، عدم نشت لاتک، محافظت از پرانتزهای انگلیسی و ره‌گیری ونکوور (۲۰ تست).
 15. **سوئیت بازبینی بسته و اصلاح پیوسته (`test_iterative_remediation_engine.py`):** ممیزی راندهای اصلاح جراحی، همگرایی نمره داوری و فیوز Fail-Closed (۳ تست).
 
-16. **سوئیت پلی‌مورفیسم چنددامنه‌ای نظام سلامت و بالینی v12.1 (`test_v121_multidomain_polymorphism.py`):** اعتبارسنجی مطالعات CHE/OOP، پیشگیری از مثبت کاذب چو-تالالای روی CVI و انطباق کامل ۶ کهن‌الگو (۸ تست).
+16. **سوئیت پلی‌مورفیسم چنددامنه‌ای نظام سلامت و بالینی v12.1 (`test_v121_multidomain_polymorphism.py`):** اعتبارسنجی مطالعات CHE/OOP، پیشگیری از مثبت کاذب چو-تالالای روی CVI و انطباق کامل ۶ کهن‌الگو و ریشه‌کنی نشت موجودیت‌های آزمایشگاهی به مطالعات بالینی و تشخیصی (۱۲ تست).
 17. **سوئیت هیئت داوران گرنت EGM v13.0 (`test_v130_egm_study_section.py`):** اعتبارسنجی ۶ لنز گلدفیش، سنتز SRO، حلقه اصلاح ۱۰ دور و تولید پرونده جامع داوری (۱۰ تست).
 
-**مجموع آزمون‌ها:** ۵۴۱ آزمون مستقل با قبولی ۱۰۰٪ (541 / 541 PASS) (477 / 477 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در تمام اسکریپت‌ها (42 / 42 PASS) و پاس کامل ۴۳ معیار Master Release Gate.
+**مجموع آزمون‌ها:** ۵۴۵ آزمون مستقل با قبولی ۱۰۰٪ (545 / 545 PASS) (477 / 477 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در تمام اسکریپت‌ها (42 / 42 PASS) و پاس کامل ۴۳ معیار Master Release Gate.
