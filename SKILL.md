@@ -9,7 +9,7 @@ description: >
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
   PreEmptiveRiskOfBiasMitigator (QUADAS-2 spectrum bias, STROBE sampling frame, Cochrane RoB-2, SYRCLE), MeshQueryExpander (119 descriptors across 19 clinical categories),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 552-assertion test suite (100% PASS).
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 552-assertion test suite (100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
 ---
 
 # Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.2 - نسخه مجهز به جستجوی دومسیره ضدسوگیری، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
