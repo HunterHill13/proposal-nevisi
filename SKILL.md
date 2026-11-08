@@ -2,7 +2,7 @@
 name: proposal-nevisi
 description: >
   Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v13.2 Zero-Bias Dual-Path Search, 119-Descriptor MeSH Thesaurus, Adaptive QUADAS-2/STROBE RoB Auditing, EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
+  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v14.0 Cognitive Study Section Swarm, 119-Descriptor MeSH Thesaurus, Adaptive QUADAS-2/STROBE RoB Auditing, EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
   (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, pulmonology, ophthalmology, dermatology, ob/gyn, orthopedics, toxicology, health systems, basic experimental science).
   Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
   Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
@@ -12,7 +12,7 @@ description: >
   Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 552-assertion test suite (100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v13.2 - نسخه مجهز به جستجوی دومسیره ضدسوگیری، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v14.0 - نسخه مجهز به هیئت داوران گرنت ۶ پرسونایی شناختی با کانتکست صفر و حلقه بسته تودرتو، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -165,31 +165,66 @@ description: >
 > uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 10 --output-dir "<پوشه خروجی>"
 > ```
 >
-> ### مرحله دوم (Stage 2: Post-Draft Closed-Loop Verification with 2 Independent Subagents — Up to 10 Rounds):
-> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است ۲ ساب‌ایجنت ممیز پس از نگارش** (`Citation & Claim-Span Verifier Subagent` به سبک `CitationAgent` کلاد و `Post-Draft Blind Adversarial Grant Reviewer Subagent`) را روی فایل واقعی `proposal.md` فراخوانی کند:
+> ### مرحله دوم: هیئت داوران گرنت ۶ پرسونایی شناختی (Stage 2: 6-Persona Cognitive Study Section — Up to 10 Rounds):
+> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است هیئت داوران گرنت متشکل از ۶ ساب‌ایجنت واقعی هوش مصنوعی با کانتکست کاملاً صفر (Zero-Context)** را فراخوانی کند:
 >
 > ```json
 > invoke_subagent({
 >   "Subagents": [
 >     {
->       "Role": "Citation & Claim-Span Verifier Subagent",
->       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت راستی‌آزمای استنادات و گزاره‌های کمی (Citation & Claim-Span Verifier به سبک Claude CitationAgent و PaperQA2) هستید. فایل `<پوشه خروجی>/proposal.md` و `<پوشه خروجی>/PROPOSAL_RESEARCH_DOSSIER.json` را بخوانید و تک‌تک استنادات `[n]` در بخش‌های ۲ و ۳ را با چکیده و متادیتای واقعی منبع شماره `n` در بخش ۲۸ تطبیق دهید: ۱. آیا نام نویسنده، سال انتشار، مدل زیستی و اعداد گزارش‌شده (IC50، دوز، درصد مهار) در متن فارسی دقیقاً در چکیده مقاله `[n]` وجود دارد؟ ۲. آیا مطالعه‌ای از بافت دیگر به اشتباه به عنوان اثبات مستقیم روی رده سلولی هدف معرفی شده است؟ هرگونه عدم تطابق (Citation Drift یا عدد فاقد پشتوانه) را با شماره دقیق بخش و شماره رفرنس گزارش کنید."
+>       "Role": "Grant Significance & Clinical Burden Reviewer",
+>       "TypeName": "grant-significance-innovation",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: ارزیابی بار بیماری (GLOBOCAN/WHO)، تمایز از پژوهش‌های گذشته و تبیین شفاف شکاف دانش بر پایه رول تخصصی."
 >     },
 >     {
->       "Role": "Post-Draft Blind Adversarial Grant Reviewer Subagent",
->       "TypeName": "research",
->       "Prompt": "شما داور ارشد، مستقل و سخت‌گیر گرنت‌های علمی (Blind External AI Critic) هستید. فایل واقعی تولیدشده در مسیر `<پوشه خروجی>/proposal.md` را خط‌به‌خط در تمامی ۲۸ بخش ممیزی کنید: ۱. آیا آمار اپیدمیولوژیک و بار بیماری در بخش ۲ مستند، دقیق و متناسب با موضوع طرح (GLOBOCAN برای سرطان، WHO GBD برای بیماری‌های مزمن، یا آمارهای سلامت برای نظام سلامت) است و نتیجه جستجوی منفی ذکر شده است؟ ۲. آیا در بخش ۳ برای هر مقاله پاراگراف تحلیلی اختصاصی با شاخص‌های کمی واقعی و سنتز زمانی نوشته شده است؟ ۳. آیا جدول متغیرهای بخش ۱۱ تمامی اهداف اختصاصی بخش ۶ و متغیرهای مخدوش‌گر را پوشش می‌دهد؟ ۴. آیا محاسبه حجم نمونه در بخش ۲۲ فرمول ریاضی شفاف داشته و با کهن‌الگوی طرح (کوکران و DEFF برای نظام سلامت/اپیدمیولوژی، چو و وانگ برای کارآزمایی بالینی، یا معادله مید E=N-B-T برای تجربی) و تعداد گروه‌های بخش ۲۷ همخوانی کامل دارد؟ ۵. آیا روش اجرا و ابزارهای بخش‌های ۱۳، ۱۹ و ۲۷ با راهنماهای بین‌المللی متناظر با کهن‌الگو (STROBE, CONSORT, ARRIVE, GCCP, STARD, WHO) مطابقت دارند؟ در صورت مشاهده هرگونه ایراد، لیست دقیق اصلاحات لازم را برگردانید."
+>       "Role": "Hostile Methodologist & Computational Biostatistician",
+>       "TypeName": "grant-methodology-biostatistics",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید. با اجرای دستور 'uv run python scripts/verify_biostatistics.py --proposal <پوشه خروجی>/proposal.md --study-family <archetype> --json' فرمول حجم نمونه و توان آزمون را راستی‌آزمایی نمایید."
+>     },
+>     {
+>       "Role": "Pedantic Literature & Citation Auditor",
+>       "TypeName": "grant-evidence-entailment",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: تطابق خط‌به‌خط ادعاهای بخش ۲ و ۳ با چکیده مقالات بخش ۲۸ و ممانعت قطعی از لغزش استناد."
+>     },
+>     {
+>       "Role": "Feasibility, Budget & Infrastructure Lead",
+>       "TypeName": "grant-feasibility-logistics",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: امکان‌پذیری پروتکل بخش ۲۷، جدول گانت بخش ۲۴ و امکانات مراکز دانشگاهی ایران در بخش ۱۹."
+>     },
+>     {
+>       "Role": "Bioethics & Lay Advocate Reviewer",
+>       "TypeName": "grant-ethics-lay-advocate",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: کدهای ۲۶ گانه اخلاقی پژوهشیار در بخش ۱۶، اصول ARRIVE/GCP و وضوح تعاریف بخش ۵."
 >     }
 >   ]
 > })
 > ```
 >
-> #### حلقه بسته اصلاح و بازبینی تا سقف ۱۰ راند (`Closed-Loop Critic-Refine up to 10 Iterations`):
-> چنانچه هر یک از دو ساب‌ایجنت مرحله دوم یا موتور نمادین `IterativeRemediationEngine` هرگونه ایراد علمی، استنادی، بیولوژیک یا آماری در `proposal.md` کشف کند، سیستم بر پایه **معماری هیبریدی هدفمند (Hybrid Tiered Architecture)** عمل می‌کند:
-> ۱. **موتور نمادین پایتون (`IterativeRemediationEngine`):** ممیزی‌های ریاضی، کنترل‌های منفی، فرمول حجم نمونه ($E=19, B=2, N=30$)، جدول متغیرهای بخش ۱۱ و استانداردهای ۲۸ گانه را با دقت ۱۰۰٪ پچ و ترمیم می‌کند.
-> ۲. **هدایت هوشمند ساب‌ایجنت‌های زبانی:** ایجنت اصلی صرفاً برای بازنویسی عمیق پاراگراف‌های تحلیلی (بخش‌های ۲ بیان مسأله، ۳ پیشینه پژوهش، و ۶ اهداف اختصاصی) ساب‌ایجنت‌های زبانی را فراخوانی می‌کند تا غنای متنی ارتقا یابد و از اتلاف توکن یا انحراف سایر بخش‌ها ممانعت شود.
-> ۳. **معیار توقف در رده استثنایی NIH:** شرط اتمام حلقه و صدور تصویب گرنت، احراز نمره داوری $\le 1.5$ (Exceptional Tier) و دقیقاً صفر خطای بحرانی (`0 Critical Flaws`) و صفر لغزش استنادی (`0 Citation Drift`) است.
+> سپس دبیر علمی هیئت داوران (`grant-study-section-sro`) با دریافت کارنامه‌های داوری، نمرات را در مقیاس NIH (1.0 تا 9.0) تجمیع و کارنامه نهایی را صادر می‌کند:
+> ```json
+> invoke_subagent({
+>   "Role": "Scientific Review Officer & Swarm Synthesizer",
+>   "TypeName": "grant-study-section-sro",
+>   "Prompt": "گزارش ۵ داور تخصصی را تجمیع کرده، نمره میانگین NIH را محاسبه و فایل MOCK_GRANT_REVIEW_PANEL_REPORT را صادر کنید."
+> })
+> ```
+>
+> #### سیاست داوری کامل ۶ نفره در تمامی دورها (Full Panel Re-Review up to 10 Rounds):
+> در صورت وجود هرگونه ایراد مسدودکننده (`Blocker`) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی `proposal.md` اعمال کرده و **تمامی ۶ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
+>
+> ---
+>
+> ### مرحله سوم: ممیزی ایزوله پایانی و حلقه بازگشت به هیئت داوران (Stage 3: Post-Draft Isolated Audit & Return Loop — Up to 5 Returns):
+> پس از تصویب هیئت داوران، ۲ ساب‌ایجنت ممیز ایزوله جهت صحه‌گذاری نهایی فراخوانی می‌شوند:
+> 1. `citation-claim-verifier` (راستی‌آزمایی خط‌به‌خط ارجاعات با مقالات پاب‌مد)
+> 2. `professor-namoosi-auditor` (ممیزی سخت‌گیرانه ۶ خط قرمز قطعی HARD-01 تا HARD-06).
+>
+> #### پروتکل بازگشت به هیئت داوران (The Return Loop):
+> ۱. چنانچه هر یک از دو داور ایزوله پایانی ایرادی کشف کنند، ایجنت اصلی متن را اصلاح می‌کند.
+> ۲. پروپوزال اصلاح‌شده **مجدداً وارد مرحله دوم (هیئت داوران ۶ نفره)** می‌شود و هیئت داوران تا ۱۰ دور مستقل فرصت داوری مجدد سند را خواهد داشت.
+> ۳. سقف مجاز این چرخه رفت‌وبرگشت بین مرحله ۳ و مرحله ۲ دقیقاً **۵ بار** است.
+> ۴. **قاعده رفع تعارض:** در صورت تضاد نظرات، خطوط قرمز ۶ گانه داور ایزوله (`HARD-01` تا `HARD-06`) اولویت مطلق و قطعی دارند.
+> ۵. **پروتکل تحویل بهینه (Best-Effort Delivery):** اگر پس از پایان سقف دورها به نمره زیر ۱.۵ نرسد، بهترین نسخه با الصاق کارنامه داوری و برچسب اخطار صادر می‌گردد.
 >
 > > [!CAUTION]
 > > **الزام قطعی ارسال کلیدواژه‌های انگلیسی در پرچم `--keywords`:**  
