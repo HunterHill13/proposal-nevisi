@@ -40,7 +40,7 @@ class BiostatisticalValidator:
     @classmethod
     def parse_section_22(cls, markdown_text: str) -> str:
         """Extracts Section 22 (Sample Size) from full proposal markdown."""
-        pattern = r'(?:^|\n)#{1,3}\s*(?:۲۲|22)[\.\-\s]+([^\n]+)\n(.*?)(?=(?:\n#{1,3}\s*[۰-۹0-9]+[\.\-\s]+)|$)'
+        pattern = r'(?:^|\n)#{1,2}\s*(?:۲۲|22)[\.\-\s]+([^\n]+)\n(.*?)(?=(?:\n##\s*[۰-۹0-9]+[\.\-\s]+)|$)'
         match = re.search(pattern, markdown_text, re.DOTALL)
         if match:
             return match.group(2).strip()
@@ -178,10 +178,39 @@ class BiostatisticalValidator:
                 strengths.append("فرمول محاسباتی بودرر جهت ارزیابی ابزار تشخیصی شناسایی شد.")
 
         # ---------------------------------------------------------
+        # Archetype 6: Usability & Service Design / Digital Health
+        # ---------------------------------------------------------
+        elif any(term in family_clean for term in ["usability", "service_design", "digital_health", "کاربردپذیری"]):
+            metrics["formula_type"] = "Nielsen & Landauer Defect Discovery + SUS Continuous Mean Estimation"
+            has_nielsen = bool(re.search(r'(nielsen|landauer|نلسون|لاندور|1\s*-\s*\(1\s*-\s*l\)\^?n)', sec_lower))
+            has_sus = bool(re.search(r'(sus|کاربردپذیری|z\^?2|1\.96)', sec_lower))
+            metrics["formula_found"] = has_nielsen or has_sus
+            metrics["calculated_benchmark_n"] = 40
+            if not (has_nielsen or has_sus):
+                issues.append("MISSING_USABILITY_SAMPLE_SIZE_FORMULA: فرمول مدل نلسون و لاندور یا برآورد میانگین نمره SUS یافت نشد.")
+            else:
+                strengths.append("فرمول‌های ریاضی نلسون و لاندور و تخمین حجم نمونه مقیاس SUS احراز شد.")
+
+            claimed_matches = re.findall(
+                r'(?:حجم\s+(?:نهایی\s+|کل\s+|قطعی\s+)?نمونه|n_final\s*=|n\s*=|تعداد\s+(?:کل\s+|نهایی\s+)?نمونه‌ها?|کاربر)\s*(?:برابر\s+|[:=]\s*)?([۰-۹0-9]+)',
+                section22_text
+            )
+            if claimed_matches:
+                fa_to_en = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
+                claimed_n = int(claimed_matches[0].translate(fa_to_en))
+                metrics["claimed_n"] = claimed_n
+                if claimed_n < 30:
+                    issues.append(f"INSUFFICIENT_SAMPLE_SIZE: حجم نمونه اعلام‌شده ({claimed_n}) برای مطالعه ارزیابی کاربردپذیری کمتر از حداقل ۳۰ کاربر است.")
+                else:
+                    strengths.append(f"حجم نمونه اعلام‌شده ({claimed_n} کاربر) با اصول متدولوژیک سلامت دیجیتال کاملاً همخوانی دارد.")
+            else:
+                metrics["claimed_n"] = 40
+
+        # ---------------------------------------------------------
         # General Checks: Alpha, Power, Drop-out
         # ---------------------------------------------------------
-        has_alpha = bool(re.search(r'(آلفا|alpha|0\.05|خطای\s+نوع\s+اول|سطح\s+معناداری)', sec_lower))
-        has_power = bool(re.search(r'(توان|power|0\.80|0\.8|0\.90|0\.9|80%|90%|بتا|beta)', sec_lower))
+        has_alpha = bool(re.search(r'(آلفا|alpha|0\.05|۰\.۰۵|خطای\s+نوع\s+اول|سطح\s+معناداری|سطح\s+اطمینان\s*۹۵|اطمینان\s*۹۵|z\s*=\s*۱\.۹۶)', sec_lower))
+        has_power = bool(re.search(r'(توان|power|0\.80|0\.8|0\.90|0\.9|80%|90%|۸۰|۹۰|بتا|beta)', sec_lower))
         metrics["alpha_specified"] = has_alpha
         metrics["power_specified"] = has_power
 
