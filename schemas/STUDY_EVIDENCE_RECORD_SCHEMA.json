@@ -17,14 +17,33 @@
     "claims_supported"
   ],
   "properties": {
-    "study_id": { "type": "string" },
-    "doi": { "type": "string" },
-    "pmid": { "type": "string" },
-    "title": { "type": "string" },
-    "authors": { "type": "array", "items": { "type": "string" } },
-    "year": { "type": "integer" },
-    "journal": { "type": "string" },
-    "study_family_id": { "type": "string" },
+    "study_id": {
+      "type": "string"
+    },
+    "doi": {
+      "type": "string"
+    },
+    "pmid": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "authors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "year": {
+      "type": "integer"
+    },
+    "journal": {
+      "type": "string"
+    },
+    "study_family_id": {
+      "type": "string"
+    },
     "study_design": {
       "type": "string",
       "enum": [
@@ -41,69 +60,151 @@
     "design_specific_attributes": {
       "type": "object",
       "properties": {
-        "model_system": { "type": "string" },
-        "organism_or_species": { "type": "string" },
-        "sample_size_or_replicates": { "type": "string" },
-        "intervention_details": { "type": "object" },
-        "comparator_details": { "type": "object" },
-        "endpoint_assays": { "type": "array", "items": { "type": "string" } }
-      }
+        "model_system": {
+          "type": "string"
+        },
+        "organism_or_species": {
+          "type": "string"
+        },
+        "sample_size_or_replicates": {
+          "type": "string"
+        },
+        "intervention_details": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "comparator_details": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "endpoint_assays": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "risk_of_bias": {
       "type": "object",
-      "required": ["tool_used", "overall_rob"],
+      "required": [
+        "tool_used",
+        "overall_rob"
+      ],
       "properties": {
-        "tool_used": { "type": "string" },
-        "overall_rob": { "type": "string", "enum": ["LOW_RISK", "SOME_CONCERNS", "HIGH_RISK", "CRITICAL_RISK", "NOT_REPORTED"] },
-        "domain_judgments": { "type": "object" }
-      }
+        "tool_used": {
+          "type": "string"
+        },
+        "overall_rob": {
+          "type": "string",
+          "enum": [
+            "LOW_RISK",
+            "SOME_CONCERNS",
+            "HIGH_RISK",
+            "CRITICAL_RISK",
+            "NOT_REPORTED"
+          ]
+        },
+        "domain_judgments": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     },
     "quantitative_facts": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["parameter", "value", "unit"],
+        "required": [
+          "parameter",
+          "value",
+          "unit"
+        ],
         "properties": {
-          "parameter": { "type": "string" },
-          "value": { "type": ["number", "string"] },
-          "unit": { "type": "string" },
-          "confidence_interval": { "type": "string" },
-          "p_value": { "type": "string" },
-          "source_passage": { "type": "string" }
-        }
+          "parameter": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "confidence_interval": {
+            "type": "string"
+          },
+          "p_value": {
+            "type": "string"
+          },
+          "source_passage": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "negative_or_null_findings": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["category", "description"],
+        "required": [
+          "category",
+          "description"
+        ],
         "properties": {
-          "category": { "type": "string" },
-          "description": { "type": "string" },
-          "context_parameters": { "type": "object" }
-        }
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "context_parameters": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
       }
     },
     "fulltext_status": {
       "type": "string",
-      "enum": ["FULL_TEXT_AVAILABLE", "ABSTRACT_ONLY"]
+      "enum": [
+        "FULL_TEXT_AVAILABLE",
+        "ABSTRACT_ONLY"
+      ]
     },
     "temporal_tier": {
       "type": "string",
-      "enum": ["RECENT_PRIMARY_EVIDENCE", "FOUNDATIONAL/HISTORICAL_EVIDENCE"]
+      "enum": [
+        "RECENT_PRIMARY_EVIDENCE",
+        "FOUNDATIONAL/HISTORICAL_EVIDENCE"
+      ]
     },
     "foundational_justification": {
       "type": "object",
       "properties": {
-        "is_justified": { "type": "boolean" },
-        "category": { "type": "string" },
-        "rationale": { "type": "string" }
-      }
+        "is_justified": {
+          "type": "boolean"
+        },
+        "category": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "claims_supported": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "evidence_relationship": {
       "type": "string",
@@ -140,15 +241,32 @@
     },
     "model_match": {
       "type": "string",
-      "enum": ["EXACT", "CLOSE", "DIFFERENT", "UNKNOWN"]
+      "enum": [
+        "EXACT",
+        "CLOSE",
+        "DIFFERENT",
+        "UNKNOWN"
+      ]
     },
     "synergy_evidence": {
       "type": "string",
-      "enum": ["DIRECT", "ANALOGOUS", "MONOTHERAPY_ONLY", "NOT_FOUND", "NOT_APPLICABLE"]
+      "enum": [
+        "DIRECT",
+        "ANALOGOUS",
+        "MONOTHERAPY_ONLY",
+        "NOT_FOUND",
+        "NOT_APPLICABLE"
+      ]
     },
     "ci_classification_source": {
       "type": "string",
-      "enum": ["CHOU_2006_LANDMARK", "CHOU_TALALAY_1984", "EMPIRICAL_STUDY", "UNVERIFIED"]
+      "enum": [
+        "CHOU_2006_LANDMARK",
+        "CHOU_TALALAY_1984",
+        "EMPIRICAL_STUDY",
+        "UNVERIFIED"
+      ]
     }
-  }
+  },
+  "additionalProperties": false
 }

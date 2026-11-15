@@ -24,41 +24,103 @@
   "properties": {
     "bibliographic_identity": {
       "type": "object",
-      "required": ["title", "authors", "year"],
+      "required": [
+        "title",
+        "authors",
+        "year"
+      ],
       "properties": {
-        "title": { "type": "string" },
-        "authors": { "type": "array", "items": { "type": "string" } },
-        "year": { "type": "integer" },
-        "journal": { "type": ["string", "null"] },
-        "doi": { "type": ["string", "null"] },
-        "pmid": { "type": ["string", "null"] },
-        "ref_id": { "type": "string" }
-      }
+        "title": {
+          "type": "string"
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "year": {
+          "type": "integer"
+        },
+        "journal": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "doi": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pmid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ref_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "study_design": {
       "type": "object",
-      "required": ["value", "source_location", "status"],
+      "required": [
+        "value",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "value": { "type": "string" },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "value": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "population_or_model": {
       "type": "object",
-      "required": ["value", "source_location", "status"],
+      "required": [
+        "value",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "value": { "type": "string" },
-        "model_type": { "type": "string" },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "value": {
+          "type": "string"
+        },
+        "model_type": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "intervention_or_exposure": {
       "type": "object",
-      "required": ["value", "entity_granularity", "source_location", "status"],
+      "required": [
+        "value",
+        "entity_granularity",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "value": { "type": "string" },
+        "value": {
+          "type": "string"
+        },
         "entity_granularity": {
           "type": "string",
           "enum": [
@@ -73,48 +135,112 @@
             "NOT_APPLICABLE"
           ]
         },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "comparator": {
       "type": "object",
-      "required": ["value", "source_location", "status"],
+      "required": [
+        "value",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "value": { "type": "string" },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "value": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "outcomes": {
       "type": "object",
-      "required": ["primary_outcome", "source_location", "status"],
+      "required": [
+        "primary_outcome",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "primary_outcome": { "type": "string" },
-        "secondary_outcomes": { "type": "array", "items": { "type": "string" } },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "primary_outcome": {
+          "type": "string"
+        },
+        "secondary_outcomes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "measurements": {
       "type": "object",
-      "required": ["assay_method", "source_location", "status"],
+      "required": [
+        "assay_method",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "assay_method": { "type": "string" },
-        "parameters": { "type": "array", "items": { "type": "string" } },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "assay_method": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "quantitative_results": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["metric", "value", "unit", "numeric_status", "source_location"],
+        "required": [
+          "metric",
+          "value",
+          "unit",
+          "numeric_status",
+          "source_location"
+        ],
         "properties": {
-          "metric": { "type": "string" },
-          "value": { "type": ["number", "string", "null"] },
-          "unit": { "type": "string" },
+          "metric": {
+            "type": "string"
+          },
+          "value": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
           "numeric_status": {
             "type": "string",
             "enum": [
@@ -125,47 +251,111 @@
               "NOT_REPORTED"
             ]
           },
-          "source_location": { "type": "string" },
-          "uncertainty_or_ci": { "type": ["string", "null"] },
-          "p_value": { "type": ["string", "number", "null"] }
-        }
+          "source_location": {
+            "type": "string"
+          },
+          "uncertainty_or_ci": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "p_value": {
+            "type": [
+              "string",
+              "number",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
       }
     },
     "qualitative_results": {
       "type": "object",
-      "required": ["summary", "source_location", "status"],
+      "required": [
+        "summary",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "summary": { "type": "string" },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "summary": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "negative_or_null_results": {
       "type": "object",
-      "required": ["has_negative_results", "findings", "source_location"],
+      "required": [
+        "has_negative_results",
+        "findings",
+        "source_location"
+      ],
       "properties": {
-        "has_negative_results": { "type": "boolean" },
-        "findings": { "type": "array", "items": { "type": "string" } },
-        "source_location": { "type": "string" }
-      }
+        "has_negative_results": {
+          "type": "boolean"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_location": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "limitations": {
       "type": "object",
-      "required": ["reported_limitations", "source_location", "status"],
+      "required": [
+        "reported_limitations",
+        "source_location",
+        "status"
+      ],
       "properties": {
-        "reported_limitations": { "type": "array", "items": { "type": "string" } },
-        "source_location": { "type": "string" },
-        "status": { "type": "string" }
-      }
+        "reported_limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "funding_or_coi": {
       "type": "object",
-      "required": ["statement", "has_conflict", "source_location"],
+      "required": [
+        "statement",
+        "has_conflict",
+        "source_location"
+      ],
       "properties": {
-        "statement": { "type": "string" },
-        "has_conflict": { "type": "boolean" },
-        "source_location": { "type": "string" }
-      }
+        "statement": {
+          "type": "string"
+        },
+        "has_conflict": {
+          "type": "boolean"
+        },
+        "source_location": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "evidence_directness": {
       "type": "string",
@@ -194,15 +384,26 @@
     },
     "source_locations": {
       "type": "object",
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "provenance": {
       "type": "object",
-      "required": ["extractor_version", "extraction_timestamp"],
+      "required": [
+        "extractor_version",
+        "extraction_timestamp"
+      ],
       "properties": {
-        "extractor_version": { "type": "string" },
-        "extraction_timestamp": { "type": "string" }
-      }
+        "extractor_version": {
+          "type": "string"
+        },
+        "extraction_timestamp": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

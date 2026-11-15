@@ -3,20 +3,58 @@
   "title": "ReferenceRecordSchema",
   "description": "Schema for individual reference records with granular temporal audit and retraction/correction/identity verification.",
   "type": "object",
-  "required": ["ref_id", "title", "authors", "year"],
+  "required": [
+    "ref_id",
+    "title",
+    "authors",
+    "year"
+  ],
   "properties": {
-    "ref_id": { "type": "string" },
-    "title": { "type": "string" },
+    "ref_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
     "authors": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "journal": { "type": "string" },
-    "year": { "type": ["integer", "null"] },
-    "publication_date": { "type": ["string", "null"] },
-    "doi": { "type": ["string", "null"] },
-    "pmid": { "type": ["string", "null"] },
-    "openalex_id": { "type": ["string", "null"] },
+    "journal": {
+      "type": "string"
+    },
+    "year": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "publication_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "doi": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pmid": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "openalex_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "evidence_role": {
       "type": "string",
       "enum": [
@@ -44,12 +82,23 @@
     "foundational_justification": {
       "type": "object",
       "properties": {
-        "is_justified": { "type": "boolean" },
-        "category": { "type": "string" },
-        "rationale": { "type": "string" },
-        "no_modern_alternative_exists": { "type": "boolean" },
-        "section_scope": { "type": "string" }
-      }
+        "is_justified": {
+          "type": "boolean"
+        },
+        "category": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "no_modern_alternative_exists": {
+          "type": "boolean"
+        },
+        "section_scope": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "verification_status": {
       "type": "string",
@@ -95,6 +144,16 @@
         "VIRUS_DERIVED_PLATFORM",
         "NOT_APPLICABLE"
       ]
+    },
+    "is_retracted": {
+      "type": "boolean"
+    },
+    "is_corrected": {
+      "type": "boolean"
+    },
+    "core_evidence_eligible": {
+      "type": "boolean"
     }
-  }
+  },
+  "additionalProperties": false
 }

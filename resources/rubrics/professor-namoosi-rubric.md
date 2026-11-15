@@ -1,85 +1,60 @@
-# Objective Quality & Scientific Rubric: Professor_namoosi
-## معیارها و سنجه‌های عینی داوری ایزوله پروپوزال‌های پژوهشی علوم پزشکی (v1.0)
+# Objective Quality & Scientific Rubric: Professor Namoosi (v14.1.0)
+## Objective Evaluation Criteria for Isolated Proposal Quality Auditing
 
-> **دامنه کاربرد:** این سند مبنای انحصاری و قطعی ارزیابی ساب‌ایجنتِ داور ایزوله (`professor-namoosi-auditor`) است.  
-> **اصل کانتکست صفر:** داور ایزوله بدون هیچ‌گونه اتکا به حافظه فرار یا توجیهات چت، صرفاً خروجی نهایی (`output/[topic_slug]/proposal.md` و `proposal.docx`) را بر مبنای جدول خطوط قرمز و سنجه‌های زیر ممیزی می‌کند.
+> **Scope:** This document is the exclusive and binding evaluation rubric executed by the isolated zero-context auditor subagent (`professor-namoosi-auditor`).  
+> **Zero-Context Mandate:** The isolated auditor operates with zero conversational memory, auditing exclusively the physical artifacts on disk (`output/[topic_slug]/proposal.md` and `proposal.docx`) against the binary hard constraints and qualitative criteria defined below.
 
 ---
 
-## ۱. جدول خطوط قرمز قطعی (Hard Constraints — Immediate Fail)
+## 1. Hard Constraints Table (Binary Immediate Rejection Gate)
 
-در صورت نقض حتی یک مورد از خطوط قرمز زیر، خروجی به صورت خودکار وضعیت **REJECT_HARD_FAIL** دریافت کرده و بلافاصله به ایجنت اصلی جهت رفع اشکال ارجاع می‌شود:
+If ANY of the following 7 Hard Constraints are violated, the proposal immediately receives **`REJECT_HARD_FAIL`** and is returned to the authoring agent for surgical remediation:
 
-| شناسه خطا | عنوان خط قرمز | تعریف فنی و آستانه شکست | پیامد قطعی |
+| Error ID | Constraint Name | Technical Definition & Failure Threshold | Enforcement Action |
 | :--- | :--- | :--- | :---: |
-| **`HARD-01`** | **`DATA_INVARIANT_VIOLATION`** | هرگونه تغییر، گرد کردن، توهم، یا مخدوش‌سازی اعداد واقعی (دوزها، مقادیر $IC_{50}$، کدهای آماری، مقادیر $p$-value، نسبت‌های شانس $AOR$، ارقام اپیدمیولوژی، یا شناسه‌های عددی مقالات). | **ابطال فوری** |
-| **`HARD-02`** | **`PHANTOM_CITATION_VIOLATION`** | وجود حتی یک ارجاع ساختگی، منبع فاقد PMID/DOI معتبر، یا مقاله ناموجود در پایگاه‌های بین‌المللی PubMed/Europe PMC. | **ابطال فوری** |
-| **`HARD-03`** | **`PIPELINE_BYPASS_VIOLATION`** | دور زدن پایپ‌لاین رسمی (`run_research_pipeline.py`) و نگارش آزاد متنی بدون رعایت دقیق ۲۸ بخش مصوب پژوهشیار. | **ابطال فوری** |
-| **`HARD-04`** | **`CROSS_DOMAIN_ENTITY_LEAKAGE`** | نشت اصطلاحات یا مدل‌های آزمایشگاهی سلولی (مانند کشت سلول، آپوپتوز، $IC_{50}$، تداخل بلانک) به مطالعات غیرسلولی (مانند نظام سلامت، اپیدمیولوژی، یا کارآزمایی بالینی). | **ابطال فوری** |
-| **`HARD-05`** | **`LATEX_LEAKAGE_IN_WORD`** | وجود کدهای خام لاتک، علامت‌های دلار (`$...$`) یا برچسب‌های `\frac` و `\sum` در متن یا فایل Word به جای استفاده از فرمول‌های بومی OMML ورد. | **ابطال فوری** |
-| **`HARD-06`** | **`BANNED_AI_CLICHE_AND_DISCLOSURE_VIOLATION`** | وجود هر یک از ۳۰ تکیه‌کلام ممنوعه کلیشه‌ای در متن، یا وجود هرگونه سلب مسئولیت، پانویس، بیانیه و اشاره به نگارش با هوش مصنوعی یا استفاده از مدل‌های زبانی در متن پروپوزال (`proposal.md` و `proposal.docx`). متن باید ۱۰۰٪ اصیل، فاخر و علمی باشد. | **ابطال فوری** |
-| **`HARD-07`** | **`WORD_VISUAL_STANDARD_VIOLATION`** | عدم انطباق سند Word با استانداردهای رسمی مصوب: فقدان صفحه جلد رسمی (هدر دانشگاه و جدول ۵ نفره تیم)، تیترهای H1 فاقد خط افقی آبی ۵۵ کاراکتری (`#2B6CB0`)، نشت ستاره‌های مارک‌داون (`**`) به متن، یا وجود کشیدگی غیرعادی کلمات ناشی از شکست خط نرم (`Soft Line Break`). | **ابطال فوری** |
+| **`HARD-01`** | **`DATA_INVARIANT_VIOLATION`** | Any modified, rounded, hallucinated, or ungrounded numbers (doses, $IC_{50}$ concentrations, statistical test statistics, $p$-values, adjusted odds ratios, epidemiological statistics, or reference IDs). | **Immediate Rejection** |
+| **`HARD-02`** | **`PHANTOM_CITATION_VIOLATION`** | Any synthetic reference, citation lacking a verifiable PMID or DOI, or paper nonexistent in PubMed/Europe PMC. | **Immediate Rejection** |
+| **`HARD-03`** | **`PIPELINE_BYPASS_VIOLATION`** | Bypassing the official pipeline (`run_research_pipeline.py`) or failing to produce the mandatory 28 canonical Pajooheshyar section headings. | **Immediate Rejection** |
+| **`HARD-04`** | **`CROSS_DOMAIN_ENTITY_LEAKAGE`** | Leakage of cell-culture parameters (cell seeding, MTT, apoptosis, $IC_{50}$, cell-free blank) into non-laboratory domains (health systems, epidemiology, clinical surveys). | **Immediate Rejection** |
+| **`HARD-05`** | **`LATEX_LEAKAGE_IN_WORD`** | Unconverted raw LaTeX delimiters (`$`, `\frac`, `\sum`) leaking into readable text rather than native Word OMML equations. | **Immediate Rejection** |
+| **`HARD-06`** | **`BANNED_CLICHE_AND_META_LEAKAGE`** | Formulaic machine transition clichés («در این راستا»، «نقش بسزایی دارد») or extraneous conversational assistant meta-disclaimers leaking into proposal text (violating the Clean Author Manuscript Delivery Standard). | **Immediate Rejection** |
+| **`HARD-07`** | **`WORD_VISUAL_STANDARD_VIOLATION`** | Deviation from approved Word typography standards: missing cover page header, unstyled raw markdown stars (`**`), or distorted word spacing caused by soft line breaks. | **Immediate Rejection** |
 
 ---
 
-## ۲. چک‌لیست سنجش عینی و چندبعدی (Pass/Fail Rubric)
+## 2. Objective Multi-Dimensional Pass/Fail Checklist
 
-داور ایزوله پس از اطمینان از عدم نقض خطوط قرمز، موارد زیر را با دقت ریاضی بررسی می‌کند:
+Once all Hard Constraints pass, the isolated auditor verifies the following criteria:
 
-### ۲.۱. تطابق ساختاری ۲۸ بخش پژوهشیار (`Pajooheshyar 28 Sections`)
-- [ ] وجود دقیقاً ۲۸ بخش مصوب با عناوین و شماره‌گذاری رسمی مصوب وزارت بهداشت (از بخش ۱ «موضوع» تا بخش ۲۸ «منابع»).
-- [ ] عدم حذف، ادغام یا تغییر نام هدینگ‌های سطح دو (`##`).
+### 2.1. Structural Canonical Pajooheshyar 28 Sections
+- [ ] Exactly 28 canonical sections present, numbered sequentially from Section 1 (Topic) to Section 28 (References).
+- [ ] No merged, omitted, or modified H2 (`##`) headings.
 
-### ۲.۲. انطباق بیواستاتیک و حجم نمونه با کهن‌الگو (`Biostatistical Coherence`)
-- [ ] بخش ۲۲ دارای فرمول ریاضی شفاف و متناسب با کهن‌الگو باشد:
-  - **نظام سلامت / اقتصاد سلامت:** فرمول کوکران با ضریب اثر طرح ($DEFF \ge 1.5$) و تحلیل رگرسیون چندمتغیره/کاکوانی.
-  - **اپیدمیولوژی مشاهده‌ای:** فرمول کوکران مبتنی بر شیوع با تصحیح جامعه محدود در صورت نیاز.
-  - **کارآزمایی بالینی (RCT):** فرمول مقایسه دو نسبت چو و وانگ ($n=128$) با تحلیل قصد درمان (ITT).
-  - **مدل حیوانی (In Vivo):** معادله تخصیص منابع مید ($E = N - B - T \in [10, 20]$) بر پایه راهنمای ARRIVE 2.0.
-  - **کشت سلولی (In Vitro):** معادله مید ($E=19$)، دو ژن مرجع در qPCR (GAPDH و ACTB بر پایه MIQE)، کنترل تداخل بلانک بدون سلول، و ۵ طبقه هم‌افزایی چو-تالالای در CompuSyn.
-  - **تشخیصی:** فرمول حساسیت و ویژگی بر پایه بودرر (Buderer) و انطباق با راهنمای STARD.
-- [ ] تطابق ۱۰۰٪ تعداد نمونه‌های بخش ۲۲ با تعداد گروه‌ها و تکرارهای بخش ۲۷ (پروتکل اجرایی).
+### 2.2. Biostatistical Coherence & Archetype Alignment
+- [ ] Section 22 contains a clear, mathematically sound sample size derivation tailored to the research archetype:
+  - **Health Systems / Health Policy:** Cochran population formula with cluster design effect ($\text{DEFF} \ge 1.5$) and attrition buffer.
+  - **Observational Epidemiology:** Prevalence-based Cochran formula with finite population correction if applicable.
+  - **Clinical Trial (RCT):** Two-arm comparative trial formula with CONSORT power ($1-\beta \ge 0.80$) and intention-to-treat (ITT) framework.
+  - **In Vivo Animal Models:** Festing & Mead's resource allocation equation ($E = N - B - T \in [10, 20]$) adhering to ARRIVE 2.0.
+  - **In Vitro Bioassays:** Factorial ANOVA replicate design ($\ge 3$ biological replicates), vehicle control (DMSO $< 0.1\%$), and cell-free blank interference controls.
+  - **Diagnostic Accuracy:** Buderer sensitivity/specificity formula compliant with STARD guidelines.
+  - **Usability & Digital Health:** Nielsen-Landauer problem discovery model and SUS scale sample sizing.
+- [ ] 100% numerical consistency between Section 22 sample sizes and Section 27 experimental arm/group counts.
 
-### ۲.۳. اصالت استنادها و تمامیت ونکوور (`Vancouver Monotonic Order`)
-- [ ] شماره‌گذاری ترتیبی ارجاعات در متن دقیقاً از `[1]` آغاز شده و بدون جهش یا ارجاع یتیم (`Orphaned Claim`) تا منبع آخر ادامه یابد.
-- [ ] تطابق تک‌تک استنادات بخش‌های ۲ و ۳ با متادیتای واقعی منبع در بخش ۲۸.
-- [ ] وجود حداقل ۱۵ و حداکثر ۲۵ رفرنس کانونی معتبر.
+### 2.3. Vancouver Citation Integrity & Monotonic Order
+- [ ] Citation numbering strictly starts at `[1]` and increments monotonically without gaps or unreferenced orphan claims.
+- [ ] 100% concordance between in-text citation markers `[n]` in Sections 2–3 and Reference `[n]` metadata in Section 28.
+- [ ] Adequate bibliographic depth (typically 15 to 40 authoritative references).
 
-### ۲.۴. معماری عدم سوگیری و شفافیت معرفتی (`Zero-Bias Architecture`)
-- [ ] بررسی مسیر موازی جستجوی شواهد منفی و عوارض (Route B).
-- [ ] در صورت غیبت شواهد منفی در پایگاه‌ها، وجود بند شفافیت معرفتی سوگیری انتشار (`Epistemic Caveat Injection`) در بخش‌های ۳ و ۲۶.
-- [ ] ارزیابی ریسک سوگیری متناسب با کهن‌الگو (دامنه ۱ QUADAS-2 برای تشخیصی، چارچوب نمونه‌گیری STROBE برای مشاهده‌ای).
+### 2.4. Zero-Bias Evidence Architecture & Epistemic Honesty
+- [ ] Dual-path literature retrieval executed (supporting vs. contradicting/adverse evidence).
+- [ ] If no negative or contradicting papers exist in international databases, an explicit publication bias caveat is injected into Sections 3 and 26.
+- [ ] Risk-of-bias framework matches the study archetype (QUADAS-2 for diagnostic, STROBE for observational, Cochrane RoB-2 for clinical trials, SYRCLE for animal studies).
 
-### ۲.۵. کالیبراسیون ریتم جملات و سبک‌سنجی فارسی (`Stylometry & Burstiness`)
-- [ ] انحراف معیار طول جملات متن فارسی $\sigma \ge 8.0$ باشد (عدم وجود یکنواختی ماشینی).
-- [ ] رعایت دقیق نیم‌فاصله‌ها (ZWNJ) و استانداردهای فرهنگستان علوم پزشکی.
+### 2.5. Stylometry, Prose Cadence & Burstiness
+- [ ] Sentence length distribution exhibits healthy statistical variance (standard deviation $\sigma \ge 8.0$ words per sentence).
+- [ ] Rigorous orthographic hygiene: zero-width non-joiners (ZWNJ) preserved, zero raw machine em-dashes.
 
-### ۲.۶. نمره داوری گرنت به سبک NIH (`NIH Grant Scoring`)
-- [ ] محاسبه میانگین نمره داوری در ۶ بعد (نوآوری، اهمیت، رویکرد متدولوژیک، محققان، محیط، و توان آماری).
-- [ ] **آستانه قبولی داور ایزوله:** امتیاز جامعیت ساختاری و روش‌شناختی (Heuristic Completeness Score) باید $\le 2.0$ (سطح ممتاز $\le 1.5$) و بدون هیچ نقص بحرانی باشد.
-
----
-
-## ۳. قالب خروجی گزارش داوری ایزوله (`AUDIT_REPORT.json` & `.md`)
-
-داور ایزوله خروجی ارزیابی خود را در قالب زیر صادر می‌کند:
-
-```json
-{
-  "audit_timestamp": "ISO-8601",
-  "auditor_version": "1.0.0",
-  "hard_constraints_status": "PASS",
-  "hard_constraint_violations": [],
-  "rubric_scores": {
-    "structure_28_compliance": 1.0,
-    "biostatistical_coherence": 1.0,
-    "vancouver_citation_integrity": 1.0,
-    "zero_bias_epistemic_rigor": 1.0,
-    "stylometry_burstiness_sigma": 8.4,
-    "banned_cliches_count": 0,
-    "nih_overall_score": 1.2
-  },
-  "final_verdict": "APPROVED_FUNDABLE",
-  "remediation_actions": []
-}
-```
+### 2.6. Consensus Heuristic Readiness Score
+- [ ] Consensus score calculated across the 6 study section dimensions.
+- [ ] **Approval Threshold:** Heuristic Readiness Score $\le 2.0$ (Exceptional $\le 1.5$) with **0 Blocker flaws**.

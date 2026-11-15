@@ -3,9 +3,15 @@
   "title": "EvidenceLedgerSchema",
   "description": "Atomic evidence ledger preventing numerical hallucination and linking scientific statements to exact source passages.",
   "type": "object",
-  "required": ["project_id", "facts", "audit_metadata"],
+  "required": [
+    "project_id",
+    "facts",
+    "audit_metadata"
+  ],
   "properties": {
-    "project_id": { "type": "string" },
+    "project_id": {
+      "type": "string"
+    },
     "facts": {
       "type": "array",
       "items": {
@@ -20,11 +26,21 @@
           "confidence"
         ],
         "properties": {
-          "fact_id": { "type": "string" },
-          "study_id": { "type": "string" },
-          "claim_id": { "type": "string" },
-          "source_location": { "type": "string" },
-          "text_or_data": { "type": "string" },
+          "fact_id": {
+            "type": "string"
+          },
+          "study_id": {
+            "type": "string"
+          },
+          "claim_id": {
+            "type": "string"
+          },
+          "source_location": {
+            "type": "string"
+          },
+          "text_or_data": {
+            "type": "string"
+          },
           "parameter_type": {
             "type": "string",
             "enum": [
@@ -39,27 +55,54 @@
           },
           "directness": {
             "type": "string",
-            "enum": ["DIRECT_EVIDENCE", "INDIRECT_EVIDENCE", "INFERENCE", "HYPOTHESIS"]
+            "enum": [
+              "DIRECT_EVIDENCE",
+              "INDIRECT_EVIDENCE",
+              "INFERENCE",
+              "HYPOTHESIS"
+            ]
           },
           "confidence": {
             "type": "string",
-            "enum": ["HIGH", "MODERATE", "LOW"]
+            "enum": [
+              "HIGH",
+              "MODERATE",
+              "LOW"
+            ]
           },
           "extraction_method": {
             "type": "string",
-            "enum": ["FULLTEXT_EXCERPT", "TABLE_DATA", "FIGURE_LEGEND", "ABSTRACT_ONLY"]
+            "enum": [
+              "FULLTEXT_EXCERPT",
+              "TABLE_DATA",
+              "FIGURE_LEGEND",
+              "ABSTRACT_ONLY"
+            ]
           }
-        }
+        },
+        "additionalProperties": false
       }
     },
     "audit_metadata": {
       "type": "object",
-      "required": ["total_facts", "untraceable_claims_count", "numerical_hallucination_detected"],
+      "required": [
+        "total_facts",
+        "untraceable_claims_count",
+        "numerical_hallucination_detected"
+      ],
       "properties": {
-        "total_facts": { "type": "integer" },
-        "untraceable_claims_count": { "type": "integer" },
-        "numerical_hallucination_detected": { "type": "boolean" }
-      }
+        "total_facts": {
+          "type": "integer"
+        },
+        "untraceable_claims_count": {
+          "type": "integer"
+        },
+        "numerical_hallucination_detected": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

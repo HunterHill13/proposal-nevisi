@@ -3,15 +3,35 @@
   "title": "ClaimProvenanceSchema",
   "description": "Schema for scientific atomic claim provenance, causal verb auditing, and numerical traceability.",
   "type": "object",
-  "required": ["claim_id", "claim_text", "source_ref_id", "entailment_level", "verdict"],
+  "required": [
+    "claim_id",
+    "claim_text",
+    "source_ref_id",
+    "entailment_level",
+    "verdict"
+  ],
   "properties": {
-    "claim_id": { "type": "string" },
-    "claim_text": { "type": "string" },
-    "source_ref_id": { "type": "string" },
-    "source_study_design": { "type": "string" },
+    "claim_id": {
+      "type": "string"
+    },
+    "claim_text": {
+      "type": "string"
+    },
+    "source_ref_id": {
+      "type": "string"
+    },
+    "source_study_design": {
+      "type": "string"
+    },
     "claim_type": {
       "type": "string",
-      "enum": ["CAUSAL", "ASSOCIATIVE", "PREDICTIVE", "MECHANISTIC", "HYPOTHETICAL"]
+      "enum": [
+        "CAUSAL",
+        "ASSOCIATIVE",
+        "PREDICTIVE",
+        "MECHANISTIC",
+        "HYPOTHETICAL"
+      ]
     },
     "entailment_level": {
       "type": "string",
@@ -27,21 +47,50 @@
     },
     "verdict": {
       "type": "string",
-      "enum": ["ENTAILED", "OVERCLAIM", "UNSUPPORTED", "CONTRADICTED"]
+      "enum": [
+        "ENTAILED",
+        "OVERCLAIM",
+        "UNSUPPORTED",
+        "CONTRADICTED"
+      ]
     },
-    "numerical_ledger_id": { "type": ["string", "null"] },
-    "has_overclaim_risk": { "type": "boolean" },
+    "numerical_ledger_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "has_overclaim_risk": {
+      "type": "boolean"
+    },
     "support_strength": {
       "type": "string",
-      "enum": ["DIRECT", "PARTIAL", "ANALOGOUS", "INDIRECT", "INSUFFICIENT", "UNSUPPORTED"]
+      "enum": [
+        "DIRECT",
+        "PARTIAL",
+        "ANALOGOUS",
+        "INDIRECT",
+        "INSUFFICIENT",
+        "UNSUPPORTED"
+      ]
     },
     "evidence_relationship": {
       "type": "string",
-      "enum": ["DIRECT", "CLOSE_ANALOG", "MECHANISTIC_SUPPORT", "METHOD_SUPPORT", "BACKGROUND", "INDIRECT"]
+      "enum": [
+        "DIRECT",
+        "CLOSE_ANALOG",
+        "MECHANISTIC_SUPPORT",
+        "METHOD_SUPPORT",
+        "BACKGROUND",
+        "INDIRECT"
+      ]
     },
     "flagged_issues": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
-  }
+  },
+  "additionalProperties": false
 }

@@ -9,6 +9,7 @@ dynamically from any ResearchProblemModel across biomedical fields.
 
 import re
 import json
+from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple, Set
 try:
     from research_problem_model import ResearchProblemModel, ProblemModelBuilder
@@ -373,7 +374,7 @@ class GenericSearchPlanner:
                 "databases": ["PubMed", "Europe PMC", "OpenAlex", "Crossref"],
                 "target_condition": cond_en,
                 "primary_system": system,
-                "time_window": "2020-2026 (primary) / unrestricted (foundational)"
+                "time_window": f"{datetime.now().year - 6}-{datetime.now().year} (primary) / unrestricted (foundational)"
             },
             "query_matrix_facets": facets,
             "dual_path_execution": {

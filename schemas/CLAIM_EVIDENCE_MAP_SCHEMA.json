@@ -15,20 +15,46 @@
     "is_authorized_for_literature_review"
   ],
   "properties": {
-    "claim_id": { "type": "string" },
-    "claim_text": { "type": "string" },
-    "source_paper_id": { "type": "string" },
-    "citation_number": { "type": ["integer", "null"] },
+    "claim_id": {
+      "type": "string"
+    },
+    "claim_text": {
+      "type": "string"
+    },
+    "source_paper_id": {
+      "type": "string"
+    },
+    "citation_number": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
     "evidence_unit": {
       "type": "object",
-      "required": ["text_snippet", "section"],
+      "required": [
+        "text_snippet",
+        "section"
+      ],
       "properties": {
-        "text_snippet": { "type": "string" },
-        "section": { "type": "string" },
-        "table_or_figure_id": { "type": ["string", "null"] }
-      }
+        "text_snippet": {
+          "type": "string"
+        },
+        "section": {
+          "type": "string"
+        },
+        "table_or_figure_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
     },
-    "source_location": { "type": "string" },
+    "source_location": {
+      "type": "string"
+    },
     "verdict": {
       "type": "string",
       "enum": [
@@ -41,21 +67,39 @@
     },
     "contextual_match": {
       "type": "object",
-      "required": ["is_matched", "mismatches"],
+      "required": [
+        "is_matched",
+        "mismatches"
+      ],
       "properties": {
-        "is_matched": { "type": "boolean" },
+        "is_matched": {
+          "type": "boolean"
+        },
         "mismatches": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "numeric_provenance": {
       "type": "object",
-      "required": ["has_numeric_claim", "numeric_status"],
+      "required": [
+        "has_numeric_claim",
+        "numeric_status"
+      ],
       "properties": {
-        "has_numeric_claim": { "type": "boolean" },
-        "claimed_values": { "type": "array", "items": { "type": "number" } },
+        "has_numeric_claim": {
+          "type": "boolean"
+        },
+        "claimed_values": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
         "numeric_status": {
           "type": "string",
           "enum": [
@@ -67,18 +111,42 @@
             "NOT_APPLICABLE"
           ]
         },
-        "is_verified": { "type": "boolean" }
-      }
+        "is_verified": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     },
     "linguistic_certainty": {
       "type": "object",
       "properties": {
-        "stated_verb": { "type": "string" },
-        "calibrated_verb": { "type": "string" },
-        "is_calibrated": { "type": "boolean" }
-      }
+        "stated_verb": {
+          "type": "string"
+        },
+        "calibrated_verb": {
+          "type": "string"
+        },
+        "is_calibrated": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     },
-    "is_authorized_for_literature_review": { "type": "boolean" },
-    "rejection_or_downgrade_reason": { "type": ["string", "null"] }
-  }
+    "is_authorized_for_literature_review": {
+      "type": "boolean"
+    },
+    "rejection_or_downgrade_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mismatches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
 }

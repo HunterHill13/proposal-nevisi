@@ -15,29 +15,64 @@
     "reproducibility_verified"
   ],
   "properties": {
-    "provenance_type": { "type": "string", "enum": ["SEARCH_PROVENANCE_RECORD"] },
-    "total_queries_executed": { "type": "integer", "minimum": 0 },
+    "provenance_type": {
+      "type": "string",
+      "enum": [
+        "SEARCH_PROVENANCE_RECORD"
+      ]
+    },
+    "total_queries_executed": {
+      "type": "integer",
+      "minimum": 0
+    },
     "databases_queried": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "records_retrieved": { "type": "integer", "minimum": 0 },
-    "records_screened": { "type": "integer", "minimum": 0 },
-    "records_included": { "type": "integer", "minimum": 0 },
-    "records_excluded": { "type": "integer", "minimum": 0 },
+    "records_retrieved": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "records_screened": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "records_included": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "records_excluded": {
+      "type": "integer",
+      "minimum": 0
+    },
     "aggregated_exclusion_reasons": {
       "type": "object",
-      "additionalProperties": { "type": "integer" }
+      "additionalProperties": {
+        "type": "integer"
+      }
     },
     "query_event_logs": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["database", "exact_query", "search_layer", "execution_status"],
+        "required": [
+          "database",
+          "exact_query",
+          "search_layer",
+          "execution_status"
+        ],
         "properties": {
-          "database": { "type": "string" },
-          "exact_query": { "type": "string" },
-          "search_layer": { "type": "string" },
+          "database": {
+            "type": "string"
+          },
+          "exact_query": {
+            "type": "string"
+          },
+          "search_layer": {
+            "type": "string"
+          },
           "execution_status": {
             "type": "string",
             "enum": [
@@ -52,16 +87,34 @@
               "SCREENED_EXCLUDED"
             ]
           },
-          "results_count": { "type": "integer" },
-          "retrieved_count": { "type": "integer" },
-          "screened_count": { "type": "integer" },
-          "included_count": { "type": "integer" },
-          "excluded_count": { "type": "integer" },
-          "timestamp": { "type": "string" },
-          "is_reproducible": { "type": "boolean" }
-        }
+          "results_count": {
+            "type": "integer"
+          },
+          "retrieved_count": {
+            "type": "integer"
+          },
+          "screened_count": {
+            "type": "integer"
+          },
+          "included_count": {
+            "type": "integer"
+          },
+          "excluded_count": {
+            "type": "integer"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "is_reproducible": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
       }
     },
-    "reproducibility_verified": { "type": "boolean" }
-  }
+    "reproducibility_verified": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
 }

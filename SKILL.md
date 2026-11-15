@@ -1,400 +1,154 @@
 ---
 name: proposal-nevisi
-description: >
-  Universal, configuration-driven Iranian medical and biomedical research proposal drafting, deep literature research,
-  evidence synthesis, anti-AI-detection humanization, and Word (.docx) publication engine (v14.0 Cognitive Study Section Swarm, 119-Descriptor MeSH Thesaurus, Adaptive QUADAS-2/STROBE RoB Auditing, EGM-Powered Academic Grant Study Section, Multi-Domain 6-Archetype Polymorphism & Cognitive Swarm Architecture). Operates across diverse biomedical domains
-  (oncology, cardiology, infectious diseases, diagnostics, epidemiology, immunology, endocrinology, nephrology, pulmonology, ophthalmology, dermatology, ob/gyn, orthopedics, toxicology, health systems, basic experimental science).
-  Built on a 4-layer hardened modular architecture with Cognitive Subagents, MethodologyResearchSubagent (anti-chimera cohesive protocol engine),
-  Adversarial MockGrantReviewPanel (NIH 1-9 scoring with semantic drift & biostatistical coherence audits), EpistemicRigorAuditor,
-  GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
-  ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
-  PreEmptiveRiskOfBiasMitigator (QUADAS-2 spectrum bias, STROBE sampling frame, Cochrane RoB-2, SYRCLE), MeshQueryExpander (119 descriptors across 19 clinical categories),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes the unified test suite discovered dynamically by tests/run_all_tests.py (561 automated test cases, 100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
+description: Autonomous Medical Research Proposal Writing Engine (v14.1.0) featuring 7-Subagent Cognitive Study Section Panel, 6-Archetype Polymorphism, Native OMML Math Engine, and Two-Gate Review Protocol.
+version: 14.1.0
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v14.0 - نسخه مجهز به هیئت داوران گرنت ۷ پرسونایی شناختی با کانتکست صفر و حلقه بسته تودرتو، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi: Autonomous Medical Research Proposal Writing Engine (v14.1.0)
 
-> [!IMPORTANT]
-> ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
-> این مهارت بر پایه یک **پایپ‌لاین پیوندی نورو-سیمبولیک (Neuro-Symbolic Multi-Agent Pipeline)** عمل می‌کند:
-> ۱. **لایه ابزارهای دترمینستیک پایتون:** واکشی زنده پاب‌مد و Europe PMC، استخراج JATS XML، تبدیل ریاضی بومی OMML ورد، و پایش ارجاعات ونکوور بدون ارجاع یتیم.
-> ۲. **لایه ساب‌ایجنت‌های شناختی و استدلالی (Cognitive Subagents):**
->    - **ساب‌ایجنت ارزیابی شواهد (Evidence Appraisal Subagent):** خوانش عمیق مقالات، تفکیک شواهد مستقیم از مبانی نظری موازی (`TIER_1_DIRECT` در برابر `TIER_3_PARALLEL_RATIONALE`) و ممانعت قطعی از انتساب نتایج یک مدل (مثلاً سرطان پستان یا ماکروفاژ) به مدل هدف (مثلاً سرطان ریه).
->    - **ساب‌ایجنت پژوهش روش‌شناسی و پروتکل منسجم (`MethodologyResearchSubagent`):** مهار کامل خطای «روش‌شناسی فرانکنشتاین / کیمرا» (stitching incompatible protocol pieces) با استخراج پروتکل‌های یکپارچه و سازگار بر پایه استانداردهای طلایی OECD GCCP، راهنمای MIQE برای qPCR (دو ژن مرجع GAPDH و ACTB)، معادله تخصیص منابع مید ($E=N-B-T$) و تحلیل توان ANOVA فاکتوریل ($f=0.40$).
->    - **ساب‌ایجنت ممیزی اصالت و سرچ منفی (Novelty & Negative Search Auditor):** ثبت استراتژی رسمی بولین و اثبات صفر نتیجه (0 Hits) در پاب‌مد برای اثبات First-in-Class بودن طرح.
-> ۳. **هیئت داوران گرنت خصمانه (Adversarial Mock Grant Study Section):**
->    - **داور ۱ (اصالت علمی و ارزیابی شواهد):** ممیزی دقیق نشت مدل (Semantic Drift) و به‌روز بودن آمار اپیدمیولوژی (GLOBOCAN 2022 انتشار ۲۰۲۴ با ۲.۴۸ میلیون ابتلا).
->    - **داور ۲ (روش‌شناسی، بیواستاتیک و ضد کیمرا):** ممیزی عدم تناقض فرمول حجم نمونه با $n=3$، کنترل بلانک بدون سلول (Cell-Free Blank) در تترازولیوم، و تفکیک تکرارهای زیستی مستقل از تکنیکال.
->    - **داور ۳ (اخلاق و ایمنی زیستی):** استانداردهای BSL-2 و منشور ۳۱ گانه اخلاق زیستی کشور.
+`proposal-nevisi` is an autonomous scientific engineering skill designed to generate publication-grade, evidence-grounded medical research proposals adhering to the 28 canonical sections of the Iranian Ministry of Health (*Pajooheshyar*) portal.
 
-نسخه ۱۱.۵ موارد بنیادین زیر را تضمین می‌کند:
-- **ستون ۱ (Canonical Reference Lock & Live Verification Gate):** بازنویسی و تطبیق ۱۰۰ درصدی تمام اقلام فراداده‌ای مراجع مستقیماً از پاسخ خام API های رسمی PubMed / Crossref بدون اتکا به حافظه فرار ذهنی.
-- **ستون ۲ (FullTextRetrievalEngine & Deep Reading Architecture):** خط لوله واکشی آبشاری متن کامل از Europe PMC JATS XML با پارس دقیق `itertext()` و تفکیک دقیق فصول متدولوژی و نتایج.
-- **ستون ۳ (MethodologyResearchSubagent & Cohesive Protocol Engine):** پیشگیری قطعی از ترکیب وصله‌پینه‌ای متدهای ناهمخوان و ایجاد پروتکل‌های آزمایشگاهی هارمونیک با کنترل‌های تداخل فتومتری (۵۷۰ و ۶۳۰ نانومتر).
-- **ستون ۴ (Biostatistical Coherence & Mead's Resource Equation):** توجیه ریاضی $n=3$ در طرح‌های فاکتوریل بر مبنای $E = N - B - T = 30 - 2 - 9 = 19 \in [10, 20]$ (با درجات آزادی بلوک ۳ روز کاری مستقل $B=3-1=2$) و تحلیل مستقل توان ANOVA فاکتوریل در G*Power با توان ۸۵.۲٪.
-- **ستون ۵ (Adversarial Mock Grant Review Panel):** رد خودکار (`REVISION_REQUIRED`) در صورت مشاهده هرگونه انحراف معنایی مقالات یا تناقض آماری تا زمان اصلاح کامل توسط ایجنت.
-- **ستون ۷ (Dual-Layer Citation & Concept Graph Engine v12.0):** مجهز به موتور اختصاصی `CitationGraphEngine` بر پایه الگوریتم‌های Litmaps و Inciteful (فرمول Adamic/Adar برای کشف کارهای داغ معاصر و Personalized PageRank متمرکز بر سیدها)، ساخت گراف تعاملی Cytoscape.js (`LITERATURE_CITATION_GRAPH.html`)، استخراج مفاهیم زیستی (`BiomedicalConceptGraph`) و دروازه قفل‌بسته ضدتوهم و ضدکلی‌گویی (`GraphEntailmentGate`) با ۵۲۱ تست موفق.
-- **ستون ۸ (EGM-Powered Academic Grant Study Section & Socratic Brainstorming Engine v13.0):** مجهز به مدل فیل و ماهی‌قرمز گوگل (Elephant-Goldfish Model: EGM)؛ تفکیک نقش فیل (The Elephant: نگارش عمیق ۲۸ بخش با کانتکست کامل) از داوران ماهی‌قرمز (The Goldfish: هیئت داوران ۶ پرسونایی با کانتکست کاملاً ایزوله و بدون سوگیری جهت کشف نقاط کور و نقدهای عمیق متدولوژی). شامل ۶ پرسونای تخصصی: نوآوری و اهمیت (Zoom-Out)، متدولوژی خصمانه و زیست‌آمار (Design Critic)، ممیزی ارجاعات و انطباق شواهد (Codebase Details)، امکان‌پذیری و تدارکات اجرایی (Implementation Readiness)، اخلاق زیستی و ساده‌فهمی (Comprehension)، و سنتزگر ارشد نمره‌دهی NIH (Synthesizer SRO). مجهز به حلقه اصلاح خودکار تا سقف ۱۰ دور (Closed-Loop 10-Iteration Remediation) و صدور پرونده جامع داوری `EGM_GRANT_STUDY_SECTION_REPORT.md` و `.json`.
-- **ستون ۶ (Academic Style Refinement, Burstiness & Persian Medical Typography Linter v14.0):** موتور ارتقای سبک آکادمیک و تنوع نحوی جملات (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی و بالینی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و صدور بیانیه شفافیت و افشای استفاده از هوش مصنوعی مطابق استانداردهای ICMJE/وزارت بهداشت).
-- **ستون ۹ (Temporal Knowledge Graph & GraphRAG Synthesis Engine v13.0):** مجهز به موتور اختصاصی گراف دانش زمانی (`temporal_knowledge_graph.py`) با الهام از Graphify و Litmaps، دسته‌بندی مقالات در ۳ اپوک تاریخی (`FOUNDATIONAL_LANDMARK` $\le 2018$، `INTERMEDIATE_VALIDATION` 2019-2022، `CONTEMPORARY_FRONTIER` 2023-2026)، ردیابی ارجاعات زمانی جهت‌دار و تزریق سنتز تاریخی به بخش ۳ (مرور منابع) جهت ریشه‌کنی کامل توهم، جاافتادگی زمانی و ارجاعات نابجا.
-- **ستون ۱۰ (Zero-Bias Dual-Path Search & Adaptive Risk of Bias Mitigator v13.2):** سیستم جستجوی ادبیات دومسیره (مسیر الف: شواهد اثربخشی؛ مسیر ب: شواهد منفی، تضاد، عوارض و بی‌اثری) با تزریق خودکار بند شفافیت معرفتی (`Epistemic Caveat Injection`) در بخش‌های ۳ و ۲۶ در صورت غیبت شواهد منفی در پایگاه‌ها؛ مجهز به تزاروس ۱۱۹ سرعنوانه MeSH در ۱۹ حوزه تخصصی با مهار سوگیری موضوعی؛ ممیزی انطباقی ریسک سوگیری با ابزارهای استاندارد جهانی (QUADAS-2 برای مطالعات تشخیصی، STROBE برای مشاهده‌ای و نظام سلامت، RoB-2 و SYRCLE برای تجربی)؛ و نگاشت روابط استنادی متقابل واقعی بین مقالات و اسنوبالینگ ۱-هاپ به جای زنجیره‌های خطی ساده.
+The engine integrates real-time biomedical literature retrieval (PubMed, Europe PMC, OpenAlex), mathematical formula compilation via native Office Math Markup Language (OMML), a 6-archetype study design polymorphism matrix, and a 7-subagent adversarial cognitive study section panel.
 
 ---
 
-## ۱. ساختار قطعی، مصوب و الزامی ۲۸ بخشی پروپوزال (Mandatory 28 Canonical Sections)
+## 1. Core Directorial Workflow
 
-کلیه پروپوزال‌های تدوین‌شده توسط این مهارت، بدون هیچ‌گونه استثنا، حذف یا ادغام، باید دارای **دقیقاً ۲۸ بخش اصلی** زیر با هدینگ سطح دو (`##`) و با شماره‌گذاری و عناوین فارسی استاندارد زیر باشند:
-
-1. **موضوع** (شامل عنوان کامل فارسی و انگلیسی طرح)
-2. **بیان مسئله** (Problem Statement تحلیلی با شواهد بیولوژیک و اپیدمیولوژیک)
-3. **مرور بر منابع (مقالات و فعالیت های مشابه به موضوع ما)** (سنتز پیشینه با پاراگراف‌های مجزا به ازای هر مطالعه)
-4. **اهمیت وضرورت تحقیق** (دلایل توجیه‌کننده بالینی، علمی و اقتصادی)
-5. **تعریف واژه ها (واژه های بولد و علمی که نیازمند توضیح هستند)** (تعاریف واژگان تخصصی و مداخلات)
-6. **اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)** (اهداف اختصاصی مرحله‌ای و آزمون‌پذیر)
-7. **اهداف کلی (همین موضوع با کلمه تعیین..)** (عنوان طرح با عبارت آغازین تعیین...)
-8. **اهداف کاربردی** (کاربردهای ملموس در نظام سلامت، بالین و داروسازی)
-9. **فرضیات و سوالات** (فرضیه‌های متوازن هم‌افزایی/تضاد و سوالات کلیدی پژوهش)
-10. **دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)** (خروجی‌های ملموس، مقالات علمی و دانش فنی بومی)
-11. **جدول متغیر ها (نقش متغیر (وابسته، مستقل،مخدوش گر) و نوع متغیر(کیفی، کمی پیوسته یا کمی گسسته))** (جدول استاندارد متغیرها با تمام ستون‌های متدولوژیک)
-12. **جدول زمان بندی و مراحل اجرا** (گانت چارت فازبندی‌شده زمانی به صورت جدول Markdown)
-13. **روش اجرا** (نمای کلی و چارچوب کلی متدولوژی پژوهش)
-14. **نوع مطالعه** (طراحی تجربی برون‌تن، درون‌تن، کارآزمایی بالینی، مشاهده‌ای یا تشخیصی)
-15. **جامعه مورد مطالعه** (مدل زیستی، رده سلولی، حیوان آزمایشگاهی یا جامعه انسانی هدف)
-16. **محل انجام مطالعه** (آزمایشگاه‌ها، مراکز تحقیقاتی و دانشگاه محل اجرا)
-17. **معیار های ورود به مطالعه** (شرایط احراز نمونه‌ها، سلول‌ها یا بیماران)
-18. **معیار های خروج از مطالعه** (شرایط حذف، آلودگی یا افت شاخص‌ها)
-19. **ابزار های گردآوری اطلاعات** (دستگاه‌های آزمایشگاهی، کیت‌ها و نرم‌افزارهای تحلیلی)
-20. **تعیین اعتبار ابزار گردآوری** (روایی، کالیبراسیون و استانداردهای مرجع بین‌المللی)
-21. **تعیین ابزار گردآوری** (پایایی، قابلیت اعتماد ابزار، تکرارهای مستقل و ضرایب CV)
-22. **حجم نمونه و روش محاسبه آن** (فرمول ریاضی استاندارد کوهن/مید/کوکران و تعیین تکرارهای بیولوژیک مستقل)
-23. **روش تجزیه و تحلیل داده** (آزمون‌های پیش‌فرض، آنالیز واریانس فاکتوریل، مدل‌های برهم‌کنش و نرم‌افزارها)
-24. **ملاحظلات اخلاقی در صورت نیاز** (کد اخلاق، رضایت آگاهانه و استانداردهای مصوب کمیته اخلاق)
-25. **نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز** (سطح ایمنی زیستی BSL، مدیریت پسماند و PPE)
-26. **مشکلات و محدودیت ها** (چالش‌های فنی، فارماکولوژیک و بیولوژیک و راهکارهای مهار)
-27. **روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات** (پروتکل گام‌به‌گام اجرایی طرح)
-28. **منابعی که استفاده شد (انگلیسی یا فارسی)** (فهرست کامل منابع به شیوه ونکوور بر مبنای ترتیب ظهور در متن)
-
-> **قانون قطعی برای مدل‌های هوش مصنوعی (Absolute Instruction for AI Agents):**  
-> هنگام استفاده از این اسکیل در هر سشنی، هرگز ساختارهای قدیمی (نظیر ساختار ۱۴ بخشی) را تولید نکنید و هرگز پروپوزال را مستقیماً از حافظه فرار ذهنی خود ننویسید. خروجی پروپوزال باید **دقیقاً و مو‌به‌مو شامل این ۲۸ بخش با شماره‌گذاری و عناوین فوق** باشد و از طریق پایپ‌لاین ریسرچ اجرا گردد.
-
----
-
-## ۲. دستورالعمل اجرایی ایجنت هوش مصنوعی (Mandatory Two-Stage 4-Subagent Execution Protocol)
-
-> [!IMPORTANT]
-> **پروتکل قطعی ارکستراسیون دومرحله‌ای با ۴ ساب‌ایجنت تخصصی (Two-Stage 4-Subagent Orchestration Protocol — Inspired by Claude Multi-Agent Research, PaperQA2 & AI-Scientist-v2):**  
-> برای تضمین اصالت علمی ۱۰۰٪، حذف کامل عبارات قالبی، جلوگیری از خطای انتساب استنادی (Citation Drift) و ممانعت از هرگونه مغایرت بین‌بخش‌ها، ایجنت اصلی **موظف و مکلف است** فرآیند تولید پروپوزال را در **۲ مرحله مستقل با ۴ ساب‌ایجنت تخصصی از طریق ابزار `invoke_subagent`** و **موتور حلقه بسته ۱۰ مرحله‌ای (`DEFAULT_MAX_ITERATIONS = 10`)** اجرا نماید:
->
-> [!CAUTION]
-> ### 🛑 الزامات قطعی عدم دور زدن پایپ‌لاین و پشتیبانی چنددامنه‌ای (Multi-Domain Polymorphism v12.1)
-> **هرگز و تحت هیچ شرایطی پایپ‌لاین پیش‌فرض (`run_research_pipeline.py`) یا ساب‌ایجنت‌ها را کنار نگذارید!**  
-> اگر موضوع طرح غیرآزمایشگاهی باشد (مانند نظام سلامت، هزینه‌های کمرشکن CHE، پرداخت از جیب OOP، مطالعات مشاهده‌ای، یا کارآزمایی‌های بالینی)، ایجنت **نباید** پایپ‌لاین را دور بزند یا به صورت دستی و متنی پروپوزال بنویسد.
-> 
-> پایپ‌لاین در نسخه ۱۲.۱ به طور کاملاً خودکار نوع مطالعه (`study_family`) را از عنوان طرح یا پرچم `--study-family` تشخیص داده و تمامی ۲۸ بخش را به صورت پلی‌مورفیک تنظیم می‌کند:
-> 
-> | نوع مطالعه (`study_family`) | جامعه و مدل هدف | ابزار و روش گردآوری | حجم نمونه (بخش ۲۲) | مدل تحلیل آماری (بخش ۲۳) |
-> | :--- | :--- | :--- | :--- | :--- |
-> | **نظام سلامت و اقتصاد سلامت** (`health_systems`) | بیماران و خانوارهای مراجعه‌کننده | پرسشنامه WHO WHS & NHA و تطبیق با HIS بیمارستان | فرمول کوکران با ضریب اثر طرح ($DEFF=1.5, n=642$) | رگرسیون لجستیک چندمتغیره (AOR) و شاخص تمرکز کاکوانی (Stata/R) |
-> | **اپیدمیولوژی مشاهده‌ای** (`epidemiological`) | جمعیت هدف و گروه شاهد مبتنی بر جامعه | چک‌لیست معتبر STROBE و سامانه پرونده الکترونیک | فرمول کوکران مطالعات شیوع ($n=428$) | رگرسیون لجستیک چندمتغیره و تحلیل‌های تعدیل‌شده در SPSS/R |
-> | **کارآزمایی بالینی انسان** (`clinical_rct`) | بیماران واجد معیارهای ورود به مطالعه | پروتکل استاندارد GCP و فرم‌های eCRF | فرمول چو و وانگ ($n=128$) | تحلیل قصد درمان (ITT) و آزمون ANCOVA بر پایه CONSORT |
-> | **مدل حیوانی درون‌تنی** (`in_vivo`) | جوندگان آزمایشگاهی استاندارد | مداخله با سرنگ کالیبره و پاتولوژی | معادله تخصیص منابع مید ($E=N-B-T$) بر پایه ARRIVE 2.0 | Repeated Measures ANOVA و آزمون Log-Rank بقا |
-> | **کشت سلولی برون‌تن** (`in_vitro`) | رده‌های سلولی استاندارد ATCC | پلیت ۹۶، فلوسایتومتری، Real-Time PCR | معادله مید ($E=19$) و تحلیل توان فاکتوریل (G*Power) | آنالیز واریانس دوطرفه فاکتوریل و Chou-Talalay در CompuSyn |
-> 
-> **چرا دور زدن پایپ‌لاین منجر به شکست کامل کار می‌شود؟**
-> با کنار رفتن رانر اصلی، زنجیره تولید خودکار گراف قطع شده و فایل‌های حیاتی زیر تولید **نخواهند شد**:
-> ۱. `LITERATURE_CITATION_GRAPH.json` (گراف کامل روابط استنادی مقالات)
-> ۲. `LITERATURE_CITATION_GRAPH.html` (ویژوالایزر تحت وب اینتراکتیو با Cytoscape.js)
-> ۳. `BIOMEDICAL_CONCEPT_GRAPH.json` (شبکه ارتباطی مفاهیم و شاخص‌های سلامت CHE/OOP/ICER/QALY)
-> ۴. `claim_entailment_audit.json` (ممیزی قفل‌بسته گزاره‌های علمی علیه توهم)
-> ۵. سند Word رسمی با فرمول‌های بومی OMML ورد و استایل‌شیت پژوهشیار (`proposal.docx`).
->
-> ### مرحله اول (Stage 1: Parallel Pre-Draft Subagents -> `PROPOSAL_SPEC.json`):
-> پیش از اجرای پایپ‌لاین، ابتدا **۲ ساب‌ایجنت تخصصی شواهد و متدولوژی** را به صورت موازی فراخوانی کنید تا مقالات زنده PubMed/Europe PMC/OpenAlex، امتیاز ارتباط و استناد (PaperQA2 RCS 0–10)، و پارامترهای اختصاصی مدل بیماری را استخراج کنند:
->
-> ```json
-> invoke_subagent({
->   "Subagents": [
->     {
->       "Role": "Evidence & Quantitative RCS Appraisal Subagent",
->       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت ارزیابی نقادانه شواهد و امتیازدهی کمی (PaperQA2 Gather-Score-Cite) برای موضوع پروپوزال «<موضوع>» هستید. وظیفه شما: ۱. اجرای جستجوی زنده چندمرحله‌ای در PubMed/Europe PMC/OpenAlex با سرعنوان‌های MeSH انگلیسی و استخراج داده‌های اپیدمیولوژی و بار بیماری (GLOBOCAN برای سرطان، WHO/IHME GBD برای بیماری‌های مزمن و غیرواگیر، یا گزارش‌های رسمی سلامت برای نظام سلامت و اقتصاد سلامت) و ثبت استعلام رسمی پیشینه مستقیم موضوع (Negative Boolean Search Log). ۲. امتیازدهی به هر مطالعه (RCS 0-10) و استخراج مقادیر کمی واقعی از متن/چکیده هر مقاله متناسب با کهن‌الگوی مطالعه (نسبت شانس تعدیل‌شده AOR، درصد شیوع، شاخص‌های اقتصادی CHE/OOP/Kakwani، مقادیر IC50، دوز، درصد مهار، مقدار p، حجم نمونه) و تدوین پاراگراف سنتز فارسی اختصاصی (`farsi_synthesis_summary`) برای هر مقاله در لیست `studies`. ۳. تفکیک شواهد مستقیم جامعه/مدل هدف از شواهد موازی سایر جمعیت‌ها یا بافت‌ها جهت پیشگیری از خطای انتساب و تعمیم نادرست."
->     },
->     {
->       "Role": "Methodology & Biostatistical Anti-Chimera Subagent",
->       "TypeName": "research",
->       "Prompt": "شما ساب‌ایجنت طراحی متدولوژی منسجم و ضد کیمرا (Primary Anchor Protocol & Biostatistical Coherence) برای «<موضوع>» هستید. وظیفه شما: ۱. شناسایی کهن‌الگوی پژوهش (یکی از ۶ کهن‌الگو: نظام سلامت/اقتصاد سلامت، اپیدمیولوژی مشاهده‌ای، کارآزمایی بالینی RCT، مدل حیوانی، کشت سلولی برون‌تن، یا تشخیصی) و انتخاب یک مطالعه مرجع اصلی (Primary Anchor Study) هماهنگ با استانداردهای گزارش‌دهی جهانی (STROBE برای مشاهده‌ای، CONSORT برای بالینی، ARRIVE 2.0 برای حیوانی، OECD GCCP/MIQE برای آزمایشگاهی، STARD برای تشخیصی، و WHO Guidelines برای نظام سلامت). ۲. طراحی جدول کامل متغیرهای مستقل، وابسته و کنترل (بخش ۱۱) منطبق با تمامی اهداف اختصاصی بخش ۶، تعریف کنترل‌های اختصاصی روش (شاهد منفی، شاهد مثبت، کنترل متغیرهای مخدوش‌گر یا کنترل‌های مداخله‌ای)، ابزارهای استاندارد گردآوری داده (پرسشنامه‌های روایی‌سنجی‌شده WHO/NHA، سامانه‌های اطلاعات بیمارستانی HIS، چک‌لیست‌ها، یا دستگاه‌های آزمایشگاهی کالیبره) و روش گام‌به‌گام اجرا (بخش ۲۷). ۳. قفل کردن پارامترهای ریاضی حجم نمونه متناسب با کهن‌الگو در بخش ۲۲ (فرمول کوکران با ضریب اثر طرح DEFF برای نظام سلامت/مشاهده‌ای، فرمول چو و وانگ برای کارآزمایی بالینی، یا معادله تخصیص منابع مید E=N-B-T و تحلیل توان فاکتوریل G*Power برای مطالعات تجربی) جهت درج در `PROPOSAL_SPEC.json`."
->     }
->   ]
-> })
-> ```
->
-> #### ساختار استاندارد فایل `PROPOSAL_SPEC.json` (با ادغام عمیق خودکار در پایپ‌لاین):
-> ایجنت اصلی خروجی دو ساب‌ایجنت مرحله اول را در فایل `<پوشه خروجی>/PROPOSAL_SPEC.json` ذخیره می‌کند. پایپ‌لاین `run_research_pipeline.py` به صورت خودکار (`Deep-Merge`) فیلدهای `keywords`، مقالات و پاراگراف‌های `studies[].farsi_synthesis_summary`، `research_problem_model`، و پروتکل ضدکیمرای `MethodologyResearchSubagent` را بدون حذف هیچ داده‌ای ادغام می‌نماید:
->
-> ```json
-> {
->   "keywords": ["<English Agent 1>", "<English Agent 2>", "<English Disease/Cell Line MeSH>"],
->   "max_iterations": 10,
->   "problem_statement_text": "<متن جامع و مستند بخش ۲ با آمار دقیق GLOBOCAN 2022 اختصاصی ارگان هدف و گزارش جستجوی منفی>",
->   "studies": [
->     {
->       "study_id": "PMID:12345678",
->       "pmid": "12345678",
->       "doi": "10.xxxx/xxxxx",
->       "title": "Exact English Title from PubMed",
->       "authors": "Author A et al.",
->       "year": 2024,
->       "journal": "Journal Name",
->       "abstract": "Full English abstract text...",
->       "farsi_synthesis_summary": "در مطالعه بنیادین Author و همکاران (۲۰۲۴) بر روی رده سلولی ... نشان داده شد که ... (IC50 = ... μM, p < 0.01)؛ محدودیت روش‌شناختی این مطالعه عدم بررسی ... بود که در طرح حاضر پوشش داده می‌شود."
->     }
->   ],
->   "research_problem_model": {
->     "framework": "<یکی از ۶ کهن‌الگو: HEALTH_SYSTEMS_AND_HEALTH_POLICY / EPIDEMIOLOGICAL_OBSERVATIONAL / CLINICAL_TRIAL / EXPERIMENTAL_ANIMAL / EXPERIMENTAL_IN_VITRO / DIAGNOSTIC>",
->     "target_condition": {"name_fa": "<نام فارسی بیماری یا اولویت سلامت>", "name_en": "<English MeSH Condition / Health Topic>"},
->     "interventions_or_exposures": [{"name": "<مداخله اول یا متغیر مستقل اول>"}, {"name": "<مداخله دوم یا مواجهه>"}],
->     "population_or_model": {"primary_system": "<جامعه هدف، رده سلولی، حیوان آزمایشگاهی یا بیماران>", "control_system": "<گروه شاهد سالم، شاهد حلال، یا جمعیت مقایسه>"},
->     "primary_outcomes": [{"name": "<پیامد اولیه اول متناسب با کهن‌الگو: CHE/OOP، AOR، بقا، زیست‌پذیری یا حساسیت>"}, {"name": "<پیامد اولیه دوم>"}]
->   }
-> }
-> ```
->
-> سپس پایپ‌لاین را با پرچم‌های `--spec-file` و `--max-iterations 10` اجرا نمایید:
->
-> ```powershell
-> uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 10 --output-dir "<پوشه خروجی>"
-> ```
->
-> ### مرحله دوم: هیئت داوران گرنت ۷ پرسونایی شناختی (Stage 2: 7-Persona Cognitive Study Section — Up to 10 Rounds):
-> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است هیئت داوران گرنت متشکل از ۷ ساب‌ایجنت واقعی هوش مصنوعی با کانتکست کاملاً صفر (Zero-Context)** را فراخوانی کند:
->
-> ```json
-> invoke_subagent({
->   "Subagents": [
->     {
->       "Role": "Grant Significance & Clinical Burden Reviewer",
->       "TypeName": "grant-significance-innovation",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: ارزیابی بار بیماری (GLOBOCAN/WHO)، تمایز از پژوهش‌های گذشته و تبیین شفاف شکاف دانش بر پایه رول تخصصی."
->     },
->     {
->       "Role": "Hostile Methodologist & Computational Biostatistician",
->       "TypeName": "grant-methodology-biostatistics",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید. با اجرای دستور 'uv run python scripts/verify_biostatistics.py --proposal <پوشه خروجی>/proposal.md --study-family <archetype> --json' فرمول حجم نمونه و توان آزمون را راستی‌آزمایی نمایید."
->     },
->     {
->       "Role": "Pedantic Literature & Citation Auditor",
->       "TypeName": "grant-evidence-entailment",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: تطابق خط‌به‌خط ادعاهای بخش ۲ و ۳ با چکیده مقالات بخش ۲۸ و ممانعت قطعی از لغزش استناد."
->     },
->     {
->       "Role": "Feasibility, Budget & Infrastructure Lead",
->       "TypeName": "grant-feasibility-logistics",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: امکان‌پذیری پروتکل بخش ۲۷، جدول زمان‌بندی گانت بخش ۱۲ و امکانات مراکز دانشگاهی در بخش‌های ۱۶ و ۱۹."
->     },
->     {
->       "Role": "Bioethics & Lay Advocate Reviewer",
->       "TypeName": "grant-ethics-lay-advocate",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: کدهای ۲۶ گانه اخلاقی پژوهشیار در بخش ۲۴، الزامات حفاظت زیستی بخش ۲۵، اصول ARRIVE/GCP، وضوح تعاریف بخش ۵ و محدودیت‌های بخش ۲۶."
->     },
->     {
->       "Role": "Academic Style, Scholarly Voice & Prose Hygiene Reviewer",
->       "TypeName": "grant-academic-style-voice",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را بر پایه استانداردهای ۶ لایه Academic Humanizer ممیزی کنید: تنوع طول جملات (انحراف معیار σ >= 8.0)، حذف امضاهای کلیشه‌ای ماشینی و خط‌فاصله کشیده، لنگراندازی دقیق آزمایشگاهی، مهار ادعای قطعیت زودهنگام و ممانعت قطعی از هرگونه اشاره به هوش مصنوعی در متن."
->     }
->   ]
-> })
-> ```
->
-> سپس دبیر علمی هیئت داوران (`grant-study-section-sro`) با دریافت کارنامه‌های داوری، نمرات را در مقیاس NIH (1.0 تا 9.0) تجمیع و کارنامه نهایی را صادر می‌کند:
-> ```json
-> invoke_subagent({
->   "Role": "Scientific Review Officer & Swarm Synthesizer",
->   "TypeName": "grant-study-section-sro",
->   "Prompt": "گزارش ۶ داور تخصصی را تجمیع کرده، نمره میانگین NIH را محاسبه و فایل MOCK_GRANT_REVIEW_PANEL_REPORT را صادر کنید."
-> })
-> ```
->
-> #### سیاست داوری کامل ۷ نفره در تمامی دورها (Full Panel Re-Review up to 10 Rounds):
-> در صورت وجود هرگونه ایراد مسدودکننده (Blocker) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی proposal.md اعمال کرده و **تمامی ۷ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
->
-> #### پروتکل جایگزین ترتیبی در محیط‌های فاقد invoke_subagent (Sequential In-Context Fallback Protocol):
-> چنانچه ابزار invoke_subagent در محیط اجرایی (یا کلاینت کاربر) فعال یا در دسترس نباشد:
-> ۱. ایجنت اصلی به صورت خودکار به عنوان جایگزین عمل نموده و ۶ لنز داوری گلدفیش را به صورت ترتیبی و با ایزولاسیون ذهنی کامل (Persona-based In-Context Auditing) شبیه‌سازی می‌کند.
-> ۲. برای لنز متدولوژی، دستور پایتونی python scripts/verify_biostatistics.py --proposal ... را اجرا کرده و خروجی محاسباتی را ملاک قرار می‌دهد.
-> ۳. سپس با پرسونای دبیر علمی (grant-study-section-sro) گزارش‌ها را تجمیع، میانگین نمرات را محاسبه و گزارش EGM_GRANT_STUDY_SECTION_REPORT.md را صادر می‌نماید.
-> ۴. رانر پایتونی پایپ‌لاین (
-un_research_pipeline.py) به صورت توکار دارای ماژول‌های محاسباتی EGMStudySectionCoordinator و MockGrantReviewPanel است که بدون نیاز به invoke_subagent تمام ممیزی‌های عینی، تطابق بخش‌ها و محاسبه نمرات را به صورت دترمینستیک و مستقل اجرا می‌کنند.
->
-> ---
->
-> ### مرحله سوم: ممیزی ایزوله پایانی و حلقه بازگشت به هیئت داوران (Stage 3: Post-Draft Isolated Audit & Return Loop — Up to 5 Returns):
-> پس از تصویب هیئت داوران، ۲ ساب‌ایجنت ممیز ایزوله جهت صحه‌گذاری نهایی فراخوانی می‌شوند:
-> 1. `citation-claim-verifier` (راستی‌آزمایی خط‌به‌خط ارجاعات با مقالات پاب‌مد)
-> 2. `professor-namoosi-auditor` (ممیزی سخت‌گیرانه ۶ خط قرمز قطعی HARD-01 تا HARD-06).
->
-> #### پروتکل بازگشت به هیئت داوران (The Return Loop):
-> ۱. چنانچه هر یک از دو داور ایزوله پایانی ایرادی کشف کنند، ایجنت اصلی متن را اصلاح می‌کند.
-> ۲. پروپوزال اصلاح‌شده **مجدداً وارد مرحله دوم (هیئت داوران ۷ نفره)** می‌شود و هیئت داوران تا ۱۰ دور مستقل فرصت داوری مجدد سند را خواهد داشت.
-> ۳. سقف مجاز این چرخه رفت‌وبرگشت بین مرحله ۳ و مرحله ۲ دقیقاً **۵ بار** است.
-> ۴. **قاعده رفع تعارض:** در صورت تضاد نظرات، خطوط قرمز ۶ گانه داور ایزوله (`HARD-01` تا `HARD-06`) اولویت مطلق و قطعی دارند.
-> ۵. **قانون ممنوعیت قطعی نشت هرگونه بیانیه یا اشاره به هوش مصنوعی (Zero AI Mentions Invariant):** در سراسر متن پروپوزال (`proposal.md` و `proposal.docx`) به هیچ وجه نباید هیچ‌گونه سلب مسئولیت، پانویس یا اشاره‌ای به نگارش با هوش مصنوعی یا استفاده از مدل‌های زبانی درج شود؛ اثر نهایی باید ۱۰۰٪ به عنوان یک خروجی آکادمیک اصیل، فاخر و معتبر متعلق به پژوهشگر ارائه گردد.
-> ۶. **پروتکل تحویل بهینه (Best-Effort Delivery):** اگر پس از پایان سقف دورها به نمره زیر ۱.۵ نرسد، بهترین نسخه با الصاق کارنامه داوری و برچسب اخطار صادر می‌گردد.
->
-> > [!CAUTION]
-> > **الزام قطعی ارسال کلیدواژه‌های انگلیسی در پرچم `--keywords`:**  
-> > پایگاه‌های علمی رسمی بین‌المللی نظیر PubMed و Europe PMC صرفاً بر مبنای سرعنوان‌های استاندارد انگلیسی (MeSH Descriptors) ایندکس شده‌اند. ساب‌ایجنت‌ها و ایجنت اصلی موظفند کلیدواژه‌های داروها و بیماری را به انگلیسی ارسال نمایند (مثال: `--keywords "Metformin, Curcumin, Breast Neoplasms"`). عدم ارسال کلیدواژه‌های انگلیسی موجب خطای 0-hit و افت کیفیت نتایج آنلاین خواهد شد.
-
----
-
-## ۳. معماری ۴ لایه‌ای ماژولار نسخه ۱۱.۰
-
-```text
-+-----------------------------------------------------------------------------------+
-|                        ProposalReadinessGate (Master Gatekeeper)                  |
-+-----------------------------------------------------------------------------------+
-        │                                                                   │
-        ▼                                                                   ▼
-+---------------------------------------+   +---------------------------------------+
-|    LAYER 1: SCIENTIFIC ACCURACY       |   |    LAYER 2: STRUCTURAL COMPLIANCE     |
-| • BiologicalMechanismVerifier         |   | • MethodologyCompletenessGate (28)    |
-| • CombinationHypothesisEngine         |   | • CombinationModelSelector (ANOVA/GLM)|
-| • CompoundEntityNormalizer            |   | • Mandatory Sample Size Formula Box   |
-+---------------------------------------+   +---------------------------------------+
-        │                                                                   │
-        ▼                                                                   ▼
-+---------------------------------------+   +---------------------------------------+
-|    LAYER 3: CITATION INTEGRITY        |   |   LAYER 4: FORMATTING & TYPESETTING   |
-| • CitationTracker                     |   | • NativeOmmlMathEngine (LaTeX->OMML)  |
-| • Strict Vancouver Order of Appearance|   | • PersianMedicalTypographyLinter      |
-| • Orphaned Claim & Unused Ref Auditor |   | • YAML Rules & First-Mention Expansion|
-+---------------------------------------+   +---------------------------------------+
+```
+┌────────────────────────────────────────────────────────┐
+│  Creative Gate 1: Socratic Strategy & Archetype Conf.   │
+│  - ask_question: Clarify study archetype & methodology │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│  Stage 1: Pre-Draft Literature & Evidence Harvesting   │
+│  - generic_search_planner.py & mesh_query_expander.py  │
+│  - Parallel Research Subagents (PaperQA2 RCS 0-10)     │
+│  - Generate PROPOSAL_SPEC.json                         │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│  Stage 2: Core Proposal & Native Word OMML Synthesis   │
+│  - Render 28 Canonical Pajooheshyar Sections           │
+│  - build_canonical_proposal_docx.py                    │
+│  - native_omml_math_engine.py (<m:f>, <m:rad>)        │
+│  - Literature & Concept Graphs (Cytoscape.js)          │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│  Stage 3: 7-Subagent Cognitive Study Section Panel     │
+│  - 6 Specialized Domain Reviewers (NIH Heuristic 1-9) │
+│  - Biostatistics Verification (verify_biostatistics.py)│
+│  - SRO Panel Synthesis (grant-study-section-sro)      │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│  Stage 4: Post-Draft Citation & Quality Audit Loop     │
+│  - citation-claim-verifier: Abstract entailment check  │
+│  - professor-namoosi-auditor: Objective rubric check   │
+│  - Self-repair loop (Max 2 iterations if needed)       │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│  Creative Gate 2: Package Release & Delivery           │
+│  - Final verified proposal.docx & proposal.md          │
+│  - Visual Literature Graph & Audit Dossier             │
+└────────────────────────────────────────────────────────┘
 ```
 
-### لایه ۱: صحت علمی (Scientific Accuracy)
-1. **راستی‌آزمای خصمانه مکانیسم‌های بیولوژیک (`BiologicalMechanismAdversarialVerifier`):**
-   - دارای هستی‌شناسی ساختارمند از تنظیم‌کننده‌های مرگ برنامه‌ریزی‌شده سلولی (آپوپتوز) و چرخه سلولی (Bcl-2, Bcl-xL, Bax, Bak, Caspases, p53, AKT, PTEN و ...).
-   - شناسایی و مسدودسازی وارونگی نقش پروتئین‌ها (نظیر معرفی اشتباه Bcl-xL به عنوان پیش‌آپوپتوزی یا Bax به عنوان ضدآپوپتوزی) با برگرداندن وضعیت `CONTRADICTED`.
-2. **موتور فرضیات ترکیب درمانی (`CombinationHypothesisEngine`):**
-   - تولید خودکار دو فرضیه موازی و متوازن: فرضیه هم‌افزایی ($H_1$) و فرضیه تضاد / اثر تجمعی ($H_2$).
-   - محاسبه شاخص توازن شواهد (`evidence_balance_score`) و صدور اخطار سوگیری شواهد مثبت (`POSITIVE_EVIDENCE_DOMINANCE_WARNING`) در صورت غیبت شواهد منفی یا بی‌اثر.
-3. **نرمال‌ساز هویت مواد (`CompoundEntityNormalizer`):**
-   - دسته‌بندی مواد در ۴ رده استاندارد: ماده خالص (`PURE_COMPOUND`)، عصاره استاندارد (`STANDARDIZED_EXTRACT`)، عصاره خام گیاهی (`CRUDE_EXTRACT`) و آنالوگ سنتزی (`SYNTHETIC_ANALOG`).
-   - پیشگیری قطعی از مغالطه انتساب اثرات عصاره به مولکول خالص بدون ذکر مشخصات خلوص و استانداردسازی.
+---
 
-### لایه ۲: تطابق ساختاری (Structural Compliance)
-4. **گیت جامعیت ۲۸ بخشی پژوهشیار (`MethodologyCompletenessGate`):**
-   - اعتبارسنجی دقیق و بدون اغماض ۲۸ بخش مصوب فوق.
-   - الزام قطعی درج فرمول ریاضی محاسبه حجم نمونه (فرمول کوهن، رابطه تخصیص منابع مید $E = N - B - T$، فرمول کوکران و ...) در بخش ۲۲؛ نبود فرمول مانع کامپایل سند خواهد شد.
-5. **انتخاب‌گر مدل آماری ترکیبی (`CombinationModelSelector`):**
-   - انتخاب مدل آماری متناسب با طراحی تجربی (مانند Two-Way Factorial ANOVA با ترم اثر متقابل $A \times B$، Repeated Measures ANOVA یا رگرسیون کاکس).
-   - تعریف آزمون‌های بررسی پیش‌فرض‌های آماری (نرمالیته، همگنی واریانس‌ها) و آزمون‌های تعقیبی مناسب (Tukey HSD, Bonferroni).
+## 2. Execution Protocol & Stages
 
-### لایه ۳: تمامیت استنادها (Citation Integrity)
-6. **ره‌گیر یکپارچه استنادات (`CitationTracker`):**
-   - اعمال دقیق شیوه ونکوور بر مبنای ترتیب ظهور در متن.
-   - کشف و گزارش ادعاهای بی‌ارجاع (`Orphaned Claims`) و منابع استفاده‌نشده در کتاب‌شناسی (`Unused References`).
-   - شماره‌گذاری و بازآرایی پویای ارجاعات در صورت جابه‌جایی پاراگراف‌ها.
+### Creative Gate 1: Socratic Strategy Confirmation
+Before executing any generation pipeline, the agent must interact with the user via `ask_question` to determine:
+1. **Study Archetype:** Choose from the 6 canonical archetypes (`clinical_rct`, `in_vivo`, `in_vitro`, `health_systems`, `epidemiological`, `diagnostic`).
+2. **Target Intervention & Biological System:** Confirm specific drugs, cell lines, animal models, or clinical cohorts.
+3. **Primary Outcome Measure:** Confirm the primary statistical endpoint (e.g., cell viability, hazard ratio, Catastrophic Health Expenditures, sensitivity/specificity).
 
-### لایه ۴: فرمت‌بندی و تایپوگرافی (Formatting & Typesetting)
-7. **موتور فرمول‌نویسی بومی ورد (`NativeOmmlMathEngine`):**
-   - تبدیل کدهای ریاضی لاتک به فرمول‌های استاندارد Office Math Markup Language (`<m:oMath>`, `<m:oMathPara>`) در ساختار XML ورد با پشتیبانی از فال‌بک یونیکد تمیز.
-   - حذف کامل و قطعی کدهای لاتک، علامت‌های دلار (`$...$`) و براکت‌های ریاضی از متن سند Word.
-8. **لینتر تایپوگرافی پزشکی فارسی (`PersianMedicalTypographyLinter`):**
-   - موتور مبتنی بر قوانین (`typography_rules.yaml`) برای تنظیم دقیق نیم‌فاصله‌ها (ZWNJ).
-   - تبدیل خودکار ارقام انگلیسی به فارسی در متن با محافظت از فرمول‌های علمی و مارکرهای استنادی.
-   - بسط و ترجمه خودکار اختصارات انگلیسی در نخستین اشاره در متن.
+### Stage 1: Evidence Harvesting & Specification (`PROPOSAL_SPEC.json`)
+The agent initiates literature harvesting:
+1. Formulate two-tier MeSH query strings using `scripts/mesh_query_expander.py`.
+2. Execute balanced dual-path search (efficacy trials vs. safety/toxicity/negative trials) across PubMed and Europe PMC.
+3. Spawn two parallel research subagents (`Role: Evidence & Quantitative RCS Appraisal Subagent`) to evaluate studies, compute Relevance and Citation Scores (RCS 0-10), and extract quantitative data points (IC50, sample size, odds ratios, p-values).
+4. Save the gathered metadata to `PROPOSAL_SPEC.json`.
 
-### گیت آمادگی جامع (`ProposalReadinessGate`)
-- یکپارچه‌ساز و سد نهایی پیش از تولید پروپوزال (Fail-Closed). تا زمانی که وضعیت تمام ۸ ماژول فوق به صورت کامل ارزیابی و تأیید نشود، هیچ سندی کامپایل نخواهد شد.
+### Stage 2: Proposal Drafting & Native OMML Compilation
+The proposal is generated strictly across the **28 Canonical Pajooheshyar Sections** (see `docs/STANDARDS_REFERENCE.md` for section definitions).
+- **Mathematical Equations:** Sample size formulas and statistical equations must be compiled into native Word OMML via `scripts/native_omml_math_engine.py`. Raw LaTeX strings (e.g., `\frac{...}{...}`) are strictly prohibited in the final `.docx` (enforced by `HARD-05`).
+- **Visual Design:** Governed by `scripts/build_canonical_proposal_docx.py`, enforcing Dubai 10.5pt font, `#1A365D` headers, zero soft line breaks, and table pagination tags (`<w:tblHeader/>`, `<w:cantSplit/>`).
+
+### Stage 3: 7-Subagent Cognitive Study Section Panel
+The unverified draft is evaluated by 7 specialized zero-context subagent reviewers:
+1. **Significance & Innovation (`grant-significance-innovation.md`):** Evaluates Sections 2, 3, 4 against epidemiologic indices (GLOBOCAN, GBD).
+2. **Methodology & Biostatistics (`grant-methodology-biostatistics.md`):** Audits Sections 13-23; executes `scripts/verify_biostatistics.py` to mathematically verify sample size formulas.
+3. **Evidence Entailment (`grant-evidence-entailment.md`):** Audits Sections 2, 3, 28 for zero citation drift and accurate PubMed metadata matching.
+4. **Feasibility & Logistics (`grant-feasibility-logistics.md`):** Audits Sections 12, 16, 19, 27 for realistic timeline Gantt charts and equipment availability.
+5. **Ethics & Lay Advocacy (`grant-ethics-lay-advocate.md`):** Audits Sections 5, 24, 25, 26 for Pajooheshyar ethics compliance, ARRIVE 2.0, and BSL safety.
+6. **Academic Style & Voice (`grant-academic-style-voice.md`):** Audits lexical hygiene, sentence burstiness ($\ge 8.0$), naturalized transitions, and zero AI disclosure boilerplate.
+7. **Scientific Review Officer (`grant-study-section-sro.md`):** Synthesizes reviewer scores into an aggregate Heuristic Completeness Score and issues the panel verdict.
+
+### Stage 4: Post-Draft Verification & Self-Repair
+- `citation-claim-verifier` inspects cited sentences against actual PubMed/PMC abstracts.
+- `professor-namoosi-auditor` evaluates the draft against `resources/rubrics/professor-namoosi-rubric.md` (HARD-01 to HARD-06).
+- If score is $\ge 90$ and 0 hard failures: Status is `APPROVED_HIGH_YIELD_READY`.
+- If minor deficiencies exist: The agent performs up to 2 targeted surgical self-repair cycles.
+
+### Creative Gate 2: Release & Delivery
+Deliver the verified artifacts in `output/[topic_slug]/`:
+- `proposal.docx`: Official Word document with native OMML formulas.
+- `proposal.md`: Markdown proposal manuscript.
+- `LITERATURE_CITATION_GRAPH.html`: Interactive Cytoscape.js citation network.
+- `BIOMEDICAL_CONCEPT_GRAPH.json`: Structured biomedical knowledge graph.
+- `AUDIT_REPORT.json`: Complete audit findings and scoring breakdown.
 
 ---
 
-## ۳. اسکریپت‌ها و ماژول‌های اجرایی مهارت (`scripts/`)
+## 3. Core Script Architecture (`scripts/`)
 
-- **`proposal_readiness_gate.py`:** گیت جامع آمادگی پیش از تولید سند پروپوزال (v9.0).
-- **`biological_mechanism_adversarial_verifier.py`:** راستی‌آزمای بیولوژیک و ناظر بر عدم وارونگی مسیرهای مرگ سلولی و چرخه سلولی (v9.0).
-- **`combination_hypothesis_engine.py`:** موتور تولید فرضیات دوگانه ترکیب درمانی و ارزیابی توازن شواهد (v9.0).
-- **`compound_entity_normalizer.py`:** نرمال‌ساز هستی‌شناختی مواد دارویی، عصاره‌ها و مشتقات (v9.0).
-- **`methodology_completeness_gate.py`:** گیت جامعیت ۲۸ بخشی پژوهشیار با الزام فرمول حجم نمونه (v9.0).
-- **`combination_model_selector.py`:** انتخاب‌گر مدل‌های آماری فاکتوریل و اثرات متقابل (v9.0).
-- **`citation_tracker.py`:** ره‌گیر استنادات به سبک ونکوور و کاشف ادعاهای بی‌منبع (v9.0).
-- **`native_omml_math_engine.py`:** تبدیل‌گر LaTeX به OMML بومی Word و حذف نشت کدهای لاتک (v9.0).
-- **`persian_medical_typography_linter.py` & `typography_rules.yaml`:** لینتر قوانین تایپوگرافی، نیم‌فاصله و اصطلاحات پزشکی (v9.0).
-- **`research_problem_model.py`:** استخراج و ساخت مدل مسئله پژوهش بر مبنای چارچوب‌های PICO/PECO/Diagnostic/Mechanistic.
-- **`generic_search_planner.py`:** طراحی استراتژی جستجوی ۱۶ لایه‌ای، تجزیه ابعاد مسئله پژوهش و نقشه‌برداری اصطلاحات MeSH.
-- **`scientific_search_adapter.py`:** آداپتور چندپایگاهی (PubMed, Europe PMC, OpenAlex, Crossref)، تعقیب استنادی سه‌جهته، بنچ‌مارک ریکال و ردیاب اشباع.
-- **`generic_reference_auditor.py`:** رکورد ۱۶ فیلدی شواهد کانونی، گیت اصالت داده‌های عددی، گیت مرزهای متنی، ونگاشت ادعا-شواهد بر مبنای SciFact.
-- **`generic_evidence_synthesis.py`:** تلفیق چندبعدی شواهد بر پایه ۸ بعد قطعیت، سنتز ساختارمند ۷ نقطه‌ای و تحلیل ریشه‌ای اختلافات.
-- **`docx_builder.py`:** موتور ارتقایافته ساخت سند رسمی Word با فونت دبی، صفحه جلد دانشگاهی، پالت رنگی ۵گانه سازمانی، خطوط افقی ۵۵ کاراکتری، فرمول‌های بومی OMML، جداول زبرا با تگ‌های cantSplit و tblHeader، و حذف قطعی شکست خط نرم جهت پیشگیری از به‌هم‌ریختگی جاستیفای.
-- **`iterative_remediation_engine.py`:** موتور راند بسته اصلاح و بازبینی جراحی پیوسته (Closed-Loop Critic-Refine) با هیئت داوری Mock Study Section تا احراز اجماع ۱۰۰٪ (v11.4.1).
-- **`egm_study_section_subagents.py`:** هیئت داوران گرنت ۶ پرسونایی بر پایه مدل فیل و ماهی‌قرمز گوگل (EGM v13.0) با ارزیابی ایزوله کانتکست صفر، سنتزگر SRO و نمره‌دهی تفکیکی استاندارد NIH از ۱.۰ تا ۹.۰.
-- **`temporal_knowledge_graph.py`:** موتور گراف دانش زمانی و سنتز GraphRAG مقالات در ۳ دوره تاریخی (مبانی کلاسیک، اعتبارسنجی میانی، مرزهای معاصر) جهت پیشگیری از توهم، جاافتادگی و خطاهای زمانی در مرور منابع (v13.0).
-- **`citation_graph_engine.py`:** موتور استخراج گراف استنادی چندجهته بر پایه الگوریتم‌های Litmaps/Inciteful و تولید ویژوالایزر تحت وب اینتراکتیو با Cytoscape.js (`LITERATURE_CITATION_GRAPH.html`).
-- **`biomedical_concept_graph.py`:** شبکه استخراج موجودیت‌ها و مفاهیم زیست‌پزشکی و اقتصاد سلامت (CHE, OOP, ICER, QALY) و ثبت در `BIOMEDICAL_CONCEPT_GRAPH.json`.
-- **`mesh_query_expander.py`:** تزاروس جامع MeSH گسترش‌یافته به ۱۱۹ توصیف‌گر استاندارد در ۱۹ شاخه بالینی همراه با استخراج کلیدواژه‌های لاتین و ممانعت قطعی از فال‌بک سرطان بر موضوعات غیرسرطان (v13.2).
-- **`pre_emptive_risk_of_bias_mitigator.py`:** ممیزی پیش‌گیرانه خطر سوگیری متناسب با کهن‌الگو شامل QUADAS-2 (سوگیری طیف و ثبت متوالی) برای تشخیصی، STROBE (چارچوب نمونه‌گیری و استانداردسازی مصاحبه‌گر) برای مشاهده‌ای، در کنار Cochrane RoB-2 و SYRCLE (v13.2).
-- **`graph_entailment_gate.py`:** دروازه قفل‌بسته تطبیق ادعاها با شواهد گراف و جلوگیری از ادعاهای تعمیم‌یافته فاقد پشتوانه.
-- **`methodology_research_subagent.py`:** ساب‌ایجنت استخراج پروتکل‌های یکپارچه و ضد کیمرا در ۶ کهن‌الگوی مطالعاتی (نظام سلامت، اپیدمیولوژی، کارآزمایی بالینی، درون‌تنی، برون‌تن).
-- **`generate_compliant_proposal.py`:** پایپ‌لاین یکپارچه و منطبق بر ۲۸ بخش پژوهشیار با کنترل کامل گیت آمادگی.
+| Script | Purpose & Capabilities |
+|---|---|
+| `build_canonical_proposal_docx.py` | Official Word (.docx) compiler with Pajooheshyar stylesheet, Dubai font, and table formatting. |
+| `native_omml_math_engine.py` | Converts LaTeX math expressions into native Office Math Markup Language (`<m:oMath>`, `<m:f>`, `<m:rad>`). |
+| `verify_biostatistics.py` | Parametrically verifies sample size equations across all 6 study archetypes; rejects unsupported archetypes. |
+| `mesh_query_expander.py` | Maps clinical keywords across 130+ standardized MeSH descriptors in 11 clinical fields. |
+| `generic_search_planner.py` | Formulates balanced, multi-database search queries with dynamic time windows. |
+| `claim_entailment_auditor.py` | Evaluates factual entailment between cited claims and retrieved abstracts. |
+| `literature_citation_graph.py` | Constructs directed citation networks and exports interactive Cytoscape HTML visualizers. |
+| `biomedical_concept_network.py` | Builds semantic concept graphs connecting interventions, outcomes, and disease targets. |
+| `sync_skills.py` | Dual-repo synchronization engine for submodules and parent repositories. |
+| `sync_agent_memory.py` | Persistent memory synchronization engine with automatic length compaction (< 200 lines). |
 
 ---
 
-## ۴. سوئیت جامع آزمون و اعتبارسنجی (`tests/`)
+## 4. Test Suite & Validation Commands
 
-موتور با اجرای دستور زیر ممیزی و آزاد می‌شود:
+All core functionality is covered by regression tests in `tests/`:
+
 ```bash
-python scripts/master_release_gate.py
+# Run the complete test suite
+uv run python tests/run_all_tests.py
+
+# Run targeted adversarial and math conversion tests
+uv run python -m unittest tests/test_v90_adversarial.py
+
+# Run cognitive study section verification tests
+uv run python -m unittest tests/test_v140_cognitive_study_section.py
+
+# Run JSON schema integrity tests
+uv run python -m unittest tests/test_property_and_schemas.py
 ```
-این سیستم به صورت پویا کلیه سوئیت‌های آزمون مستقل را اجرا و نتایج زیر را ثبت کرده است:
-1. **آزمون نشت کدهای ایستا (`test_hard_code_leakage.py`):** اثبات وجود ۰ کلیدواژه بیولوژیک در کدهای هسته در ۴۲ آزمون (۴۲ تست).
-2. **آزمون تعمیم‌پذیری ۱۲ گانه دامنه‌ای (`test_generalization.py`):** اجرای کامل پایپ‌لاین روی ۱۲ فیکسچر مستقل (۱۲ تست).
-3. **آزمون‌های تنش خصمانه و کنترل‌های منفی ۱۱۴ گانه (`test_adversarial_scenarios.py`):** ۱۱۴ آزمون شامل آداپتور، اشباع، غربالگری و سقف ۲۵ رفرنس (۱۱۴ تست).
-4. **سوئیت بنچ‌مارک ۶۰ آزمونه (`self_audit_suite.py`):** اعتبارسنجی ۱۰۰ درصدی طرح‌های تاریخی و رعایت فرمت (۶۰ تست).
-5. **سوئیت آزمون جهش‌های علمی (`test_mutations.py`):** آزمون ۱۰ جهش مخرب عمدی با نمره کشندگی ۱۰۰٪ (۱۰ تست).
-6. **سوئیت آزمون‌های خاصیت و اسکیمای Draft-07 (`test_property_and_schemas.py`):** ممیزی ناوردایی‌ها و تطابق اسکیماها (۱۴ تست).
-7. **سوئیت آزمون‌های یکپارچگی سرتاسری E2E (`test_e2e_integration.py`):** شبیه‌سازی کامل پایپ‌لاین (۲۴ تست).
-8. **سوئیت آزمون‌های خصمانه چندموضوعی دامنه‌مستقل (`test_cross_topic_adversarial.py`):** اعتبارسنجی سناریوهای A تا J (۱۱ تست).
-9. **سوئیت موتور پژوهش پیشرفته v8.5 (`test_advanced_research_engine.py`):** اعتبارسنجی جستجوی چندپایگاهی و تعقیب استنادی (۲۲ تست).
-10. **سوئیت خوانش عمیق و بنچ‌مارک ریکال v8.6 (`test_v86_deep_reading_and_recall_benchmark.py`):** آزمون بخش‌های A-E، رده‌بندی ۸ سطحی شواهد و تاکسونومی ۱۳ گانه (۱۴ تست).
-11. **سوئیت اصالت شواهد و نگاشت معنایی v8.7 (`test_v87_evidence_grounding_and_attribution.py`):** آزمون داده‌های عددی، گیت مرزهای متنی و SciFact (۱۴ تست).
-12. **سوئیت رگرسیون ممیزی واقعی v8.7 (`test_v87_remediation_regressions.py`):** پیشگیری قطعی از خطاهای انتساب شواهد و رفع سقف‌های تصنعی (۱۰ تست).
-13. **سوئیت آزمون‌های خصمانه معماری ماژولار v9.0 (`test_v90_adversarial.py`):** اعتبارسنجی شکست‌های عمدی مکانیسم، سوگیری مثبت، فرمول حجم نمونه، OMML، ونکوور و گیت آمادگی (۱۴ تست).
-14. **سوئیت هاردنینگ علمی و اعتبارسنجی ۲۸ بخشی v9.1 (`test_v91_hardening.py`):** اعتبارسنجی ساختار ۲۸ بخشی، گیت جامعیت، عدم نشت لاتک، محافظت از پرانتزهای انگلیسی و ره‌گیری ونکوور (۲۰ تست).
-15. **سوئیت بازبینی بسته و اصلاح پیوسته (`test_iterative_remediation_engine.py`):** ممیزی راندهای اصلاح جراحی، همگرایی نمره داوری و فیوز Fail-Closed (۳ تست).
-
-16. **سوئیت پلی‌مورفیسم چنددامنه‌ای نظام سلامت و بالینی v12.1 (`test_v121_multidomain_polymorphism.py`):** اعتبارسنجی مطالعات CHE/OOP، پیشگیری از مثبت کاذب چو-تالالای روی CVI و انطباق کامل ۶ کهن‌الگو و ریشه‌کنی نشت موجودیت‌های آزمایشگاهی به مطالعات بالینی و تشخیصی (۱۲ تست).
-17. **سوئیت هیئت داوران گرنت EGM v13.0 (`test_v130_egm_study_section.py`):** اعتبارسنجی ۶ لنز گلدفیش، سنتز SRO، حلقه اصلاح ۱۰ دور و تولید پرونده جامع داوری (۱۰ تست).
-18. **سوئیت جامع عدم سوگیری، گسترش تزاروس MeSH و ممیزی پیش‌گیرانه ریسک سوگیری v13.2 (`test_v132_zero_bias_and_search_hardening.py`):** اعتبارسنجی گسترش تزاروس به ۱۱۹ توصیف‌گر در ۱۹ دسته تخصصی بدون فال‌بک ناخواسته سرطان، مسیر موازی جستجوی شواهد منفی و ایمنی، تزریق هوشمند بند شفافیت معرفتی در صورت نبود شواهد منفی، ممیزی سوگیری طیف QUADAS-2 و مخدوش‌گرهای STROBE، و استخراج لینک‌های استنادی واقعی درون مقالات و اسنوبالینگ ۱-هاپ (۷ تست).
-
-**مجموع آزمون‌ها:** ۵۵۲ آزمون مستقل با قبولی ۱۰۰٪ (552 / 552 PASS)، نمره کشندگی جهش ۱۰۰٪ (10 / 10 KILLED)، عدم نشت کد در تمام اسکریپت‌ها (42 / 42 PASS) و پاس کامل تمام معیارهای ممیزی.
 
 ---
 
-## ۵. استانداردهای اجباری طراحی دیداری سند رسمی مایکروسافت ورد (Mandatory Word Visual Design Standards)
+## 5. Reference Standards & Supplementary Documentation
 
-کلیه اسناد رسمی Word (`proposal.docx`) تولیدشده توسط این مهارت و ایجنت مربوطه در تمامی نشست‌ها و پروژه‌ها موظف به رعایت دقیق و صددرصدی مشخصات دیداری زیر هستند:
-
-1. **صفحه جلد دانشگاهی (Official Cover Page):**
-   - عنوان رسمی دانشگاه در بالا وسط‌چین با رنگ سرمه‌ای `#1A365D` و قلم دبی ۱۴ بولد.
-   - زیرعنوان رویداد/دانشکده با رنگ زرشکی `#742A2A` و قلم دبی ۱۱ بولد.
-   - محور تخصصی طرح با رنگ فیروزه‌ای `#0D5C75` و قلم دبی ۱۱ بولد.
-   - کادر اصلی عنوان: جدول ۱×۱ با پس‌زمینه `#F8FAFC`، خط کناری ضخیم راست سرمه‌ای (`sz=36`, `#1A365D`)، عنوان فارسی در ۱۱.۵pt بولد و عنوان انگلیسی در Times New Roman 9pt ایتالیک.
-   - جدول رسمی تیم پژوهشی: ۵ ستونه با هدر سرمه‌ای `#1A365D`، متن سفید، و سطرهای زبرای یک‌درمیان (`#F8FAFC` و `#FFFFFF`).
-   - کادر راهنمای ارسال: با خط کناری آبی `#2B6CB0` و پس‌زمینه `#F0F4F8`.
-   - شکست صفحه قطعی (`Page Break`) پس از صفحه جلد پیش از آغاز بخش ۱.
-
-2. **سلسله‌مراتب تیترها و خطوط جداکننده (Headings & Underlines):**
-   - **تیترهای اصلی سطح ۱ (`H1` / `##`):** رنگ سرمه‌ای `#1A365D`، اندازه قلم ۱۴pt بولد، تراز راست (`val="start"` با `w:bidi="1"`). بلافاصله در زیر هر تیتر اصلی، خط افقی ۵۵ کاراکتری استاندارد `"───────────────────────────────────────────────────────"` با رنگ آبی `#2B6CB0` و اندازه قلم ۸.۵pt درج می‌گردد.
-   - **زیرتیترهای سطح ۲ (`H2` / `###`):** رنگ زرشکی `#742A2A`، اندازه قلم ۱۱.۵pt بولد، تراز راست.
-   - **زیرتیترهای سطح ۳ (`H3` / `####`):** رنگ آبی تیره / استیل `#2B6CB0`، اندازه قلم ۱۰.۵pt بولد، تراز راست.
-
-3. **پاراگراف‌های بدنه و مهار کشیدگی جاستیفای (Body Text & Justification Invariant):**
-   - قلم سازمانی دبی (Dubai) با اندازه ۱۰.۵pt، رنگ زغالی `#2D3748`، فاصله خطوط ۱.۱۵.
-   - **ممنوعیت مطلق شکست خط نرم (`Soft Line Break`):** هرگونه کاراکتر `\r\n`، `\n` یا `<w:br/>` درون متن پاراگراف‌ها اکیداً ممنوع بوده و متن پیش از درج پاکسازی می‌شود تا ورد هرگز سطر پایانی پاراگراف‌ها را با فواصل عریض و زشت کش ندهد.
-   - پارس کامل ستاره‌های مارک‌داون (`**` و `*`) به صفات بولد و ایتالیک واقعی مایکروسافت ورد با تگ‌های اختصاصی بومی `<w:bCs/>` و `<w:iCs/>`.
-   - تزریق خودکار نشانگرهای ایزولاسیون یونیکد (`\u200F` برای کروشه‌های مراجع و `\u200E` برای اصطلاحات لاتین) جهت ممانعت از وارونگی مراجع نظیر `[8 ,2 ,1]`.
-
-4. **باکس‌های ویژه و جداول مقاله‌ای (Callouts & Tables):**
-   - **کادر شفافیت معرفتی و یادداشت‌های سیاستی (`>`):** خط راست فیروزه‌ای `#0D5C75`، پس‌زمینه لایت `#F0F4F8`، پیشوند رسمی `◄ شفافیت معرفتی پیرامون سوگیری انتشار (Publication Bias):` با فونت ۱۰.۵pt بولد.
-   - **جداول:** تراز وسط، خطوط افقی باریک `#E2E8F0`، خطوط بالا و پایین سرمه‌ای `#1A365D`، عدم استفاده از خطوط عمودی، رنگ هدر سرمه‌ای `#1A365D` با متن سفید بولد، سطرهای زبرا، و الصاق اجباری تگ‌های `<w:tblHeader/>` و `<w:cantSplit/>` به تمام سطرها.
-
+For exhaustive specifications, consult the following documentation in `docs/`:
+- **`docs/STANDARDS_REFERENCE.md`**: Detailed breakdown of the 28 Pajooheshyar canonical sections, the 6-archetype polymorphism matrix, full MeSH thesaurus mapping, and Word typography rules.
+- **`docs/HISTORICAL_CHANGELOG.md`**: Complete architectural evolution from v1.0 through v14.1.0.
+- **`resources/rubrics/professor-namoosi-rubric.md`**: Objective 100-point rubric and HARD-01 to HARD-06 failure definitions.

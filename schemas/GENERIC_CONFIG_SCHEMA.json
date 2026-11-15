@@ -3,7 +3,12 @@
   "title": "ProposalNevisiProjectConfig",
   "description": "Topic-agnostic configuration schema for medical research proposal generation and literature synthesis.",
   "type": "object",
-  "required": ["project_id", "research_question", "domain", "study_framework"],
+  "required": [
+    "project_id",
+    "research_question",
+    "domain",
+    "study_framework"
+  ],
   "properties": {
     "project_id": {
       "type": "string",
@@ -59,7 +64,8 @@
           "type": "number",
           "default": 0.75
         }
-      }
+      },
+      "additionalProperties": false
     },
     "evidence_policy": {
       "type": "object",
@@ -84,7 +90,8 @@
           "type": "integer",
           "default": 0
         }
-      }
+      },
+      "additionalProperties": false
     },
     "output_specification": {
       "type": "object",
@@ -101,7 +108,9 @@
           "type": "boolean",
           "default": true
         }
-      }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }

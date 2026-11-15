@@ -192,6 +192,121 @@ class NativeOmmlMathEngine:
         return clean
 
     @classmethod
+    def _convert_latex_to_omml_body_native(cls, text: str) -> str:
+        """
+        Recursively translates LaTeX math expressions directly into native OMML elements
+        (<m:f>, <m:rad>, <m:acc>, <m:sSub>, <m:sSup>, <m:r>) without requiring external libraries.
+        Guarantees that fractions and radicals never degrade to raw text strings.
+        """
+        text = text.strip()
+        if not text:
+            return ""
+
+        parts = []
+        i = 0
+        n = len(text)
+
+        while i < n:
+            # Check for \frac{num}{den}
+            if text[i:].startswith(r'\frac'):
+                p = i + 5
+                while p < n and text[p].isspace():
+                    p += 1
+                if p < n and text[p] == '{':
+                    num, p2 = cls._extract_braced_arg(text, p)
+                    while p2 < n and text[p2].isspace():
+                        p2 += 1
+                    if num is not None and p2 < n and text[p2] == '{':
+                        den, p3 = cls._extract_braced_arg(text, p2)
+                        if den is not None:
+                            num_omml = cls._convert_latex_to_omml_body_native(num)
+                            den_omml = cls._convert_latex_to_omml_body_native(den)
+                            parts.append(f'<m:f><m:num>{num_omml}</m:num><m:den>{den_omml}</m:den></m:f>')
+                            i = p3
+                            continue
+
+            # Check for \sqrt{arg}
+            if text[i:].startswith(r'\sqrt'):
+                p = i + 5
+                while p < n and text[p].isspace():
+                    p += 1
+                if p < n and text[p] == '{':
+                    arg, p2 = cls._extract_braced_arg(text, p)
+                    if arg is not None:
+                        arg_omml = cls._convert_latex_to_omml_body_native(arg)
+                        parts.append(f'<m:rad><m:radPr><m:degHide m:val="1"/></m:radPr><m:e>{arg_omml}</m:e></m:rad>')
+                        i = p2
+                        continue
+
+            # Check for \hat, \bar, \overline
+            m_acc = re.match(r'\\(hat|bar|overline)\{', text[i:])
+            if m_acc:
+                acc_type = m_acc.group(1)
+                p = i + len(m_acc.group(0)) - 1
+                arg, p2 = cls._extract_braced_arg(text, p)
+                if arg is not None:
+                    chr_val = "^" if acc_type == "hat" else "¯"
+                    arg_omml = cls._convert_latex_to_omml_body_native(arg)
+                    acc_elem = f'<m:acc><m:accPr><m:chr m:val="{chr_val}"/></m:accPr><m:e>{arg_omml}</m:e></m:acc>'
+                    # Check if followed by subscript e.g. \hat{p}_1 or \hat{p}_{1}
+                    if p2 < n and text[p2] == '_':
+                        p3 = p2 + 1
+                        if p3 < n and text[p3] == '{':
+                            sub_arg, p4 = cls._extract_braced_arg(text, p3)
+                        elif p3 < n:
+                            sub_arg, p4 = text[p3], p3 + 1
+                        else:
+                            sub_arg, p4 = "", p3
+                        sub_omml = cls._convert_latex_to_omml_body_native(sub_arg or "")
+                        parts.append(f'<m:sSub><m:e>{acc_elem}</m:e><m:sub>{sub_omml}</m:sub></m:sSub>')
+                        i = p4
+                        continue
+                    else:
+                        parts.append(acc_elem)
+                        i = p2
+                        continue
+
+            # Subscript check e.g. n_1 or n_{1}
+            m_sub = re.match(r'([a-zA-Z0-9])_(\{([^{}]+)\}|([a-zA-Z0-9]))', text[i:])
+            if m_sub:
+                base = m_sub.group(1)
+                sub_val = m_sub.group(3) or m_sub.group(4)
+                parts.append(f'<m:sSub><m:e><m:r><m:t>{base}</m:t></m:r></m:e><m:sub><m:r><m:t>{sub_val}</m:t></m:r></m:sub></m:sSub>')
+                i += len(m_sub.group(0))
+                continue
+
+            # Superscript check e.g. z^2 or z^{2}
+            m_sup = re.match(r'([a-zA-Z0-9])\^(\{([^{}]+)\}|([a-zA-Z0-9]))', text[i:])
+            if m_sup:
+                base = m_sup.group(1)
+                sup_val = m_sup.group(3) or m_sup.group(4)
+                parts.append(f'<m:sSup><m:e><m:r><m:t>{base}</m:t></m:r></m:e><m:sup><m:r><m:t>{sup_val}</m:t></m:r></m:sup></m:sSup>')
+                i += len(m_sup.group(0))
+                continue
+
+            # Greek / symbol command e.g. \alpha, \pm
+            m_cmd = re.match(r'\\[a-zA-Z]+', text[i:])
+            if m_cmd:
+                cmd = m_cmd.group(0)
+                uni = cls.LATEX_TO_UNICODE.get(cmd, cmd)
+                parts.append(f'<m:r><m:t>{uni}</m:t></m:r>')
+                i += len(cmd)
+                continue
+
+            # Plain character
+            char = text[i]
+            if char in ('&', '<', '>'):
+                esc = '&amp;' if char == '&' else ('&lt;' if char == '<' else '&gt;')
+                parts.append(f'<m:r><m:t>{esc}</m:t></m:r>')
+            elif char == '-':
+                parts.append('<m:r><m:t>−</m:t></m:r>')
+            elif not char.isspace():
+                parts.append(f'<m:r><m:t>{char}</m:t></m:r>')
+            i += 1
+
+        return "".join(parts)
+
+    @classmethod
     def convert_latex_to_omml(cls, latex_expr: str, is_display: bool = False) -> str:
         """
         Converts LaTeX mathematical expression to OMML XML string.
@@ -216,7 +331,19 @@ class NativeOmmlMathEngine:
             except Exception:
                 pass
 
-        # Fallback: Clean Unicode embedded in standard OMML run
+        # Fallback 1: Native recursive OMML element parser (zero external deps)
+        native_body = cls._convert_latex_to_omml_body_native(clean_latex)
+        if native_body:
+            if is_display:
+                return (
+                    f'<m:oMathPara {nsdecls("m")}>'
+                    f'<m:oMath>{native_body}</m:oMath>'
+                    f'</m:oMathPara>'
+                )
+            else:
+                return f'<m:oMath {nsdecls("m")}>{native_body}</m:oMath>'
+
+        # Fallback 2: Clean Unicode embedded in standard OMML run
         unicode_math = cls.convert_latex_to_unicode(clean_latex)
         escaped_text = (
             unicode_math.replace('&', '&amp;')

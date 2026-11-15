@@ -17,50 +17,127 @@
     "controlled_vocabulary"
   ],
   "properties": {
-    "model_id": { "type": "string" },
-    "research_title_fa": { "type": "string" },
-    "research_title_en": { "type": "string" },
-    "domain": { "type": "string" },
+    "model_id": {
+      "type": "string"
+    },
+    "research_title_fa": {
+      "type": "string"
+    },
+    "research_title_en": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
     "framework": {
       "type": "string",
-      "enum": ["PICO", "PECO", "DIAGNOSTIC", "PROGNOSTIC", "MECHANISTIC", "EXPERIMENTAL_IN_VITRO", "EXPERIMENTAL_ANIMAL"]
+      "enum": [
+        "PICO",
+        "PECO",
+        "DIAGNOSTIC",
+        "PROGNOSTIC",
+        "MECHANISTIC",
+        "EXPERIMENTAL_IN_VITRO",
+        "EXPERIMENTAL_ANIMAL"
+      ]
     },
     "target_condition": {
       "type": "object",
-      "required": ["name_en", "mesh_term"],
+      "required": [
+        "name_en",
+        "mesh_term"
+      ],
       "properties": {
-        "name_en": { "type": "string" },
-        "name_fa": { "type": "string" },
-        "mesh_term": { "type": "string" },
-        "synonyms": { "type": "array", "items": { "type": "string" } }
-      }
+        "name_en": {
+          "type": "string"
+        },
+        "name_fa": {
+          "type": "string"
+        },
+        "mesh_term": {
+          "type": "string"
+        },
+        "synonyms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "population_or_model": {
       "type": "object",
-      "required": ["model_type", "primary_system"],
+      "required": [
+        "model_type",
+        "primary_system"
+      ],
       "properties": {
-        "model_type": { 
+        "model_type": {
           "type": "string",
-          "enum": ["HUMAN_CLINICAL", "ANIMAL_IN_VIVO", "CELL_CULTURE_IN_VITRO", "EX_VIVO_TISSUE", "IN_SILICO"]
+          "enum": [
+            "HUMAN_CLINICAL",
+            "ANIMAL_IN_VIVO",
+            "CELL_CULTURE_IN_VITRO",
+            "EX_VIVO_TISSUE",
+            "IN_SILICO"
+          ]
         },
-        "primary_system": { "type": "string" },
-        "secondary_systems": { "type": "array", "items": { "type": "string" } },
-        "normal_control_system": { "type": "string" }
-      }
+        "primary_system": {
+          "type": "string"
+        },
+        "secondary_systems": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "normal_control_system": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
     },
     "interventions_or_exposures": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "role"],
+        "required": [
+          "name",
+          "role"
+        ],
         "properties": {
-          "name": { "type": "string" },
-          "chemical_or_biological_class": { "type": "string" },
-          "role": { "type": "string", "enum": ["PRIMARY_AGENT", "ADJUVANT_AGENT", "REFERENCE_DRUG", "EXPOSURE_FACTOR", "INDEX_TEST"] },
-          "mesh_terms": { "type": "array", "items": { "type": "string" } },
-          "synonyms": { "type": "array", "items": { "type": "string" } }
-        }
+          "name": {
+            "type": "string"
+          },
+          "chemical_or_biological_class": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "PRIMARY_AGENT",
+              "ADJUVANT_AGENT",
+              "REFERENCE_DRUG",
+              "EXPOSURE_FACTOR",
+              "INDEX_TEST"
+            ]
+          },
+          "mesh_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     },
     "comparators": {
@@ -68,11 +145,27 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "type"],
+        "required": [
+          "name",
+          "type"
+        ],
         "properties": {
-          "name": { "type": "string" },
-          "type": { "type": "string", "enum": ["VEHICLE_CONTROL", "NEGATIVE_CONTROL", "POSITIVE_CONTROL", "PLACEBO", "STANDARD_OF_CARE", "GOLD_STANDARD"] }
-        }
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "VEHICLE_CONTROL",
+              "NEGATIVE_CONTROL",
+              "POSITIVE_CONTROL",
+              "PLACEBO",
+              "STANDARD_OF_CARE",
+              "GOLD_STANDARD"
+            ]
+          }
+        },
+        "additionalProperties": false
       }
     },
     "primary_outcomes": {
@@ -80,42 +173,119 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["name", "measurement_unit"],
+        "required": [
+          "name",
+          "measurement_unit"
+        ],
         "properties": {
-          "name": { "type": "string" },
-          "type": { "type": "string", "enum": ["EFFICACY", "VIABILITY", "TOXICITY", "SYNERGY", "MORTALITY", "SENSITIVITY", "SPECIFICITY", "HAZARD_RATIO"] },
-          "measurement_unit": { "type": "string" },
-          "preferred_assays": { "type": "array", "items": { "type": "string" } }
-        }
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "EFFICACY",
+              "VIABILITY",
+              "TOXICITY",
+              "SYNERGY",
+              "MORTALITY",
+              "SENSITIVITY",
+              "SPECIFICITY",
+              "HAZARD_RATIO"
+            ]
+          },
+          "measurement_unit": {
+            "type": "string"
+          },
+          "preferred_assays": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     },
     "hypothesized_mechanisms": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["pathway_name", "target_molecules"],
+        "required": [
+          "pathway_name",
+          "target_molecules"
+        ],
         "properties": {
-          "pathway_name": { "type": "string" },
-          "target_molecules": { "type": "array", "items": { "type": "string" } },
-          "expected_modulation": { "type": "string", "enum": ["UPREGULATION", "DOWNREGULATION", "PHOSPHORYLATION", "INHIBITION", "CLEAVAGE", "SECRETION"] }
-        }
+          "pathway_name": {
+            "type": "string"
+          },
+          "target_molecules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expected_modulation": {
+            "type": "string",
+            "enum": [
+              "UPREGULATION",
+              "DOWNREGULATION",
+              "PHOSPHORYLATION",
+              "INHIBITION",
+              "CLEAVAGE",
+              "SECRETION"
+            ]
+          }
+        },
+        "additionalProperties": false
       }
     },
     "controlled_vocabulary": {
       "type": "object",
-      "required": ["primary_mesh", "all_synonyms"],
+      "required": [
+        "primary_mesh",
+        "all_synonyms"
+      ],
       "properties": {
-        "primary_mesh": { "type": "array", "items": { "type": "string" } },
-        "all_synonyms": { "type": "array", "items": { "type": "string" } },
-        "exclusion_terms": { "type": "array", "items": { "type": "string" } }
-      }
+        "primary_mesh": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "all_synonyms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclusion_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "eligibility_criteria": {
       "type": "object",
       "properties": {
-        "inclusion": { "type": "array", "items": { "type": "string" } },
-        "exclusion": { "type": "array", "items": { "type": "string" } }
-      }
+        "inclusion": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclusion": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "additionalProperties": false
 }
