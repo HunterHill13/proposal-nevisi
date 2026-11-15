@@ -551,6 +551,171 @@ class EGMStudySectionCoordinator:
             weaknesses=weaknesses
         )
 
+
+    @classmethod
+    def evaluate_academic_style_and_voice(cls, sections: Dict[int, str], data: Dict[str, Any]) -> GoldfishReviewerResult:
+        """
+        Lens 6: grant-academic-style-voice (Derived from egm-style and academic-humanizer)
+        Academic Style, Scholarly Voice and Prose Hygiene Reviewer:
+        - 6-Layer Architecture based on https://github.com/AIScientists-Dev/academic-humanizer
+        - Layer 1: Eradicate robotic transition cliches and Em-dashes
+        - Layer 2: Sentence-length cadence and burstiness variance (target sigma >= 8.0)
+        - Layer 3: Concrete laboratory and clinical grounding (concentrations, timepoints, kinetics)
+        - Layer 4: Zero premature certainty (no false proof/isbat or over-claiming)
+        - Layer 5: Naturalized structure and non-repetitive list starters in aims
+        - Layer 6: Data invariant protection and ZERO AI disclosure mentions (Strict Blocker on AI leakage).
+        """
+        findings: List[GoldfishFinding] = []
+        strengths: List[str] = []
+        weaknesses: List[str] = []
+
+        sec2 = sections.get(2, '')
+        sec3 = sections.get(3, '')
+        sec4 = sections.get(4, '')
+        sec12 = sections.get(12, '')
+        sec26 = sections.get(26, '')
+        sec27 = sections.get(27, '')
+        full_text = '\n'.join(sections.values())
+
+        paraphrase = 'نثر آکادمیک، ریتم طول جملات، اصالت لحن علمی و عدم نشت تکیه‌کلام‌ها و بیانیه‌های هوش مصنوعی ارزیابی گردید.'
+
+        # Audit Vector 1: Robotic AI Signatures and Transition Traps (Layer 1)
+        banned_fa_cliches = [
+            'در این راستا', 'حائز اهمیت است', 'نقش بسزایی دارد',
+            'به عنوان یک', 'از این رو', 'شایان ذکر است', 'لازم به ذکر است',
+            'جامع و مانع', 'در دنیای امروز', 'پرواضح است'
+        ]
+        found_cliches = [c for c in banned_fa_cliches if c in full_text]
+        em_dash_count = full_text.count('—') + full_text.count('–')
+
+        if not found_cliches and em_dash_count == 0:
+            strengths.append('متن کاملاً عاری از تکیه‌کلام‌های کلیشه‌ای ماشینی و خط فاصله‌های کشیده است.')
+        else:
+            if found_cliches:
+                findings.append(GoldfishFinding(
+                    issue_name='BANNED_TRANSITION_CLICHES_DETECTED',
+                    severity='Major' if len(found_cliches) > 2 else 'Nit',
+                    reviewer_lens='grant-academic-style-voice',
+                    affected_scope='متن عمومی پروپوزال',
+                    discrepancy_description=f'تعداد {len(found_cliches)} تکیه‌کلام کلیشه‌ای شناسایی شد: {", ".join(found_cliches[:4])}',
+                    rationale_recommendation='حذف عبارات کلیشه‌ای و بازنویسی مستقیم گزاره‌ها با افعال معلوم علمی.'
+                ))
+                weaknesses.append(f'وجود تکیه‌کلام‌های کلیشه‌ای ({", ".join(found_cliches[:3])})')
+            if em_dash_count > 2:
+                findings.append(GoldfishFinding(
+                    issue_name='EXCESSIVE_EM_DASH_USAGE',
+                    severity='Nit',
+                    reviewer_lens='grant-academic-style-voice',
+                    affected_scope='نگارش متن',
+                    discrepancy_description=f'تعداد {em_dash_count} خط فاصله کشیده انگلیسی (—/–) در متن فارسی شناسایی شد.',
+                    rationale_recommendation='جایگزینی خط فاصله‌ها با ویرگول، نقطه یا پرانتز استاندارد.'
+                ))
+
+        # Audit Vector 2: Sentence Cadence and High Burstiness (Layer 2)
+        raw_sentences = [s.strip() for s in re.split(r'[\.!\?؟\n]+', full_text) if len(s.strip()) > 3]
+        word_counts = [len(s.split()) for s in raw_sentences if len(s.split()) >= 3]
+        if len(word_counts) >= 5:
+            mean_wc = sum(word_counts) / len(word_counts)
+            variance = sum((x - mean_wc) ** 2 for x in word_counts) / len(word_counts)
+            sigma = variance ** 0.5
+            has_short = any(4 <= x <= 8 for x in word_counts)
+            has_long = any(x >= 20 for x in word_counts)
+
+            if sigma >= 7.0 and (has_short or has_long):
+                strengths.append(f'تنوع و ریتم ساختاری طول جملات برجسته است (σ = {sigma:.1f} کلمه بر جمله).')
+            elif sigma < 4.5:
+                findings.append(GoldfishFinding(
+                    issue_name='MONOTONOUS_SENTENCE_CADENCE',
+                    severity='Nit',
+                    reviewer_lens='grant-academic-style-voice',
+                    affected_scope='ساختار و ریتم جملات',
+                    discrepancy_description=f'توزیع طول جملات بیش از حد یکنواخت است (انحراف معیار σ = {sigma:.1f} کلمه).',
+                    rationale_recommendation='ایجاد تنوع با ترکیب جملات کوتاه تک‌گزاره‌ای (۴-۸ کلمه) و جملات تبیینی مشروح (۲۰-۳۰ کلمه).'
+                ))
+                weaknesses.append('ریتم نسبتاً یکنواخت طول جملات')
+        else:
+            sigma = 8.0
+
+        # Audit Vector 3: Concrete Lab / Operational Grounding (Layer 3)
+        if sec12:
+            has_grounding = bool(re.search(r'(\d+\s*(?:میلی|میکرو|mg|ml|μm|nm|ساعت|روزه?|درصد|%|rpm|سانتی‌گراد|c°))', sec12, re.I))
+            if has_grounding:
+                strengths.append('پروتکل اجرایی و آزمایشگاهی به صورت ملموس دارای ارقام، غلظت‌ها و زمان‌بندی دقیق است.')
+            else:
+                findings.append(GoldfishFinding(
+                    issue_name='ABSTRACT_METHODOLOGY_DESCRIPTION',
+                    severity='Nit',
+                    reviewer_lens='grant-academic-style-voice',
+                    affected_scope='بخش ۱۲ (روش اجرا)',
+                    discrepancy_description='روش اجرا بیش از حد کلی توصیف شده و فاقد مقادیر عملیاتی دقیق (غلظت، دما، یا بازه زمانی) است.',
+                    rationale_recommendation='تصریح مقادیر عددی دقیق، غلظت محلول‌ها و بازه‌های زمانی انکوباسیون یا سنجش.'
+                ))
+
+        # Audit Vector 4: Zero Premature Certainty (Layer 4)
+        over_claims = re.findall(r'(به طور قطعی اثبات خواهد شد|اثبات قطعی|یقین کامل|بدون تردید ثابت|کاملاً مشخص است که)', full_text)
+        if over_claims:
+            findings.append(GoldfishFinding(
+                issue_name='PREMATURE_CERTAINTY_IN_PROPOSAL',
+                severity='Major',
+                reviewer_lens='grant-academic-style-voice',
+                affected_scope='لحن علمی و گزاره‌ها',
+                discrepancy_description=f'استفاده از ادعای قطعیت یا اثبات برای پژوهش اجرا‌نشده: {", ".join(set(over_claims))}',
+                rationale_recommendation='استفاده از افعال فرضیه‌محور نظیر «آزمون فرضیه»، «بررسی احتمال اثر» و «ارزیابی معناداری».'
+            ))
+            weaknesses.append('ادعای قطعیت زودهنگام در اهداف یا فرضیات')
+        else:
+            strengths.append('لحن نگارش کاملاً علمی، کالیبره‌شده و بدون ادعای قطعیت زودهنگام است.')
+
+        # Audit Vector 5: Non-repetitive List Traps in Aims (Layer 5)
+        if sec4:
+            repeated_openers = re.findall(r'(?:^|\n)\s*[-*•\d\.]+\s*(تعیین|بررسی|شناسایی|سنجش)', sec4)
+            if len(repeated_openers) >= 6 and len(set(repeated_openers)) == 1:
+                findings.append(GoldfishFinding(
+                    issue_name='REPETITIVE_AIM_LIST_OPENERS',
+                    severity='Nit',
+                    reviewer_lens='grant-academic-style-voice',
+                    affected_scope='بخش ۴ (اهداف اختصاصی)',
+                    discrepancy_description=f'تکرار بیش از حد یک فعل یکسان در آغاز بندهای اهداف ({repeated_openers[0]}).',
+                    rationale_recommendation='طبیعی‌سازی ساختار فهرست با افعال متنوع و دسته‌بندی فازبندی‌شده اهداف.'
+                ))
+
+        # Audit Vector 6: Zero AI Mentions Leakage (Layer 6 - STRICT BLOCKER)
+        ai_leakage = re.findall(r'(?i)(?:هوش مصنوعی|artificial intelligence|generative ai|ai-generated|چت‌جی‌پی‌تی|chatgpt|مدل زبانی|زبانی بزرگ|large language model|llm|نوشته شده توسط|ai usage disclosure|افشای استفاده)', full_text)
+        if ai_leakage:
+            findings.append(GoldfishFinding(
+                issue_name='UNWARRANTED_AI_DISCLOSURE_LEAKAGE',
+                severity='Blocker',
+                reviewer_lens='grant-academic-style-voice',
+                affected_scope='متن نهایی پروپوزال',
+                discrepancy_description=f'نشت اشاره یا بیانیه هوش مصنوعی در متن پروپوزال: {", ".join(set(ai_leakage))}',
+                rationale_recommendation='حذف قطعی و کامل هرگونه بیانیه، پانویس یا اشاره به هوش مصنوعی/مدل زبانی از متن پروپوزال جهت تضمین ارائه اصیل اثر.'
+            ))
+            weaknesses.append('نشت غیرمجاز اشاره به ابزارهای هوش مصنوعی در متن علمی')
+
+        # Score calculation
+        score = 1.10
+        for f in findings:
+            if f.severity == 'Blocker':
+                score += 2.0
+            elif f.severity == 'Major':
+                score += 0.5
+            elif f.severity == 'Nit':
+                score += 0.1
+        score = min(max(round(score, 2), 1.0), 9.0)
+
+        return GoldfishReviewerResult(
+            reviewer_id='REV_6_STYLE_VOICE',
+            name_fa='داور نگارش آکادمیک، لحن علمی و پالایش نثر',
+            name_en='Grant Academic Style, Scholarly Voice & Prose Hygiene Reviewer (EGM Style Lens)',
+            egm_lens='egm-style',
+            status='completed',
+            nih_score=score,
+            paraphrase_summary=paraphrase,
+            findings=findings,
+            strengths=strengths,
+            weaknesses=weaknesses
+        )
+
     @classmethod
     def synthesize_grant_study_section(cls, reviewer_results: Dict[str, GoldfishReviewerResult], remediation_round: int = 1) -> EGMStudySectionResult:
         """
@@ -626,13 +791,15 @@ class EGMStudySectionCoordinator:
         rev3 = cls.evaluate_evidence_entailment(sections, proposal_data)
         rev4 = cls.evaluate_feasibility_and_logistics(sections, proposal_data)
         rev5 = cls.evaluate_ethics_and_lay_comprehension(sections, proposal_data)
+        rev6 = cls.evaluate_academic_style_and_voice(sections, proposal_data)
 
         reviewer_results = {
             "rev_1_significance": rev1,
             "rev_2_methodology": rev2,
             "rev_3_evidence": rev3,
             "rev_4_feasibility": rev4,
-            "rev_5_ethics": rev5
+            "rev_5_ethics": rev5,
+            "rev_6_style_voice": rev6
         }
 
         return cls.synthesize_grant_study_section(reviewer_results, remediation_round=remediation_round)

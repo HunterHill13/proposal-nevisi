@@ -17,6 +17,7 @@ if SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, SCRIPTS_DIR)
 
 from verify_biostatistics import BiostatisticalValidator
+from egm_study_section_subagents import EGMStudySectionCoordinator
 
 
 class TestV140BiostatisticalValidator(unittest.TestCase):
@@ -111,6 +112,7 @@ class TestV140SubagentManifests(unittest.TestCase):
             "grant-evidence-entailment.md",
             "grant-feasibility-logistics.md",
             "grant-ethics-lay-advocate.md",
+            "grant-academic-style-voice.md",
             "grant-study-section-sro.md",
             "citation-claim-verifier.md"
         ]
@@ -129,6 +131,36 @@ class TestV140SubagentManifests(unittest.TestCase):
             content = f.read()
         self.assertIn("run_command", content)
         self.assertIn("verify_biostatistics.py", content)
+
+
+    def test_academic_style_voice_reviewer_and_evaluator(self):
+        """Verifies grant-academic-style-voice agent definition and EGM evaluator."""
+        voice_path = os.path.join(self.agents_dir, "grant-academic-style-voice.md")
+        self.assertTrue(os.path.exists(voice_path), f"Voice reviewer agent missing: {voice_path}")
+        with open(voice_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("grant-academic-style-voice", content)
+        self.assertIn("Academic Humanizer", content)
+        self.assertIn("read_file", content)
+
+        # Test evaluation with clean text
+        sections = {
+            2: "بیان مسئله به صورت دقیق تدوین شده است. میزان شیوع بیماری طبق گزارش رسمی ۳۴ درصد است.",
+            4: "هدف اصلی آزمون فرضیه اثربخشی داروست.",
+            12: "غلظت نهایی محلول برابر ۵۰ میکرومولار تعیین شد و سلول‌ها به مدت ۴۸ ساعت در دمای ۳۷ درجه انکوبه گردیدند."
+        }
+        res = EGMStudySectionCoordinator.evaluate_academic_style_and_voice(sections, {})
+        self.assertEqual(res.reviewer_id, "REV_6_STYLE_VOICE")
+        self.assertEqual(len(res.blockers), 0)
+        self.assertTrue(res.nih_score <= 1.5)
+
+        # Test with forbidden AI leakage -> must trigger Blocker
+        sections_leaked = {
+            2: "این پروپوزال توسط هوش مصنوعی و مدل زبانی نگاشته شده است."
+        }
+        res_leak = EGMStudySectionCoordinator.evaluate_academic_style_and_voice(sections_leaked, {})
+        self.assertTrue(any(f.issue_name == "UNWARRANTED_AI_DISCLOSURE_LEAKAGE" for f in res_leak.blockers))
+        self.assertTrue(res_leak.nih_score >= 3.0)
 
 
 if __name__ == "__main__":

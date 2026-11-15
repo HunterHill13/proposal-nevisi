@@ -9,10 +9,10 @@ description: >
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
   PreEmptiveRiskOfBiasMitigator (QUADAS-2 spectrum bias, STROBE sampling frame, Cochrane RoB-2, SYRCLE), MeshQueryExpander (119 descriptors across 19 clinical categories),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes the unified test suite discovered dynamically by tests/run_all_tests.py (560 automated test cases, 100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes the unified test suite discovered dynamically by tests/run_all_tests.py (561 automated test cases, 100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
 ---
 
-# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v14.0 - نسخه مجهز به هیئت داوران گرنت ۶ پرسونایی شناختی با کانتکست صفر و حلقه بسته تودرتو، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
+# Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v14.0 - نسخه مجهز به هیئت داوران گرنت ۷ پرسونایی شناختی با کانتکست صفر و حلقه بسته تودرتو، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
 
 > [!IMPORTANT]
 > ### 🧠 معماری شناختی چندایجنت (Cognitive Multi-Agent Architecture)
@@ -165,8 +165,8 @@ description: >
 > uv run python scripts/run_research_pipeline.py --topic "<موضوع کامل پژوهش به فارسی>" --keywords "<English Agent1>, <English Agent2>, <Target Disease/Model>" --spec-file "<پوشه خروجی>/PROPOSAL_SPEC.json" --max-iterations 10 --output-dir "<پوشه خروجی>"
 > ```
 >
-> ### مرحله دوم: هیئت داوران گرنت ۶ پرسونایی شناختی (Stage 2: 6-Persona Cognitive Study Section — Up to 10 Rounds):
-> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است هیئت داوران گرنت متشکل از ۶ ساب‌ایجنت واقعی هوش مصنوعی با کانتکست کاملاً صفر (Zero-Context)** را فراخوانی کند:
+> ### مرحله دوم: هیئت داوران گرنت ۷ پرسونایی شناختی (Stage 2: 7-Persona Cognitive Study Section — Up to 10 Rounds):
+> **بسیار حیاتی:** بلافاصله پس از تولید فایل `<پوشه خروجی>/proposal.md`، ایجنت اصلی **موظف است هیئت داوران گرنت متشکل از ۷ ساب‌ایجنت واقعی هوش مصنوعی با کانتکست کاملاً صفر (Zero-Context)** را فراخوانی کند:
 >
 > ```json
 > invoke_subagent({
@@ -195,6 +195,11 @@ description: >
 >       "Role": "Bioethics & Lay Advocate Reviewer",
 >       "TypeName": "grant-ethics-lay-advocate",
 >       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: کدهای ۲۶ گانه اخلاقی پژوهشیار در بخش ۲۴، الزامات حفاظت زیستی بخش ۲۵، اصول ARRIVE/GCP، وضوح تعاریف بخش ۵ و محدودیت‌های بخش ۲۶."
+>     },
+>     {
+>       "Role": "Academic Style, Scholarly Voice & Prose Hygiene Reviewer",
+>       "TypeName": "grant-academic-style-voice",
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را بر پایه استانداردهای ۶ لایه Academic Humanizer ممیزی کنید: تنوع طول جملات (انحراف معیار σ >= 8.0)، حذف امضاهای کلیشه‌ای ماشینی و خط‌فاصله کشیده، لنگراندازی دقیق آزمایشگاهی، مهار ادعای قطعیت زودهنگام و ممانعت قطعی از هرگونه اشاره به هوش مصنوعی در متن."
 >     }
 >   ]
 > })
@@ -205,16 +210,16 @@ description: >
 > invoke_subagent({
 >   "Role": "Scientific Review Officer & Swarm Synthesizer",
 >   "TypeName": "grant-study-section-sro",
->   "Prompt": "گزارش ۵ داور تخصصی را تجمیع کرده، نمره میانگین NIH را محاسبه و فایل MOCK_GRANT_REVIEW_PANEL_REPORT را صادر کنید."
+>   "Prompt": "گزارش ۶ داور تخصصی را تجمیع کرده، نمره میانگین NIH را محاسبه و فایل MOCK_GRANT_REVIEW_PANEL_REPORT را صادر کنید."
 > })
 > ```
 >
-> #### سیاست داوری کامل ۶ نفره در تمامی دورها (Full Panel Re-Review up to 10 Rounds):
-> در صورت وجود هرگونه ایراد مسدودکننده (Blocker) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی proposal.md اعمال کرده و **تمامی ۶ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
+> #### سیاست داوری کامل ۷ نفره در تمامی دورها (Full Panel Re-Review up to 10 Rounds):
+> در صورت وجود هرگونه ایراد مسدودکننده (Blocker) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی proposal.md اعمال کرده و **تمامی ۷ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
 >
 > #### پروتکل جایگزین ترتیبی در محیط‌های فاقد invoke_subagent (Sequential In-Context Fallback Protocol):
 > چنانچه ابزار invoke_subagent در محیط اجرایی (یا کلاینت کاربر) فعال یا در دسترس نباشد:
-> ۱. ایجنت اصلی به صورت خودکار به عنوان جایگزین عمل نموده و ۵ لنز داوری گلدفیش را به صورت ترتیبی و با ایزولاسیون ذهنی کامل (Persona-based In-Context Auditing) شبیه‌سازی می‌کند.
+> ۱. ایجنت اصلی به صورت خودکار به عنوان جایگزین عمل نموده و ۶ لنز داوری گلدفیش را به صورت ترتیبی و با ایزولاسیون ذهنی کامل (Persona-based In-Context Auditing) شبیه‌سازی می‌کند.
 > ۲. برای لنز متدولوژی، دستور پایتونی python scripts/verify_biostatistics.py --proposal ... را اجرا کرده و خروجی محاسباتی را ملاک قرار می‌دهد.
 > ۳. سپس با پرسونای دبیر علمی (grant-study-section-sro) گزارش‌ها را تجمیع، میانگین نمرات را محاسبه و گزارش EGM_GRANT_STUDY_SECTION_REPORT.md را صادر می‌نماید.
 > ۴. رانر پایتونی پایپ‌لاین (
@@ -229,10 +234,11 @@ un_research_pipeline.py) به صورت توکار دارای ماژول‌های
 >
 > #### پروتکل بازگشت به هیئت داوران (The Return Loop):
 > ۱. چنانچه هر یک از دو داور ایزوله پایانی ایرادی کشف کنند، ایجنت اصلی متن را اصلاح می‌کند.
-> ۲. پروپوزال اصلاح‌شده **مجدداً وارد مرحله دوم (هیئت داوران ۶ نفره)** می‌شود و هیئت داوران تا ۱۰ دور مستقل فرصت داوری مجدد سند را خواهد داشت.
+> ۲. پروپوزال اصلاح‌شده **مجدداً وارد مرحله دوم (هیئت داوران ۷ نفره)** می‌شود و هیئت داوران تا ۱۰ دور مستقل فرصت داوری مجدد سند را خواهد داشت.
 > ۳. سقف مجاز این چرخه رفت‌وبرگشت بین مرحله ۳ و مرحله ۲ دقیقاً **۵ بار** است.
 > ۴. **قاعده رفع تعارض:** در صورت تضاد نظرات، خطوط قرمز ۶ گانه داور ایزوله (`HARD-01` تا `HARD-06`) اولویت مطلق و قطعی دارند.
-> ۵. **پروتکل تحویل بهینه (Best-Effort Delivery):** اگر پس از پایان سقف دورها به نمره زیر ۱.۵ نرسد، بهترین نسخه با الصاق کارنامه داوری و برچسب اخطار صادر می‌گردد.
+> ۵. **قانون ممنوعیت قطعی نشت هرگونه بیانیه یا اشاره به هوش مصنوعی (Zero AI Mentions Invariant):** در سراسر متن پروپوزال (`proposal.md` و `proposal.docx`) به هیچ وجه نباید هیچ‌گونه سلب مسئولیت، پانویس یا اشاره‌ای به نگارش با هوش مصنوعی یا استفاده از مدل‌های زبانی درج شود؛ اثر نهایی باید ۱۰۰٪ به عنوان یک خروجی آکادمیک اصیل، فاخر و معتبر متعلق به پژوهشگر ارائه گردد.
+> ۶. **پروتکل تحویل بهینه (Best-Effort Delivery):** اگر پس از پایان سقف دورها به نمره زیر ۱.۵ نرسد، بهترین نسخه با الصاق کارنامه داوری و برچسب اخطار صادر می‌گردد.
 >
 > > [!CAUTION]
 > > **الزام قطعی ارسال کلیدواژه‌های انگلیسی در پرچم `--keywords`:**  
