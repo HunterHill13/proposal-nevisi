@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 mesh_query_expander.py - Advanced Multi-Domain MeSH Thesaurus & Precision Boolean Query Expansion Engine
-Proposal-Nevisi Engine v13.2 (Comprehensive Multi-Domain Medical Core)
+Proposal-Nevisi Engine v14.0 (Comprehensive Multi-Domain Medical Core)
 
 Provides:
 1. Multi-Domain MeSH Thesaurus Mapping (130+ Standard Descriptors across 10 Clinical Disciplines):

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 core_policies.py - Single Source of Truth Policy & Configuration Registry
-Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Centralizes all non-negotiable institutional structures, temporal constraints,
 evidence scales, search boundaries, and study-design taxonomy.
@@ -338,7 +338,7 @@ MANDATORY_SUBSECTIONS_13: List[Tuple[str, str, List[str]]] = [
 SECTION_CONTENT_EXPECTATIONS: Dict[int, Dict[str, Any]] = {
     1: {"min_words": 10, "required_fields": ["fa_title", "en_title"]},
     2: {"min_words": 500, "min_paragraphs": 4, "required_elements": ["burden_of_disease", "current_state", "biological_rationale", "contradictions_and_limits", "research_gap", "study_rationale"]},
-    3: {"min_words": 600, "independent_paragraphs_per_reference": True, "cross_study_synthesis_required": True},
+    3: {"min_words": 400, "target_words": 600, "independent_paragraphs_per_reference": True, "cross_study_synthesis_required": True, "guideline_weight_multiplier": 1.5},
     4: {"min_words": 150, "structured_bullets": True},
     5: {"min_words": 100, "min_terms": 3},
     6: {"min_words": 50, "min_aims": 2},
@@ -354,6 +354,22 @@ SECTION_CONTENT_EXPECTATIONS: Dict[int, Dict[str, Any]] = {
 
 MAX_FINAL_REFERENCES: int = 25
 MIN_FINAL_REFERENCES: int = 15
+
+def get_adaptive_section_word_count(section_num: int, study_family: str = "in_vitro") -> int:
+    """Returns archetype-aware minimum word count expectation for canonical proposal sections."""
+    fam = (study_family or "").lower()
+    base = SECTION_CONTENT_EXPECTATIONS.get(section_num, {}).get("min_words", 50)
+    if section_num == 3:
+        if any(t in fam for t in ["health_system", "policy", "diagnostic"]):
+            return 350
+        elif any(t in fam for t in ["clinical", "trial"]):
+            return 450
+        return 500
+    if section_num == 2:
+        if any(t in fam for t in ["health_system", "policy"]):
+            return 400
+        return 500
+    return base
 
 # ==============================================================================
 # 8. CONTEXTUAL RELEVANCE & BIOLOGICAL COMPATIBILITY POLICIES

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 combination_interaction_model_selector.py - Universal Combination Interaction Model Selector
-Proposal-Nevisi Engine v9.1 (Layer 2: Structural Compliance)
+Proposal-Nevisi Engine v14.0 (Layer 2: Structural Compliance)
 
 Selects the scientifically and mathematically sound Combination Interaction Model:
 - Chou-Talalay (Median-Effect Equation / Combination Index CI)

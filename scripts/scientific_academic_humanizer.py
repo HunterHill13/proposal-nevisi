@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-scientific_academic_humanizer.py - Scientific & Academic Anti-AI-Detection Humanizer
-Proposal-Nevisi Engine v11.5 (Academic Integrity, Burstiness & Invariant Protection)
-===================================================================================
+scientific_academic_humanizer.py - Academic Style Refinement, Burstiness & Persian Medical Typography Linter
+Proposal-Nevisi Engine v14.0 (Academic Integrity, Cadence Diversification & Invariant Protection)
+=================================================================================================
 
 Combines:
 1. Contextual Semantic Replacement Engine for 30+ prominent Persian AI cliches and tells
@@ -794,9 +794,13 @@ class ScientificAcademicHumanizer:
             json.dump(report_data, f, ensure_ascii=False, indent=2)
 
         md_content = [
-            "# گزارش ممیزی انسانی‌سازی و عدم کشف هوش مصنوعی (Scientific Academic Humanizer Audit)",
+            "# گزارش ممیزی ارتقای نگارش علمی و تنوع ساختاری جملات (Academic Style & Persian Medical Typography Audit)",
             f"**تاریخ ارزیابی:** {report_data.get('timestamp')}",
             f"**وضعیت دروازه حفاظت از داده‌ها:** {report_data.get('invariant_gate_verdict')}",
+            "",
+            "> [!NOTE]",
+            "> **بیانیه شفافیت و افشای استفاده از ابزارهای هوش مصنوعی (AI Usage Disclosure):**",
+            "> مطابق رهنمودهای ICMJE و معاونت تحقیقات و فناوری وزارت بهداشت، ابزارهای محاسباتی منحصراً جهت بهینه‌سازی خوانایی، ایجاد تنوع ساختاری و ریتم در جملات و پالایش تکیه‌کلام‌های کلیشه‌ای به کار رفته‌اند. مسئولیت علمی و اصالت طرح بر عهده پژوهشگر اصلی است.",
             "",
             "## ۱. شاخص‌های آماری ریتم و تنوع جملات (Burstiness & Sentence Cadence)",
             f"- **انحراف معیار اولیه طول جملات (σ قبل):** {report_data.get('document_burstiness_before')}",

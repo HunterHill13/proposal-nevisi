@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 statistical_model_selector.py - Universal Study-Design-Aware Statistical Model Selector
-Proposal-Nevisi Engine v9.1 (Layer 2: Structural Compliance)
+Proposal-Nevisi Engine v14.0 (Layer 2: Structural Compliance)
 
 Determines the appropriate inferential statistical analysis model.
 Distinguishes descriptive multi-arm grouping (e.g. Control, A, B, A+B) from true factorial

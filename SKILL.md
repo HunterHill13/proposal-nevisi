@@ -9,7 +9,7 @@ description: >
   GLOBOCAN 2022/2024 epidemiology, formal negative search strategy (novelty proof), Mead's Resource Equation, MIQE dual reference gene compliance,
   ScientificAcademicHumanizer (30+ Persian AI cliches eradication, sentence length burstiness calibration σ >= 8.0, and 100% fail-closed DataInvariantGate with auto-rollback),
   PreEmptiveRiskOfBiasMitigator (QUADAS-2 spectrum bias, STROBE sampling frame, Cochrane RoB-2, SYRCLE), MeshQueryExpander (119 descriptors across 19 clinical categories),
-  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes a unified 552-assertion test suite (100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
+  Cell-Free Blank interference controls, and CitationGraphEngine (Litmaps/Inciteful-style true cross-paper citation links and 1-hop seed snowballing), BiomedicalConceptGraph, GraphEntailmentGate, and passes the unified test suite discovered dynamically by tests/run_all_tests.py (560 automated test cases, 100% PASS). Trigger this skill automatically whenever the user asks to draft, write, design, refine, or evaluate a medical or health sciences research proposal, thesis protocol, IRB application, or mentions 'پروپوزال', 'پروپوزال نویسی', 'طرح پژوهشی', 'پژوهشیار', 'پروتکل تحقیق', 'proposal', or biomedical research design across any of the 6 archetypes.
 ---
 
 # Proposal-Nevisi (موتور جامع، چندایجنتِ شناختی، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد نگارش پروپوزال‌های علوم پزشکی v14.0 - نسخه مجهز به هیئت داوران گرنت ۶ پرسونایی شناختی با کانتکست صفر و حلقه بسته تودرتو، تزاروس ۱۱۹ توصیف‌گره MeSH، ممیزی تطبیقی QUADAS-2 و STROBE، پلی‌مورفیسم کامل ۶ کهن‌الگو، هیئت داوران گرنت گلدفیش EGM، گراف استنادی چندجهته و شبکه مفاهیم زیست‌پزشکی)
@@ -35,7 +35,7 @@ description: >
 - **ستون ۵ (Adversarial Mock Grant Review Panel):** رد خودکار (`REVISION_REQUIRED`) در صورت مشاهده هرگونه انحراف معنایی مقالات یا تناقض آماری تا زمان اصلاح کامل توسط ایجنت.
 - **ستون ۷ (Dual-Layer Citation & Concept Graph Engine v12.0):** مجهز به موتور اختصاصی `CitationGraphEngine` بر پایه الگوریتم‌های Litmaps و Inciteful (فرمول Adamic/Adar برای کشف کارهای داغ معاصر و Personalized PageRank متمرکز بر سیدها)، ساخت گراف تعاملی Cytoscape.js (`LITERATURE_CITATION_GRAPH.html`)، استخراج مفاهیم زیستی (`BiomedicalConceptGraph`) و دروازه قفل‌بسته ضدتوهم و ضدکلی‌گویی (`GraphEntailmentGate`) با ۵۲۱ تست موفق.
 - **ستون ۸ (EGM-Powered Academic Grant Study Section & Socratic Brainstorming Engine v13.0):** مجهز به مدل فیل و ماهی‌قرمز گوگل (Elephant-Goldfish Model: EGM)؛ تفکیک نقش فیل (The Elephant: نگارش عمیق ۲۸ بخش با کانتکست کامل) از داوران ماهی‌قرمز (The Goldfish: هیئت داوران ۶ پرسونایی با کانتکست کاملاً ایزوله و بدون سوگیری جهت کشف نقاط کور و نقدهای عمیق متدولوژی). شامل ۶ پرسونای تخصصی: نوآوری و اهمیت (Zoom-Out)، متدولوژی خصمانه و زیست‌آمار (Design Critic)، ممیزی ارجاعات و انطباق شواهد (Codebase Details)، امکان‌پذیری و تدارکات اجرایی (Implementation Readiness)، اخلاق زیستی و ساده‌فهمی (Comprehension)، و سنتزگر ارشد نمره‌دهی NIH (Synthesizer SRO). مجهز به حلقه اصلاح خودکار تا سقف ۱۰ دور (Closed-Loop 10-Iteration Remediation) و صدور پرونده جامع داوری `EGM_GRANT_STUDY_SECTION_REPORT.md` و `.json`.
-- **ستون ۶ (Scientific Academic Humanizer & Anti-AI-Detection Engine v11.5):** موتور ضدتشخیص و انسانی‌ساز علمی دو لایه (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و گزارش تحلیلی Audit Report).
+- **ستون ۶ (Academic Style Refinement, Burstiness & Persian Medical Typography Linter v14.0):** موتور ارتقای سبک آکادمیک و تنوع نحوی جملات (لایه اول: پالایش قطعی استایل‌متری و جایگزینی ۳۰+ تکیه‌کلام هوش مصنوعی فارسی با افعال دقیق آزمایشگاهی و بالینی؛ لایه دوم: کالیبراسیون ریتم جملات با انحراف معیار $\sigma \ge 8.0$؛ دروازه قطعی Data Invariant Gate برای حفاظت ۱۰۰٪ از ارقام، دوزها، فرمول‌ها و کدهای PubMed همراه با بازگشت خودکار Rollback و صدور بیانیه شفافیت و افشای استفاده از هوش مصنوعی مطابق استانداردهای ICMJE/وزارت بهداشت).
 - **ستون ۹ (Temporal Knowledge Graph & GraphRAG Synthesis Engine v13.0):** مجهز به موتور اختصاصی گراف دانش زمانی (`temporal_knowledge_graph.py`) با الهام از Graphify و Litmaps، دسته‌بندی مقالات در ۳ اپوک تاریخی (`FOUNDATIONAL_LANDMARK` $\le 2018$، `INTERMEDIATE_VALIDATION` 2019-2022، `CONTEMPORARY_FRONTIER` 2023-2026)، ردیابی ارجاعات زمانی جهت‌دار و تزریق سنتز تاریخی به بخش ۳ (مرور منابع) جهت ریشه‌کنی کامل توهم، جاافتادگی زمانی و ارجاعات نابجا.
 - **ستون ۱۰ (Zero-Bias Dual-Path Search & Adaptive Risk of Bias Mitigator v13.2):** سیستم جستجوی ادبیات دومسیره (مسیر الف: شواهد اثربخشی؛ مسیر ب: شواهد منفی، تضاد، عوارض و بی‌اثری) با تزریق خودکار بند شفافیت معرفتی (`Epistemic Caveat Injection`) در بخش‌های ۳ و ۲۶ در صورت غیبت شواهد منفی در پایگاه‌ها؛ مجهز به تزاروس ۱۱۹ سرعنوانه MeSH در ۱۹ حوزه تخصصی با مهار سوگیری موضوعی؛ ممیزی انطباقی ریسک سوگیری با ابزارهای استاندارد جهانی (QUADAS-2 برای مطالعات تشخیصی، STROBE برای مشاهده‌ای و نظام سلامت، RoB-2 و SYRCLE برای تجربی)؛ و نگاشت روابط استنادی متقابل واقعی بین مقالات و اسنوبالینگ ۱-هاپ به جای زنجیره‌های خطی ساده.
 
@@ -189,12 +189,12 @@ description: >
 >     {
 >       "Role": "Feasibility, Budget & Infrastructure Lead",
 >       "TypeName": "grant-feasibility-logistics",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: امکان‌پذیری پروتکل بخش ۲۷، جدول گانت بخش ۲۴ و امکانات مراکز دانشگاهی ایران در بخش ۱۹."
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: امکان‌پذیری پروتکل بخش ۲۷، جدول زمان‌بندی گانت بخش ۱۲ و امکانات مراکز دانشگاهی در بخش‌های ۱۶ و ۱۹."
 >     },
 >     {
 >       "Role": "Bioethics & Lay Advocate Reviewer",
 >       "TypeName": "grant-ethics-lay-advocate",
->       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: کدهای ۲۶ گانه اخلاقی پژوهشیار در بخش ۱۶، اصول ARRIVE/GCP و وضوح تعاریف بخش ۵."
+>       "Prompt": "فایل `<پوشه خروجی>/proposal.md` را ممیزی کنید: کدهای ۲۶ گانه اخلاقی پژوهشیار در بخش ۲۴، الزامات حفاظت زیستی بخش ۲۵، اصول ARRIVE/GCP، وضوح تعاریف بخش ۵ و محدودیت‌های بخش ۲۶."
 >     }
 >   ]
 > })
@@ -210,7 +210,15 @@ description: >
 > ```
 >
 > #### سیاست داوری کامل ۶ نفره در تمامی دورها (Full Panel Re-Review up to 10 Rounds):
-> در صورت وجود هرگونه ایراد مسدودکننده (`Blocker`) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی `proposal.md` اعمال کرده و **تمامی ۶ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
+> در صورت وجود هرگونه ایراد مسدودکننده (Blocker) یا نمره NIH $> 1.5$، ایجنت اصلی اصلاحات جراحی را روی proposal.md اعمال کرده و **تمامی ۶ داور مجدداً از نو کل سند را ممیزی می‌کنند** (تا سقف ۱۰ دور مستقل). شرط قبولی هیئت داوران: نمره NIH $\le 1.5$ و صفر ایراد Blocker.
+>
+> #### پروتکل جایگزین ترتیبی در محیط‌های فاقد invoke_subagent (Sequential In-Context Fallback Protocol):
+> چنانچه ابزار invoke_subagent در محیط اجرایی (یا کلاینت کاربر) فعال یا در دسترس نباشد:
+> ۱. ایجنت اصلی به صورت خودکار به عنوان جایگزین عمل نموده و ۵ لنز داوری گلدفیش را به صورت ترتیبی و با ایزولاسیون ذهنی کامل (Persona-based In-Context Auditing) شبیه‌سازی می‌کند.
+> ۲. برای لنز متدولوژی، دستور پایتونی python scripts/verify_biostatistics.py --proposal ... را اجرا کرده و خروجی محاسباتی را ملاک قرار می‌دهد.
+> ۳. سپس با پرسونای دبیر علمی (grant-study-section-sro) گزارش‌ها را تجمیع، میانگین نمرات را محاسبه و گزارش EGM_GRANT_STUDY_SECTION_REPORT.md را صادر می‌نماید.
+> ۴. رانر پایتونی پایپ‌لاین (
+un_research_pipeline.py) به صورت توکار دارای ماژول‌های محاسباتی EGMStudySectionCoordinator و MockGrantReviewPanel است که بدون نیاز به invoke_subagent تمام ممیزی‌های عینی، تطابق بخش‌ها و محاسبه نمرات را به صورت دترمینستیک و مستقل اجرا می‌کنند.
 >
 > ---
 >

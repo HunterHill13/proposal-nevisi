@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 citation_graph_engine.py - Academic Citation Graph & Semantic Literature Discovery Engine
-Proposal-Nevisi Engine v12.0 (Cognitive Multi-Agent Architecture)
+Proposal-Nevisi Engine v14.0 (Cognitive Multi-Agent Architecture)
 
 Implements:
 1. Bidirectional Citation Network Traversal (Backward references & Forward citations).

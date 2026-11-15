@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 citation_tracker.py - Universal Document-Level Citation Re-indexer & Claim-Binding Auditor
-Proposal-Nevisi Engine v9.1 (Layer 3: Citation Integrity)
+Proposal-Nevisi Engine v14.0 (Layer 3: Citation Integrity)
 
 Features:
 1. Full Document-Level Re-indexing:

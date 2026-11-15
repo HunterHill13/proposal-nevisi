@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 pre_emptive_risk_of_bias_mitigator.py - Pre-emptive Risk of Bias (RoB) Mitigation Engine
-Proposal-Nevisi Engine v10.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Enforces international standards for pre-emptive experimental and observational bias mitigation:
 - Cochrane RoB-2 (Clinical Trials / Human RCTs)

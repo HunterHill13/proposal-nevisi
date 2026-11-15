@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 methodology_research_subagent.py - Dedicated Scientific Methodology & Cohesive Protocol Engine
-Proposal-Nevisi Engine v11.4 (Layer 2: Structural & Methodological Integrity)
+Proposal-Nevisi Engine v14.0 (Layer 2: Structural & Methodological Integrity)
 
 Solves the "Frankenstein / Chimera Methodology" problem:
 Prevents stitching incompatible protocol fragments from disparate papers by deriving

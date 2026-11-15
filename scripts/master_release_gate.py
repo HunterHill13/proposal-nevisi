@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 master_release_gate.py - Master Verification & Release Gate Script
-Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Enforces:
 1. Single Source of Truth version synchronization across VERSION, project_metadata.json, and core_policies.py.

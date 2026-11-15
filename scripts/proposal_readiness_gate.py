@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 proposal_readiness_gate.py - Fail-Closed Pre-Generation & Proposal-Specific Readiness Gate
-Proposal-Nevisi Engine v9.1
+Proposal-Nevisi Engine v14.0
 
 Enforces strict, fail-closed pre-generation gatekeeping across two distinct modes:
 1. PRE_GENERATION_INFRASTRUCTURE:

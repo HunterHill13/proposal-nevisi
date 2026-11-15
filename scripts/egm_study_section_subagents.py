@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 egm_study_section_subagents.py - EGM-Powered Academic Grant Study Section
-Proposal-Nevisi Engine v13.0 (Elephant-Goldfish Model Hybrid Architecture)
+Proposal-Nevisi Engine v14.0 (Elephant-Goldfish Model Hybrid Architecture)
 
 Implements the 6-Persona Goldfish Grant Study Section:
 1. grant-significance-innovation (Skeptical Architect / YAGNI - derived from egm-zoom-out)
@@ -588,16 +588,16 @@ class EGMStudySectionCoordinator:
 
         overall_score = min(max(round(overall_score, 2), 1.0), 9.0)
 
-        # Funding verdict based on NIH competitive cutoffs
-        if overall_score <= 3.0 and blocker_count == 0:
+        # Funding verdict based on competitive heuristic cutoffs
+        if overall_score <= 2.5 and blocker_count == 0:
             funding_verdict = "APPROVED_FUNDABLE"
             can_proceed = True
             percentile = max(100.0 - (overall_score - 1.0) * 15.0, 85.0)
-            exec_summary = f"پروپوزال موفق به کسب نمره برجسته NIH {overall_score}/9.0 و رتبه استثنایی بدون خطای بحرانی گردید و با اولویت حداکثری تصویب و شایسته تخصیص گرنت تشخیص داده شد."
-        elif overall_score <= 4.0 and blocker_count <= 1:
+            exec_summary = f"پروپوزال موفق به کسب امتیاز جامعیت ساختاری برجسته {overall_score}/9.0 (کالیبره بر مقیاس رقابتی NIH) و رتبه استثنایی بدون خطای بحرانی گردید و با اولویت حداکثری شایسته تصویب و تخصیص گرنت تشخیص داده شد."
+        elif overall_score <= 4.0 or blocker_count > 0:
             funding_verdict = "REVISION_REQUIRED"
             can_proceed = False
-            percentile = 70.0 - (overall_score - 3.0) * 20.0
+            percentile = 70.0 - (overall_score - 2.0) * 15.0
             exec_summary = f"پروپوزال نمره قابل قبول مشروط {overall_score}/9.0 را کسب کرد اما نیازمند رفع {blocker_count} نقص بحرانی و بازنگری متدولوژیک در راندهای اصلاحی است."
         else:
             funding_verdict = "REJECTED_UNFUNDABLE"
@@ -642,9 +642,12 @@ class EGMStudySectionCoordinator:
         """Generates the official EGM_GRANT_STUDY_SECTION_REPORT.md deliverable."""
         md = []
         md.append("# 🏛️ کارنامه رسمی نشست داوری گرنت‌های پزشکی (EGM Study Section Report)")
+        md.append("> [!NOTE]")
+        md.append("> **تذکر شفافیت:** نمره حاضر شاخص جامعیت ساختاری و روش‌شناختی (Heuristic Completeness Score) مبتنی بر شبیه‌سازی هوشمند هیئت داوران بوده و نباید به عنوان تاییدیه رسمی نهادهای حاکمیتی گرنت تفسیر شود.")
+        md.append("")
         md.append(f"**عنوان طرح پژوهشی:** {proposal_title}")
         md.append(f"**معماری ارزیابی:** EGM v13.0 (Elephant-Goldfish Multi-Agent Swarm)")
-        md.append(f"**نمره کل داوری (NIH Impact Score):** `{result.overall_nih_score} / 9.0`")
+        md.append(f"**امتیاز جامعیت ساختاری و روش‌شناختی (Heuristic Completeness / NIH Impact Score):** `{result.overall_nih_score} / 9.0`")
         md.append(f"**رتبه درصدی مصوب:** `صدک {result.percentile:.1f}%`")
         md.append(f"**وضعیت نهایی تخصیص بودجه:** **{result.funding_verdict}**")
         md.append(f"**تعداد دورهای اصلاحی طی‌شده:** `{result.remediation_rounds_conducted}`")

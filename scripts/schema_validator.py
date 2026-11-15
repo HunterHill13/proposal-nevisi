@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 schema_validator.py - Pure Python JSON Schema Validator (Draft-07 Compatible)
-Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Validates dictionary data structures against JSON schema files without external third-party dependencies.
 Enforces types, required properties, enums, nested properties, array items, and pattern constraints.

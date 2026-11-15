@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 methodology_completeness_gate.py - Pajooheshyar 28-Section Completeness & Sample Size Methodology Gate
-Proposal-Nevisi Engine v9.1 (Layer 2: Structural Compliance)
+Proposal-Nevisi Engine v14.0 (Layer 2: Structural Compliance)
 
 Enforces:
 1. 28 Mandatory Sections of the official Iranian Biomedical Research Information System (Pajooheshyar).

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 native_omml_math_engine.py - Office Math Markup Language (OMML) Math Engine
-Proposal-Nevisi Engine v9.0 (Layer 4: Formatting & Typesetting)
+Proposal-Nevisi Engine v14.0 (Layer 4: Formatting & Typesetting)
 
 Converts LaTeX math expressions into Microsoft Word native OMML (<m:oMath> / <m:oMathPara>)
 and clean Unicode representations, preventing raw LaTeX syntax leakage ($...$, \\frac, \\sqrt)
@@ -82,25 +82,90 @@ class NativeOmmlMathEngine:
         return s, is_display
 
     @classmethod
+    def _extract_braced_arg(cls, s: str, start_idx: int) -> Tuple[Optional[str], int]:
+        """Extracts content inside matching braces { ... } supporting arbitrary nesting."""
+        if start_idx >= len(s) or s[start_idx] != '{':
+            return None, start_idx
+        depth = 0
+        for i in range(start_idx, len(s)):
+            if s[i] == '{':
+                depth += 1
+            elif s[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    return s[start_idx + 1:i], i + 1
+        return None, start_idx
+
+    @classmethod
+    def _replace_fractions_unicode(cls, text: str) -> str:
+        """Recursively translates nested \\frac{a}{b} -> (a / b) from inside out."""
+        while True:
+            idx = text.rfind(r'\frac')
+            if idx == -1:
+                break
+            arg1_start = text.find('{', idx + 5)
+            if arg1_start == -1 or text[idx + 5:arg1_start].strip() != '':
+                # Handle unbraced fraction e.g. \frac 1 2
+                break
+            arg1, next_pos = cls._extract_braced_arg(text, arg1_start)
+            if arg1 is None:
+                break
+            arg2_start = text.find('{', next_pos)
+            if arg2_start == -1 or text[next_pos:arg2_start].strip() != '':
+                break
+            arg2, end_pos = cls._extract_braced_arg(text, arg2_start)
+            if arg2 is None:
+                break
+            replacement = f'({arg1} / {arg2})'
+            text = text[:idx] + replacement + text[end_pos:]
+        return text
+
+    @classmethod
+    def _replace_sqrts_unicode(cls, text: str) -> str:
+        """Recursively translates nested \\sqrt{x} -> √(x) from inside out."""
+        while True:
+            idx = text.rfind(r'\sqrt')
+            if idx == -1:
+                break
+            arg_start = text.find('{', idx + 5)
+            if arg_start == -1 or text[idx + 5:arg_start].strip() != '':
+                # Unbraced \sqrt x
+                m = re.match(r'\\sqrt\s*([0-9a-zA-Z])', text[idx:])
+                if m:
+                    replacement = f'√({m.group(1)})'
+                    text = text[:idx] + replacement + text[idx + len(m.group(0)):]
+                    continue
+                break
+            arg, end_pos = cls._extract_braced_arg(text, arg_start)
+            if arg is None:
+                break
+            replacement = f'√({arg})'
+            text = text[:idx] + replacement + text[end_pos:]
+        return text
+
+    @classmethod
     def convert_latex_to_unicode(cls, latex_expr: str) -> str:
         """
         Translates a LaTeX expression into a clean, human-readable Unicode representation.
-        Zero raw backslashes or braces remain.
+        Zero raw backslashes, braces, or command names (frac, sqrt, bar, hat) remain.
         """
         clean, _ = cls.strip_latex_delimiters(latex_expr)
         
-        # 1. Replace fractions \frac{a}{b} -> (a / b)
-        frac_pattern = re.compile(r'\\frac\{([^{}]+)\}\{([^{}]+)\}')
-        while frac_pattern.search(clean):
-            clean = frac_pattern.sub(r'(\1 / \2)', clean)
+        # 1. Recursive nested fractions \frac{a}{b} -> (a / b)
+        clean = cls._replace_fractions_unicode(clean)
 
-        # 2. Replace square roots \sqrt{x} -> √(x)
-        sqrt_pattern = re.compile(r'\\sqrt\{([^{}]+)\}')
-        while sqrt_pattern.search(clean):
-            clean = sqrt_pattern.sub(r'√(\1)', clean)
+        # 2. Recursive nested square roots \sqrt{x} -> √(x)
+        clean = cls._replace_sqrts_unicode(clean)
 
-        # 3. Replace hats \hat{p} -> p̂
-        clean = re.sub(r'\\hat\{([a-zA-Z])\}', r'\1̂', clean)
+        # 3. Replace hats and bars / accents
+        clean = re.sub(r'\\hat\{([^{}]+)\}', r'\1̂', clean)
+        clean = re.sub(r'\\hat\s+([a-zA-Z0-9])', r'\1̂', clean)
+        clean = re.sub(r'\\(?:bar|overline)\{([^{}]+)\}', r'\1̄', clean)
+        clean = re.sub(r'\\(?:bar|overline)\s+([a-zA-Z0-9])', r'\1̄', clean)
+        clean = re.sub(r'\\tilde\{([^{}]+)\}', r'\1̃', clean)
+        clean = re.sub(r'\\vec\{([^{}]+)\}', r'\1⃗', clean)
+        clean = re.sub(r'\\dot\{([^{}]+)\}', r'\1̇', clean)
+        clean = re.sub(r'\\ddot\{([^{}]+)\}', r'\1̈', clean)
 
         # 4. Replace Greek & Math symbols
         for sym, uni in cls.LATEX_TO_UNICODE.items():
@@ -118,7 +183,10 @@ class NativeOmmlMathEngine:
             return "".join(cls.SUBSCRIPTS.get(c, c) for c in val)
         clean = re.sub(r'_\{([^{}]+)\}|_([0-9a-zA-Z])', _sub_sub, clean)
 
-        # 7. Clean residual braces, backslashes, and extra spaces
+        # 7. Strip residual LaTeX command keywords if any slipped through
+        clean = re.sub(r'\\(?:frac|sqrt|bar|overline|hat|tilde|vec|dot|ddot|mathbf|mathrm|text)\b', '', clean)
+
+        # 8. Clean residual braces, backslashes, and extra spaces
         clean = clean.replace('{', '').replace('}', '').replace('\\', '').strip()
         clean = re.sub(r'\s+', ' ', clean)
         return clean

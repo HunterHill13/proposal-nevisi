@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 combination_hypothesis_engine.py - Context-Aware Parallel Combination Hypotheses & Evidence Balancer
-Proposal-Nevisi Engine v9.1 (Layer 1: Scientific Accuracy)
+Proposal-Nevisi Engine v14.0 (Layer 1: Scientific Accuracy)
 
 Eliminates superficial keyword-counting bias by evaluating evidence directness:
 - Disentangles direct combination evidence from monotherapies and indirect background.

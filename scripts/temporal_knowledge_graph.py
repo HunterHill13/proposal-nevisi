@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 temporal_knowledge_graph.py - Temporal Knowledge Graph & GraphRAG Synthesis Engine
-Proposal-Nevisi Engine v13.0 (Elephant-Goldfish & Graphify Architecture)
+Proposal-Nevisi Engine v14.0 (Elephant-Goldfish & Graphify Architecture)
 
 Inspired by Graphify, Litmaps, and Inciteful:
 1. Models scientific literature as a directed chronological knowledge graph.

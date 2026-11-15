@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 persian_medical_typography_linter.py - Persian Medical Typography & Orthography Linter
-Proposal-Nevisi Engine v9.0 (Layer 4: Formatting & Typesetting)
+Proposal-Nevisi Engine v14.0 (Layer 4: Formatting & Typesetting)
 
 Enforces standard academic Persian orthography:
 - Zero-Width Non-Joiner (ZWNJ / نیم‌فاصله) for verbal prefixes and noun suffixes

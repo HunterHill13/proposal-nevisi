@@ -3,7 +3,7 @@
 """
 run_research_pipeline.py - Master Autonomous End-to-End Biomedical Research Pipeline
 =====================================================================================
-Proposal-Nevisi Engine v11.0 (Two-Loop Research Architecture)
+Proposal-Nevisi Engine v14.0 (Two-Loop Research Architecture)
 
 Orchestrates the entire research lifecycle:
 1. Topic Modeling & Query Expansion (MeSH & Boolean terms)
@@ -1163,7 +1163,7 @@ class MasterResearchPipeline:
             b_after = hum.get('document_burstiness_after', 'N/A')
             c_purged = hum.get('total_cliches_purged', 0)
             inv_v = hum.get('invariant_gate_verdict', 'N/A')
-            print(f"  ✅ Anti-AI Humanization Audit passed (Burstiness σ: {b_after}, Cliches Purged: {c_purged}, Gate: {inv_v})")
+            print(f"  ✅ Academic Style & Cadence Audit passed (Burstiness σ: {b_after}, Cliches Purged: {c_purged}, Gate: {inv_v})")
 
         return res
 
@@ -1204,7 +1204,7 @@ class MasterResearchPipeline:
         print(f"▪ EQUATOR Compliance Audit: {results.get('equator_audit_md')}")
         print(f"▪ Risk of Bias Mitigation: {results.get('risk_of_bias_md')}")
         if results.get('humanization_audit_md'):
-            print(f"▪ Anti-AI Humanization Audit: {results.get('humanization_audit_md')}")
+            print(f"▪ Academic Style & Persian Typography Audit: {results.get('humanization_audit_md')}")
         print("=" * 80 + "\n")
 
         return results

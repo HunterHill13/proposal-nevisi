@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 graph_entailment_gate.py - Anti-Hallucination & Anti-Fluff Graph Entailment Gate
-Proposal-Nevisi Engine v12.0 (Cognitive Multi-Agent Architecture)
+Proposal-Nevisi Engine v14.0 (Cognitive Multi-Agent Architecture)
 
 Enforces two strict academic writing gates:
 1. Anti-Hallucination Gate (Graph Entailment):

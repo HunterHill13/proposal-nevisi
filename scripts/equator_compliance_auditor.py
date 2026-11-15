@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 equator_compliance_auditor.py - EQUATOR Network Compliance & Biological Resource Authentication Auditor
-Proposal-Nevisi Engine v10.1 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Enforces international transparency, reproducibility, and reporting standards:
 1. OECD / GCCP (Good Cell Culture Practice):

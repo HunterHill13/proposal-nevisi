@@ -85,9 +85,24 @@ class TestV140SubagentManifests(unittest.TestCase):
     """Verifies that all 7 Subagent definition markdown files are correctly configured."""
 
     def setUp(self):
-        # tests/ -> proposal-nevisi/ -> skills/ (wait, proposal-nevisi is in .agents/skills/proposal-nevisi)
-        # tests -> proposal-nevisi -> skills -> .agents -> root
-        self.agents_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "agents"))
+        # Dynamic search for agents directory across standalone package, workspace, and global config
+        candidates = [
+            # 1. Native inside skill folder: tests/../agents
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "agents")),
+            # 2. Workspace root relative to .agents/skills/proposal-nevisi/tests: tests/../../../../.agents/agents
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".agents", "agents")),
+            # 3. Workspace root relative: tests/../../../agents
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "agents")),
+            # 4. Global config
+            os.path.expanduser(r"~/.gemini/config/agents")
+        ]
+        self.agents_dir = None
+        for c in candidates:
+            if os.path.exists(c) and os.path.exists(os.path.join(c, "grant-significance-innovation.md")):
+                self.agents_dir = c
+                break
+        if not self.agents_dir:
+            self.agents_dir = candidates[0]
 
     def test_all_seven_subagents_exist(self):
         expected_agents = [

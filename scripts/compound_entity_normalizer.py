@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 compound_entity_normalizer.py - Universal Chemical & Botanical Entity Ontology Normalizer
-Proposal-Nevisi Engine v9.1 (Layer 1: Scientific Accuracy)
+Proposal-Nevisi Engine v14.0 (Layer 1: Scientific Accuracy)
 
 Categorizes candidate experimental substances into rigorous ontological tiers:
 - PURE_PARENT_COMPOUND

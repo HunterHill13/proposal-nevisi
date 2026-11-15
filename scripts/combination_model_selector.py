@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 combination_model_selector.py - Unified Façade for Statistical and Combination Interaction Modeling
-Proposal-Nevisi Engine v9.1 (Layer 2: Structural Compliance)
+Proposal-Nevisi Engine v14.0 (Layer 2: Structural Compliance)
 
 Architecturally separates:
 1. Inferential Statistical Analysis Models (ANOVA, GLM, RM-ANOVA, Cox)

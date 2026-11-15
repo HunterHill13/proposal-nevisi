@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 biological_mechanism_adversarial_verifier.py - Universal Biological Mechanism & Mechanistic Chain Verifier
-Proposal-Nevisi Engine v9.1 (Layer 1: Scientific Accuracy)
+Proposal-Nevisi Engine v14.0 (Layer 1: Scientific Accuracy)
 
 Operates across two rigorous tiers:
 - Level A (Role Contradiction): Detects role inversions (e.g. Bcl-xL/Bcl-2 asserted as pro-apoptotic,

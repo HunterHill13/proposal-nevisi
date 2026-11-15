@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 biomedical_concept_graph.py - Bipartite Biomedical Concept Graph & Claim Extractor
-Proposal-Nevisi Engine v12.0 (Cognitive Multi-Agent Architecture)
+Proposal-Nevisi Engine v14.0 (Cognitive Multi-Agent Architecture)
 
 Bridges the Macro-Level Bibliographic Citation Graph with a Micro-Level Mechanistic Knowledge Graph:
 1. Extracts structured biological entities:

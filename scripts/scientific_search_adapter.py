@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 scientific_search_adapter.py - Multi-Source Federated Scientific Literature Search Engine
-Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Provides a standard-library, dependency-free adapter for federated literature retrieval
 across PubMed, Europe PMC, OpenAlex, and Crossref.

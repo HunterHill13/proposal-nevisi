@@ -39,7 +39,7 @@ class TestV130EGMStudySection(unittest.TestCase):
 
     def setUp(self):
         self.test_dir = tempfile.mkdtemp(prefix="test_egm_v130_")
-        self.sample_complete_proposal = """
+        self.sample_complete_proposal = r"""
 ## ۱. موضوع
 ارزیابی اثربخشی راهکارهای مداخله‌ای در کاهش هزینه‌های کمرشکن سلامت (CHE) در بیماران مبتلا به نئوپلاسم
 

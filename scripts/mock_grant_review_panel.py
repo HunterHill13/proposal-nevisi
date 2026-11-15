@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 mock_grant_review_panel.py - Multi-Agent Mock Grant Study Section & Inter-Section Semantic Drift Gate
-Proposal-Nevisi Engine v10.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Simulates an authentic academic grant review panel (Mock Study Section) based on
 NIH / NIMAD / Pajooheshyar competitive grant scoring rubrics:
@@ -611,25 +611,25 @@ class MockGrantReviewPanel:
         overall_score = round((r1.score + r2.score + r3.score) / 3.0, 2)
 
         # Funding Verdict
-        if overall_score <= 3.5 and crit_count == 0:
+        if overall_score <= 2.5 and crit_count == 0:
             funding_verdict = "APPROVED_FUNDABLE"
             can_proceed = True
             exec_summary = (
-                f"پروپوزال با نمره میانگین داوری {overall_score} از ۹.۰ (رتبه استثنایی و ممتاز) و بدون هیچ‌گونه نقص بحرانی "
+                f"پروپوزال با نمره جامعیت ساختاری و روش‌شناختی {overall_score} از ۹.۰ (رتبه استثنایی و ممتاز) و بدون هیچ‌گونه نقص بحرانی "
                 f"توسط هیئت داوری شبیه‌سازی‌شده (Mock Study Section) در اولویت تصویب و اعطای گرنت (Fundable) ارزیابی گردید."
             )
-        elif overall_score <= 6.0 or crit_count > 0:
+        elif overall_score <= 4.5 or crit_count > 0:
             funding_verdict = "REVISION_REQUIRED"
             can_proceed = False
             exec_summary = (
-                f"پروپوزال با نمره داوری {overall_score} از ۹.۰ و تعداد {crit_count} نقص بحرانی در وضعیت نیاز به اصلاح اساسی "
+                f"پروپوزال با نمره جامعیت ساختاری {overall_score} از ۹.۰ و تعداد {crit_count} نقص بحرانی در وضعیت نیاز به اصلاح اساسی "
                 f"(Revision Required) قرار گرفت. پیش از تصویب و ارسال نهایی، اعمال توصیه‌های اصلاحی هیئت داوری الزامی است."
             )
         else:
             funding_verdict = "REJECTED_UNFUNDABLE"
             can_proceed = False
             exec_summary = (
-                f"پروپوزال با نمره داوری {overall_score} از ۹.۰ و نقایص ساختاری اساسی، حائز شرایط تصویب تشخیص داده نشد "
+                f"پروپوزال با نمره جامعیت ساختاری {overall_score} از ۹.۰ و نقایص ساختاری اساسی، حائز شرایط تصویب تشخیص داده نشد "
                 f"و نیازمند بازطراحی بنیادی متدولوژی و اهداف می‌باشد."
             )
 
@@ -695,8 +695,11 @@ class MockGrantReviewPanel:
         lines = [
             "# کارنامه رسمی داوری گرنت و ممیزی پروپوزال (Mock Grant Review Summary Report)",
             "",
+            "> [!NOTE]",
+            "> **شناسه سنجش:** این گزارش حاصل ارزیابی هوشمند و شبیه‌سازی کنترل کیفیت جامعیت ساختاری (Heuristic Completeness Score) است و مستقل از داوری رسمی بیرونی نهادهای گرنت‌دهنده می‌باشد.",
+            "",
             f"> **وضعیت ارزیابی هیئت داوران:** {verdict_badge}",
-            f"> **نمره نهایی داوری (مقیاس ۱ تا ۹):** `{overall_score} / 9.0` (نمره ۱ ممتاز - نمره ۹ ضعیف)",
+            f"> **امتیاز جامعیت ساختاری و روش‌شناختی (Heuristic Completeness Score):** `{overall_score} / 9.0` (مقیاس ۱ تا ۹ NIH: ۱ ممتاز - ۹ ضعیف)",
             f"> **تعداد نقایص بحرانی (Critical Flaws):** `{critical_flaws_count}`",
             "",
             "## ۱. خلاصه مدیریتی ارزیابی هیئت داوران (Executive Summary)",

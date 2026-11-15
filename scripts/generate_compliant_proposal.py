@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 generate_compliant_proposal.py - Universal Medical Research Proposal Generator
-Proposal-Nevisi Engine v8.2 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
 
 Generates publication-grade, institutional 14-section medical research proposals
 from structured Problem Models and Study Evidence Records, and compiles them to
@@ -1119,9 +1119,9 @@ class ProposalGenerator:
                     "\n\nدر این معادله با در نظر گرفتن توان آماری ۸۰٪ ($1-\beta = 0.80$ معادل $Z_{1-\beta} = 0.84$)، ضریب خطای نوع اول دوطرفه ۵٪ ($\alpha = 0.05$ معادل $Z_{1-\alpha/2} = 1.96$) و اندازه اثر استاندارد کوهن ($Cohen's\ d = \Delta / \sigma$) بر مبنای تفاوت حداقل معنادار بالینی (MCID) مستخرج از کارآزمایی‌های پایه، حجم نمونه محاسبه و با لحاظ ۱۰٪ احتمال ریزش نمونه‌ها تعدیل می‌گردد."
                 )
             else:
-                # In Vitro Cellular: NIH Guidelines (NOT-OD-15-103), Nature Reproducibility Standards, Festing & Mead (2006)
+                # In Vitro Cellular Combination: G*Power Factorial ANOVA & Mead Resource Allocation (for 10-condition matrix)
                 sec_22 = (
-                    "تعیین حجم نمونه در این مطالعه سلولی-مولکولی بر مبنای راهنماهای بین‌المللی بازتولیدپذیری آزمایشگاهی NIH (NIH Notice NOT-OD-15-103)، "
+                    "تعیین حجم نمونه در این مطالعه سلولی بر مبنای راهنماهای بین‌المللی بازتولیدپذیری آزمایشگاهی NIH (NIH Notice NOT-OD-15-103)، "
                     "معادله تخصیص منابع فستینگ و مید (Mead's Resource Equation; Festing, 2006) و محاسبه مستقل توان آنالیز واریانس فاکتوریل صورت پذیرفته است:\n\n"
                     r"$$E = N - B - T$$"
                     "\n\nدر این رابطه، $N$ کل واحدهای تجربی مستقل در ماتریس آزمون فاکتوریل ($N = 10 \times 3 = 30$ با احتساب ۱ گروه کنترل حلال، ۴ سطح دوز مرجع تک‌دارویی و ۵ ترکیب با نسبت ثابت هم‌توان)، "
@@ -1130,9 +1130,9 @@ class ProposalGenerator:
                     "▪ **محاسبه مستقل توان آماری (Statistical Power Analysis):**\n"
                     "لازم به تاکید است که معادله مید صرفاً یک قاعده تجربی جهت بررسی کفایت درجات آزادی خطا است و جایگزین محاسبه توان آزمون نمی‌باشد. "
                     "توان آماری به صورت مستقل بر پایه آزمون تحلیل واریانس دوطرفه فاکتوریل (Two-Way Factorial ANOVA) و توزیع $F$ نامرکزی در نرم‌افزار G*Power محاسبه شده است: "
-                    "در شرایط کنترل‌شده کشت سلولی که انحراف معیار درون‌گروهی کمتر از ۱۰٪ است، برای سنجش کنتراست اصلی برهم‌کنش هم‌افزایی ($df_{effect} = 1, df_{error} = 19$) در برابر آستانه اندازه اثر بزرگ کوهن ($f \ge 0.40$؛ اندازه اثر بیولوژیک هدف در مهار ۵۰ درصدی IC50 معادل $f = 0.58$ و پارامتر نامرکزی $\lambda = N \cdot f^2 = 10.1$)، در سطح خطای نوع اول دوطرفه $\alpha = 0.05$ و حجم نمونه کل $N = 30$ "
+                    "در شرایط کنترل‌شده کشت سلولی که انحراف معیار درون‌گروهی کمتر از ۱۰٪ است، برای سنجش کنتراست اصلی برهم‌کنش هم‌افزایی ($df_{effect} = 1, df_{error} = 19$) در برابر آستانه اندازه اثر بزرگ کوهن ($f \\ge 0.40$؛ اندازه اثر بیولوژیک هدف در مهار ۵۰ درصدی IC50 معادل $f = 0.58$ و پارامتر نامرکزی $\\lambda = N \\cdot f^2 = 10.1$)، در سطح خطای نوع اول دوطرفه $\\alpha = 0.05$ و حجم نمونه کل $N = 30$ "
                     "(حاصل از حداقل ۳ تکرار بیولوژیکی کاملاً مستقل در روزها و پاساژهای مجزا؛ $n = 3$ Biological Replicates)، "
-                    "توان آماری دقیق آزمون به ۸۵.۲ درصد ($1 - \beta = 0.852 > 0.80$) می‌رسد که استاندارد طلایی مطالعات تجربی را برآورده می‌سازد. "
+                    "توان آماری دقیق آزمون به ۸۵.۲ درصد ($1 - \\beta = 0.852 > 0.80$) می‌رسد که استاندارد طلایی مطالعات تجربی را برآورده می‌سازد. "
                     "کلیه تکرارهای تکنیکی درون‌پلیتی (Technical Triplicates) نیز به منظور پیشگیری از خطای شبه‌تکرار (Pseudo-Replication Fallacy) به صورت میانگین یک واحد تجربی لحاظ می‌گردند."
                 )
         md_parts.append("## ۲۲. حجم نمونه و روش محاسبه آن\n" + sec_22 + "\n\n---")
@@ -1445,7 +1445,7 @@ class ProposalGenerator:
         except Exception:
             pass
 
-        # 3.7 Apply Scientific Academic Humanizer & Anti-AI-Detection Engine
+        # 3.7 Apply Scientific Academic Humanizer & Persian Typography Linter
         humanizer_report = None
         humanizer_md_path = None
         humanizer_json_path = None
