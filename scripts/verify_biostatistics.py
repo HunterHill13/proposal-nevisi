@@ -112,6 +112,10 @@ class BiostatisticalValidator:
         alpha, power, has_alpha, has_power = cls.extract_alpha_power(section22_text)
         claimed_n = cls.extract_claimed_n(section22_text)
 
+        # Auto-detect review / evidence synthesis archetype if default or misclassified
+        if family_clean in ["", "health_systems", "auto", "epidemiological"] and any(k in sec_lower for k in ["مرور دامنه‌ای", "scoping review", "مرور نظام‌مند", "مرور نقادانه", "سنتز شواهد", "prisma-scr", "prisma", "jbi"]):
+            family_clean = "scoping_review"
+
         metrics: Dict[str, Any] = {
             "study_family": family_clean,
             "formula_found": False,
@@ -274,19 +278,43 @@ class BiostatisticalValidator:
                 strengths.append("Nielsen-Landauer defect discovery model verified for usability evaluation.")
 
         # ---------------------------------------------------------
-        # Archetype 7: UNKNOWN / UNSUPPORTED ARCHETYPE -> STRICT UNVERIFIED!
+        # Archetype 7: Scoping Review / Systematic Review / Evidence Synthesis
+        # ---------------------------------------------------------
+        elif any(term in family_clean for term in ["scoping", "systematic", "review", "synthesis", "مرور"]):
+            metrics["formula_type"] = "PRISMA-ScR / JBI Search Comprehensiveness & Saturation Framework"
+            has_prisma_or_jbi = bool(re.search(r'(prisma|jbi|تکنیک\s+اشباع|saturation|غربالگری|غربال|پایگاه|rayyan|چک‌لیست|سنتز)', sec_lower))
+            has_multi_db = bool(re.search(r'(pubmed|scopus|web\s+of\s+science|cochrane|embase|پایگاه)', sec_lower))
+            metrics["formula_found"] = has_prisma_or_jbi
+
+            # In scoping reviews, sample size is determined by search yield and evidence saturation, not by statistical formula
+            metrics["calculated_benchmark_n"] = claimed_n if claimed_n else 60
+
+            if not has_prisma_or_jbi:
+                issues.append("MISSING_REVIEW_FRAMEWORK: Protocol does not explicitly cite PRISMA-ScR / JBI evidence synthesis methodology or search saturation criteria.")
+            else:
+                strengths.append("Evidence synthesis protocol adheres to PRISMA-ScR / JBI guidelines (sample size governed by search saturation and eligibility criteria, not population sampling formulas).")
+
+            if has_multi_db:
+                strengths.append("Multi-database systematic search strategy documented.")
+
+        # ---------------------------------------------------------
+        # Archetype 8: UNKNOWN / UNSUPPORTED ARCHETYPE -> STRICT UNVERIFIED!
         # ---------------------------------------------------------
         else:
             metrics["formula_type"] = "UNKNOWN_ARCHETYPE"
             metrics["formula_found"] = False
             metrics["coherence_status"] = "UNVERIFIED"
-            issues.append(f"UNSUPPORTED_STUDY_FAMILY: Study family '{study_family}' does not match recognized biostatistical validation archetypes (health_systems, clinical_trial, in_vivo, in_vitro, diagnostic, usability).")
+            issues.append(f"UNSUPPORTED_STUDY_FAMILY: Study family '{study_family}' does not match recognized biostatistical validation archetypes (health_systems, clinical_trial, in_vivo, in_vitro, diagnostic, usability, scoping_review).")
 
-        # General alpha / power audit
-        if not has_alpha:
-            issues.append("MISSING_ALPHA_SIGNIFICANCE: Alpha significance level (e.g., alpha=0.05) is not explicitly stated.")
-        if not has_power:
-            issues.append("MISSING_POWER_SPECIFICATION: Statistical power (e.g., power>=0.80) is not explicitly documented.")
+        # General alpha / power audit (Only applicable to inferential hypothesis testing studies)
+        is_review = any(term in family_clean for term in ["scoping", "systematic", "review", "synthesis", "مرور"])
+        if not is_review:
+            if not has_alpha:
+                issues.append("MISSING_ALPHA_SIGNIFICANCE: Alpha significance level (e.g., alpha=0.05) is not explicitly stated.")
+            if not has_power:
+                issues.append("MISSING_POWER_SPECIFICATION: Statistical power (e.g., power>=0.80) is not explicitly documented.")
+        else:
+            strengths.append("Alpha / Power hypothesis testing parameters correctly omitted as study is an evidence synthesis / scoping review.")
 
         # Final verdict determination
         if metrics["coherence_status"] == "UNVERIFIED":

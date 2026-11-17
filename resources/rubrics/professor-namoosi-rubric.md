@@ -39,6 +39,7 @@ Once all Hard Constraints pass, the isolated auditor verifies the following crit
   - **In Vitro Bioassays:** Factorial ANOVA replicate design ($\ge 3$ biological replicates), vehicle control (DMSO $< 0.1\%$), and cell-free blank interference controls.
   - **Diagnostic Accuracy:** Buderer sensitivity/specificity formula compliant with STARD guidelines.
   - **Usability & Digital Health:** Nielsen-Landauer problem discovery model and SUS scale sample sizing.
+  - **Scoping Review / Evidence Synthesis:** PRISMA-ScR (Tricco 2018) / JBI (Peters 2020) search comprehensiveness and evidence saturation framework across >=3 international databases; PCC framework (Population, Concept, Context) with JBI data charting matrix. Strictly prohibits Cochran population formula, alpha, and power parameters.
 - [ ] 100% numerical consistency between Section 22 sample sizes and Section 27 experimental arm/group counts.
 
 ### 2.3. Vancouver Citation Integrity & Monotonic Order

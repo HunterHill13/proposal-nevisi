@@ -1,6 +1,6 @@
 ---
 name: proposal-nevisi
-description: Autonomous Medical Research Proposal Writing Engine (v14.1.0) featuring 7-Subagent Cognitive Study Section Panel, 6-Archetype Polymorphism, Native OMML Math Engine, and Two-Gate Review Protocol.
+description: Autonomous Medical Research Proposal Writing Engine (v14.1.0) featuring 7-Subagent Cognitive Study Section Panel, 7-Archetype Polymorphism, Native OMML Math Engine, and Two-Gate Review Protocol.
 version: 14.1.0
 ---
 
@@ -8,7 +8,7 @@ version: 14.1.0
 
 `proposal-nevisi` is an autonomous scientific engineering skill designed to generate publication-grade, evidence-grounded medical research proposals adhering to the 28 canonical sections of the Iranian Ministry of Health (*Pajooheshyar*) portal.
 
-The engine integrates real-time biomedical literature retrieval (PubMed, Europe PMC, OpenAlex), mathematical formula compilation via native Office Math Markup Language (OMML), a 6-archetype study design polymorphism matrix, and a 7-subagent adversarial cognitive study section panel.
+The engine integrates real-time biomedical literature retrieval (PubMed, Europe PMC, OpenAlex), mathematical formula compilation via native Office Math Markup Language (OMML), a 7-archetype study design polymorphism matrix (including PRISMA-ScR/JBI Scoping Reviews), and a 7-subagent adversarial cognitive study section panel.
 
 ---
 
@@ -67,7 +67,7 @@ The engine integrates real-time biomedical literature retrieval (PubMed, Europe 
 
 ### Creative Gate 1: Socratic Strategy Confirmation
 Before executing any generation pipeline, the agent must interact with the user via `ask_question` to determine:
-1. **Study Archetype:** Choose from the 6 canonical archetypes (`clinical_rct`, `in_vivo`, `in_vitro`, `health_systems`, `epidemiological`, `diagnostic`).
+1. **Study Archetype:** Choose from the 7 canonical archetypes (`clinical_rct`, `in_vivo`, `in_vitro`, `health_systems`, `epidemiological`, `diagnostic`, `scoping_review`). For `scoping_review` / `evidence_synthesis`, the protocol strictly enforces PRISMA-ScR / JBI search comprehensiveness and saturation, omitting Cochran formulas and alpha/power tests.
 2. **Target Intervention & Biological System:** Confirm specific drugs, cell lines, animal models, or clinical cohorts.
 3. **Primary Outcome Measure:** Confirm the primary statistical endpoint (e.g., cell viability, hazard ratio, Catastrophic Health Expenditures, sensitivity/specificity).
 
@@ -115,7 +115,7 @@ Deliver the verified artifacts in `output/[topic_slug]/`:
 |---|---|
 | `build_canonical_proposal_docx.py` | Official Word (.docx) compiler with Pajooheshyar stylesheet, Dubai font, and table formatting. |
 | `native_omml_math_engine.py` | Converts LaTeX math expressions into native Office Math Markup Language (`<m:oMath>`, `<m:f>`, `<m:rad>`). |
-| `verify_biostatistics.py` | Parametrically verifies sample size equations across all 6 study archetypes; rejects unsupported archetypes. |
+| `verify_biostatistics.py` | Parametrically verifies sample size equations across all 7 study archetypes (including PRISMA-ScR/JBI evidence saturation for reviews); rejects unsupported archetypes. |
 | `mesh_query_expander.py` | Maps clinical keywords across 130+ standardized MeSH descriptors in 11 clinical fields. |
 | `generic_search_planner.py` | Formulates balanced, multi-database search queries with dynamic time windows. |
 | `claim_entailment_auditor.py` | Evaluates factual entailment between cited claims and retrieved abstracts. |
