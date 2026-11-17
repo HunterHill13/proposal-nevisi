@@ -450,18 +450,22 @@ def render_styled_table(doc, table_lines):
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
 def render_official_cover_page(doc, main_title: str, english_title: Optional[str] = None):
-    """Generates the official cover page with university header, title card, and team table."""
-    p_uni = doc.add_paragraph()
-    apply_rtl_center(p_uni, space_before=4, space_after=2)
-    add_r(p_uni, "دانشگاه علوم پزشکی و خدمات بهداشتی درمانی بقیه‌الله (عج)", font_name="Dubai", size_pt=14.0, bold=True, color_rgb=(0x1A, 0x36, 0x5D))
+    """Generates the official Pajooheshyar cover page with national medical research header, title card, and protocol metadata."""
+    p_gov = doc.add_paragraph()
+    apply_rtl_center(p_gov, space_before=4, space_after=1)
+    add_r(p_gov, "جمهوری اسلامی ایران", font_name="Dubai", size_pt=11.0, bold=True, color_rgb=(0x4A, 0x55, 0x68))
+
+    p_min = doc.add_paragraph()
+    apply_rtl_center(p_min, space_before=0, space_after=1)
+    add_r(p_min, "وزارت بهداشت، درمان و آموزش پزشکی", font_name="Dubai", size_pt=13.0, bold=True, color_rgb=(0x1A, 0x36, 0x5D))
 
     p_sub = doc.add_paragraph()
-    apply_rtl_center(p_sub, space_before=0, space_after=3)
-    add_r(p_sub, "کمیته تحقیقات و فناوری دانشجویی — رویداد ملی ایده‌پردازی «جوانی جمعیت؛ از چالش تا راهکار»", font_name="Dubai", size_pt=11.0, bold=True, color_rgb=(0x74, 0x2A, 0x2A))
+    apply_rtl_center(p_sub, space_before=0, space_after=4)
+    add_r(p_sub, "معاونت تحقیقات و فناوری — سامانه ملی پژوهشیار", font_name="Dubai", size_pt=11.0, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
 
-    p_axis = doc.add_paragraph()
-    apply_rtl_center(p_axis, space_before=2, space_after=6)
-    add_r(p_axis, "محور تخصصی ۵: خانواده در شرایط واقعی زندگی؛ طراحی حمایت‌های مؤثر و قابل دسترس", font_name="Dubai", size_pt=11.0, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
+    p_form = doc.add_paragraph()
+    apply_rtl_center(p_form, space_before=0, space_after=6)
+    add_r(p_form, "فرم رسمی طرح پژوهشی مصوب (پروپوزال تحقیقاتی ۲۸ بخشی)", font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x74, 0x2A, 0x2A))
 
     t_box = doc.add_table(rows=1, cols=1)
     t_box.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -476,7 +480,7 @@ def render_official_cover_page(doc, main_title: str, english_title: Optional[str
 
     pt1 = cell_t.paragraphs[0]
     apply_rtl_center(pt1, space_before=2, space_after=2)
-    add_r(pt1, "پروپوزال رسمی طرح پژوهشی / ایده سیاستی و مداخله‌ای", font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
+    add_r(pt1, "عنوان رسمی طرح پژوهشی مصوب", font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
 
     pt2 = cell_t.add_paragraph()
     apply_rtl_center(pt2, space_before=2, space_after=4)
@@ -487,55 +491,49 @@ def render_official_cover_page(doc, main_title: str, english_title: Optional[str
         pt3.alignment = WD_ALIGN_PARAGRAPH.CENTER
         pt3.paragraph_format.space_before = Pt(2)
         pt3.paragraph_format.space_after = Pt(2)
-        add_r(pt3, english_title, font_name="Times New Roman", size_pt=9.0, italic=True, color_rgb=(0x4A, 0x55, 0x68), is_rtl=False)
+        add_r(pt3, english_title, font_name="Times New Roman", size_pt=9.5, italic=True, color_rgb=(0x4A, 0x55, 0x68), is_rtl=False)
 
     p_thdr = doc.add_paragraph()
-    apply_rtl_right(p_thdr, space_before=6, space_after=4)
-    add_r(p_thdr, "مشخصات کامل اعضای گروه پژوهشی (۳ الی ۵ نفره) — ضوابط صفحه ۱۰ دفترچه راهنما:", font_name="Dubai", size_pt=10, bold=True, color_rgb=(0x1A, 0x36, 0x5D))
+    apply_rtl_right(p_thdr, space_before=8, space_after=4)
+    add_r(p_thdr, "مشخصات و متادیتای ساختاری طرح در سامانه پژوهشیار:", font_name="Dubai", size_pt=10, bold=True, color_rgb=(0x1A, 0x36, 0x5D))
 
-    team_headers = ["ردیف", "نام و نام خانوادگی", "رشته و مقطع تحصیلی", "دانشگاه / دانشکده", "نقش در پروژه"]
-    team_rows = [
-        ["۱", "[نام عضو اول - سرپرست]", "پزشکی عمومی / بالینی", "علوم پزشکی بقیه‌الله (عج)", "پژوهشگر اصلی و مسئول مکاتبات"],
-        ["۲", "[نام عضو دوم]", "پزشکی عمومی / فیزیوپاتولوژی", "علوم پزشکی بقیه‌الله (عج)", "تحلیل‌گر داده‌های کمی و بیواستاتیک"],
-        ["۳", "[نام عضو سوم]", "مدیریت خدمات بهداشتی", "علوم پزشکی بقیه‌الله (عج)", "مسئول متدولوژی کیفی و مصاحبه‌ها"],
-        ["۴", "[نام عضو چهارم]", "مامایی و سلامت باروری", "علوم پزشکی بقیه‌الله (عج)", "کارشناس ارزیابی بسته‌های بارداری"],
-        ["۵", "[نام عضو پنجم - اختیاری]", "اقتصاد سلامت / سیاست‌گذاری", "علوم پزشکی بقیه‌الله (عج)", "مدل‌سازی اقتصادی و ارزیابی CHE"]
+    meta_headers = ["شاخص متدولوژیک و اجرایی", "مشخصات و استاندارد مصوب طرح"]
+    meta_rows = [
+        ["نوع طرح پژوهشی", "طرح تحقیقاتی مصوب دانشگاهی"],
+        ["کهن‌الگوی متدولوژیک", "مرور دامنه‌ای نقادانه و سنتز شواهد (PRISMA-ScR & JBI Framework)"],
+        ["حوزه تخصصی و گرایش", "بیوتکنولوژی دارویی، ویروس‌شناسی پزشکی و ایمونولوژی"],
+        ["محل اجرای مصوب", "مرکز تحقیقات بیوتکنولوژی دارویی، دانشگاه علوم پزشکی"],
+        ["چارچوب ارزیابی نقادانه", "عدم ارزیابی ریسک سوگیری به دلیل ماهیت نگاشت شواهد (مطابق راهنمای رسمی PRISMA-ScR)"],
+        ["تعداد بخش‌های رسمی", "دقیقاً ۲۸ بخش کامل منطبق بر آخرین شیوه‌نامه مصوب وزارت بهداشت"]
     ]
 
-    col_w_team = [Inches(0.6), Inches(1.8), Inches(1.5), Inches(1.4), Inches(1.5)]
-    t_team = doc.add_table(rows=len(team_rows) + 1, cols=5)
-    t_team.alignment = WD_TABLE_ALIGNMENT.CENTER
-    t_team._tbl.tblPr.append(parse_xml(f'<w:bidiVisual {nsdecls("w")}/>'))
+    t_meta = doc.add_table(rows=len(meta_rows) + 1, cols=2)
+    t_meta.alignment = WD_TABLE_ALIGNMENT.CENTER
+    t_meta._tbl.tblPr.append(parse_xml(f'<w:bidiVisual {nsdecls("w")}/>'))
 
-    for c_i, h_text in enumerate(team_headers):
-        cell = t_team.cell(0, c_i)
+    col_w_meta = [Inches(2.4), Inches(4.4)]
+    for c_i, h_text in enumerate(meta_headers):
+        cell = t_meta.cell(0, c_i)
         cell.text = ""
+        cell.width = col_w_meta[c_i]
         set_cell_shading(cell, "1A365D")
         set_cell_margins(cell, top=80, bottom=80, left=80, right=80)
         p = cell.paragraphs[0]
         apply_rtl_center(p, space_before=2, space_after=2)
         add_r(p, h_text, font_name="Dubai", size_pt=9.5, bold=True, color_rgb=(0xFF, 0xFF, 0xFF))
 
-    for r_i, r_vals in enumerate(team_rows):
+    for r_i, r_vals in enumerate(meta_rows):
         bg = "F8FAFC" if r_i % 2 == 1 else "FFFFFF"
         for c_i, val in enumerate(r_vals):
-            cell = t_team.cell(r_i + 1, c_i)
+            cell = t_meta.cell(r_i + 1, c_i)
             cell.text = ""
+            cell.width = col_w_meta[c_i]
             set_cell_shading(cell, bg)
             set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
             p = cell.paragraphs[0]
-            align_fn = apply_rtl_center if c_i in [0, 3] else apply_rtl_right
+            align_fn = apply_rtl_center if c_i == 0 else apply_rtl_right
             align_fn(p, space_before=2, space_after=2)
-            add_r(p, val, font_name="Dubai", size_pt=9, bold=(c_i == 1), color_rgb=(0x2D, 0x37, 0x48))
-
-    p_box_sub = doc.add_paragraph()
-    apply_rtl_justify(p_box_sub, space_before=6, space_after=6)
-    p_box_sub_pr = p_box_sub._p.get_or_add_pPr()
-    p_box_sub_pr.append(parse_xml(f'''<w:pBdr {nsdecls("w")}>
-        <w:right w:val="single" w:sz="24" w:space="12" w:color="2B6CB0"/>
-    </w:pBdr>'''))
-    p_box_sub_pr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="F0F4F8"/>'))
-    add_r(p_box_sub, "راهنمای ارسال اثر طبق دفترچه راهنما: این پروپوزال باید به صورت هم‌زمان در دو قالب Word (.docx) و PDF (.pdf) به نشانی پست الکترونیک دبیرخانه رویداد (bmsusrc.a@gmail.com) با موضوع مشخص «رویداد ایده پردازی: جوانی جمعیت» ارسال گردد.", font_name="Dubai", size_pt=9.0, color_rgb=(0x2D, 0x37, 0x48))
+            add_r(p, val, font_name="Dubai", size_pt=9, bold=(c_i == 0), color_rgb=(0x2D, 0x37, 0x48))
 
     doc.add_page_break()
 
