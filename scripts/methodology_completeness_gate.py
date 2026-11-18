@@ -96,7 +96,14 @@ SAMPLE_SIZE_FORMULA_PATTERNS = [
     r'resource equation',
     r'Festing|ARRIVE|Chow|کوکران|کوهن|مید|پوکاک',
     r'تکرار.*(بیولوژیک|مستقل|آزمایشگاهی)',
-    r'(biological|independent)\s+replicate'
+    r'(biological|independent)\s+replicate',
+    r'\bBuderer\b',
+    r'\bPRISMA(?:-ScR)?\b',
+    r'\bJBI\b',
+    r'اشباع\s+شواهد',
+    r'(?:evidence|search)\s+saturation',
+    r'Nielsen(?:-Landauer)?',
+    r'1\s*-\s*\(1\s*-\s*L\)',
 ]
 
 @dataclass
@@ -377,8 +384,32 @@ class MethodologyCompletenessGate:
 
         for line in lines:
             stripped = line.strip()
-            # Match Markdown headings (## or #) or institutional headers
-            header_match = re.match(r'^(?:#{1,4})\s*(?:([0-9]+|[\u06F0-\u06F9]+)[.:\s\-]+)?\s*(.+)$', stripped)
+            # 0. Support 14-section layout subsections (### 13-1 .. ### 13-14 or Persian digits)
+            sub_13_match = re.match(
+                r'^#{2,4}\s*(?:(?:بخش|Section)\s+)?(?:13|۱۳)[.\-–—]([0-9]+|[\u06F0-\u06F9]+)(?:[.:\s\-]+(.*))?$',
+                stripped,
+                re.IGNORECASE,
+            )
+            if sub_13_match:
+                clean_sub = sub_13_match.group(1)
+                for fa_d, en_d in fa_to_en.items():
+                    clean_sub = clean_sub.replace(fa_d, en_d)
+                try:
+                    sub_val = int(clean_sub)
+                    if 1 <= sub_val <= 14:
+                        save_current()
+                        current_sec = REQUIRED_SECTIONS_28[12 + sub_val]
+                        current_buffer = []
+                        continue
+                except ValueError:
+                    pass
+
+            # Match top-level canonical Markdown headings (# or ## only, never ### subsections like ### 1.)
+            header_match = re.match(
+                r'^#{1,2}(?!#)\s*(?:(?:بخش|Section)\s+)?(?:([0-9]+|[\u06F0-\u06F9]+)[.:\s\-]+)?\s*(.+)$',
+                stripped,
+                re.IGNORECASE,
+            )
             if header_match:
                 num_str = header_match.group(1)
                 candidate_title = header_match.group(2).strip()

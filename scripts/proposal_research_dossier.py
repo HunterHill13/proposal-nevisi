@@ -293,6 +293,14 @@ class ProposalResearchDossier:
             json.dump(data, f, ensure_ascii=False, indent=2)
         return output_path
 
+    def _format_alpha_power(self) -> str:
+        sf = str(self.methodological_invariants.get("study_family", "")).lower()
+        alpha = self.methodological_invariants.get("alpha")
+        power = self.methodological_invariants.get("power")
+        if any(k in sf for k in ("scoping", "prisma", "مرور دامنه‌ای")) or alpha in (None, "N/A", 0, 0.0):
+            return "N/A (غیرکاربردی در طراحی مرور دامنه‌ای / PRISMA-ScR)"
+        return f"$\\alpha={alpha}, 1-\\beta={power}$"
+
     def export_markdown(self, output_path: str) -> str:
         """Exports the dossier to a comprehensive human-readable Markdown file."""
         os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
@@ -326,7 +334,7 @@ class ProposalResearchDossier:
             f"| **فرمول محاسبه حجم نمونه** | `{self.methodological_invariants.get('sample_size_formula')}` |",
             f"| **تعداد نمونه کل ($N$)** | `{self.methodological_invariants.get('target_n')}` |",
             f"| **مدل/آزمون آماری اولیه** | `{self.methodological_invariants.get('statistical_test')}` |",
-            f"| **سطح خطا و توان آزمون** | $\\alpha={self.methodological_invariants.get('alpha')}, 1-\\beta={self.methodological_invariants.get('power')}$ |",
+            f"| **سطح خطا و توان آزمون** | {self._format_alpha_power()} |",
             f"",
             f"---",
             f"",
@@ -377,8 +385,9 @@ class ProposalResearchDossier:
                         md_lines.append(f"  > \"{p}\"")
                 md_lines.append("")
 
-            # Render Risk of Bias Table for Baseline Literature
-            if self.literature_rob_evaluations:
+            # Render Risk of Bias Table for Baseline Literature (omitted in scoping_review per PRISMA-ScR)
+            _sf = str(self.methodological_invariants.get("study_family", "")).lower()
+            if self.literature_rob_evaluations and not any(k in _sf for k in ("scoping", "prisma", "مرور دامنه‌ای")):
                 try:
                     from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
                     rob_table = BaselinePaperQualityAuditor.render_markdown_table(self.literature_rob_evaluations)

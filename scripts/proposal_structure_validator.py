@@ -63,8 +63,13 @@ class ProposalStructureValidator:
 
         missing_sections = [s["name"] for s in section_status if not s["found"]]
 
-        # 2. Check Variable Table and Timeline
-        has_var_table = bool(re.search(r"\|\s*نام\s*متغیر\s*\|", text) or re.search(r"\|\s*متغیر\s*\|", text))
+        # 2. Check Variable Table (including JBI PCC Extraction Matrix) and Timeline
+        has_var_table = bool(
+            re.search(r"\|\s*نام\s*متغیر\s*\|", text)
+            or re.search(r"\|\s*متغیر\s*\|", text)
+            or re.search(r"\|\s*محور\s*استخراج", text)
+            or re.search(r"\|\s*مؤلفه\s*(?:PCC|JBI)", text, re.IGNORECASE)
+        )
         has_timeline = bool(re.search(r"\|\s*فاز[^\n\|]*\|", text) or re.search(r"\|\s*مرحله[^\n\|]*\|", text) or re.search(r"گانت", text) or re.search(r"زمان[\s\-\u200c]*بندی", text))
 
         # 3. Content Depth Audit
@@ -306,13 +311,20 @@ class ProposalStructureValidator:
 
         # 4. Statistical plan matches framework
         primary_test = str(stat_plan.get("primary_analysis", ""))
+        fw_up = str(framework).upper()
         test_matches_design = True
-        if framework == "DIAGNOSTIC" and "حساسیت" not in primary_test and "sensitivity" not in primary_test.lower() and "roc" not in primary_test.lower():
+        if fw_up in ["DIAGNOSTIC", "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"] and "حساسیت" not in primary_test and "sensitivity" not in primary_test.lower() and "roc" not in primary_test.lower():
             test_matches_design = False
             flags.append("DIAGNOSTIC_FRAMEWORK_ANALYSIS_MISMATCH")
-        elif framework == "PICO" and "itt" not in primary_test.lower() and "قصد درمان" not in primary_test and "cox" not in primary_test.lower() and "anova" not in primary_test.lower() and "t-test" not in primary_test.lower():
+        elif fw_up in ["PICO", "CLINICAL_TRIAL"] and not any(k in primary_test.lower() for k in ["itt", "قصد درمان", "cox", "anova", "t-test", "ancova"]):
             test_matches_design = False
             flags.append("CLINICAL_TRIAL_ANALYSIS_MISMATCH")
+        elif "SCOPING" in fw_up and not any(k in primary_test.lower() for k in ["prisma", "jbi", "kappa", "کاپا", "نگاشت", "فراوانی", "توصیفی"]):
+            test_matches_design = False
+            flags.append("SCOPING_REVIEW_ANALYSIS_MISMATCH")
+        elif "USABILITY" in fw_up and not any(k in primary_test.lower() for k in ["sus", "nielsen", "نیلسن", "کاربردپذیری", "تکلیف"]):
+            test_matches_design = False
+            flags.append("USABILITY_ANALYSIS_MISMATCH")
 
         checks["statistical_analysis_aligned"] = test_matches_design
 

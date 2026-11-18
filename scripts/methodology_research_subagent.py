@@ -56,64 +56,38 @@ class MethodologyResearchSubagent:
 
     @classmethod
     def identify_study_archetype(cls, topic: str, context: Optional[Dict[str, Any]] = None) -> str:
-        """Determines the biological and experimental archetype of the study."""
+        """Determines the biological and methodological archetype via canonical core_policies classifier."""
+        from core_policies import classify_study_archetype
+
+        _MAP = {
+            "scoping_review": "SCOPING_REVIEW_AND_EVIDENCE_SYNTHESIS",
+            "usability": "USABILITY_AND_DIGITAL_HEALTH",
+            "health_systems": "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
+            "diagnostic": "DIAGNOSTIC_ACCURACY_AND_BIOMARKER",
+            "epidemiological": "EPIDEMIOLOGICAL_OBSERVATIONAL",
+            "clinical_rct": "CLINICAL_TRIAL_OR_COHORT",
+            "in_vivo": "IN_VIVO_ANIMAL_MODEL",
+            "in_vitro": "IN_VITRO_CELLULAR_COMBINATION",
+        }
+
         if isinstance(context, dict):
-            fam = str(context.get("study_family") or "").lower().replace("-", "_")
-            fw = str(context.get("framework") or "").upper().replace("-", "_")
-            if any(k in fam for k in ["health_system", "health_policy", "health_econom", "che", "oop"]) or any(k in fw for k in ["HEALTH_SYSTEM", "HEALTH_POLICY", "ECONOM"]):
-                return "HEALTH_SYSTEMS_AND_HEALTH_POLICY"
-            if any(k in fam for k in ["diagnostic", "biomarker", "stard"]) or "DIAGNOSTIC" in fw:
-                return "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"
-            if any(k in fam for k in ["epidemiol", "observational", "strobe", "survey"]) or any(k in fw for k in ["EPIDEMIOL", "OBSERVATIONAL"]):
-                return "EPIDEMIOLOGICAL_OBSERVATIONAL"
-            if any(k in fam for k in ["clinical", "rct", "trial", "consort"]) or any(k in fw for k in ["CLINICAL", "RCT"]):
-                return "CLINICAL_TRIAL_OR_COHORT"
-            if any(k in fam for k in ["in_vivo", "animal", "arrive", "xenograft"]) or any(k in fw for k in ["ANIMAL", "IN_VIVO"]):
-                return "IN_VIVO_ANIMAL_MODEL"
-            if any(k in fam for k in ["in_vitro", "cellular", "cell_line", "gccp"]) or "IN_VITRO" in fw:
-                return "IN_VITRO_CELLULAR_COMBINATION"
-
-        t_lower = topic.lower().replace("_", " ").replace("-", " ")
-        ctx_str = str(context or "").lower().replace("_", " ").replace("-", " ")
-        combined = f"{t_lower} {ctx_str}"
-
-        # 1. Health Systems, Health Economics & Health Policy (CHE, OOP, ICER, UHC, Financing)
-        if any(k in combined for k in [
-            "هزینه", "کمرشکن", "پرداخت از جیب", "اقتصاد سلامت", "نظام سلامت", "بیمه",
-            "che", "oop", "health expenditure", "catastrophic", "out-of-pocket",
-            "health system", "health systems", "health policy", "health economics", "icer", "qaly", "daly", "equity",
-            "financial protection", "uhc", "universal health coverage", "عدالت در سلامت"
-        ]):
-            return "HEALTH_SYSTEMS_AND_HEALTH_POLICY"
-
-        # 2. Diagnostic Accuracy & Biomarkers
-        elif any(k in combined for k in [
-            "تشخیصی", "حساسیت و ویژگی", "دقت تشخیصی", "ارزش اخباری", "بیومارکر تشخیصی", "بیومارکر",
-            "diagnostic accuracy", "diagnostic", "biomarker", "sensitivity and specificity", "roc curve", "auc-roc", "stard"
-        ]):
-            return "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"
-
-        # 3. Observational Epidemiology (Surveys, Cross-Sectional, Case-Control, Cohort without drug intervention)
-        elif any(k in combined for k in [
-            "مقطعی", "مورد-شاهدی", "شیوع", "همه‌گیرشناسی", "عوامل خطر", "بررسی پیمایشی", "پیمایش",
-            "cross-sectional", "cross sectional", "case-control", "case control", "prevalence", "incidence", "risk factors", "epidemiology", "epidemiological", "observational", "strobe"
-        ]) and not any(k in combined for k in ["رده سلولی", "cell line", "in vitro", "سنتز"]):
-            return "EPIDEMIOLOGICAL_OBSERVATIONAL"
-
-        # 4. Clinical Trials & Human Interventional Studies
-        elif any(k in combined for k in [
-            "کارآزمایی بالینی", "clinical trial", "rct", "مداخله درمانی", "فاز ۱", "فاز ۲", "فاز ۳",
-            "phase 1", "phase 2", "phase 3", "پروتکل کارآزمایی", "consort"
-        ]) or (any(k in combined for k in ["بیمار", "بیماران", "cohort", "کوهورت"]) and not any(k in combined for k in ["رده سلولی", "cell line", "موش", "رت"])):
-            return "CLINICAL_TRIAL_OR_COHORT"
-
-        # 5. In Vivo Animal Models
-        elif any(k in combined for k in ["موش", "رت", "in vivo", "حيوان", "xenograft", "حیوانات", "animal model", "animal", "arrive"]):
-            return "IN_VIVO_ANIMAL_MODEL"
-
-        # 6. Default: In Vitro Molecular & Cellular
+            mapped = classify_study_archetype(context)
+            if mapped != "unknown":
+                return _MAP[mapped]
+            combined_probe = f"{topic} {context.get('topic', '')} {context.get('title', '')}"
         else:
-            return "IN_VITRO_CELLULAR_COMBINATION" 
+            combined_probe = f"{topic} {context or ''}"
+
+        mapped = classify_study_archetype(combined_probe)
+        if mapped != "unknown":
+            return _MAP[mapped]
+
+        t_lower = combined_probe.lower().replace("_", " ").replace("-", " ")
+        if re.search(r"(?:^|[^\w\u0600-\u06FF])بیماران?(?:[^\w\u0600-\u06FF]|$)", t_lower) or any(k in t_lower for k in ["cohort", "کوهورت"]):
+            return "CLINICAL_TRIAL_OR_COHORT"
+        if any(k in t_lower for k in ["عصاره", "تیمار", "دارو", "مسیر", "مکانیسم", "بیان ژن", "synerg", "extract", "pathway"]):
+            return "IN_VITRO_CELLULAR_COMBINATION"
+        return "UNKNOWN_STUDY_ARCHETYPE"
 
     @classmethod
     def derive_cohesive_protocol(
@@ -194,22 +168,22 @@ class MethodologyResearchSubagent:
                     "مطالعه حاضر یک پژوهش کاربردی-مقطعی مبتنی بر جامعه از نوع توصیفی-تحلیلی و اقتصاد سلامت (Cross-Sectional Health Systems & Health Economics Study) است که مطابق با استانداردهای بین‌المللی ارزیابی حفاظت مالی سازمان جهانی بهداشت (WHO) طراحی گردیده است."
                 ),
                 15: (
-                    f"جامعه پژوهش شامل کلیه بیماران مبتلا به {target_model} و خانوارهای تحت تکفل آنها می‌باشد که جهت دریافت خدمات تخصصی درمانی (بستری، شیمی‌درمانی، رادیوتراپی و جراحی) به بیمارستان‌ها و مراکز درمانی تخصصی منتخب مراجعه نموده‌اند.\n\n"
+                    f"جامعه پژوهش شامل کلیه بیماران و خانوارهای مراجعه‌کننده مرتبط با {model_specs['model_name']} است که جهت دریافت خدمات تخصصی تشخیصی، سرپایی و بستری به بیمارستان‌ها و مراکز درمانی منتخب مراجعه نموده‌اند.\n\n"
                     f"▪ **چارچوب ساختارمند متدولوژی (PECO Framework):**\n\n"
                     f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
                     f"| :--- | :--- |\n"
-                    f"| **P (Population)** | بیماران مبتلا به {target_model} و خانوارهای تحت پوشش |\n"
-                    f"| **E (Exposure)** | مواجهه با بار مالی و هزینه‌های درمانی (خدمات بستری، سرپایی، دارویی) |\n"
+                    f"| **P (Population)** | خانوارها و بیماران مراجعه‌کننده به مراکز درمانی منتخب ({model_specs['model_name']}) |\n"
+                    f"| **E (Exposure)** | مواجهه با بار مالی و هزینه‌های درمانی (خدمات بستری، سرپایی، دارویی و تشخیصی) |\n"
                     f"| **C (Comparator)** | مقایسه دهک‌های درآمدی/هزینه‌ای و وضعیت پوشش بیمه پایه و تکمیلی |\n"
                     f"| **O (Outcomes)** | نرخ مواجهه با هزینه‌های کمرشکن سلامت (CHE) و سهم پرداخت از جیب (OOP) |\n\n"
                     f"نمونه‌گیری به شیوه خوشه‌ای چندمرحله‌ای طبقه‌بندی‌شده از میان مراکز درمانی منتخب صورت می‌پذیرد."
                 ),
                 16: (
-                    "بیمارستان‌های دانشگاهی و تخصصی انکولوژی، درمانگاه‌های سرپایی شیمی‌درمانی، مراکز تشخیصی و مراکز جامع خدمات سلامت منتخب وابسته به دانشگاه علوم پزشکی."
+                    "بیمارستان‌های دانشگاهی، مراکز درمانی تخصصی و مراکز جامع خدمات سلامت منتخب وابسته به دانشگاه علوم پزشکی."
                 ),
                 17: (
-                    f"- تشخیص قطعی {target_model} مستند به پرونده پزشکی و گزارش پاتولوژی معتبر.\n"
-                    "- گذشت حداقل ۳ ماه از آغاز مراحل فعال درمانی (شیمی‌درمانی، رادیوتراپی یا بستری جراحی).\n"
+                    f"- تشخیص بالینی یا ثبت رسمی خدمت در پرونده پزشکی و سامانه HIS برای جامعه هدف ({model_specs['model_name']}).\n"
+                    "- سابقه مراجعه درمانی و استقرار صورتحساب هزینه‌های سلامت در دوره ارزیابی مراکز درمانی منتخب.\n"
                     "- سکونت خانوار در حوزه جغرافیایی تحت پوشش پژوهش.\n"
                     "- اعلام رضایت آگاهانه کتبی جهت مشارکت در مصاحبه و تکمیل پرسشنامه توسط بیمار یا سرپرست قانونی خانوار."
                 ),
@@ -446,13 +420,13 @@ class MethodologyResearchSubagent:
                 "preregistration": "پیش‌ثبت رسمی در پایگاه IRCT یا ClinicalTrials.gov پیش از شروع بیمارگیری"
             }
             sample_size_biostatistics = {
-                "replicate_structure": "بیماران مستقل تخصیص‌یافته به بازوهای درمانی موازی",
+                "replicate_structure": "بیماران مستقل تخصیص‌یافته به دو بازوی درمانی موازی",
                 "experimental_unit": "هر بیمار به عنوان یک واحد تجربی و آماری مستقل",
-                "sample_size_formula_name": "فرمول چو و وانگ (Chow et al., 2017) جهت مقایسه دو گروه موازی در کارآزمایی بالینی",
-                "chow_equation": r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2} = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2}$$",
+                "sample_size_formula_name": "فرمول چو و وانگ (Chow et al., 2017) جهت مقایسه دو گروه موازی در کارآزمایی بالینی (n=64 در هر بازو، جمعاً N=128 بیمار)",
+                "chow_equation": r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2} = \frac{2(1.96 + 0.84)^2}{0.50^2} \approx 64\text{ per arm } (N=128)$$",
                 "derivation": (
-                    "در این رابطه توان آماری ۸۰٪ ($Z_{1-\\beta} = 0.84$)، ضریب خطای نوع اول ۵٪ ($Z_{1-\\alpha/2} = 1.96$) "
-                    "و اندازه اثر استاندارد کوهن بر مبنای تفاوت حداقل معنادار بالینی (MCID) لحاظ گردیده و با ۱۰٪ نرخ ریزش احتمالی تعدیل می‌شود."
+                    "با فرض اندازه اثر متوسط کوهن (d = 0.50)، سطح خطای نوع اول ۵٪ (alpha = 0.05، Z_1-alpha/2 = 1.96) و توان آماری ۸۰٪ (1-beta = 0.80، Z_1-beta = 0.84)، "
+                    "حجم نمونه پایه برابر n = 64 بیمار در هر گروه و مجموعاً N = 128 بیمار محاسبه می‌گردد (با لحاظ ۱۰٪ نرخ ریزش احتمالی، حدود ۷۱ بیمار در هر بازو و مجموع N = 142 بیمار غربالگری می‌شود)."
                 ),
                 "statistical_test": "آزمون تی مستقل، تحلیل کوواریانس (ANCOVA) برای تعدیل مقادیر پایه، و رویکرد Intention-to-Treat در نرم‌افزار SPSS/R"
             }
@@ -830,6 +804,176 @@ class MethodologyResearchSubagent:
                     "**گام ۶: تحلیل آماری دقت تشخیصی:** تدوین جدول توافقی ۲×۲، محاسبه حساسیت، ویژگی، PPV، NPV، رسم منحنی ROC و تعیین نقطه برش بهینه بر مبنای شاخص یودن."
                 )
             }
+
+        # =====================================================================
+        # ARCHETYPE 7: SCOPING REVIEW & EVIDENCE SYNTHESIS (PRISMA-ScR & JBI)
+        # =====================================================================
+        elif archetype == "SCOPING_REVIEW_AND_EVIDENCE_SYNTHESIS":
+            model_specs = {
+                "model_name": target_model if target_model != "Standard Biological / Cellular Model" else "پیکره شواهد علمی و مطالعات اولیه منتشرشده در پایگاه‌های معتبر بین‌المللی",
+                "authentication": "پروتکل استاندارد PRISMA-ScR (Tricco 2018) و راهنمای نگاشت شواهد موسسه JBI (Peters 2020)",
+                "sampling_strategy": "جستجوی جامع چندپایگاهی و غربالگری دوفردی مستقل تا رسیدن به اشباع کامل شواهد (Search Saturation)",
+                "target_population": "تمامی مقالات داوری‌شده واجد معیارهای چارچوب PCC (جمعیت، مفهوم، بافتار)",
+            }
+            exposure_regimen = {
+                "screening_protocol": f"ارزیابی و نگاشت شواهد پیرامون {agt1} و {agt2} با رویکرد دوفردی کور در نرم‌افزار Rayyan/Covidence",
+                "appraisal_policy": "مطابق بند ۱۲ راهنمای رسمی PRISMA-ScR، ارزیابی کمی ریسک سوگیری فردی (RoB-2) به دلیل ماهیت نگاشت شواهد الزامی نیست.",
+            }
+            assays_and_controls = {
+                "primary_extraction": "فرم ساختارمند استخراج داده JBI مبتنی بر ابعاد PCC و شاخص‌های کمی پیامد",
+                "reliability_control": "محاسبه ضریب توافق بین داوران (Cohen's Kappa >= 0.80) و حل اختلاف با داور سوم",
+            }
+            gene_expression_miqe = {
+                "guideline": "دستورالعمل بین‌المللی PRISMA-ScR و روش‌شناسی موسسه Joanna Briggs (JBI Manual)",
+                "registration": "ثبت پیشینی پروتکل مرور دامنه‌ای در پایگاه Open Science Framework (OSF)",
+            }
+            sample_size_biostatistics = {
+                "replicate_structure": "واحد تحلیل، هر مقاله یا سند علمی واجد شرایط است",
+                "sample_size_formula_name": "چارچوب جامعیت جستجوی چندپایگاهی و اشباع شواهد (PRISMA-ScR & JBI Evidence Saturation)",
+                "derivation": (
+                    "مطابق استانداردهای بین‌المللی PRISMA-ScR و JBI، در مطالعات مرور دامنه‌ای محاسبه حجم نمونه استنباطی با فرمول کوکران، "
+                    "تعیین سطح خطای نوع اول یا توان آماری موضوعیت ندارد؛ بلکه جستجوی جامع در حداقل سه پایگاه داده (PubMed، Scopus، Embase و Web of Science) "
+                    "تا دستیابی به اشباع شواهد و غربالگری کلیه رکوردهای منطبق با PCC اجرا می‌گردد."
+                ),
+                "statistical_test": "ترسیم فلوچارت جریان PRISMA-ScR، سنجش توافق دو داور با ضریب کاپای کوهن و ICC، تحلیل فراوانی و نگاشت مضمونی یا اختلاف خطر (Risk Difference).",
+            }
+            combination_index_rules = {
+                "software": "Rayyan / Covidence برای غربالگری و نرم‌افزار R (بسته‌های irr و meta) برای خلاصه‌سازی توصیفی",
+            }
+            formatted_sections = {
+                13: (
+                    f"طرح حاضر یک مطالعه مرور دامنه‌ای (Scoping Review) و سنتز ساختاریافته شواهد مبتنی بر چک‌لیست استاندارد PRISMA-ScR "
+                    f"و چارچوب روش‌شناختی موسسه JBI پیرامون {model_specs['model_name']} است. "
+                    f"جستجوی جامع بدون محدودیت تک‌پایگاهی در پایگاه‌های PubMed، Scopus، Web of Science و Embase انجام شده و غربالگری عنوان، چکیده و متن کامل به صورت مستقل توسط دو پژوهشگر صورت می‌پذیرد."
+                ),
+                14: (
+                    "مطالعه ثانویه از نوع مرور دامنه‌ای نظام‌مند و سنتز شواهد (Scoping Review & Evidence Mapping) "
+                    "منطبق بر راهنمای رسمی PRISMA-ScR و چارچوب PCC موسسه JBI."
+                ),
+                15: (
+                    f"جامعه پژوهش شامل کلیه مطالعات اولیه علمی و بالینی منتشرشده مرتبط با {model_specs['model_name']} است که از طریق چارچوب جمعیت–مفهوم–بافتار (PCC) دسته‌بندی می‌گردند."
+                ),
+                16: (
+                    "پایگاه‌های الکترونیک نمایه‌سازی علمی بین‌المللی (PubMed/MEDLINE، Embase، Scopus، Web of Science و جستجوی مکمل منابع خاکستری) در مرکز تحقیقات دانشگاه علوم پزشکی."
+                ),
+                17: (
+                    "- انتشار پژوهش‌های اصیل منطبق بر چارچوب سه‌گانه PCC (جمعیت هدف، مفهوم مداخله/ارزیابی، و بافتار مرتبط).\n"
+                    "- دسترسی به متن کامل مقاله یا داده‌های کمی کافی جهت پر کردن ماتریس استخراج JBI."
+                ),
+                18: (
+                    "- نامه‌های به سردبیر بدون داده اولیه، سرمقاله‌ها، خلاصه همایش‌های فاقد متن کامل معتبر و مطالعات تکراری همپوشان."
+                ),
+                19: (
+                    "- چک‌لیست ۲۲ گانه رسمی PRISMA-ScR و کاربرگ استاندارد استخراج داده موسسه JBI.\n"
+                    "- سامانه غربالگری آنلاین Rayyan یا Covidence و نرم‌افزار مدیریت منابع EndNote.\n"
+                    "- نرم‌افزار R جهت محاسبه شاخص توافق بین ارزیاب‌ها (Cohen's Kappa و ICC) و ترسیم نمودارهای نگاشت شواهد."
+                ),
+                20: (
+                    "- اعتبارسنجی استراتژی جستجوی بولین MeSH توسط کتابدار پزشکی و متخصص اپیدمیولوژی بر اساس معیار PRESS.\n"
+                    "- آزمون آزمایشی (Pilot Calibration) فرم استخراج JBI بر روی ۱۰ درصد تصادفی از مقالات پیش از استخراج کامل."
+                ),
+                21: (
+                    "- تضمین پایایی غربالگری و استخراج داده‌ها از طریق ارزیابی مستقل توسط دو داور همزمان و دستیابی به ضریب توافق کاپای کوهن بالای ۰.۸۰."
+                ),
+                22: (
+                    "در طراحی مرورهای دامنه‌ای مطابق راهنمای موسسه Joanna Briggs (JBI) و چک‌لیست رسمی PRISMA-ScR، مفهوم حجم نمونه استنباطی یا فرمول کوکران، توان آماری و خطای نوع اول مصداق ندارد. "
+                    "معیار کفایت داده در این پژوهش، **اشباع شواهد و جامعیت جستجو (PRISMA-ScR Search Saturation)** در حداقل چهار پایگاه علمی معتبر به صورت همزمان تا بازیابی کامل شواهد مرتبط با PCC است."
+                ),
+                23: (
+                    "تحلیل داده‌ها شامل گزارش جریان انتخاب مقالات با نمودار PRISMA-ScR، سنجش قابلیت اعتماد بین داوران با ضریب کاپای کوهن (Cohen's Kappa) و ضریب همبستگی درون‌طبقه‌ای (ICC)، "
+                    "جدول‌بندی توصیفی ویژگی‌های مطالعات، و در صورت همگنی کمی گزارش اختلاف خطر (Risk Difference) با فواصل اطمینان ۹۵٪ در محیط نرم‌افزار R انجام می‌شود."
+                ),
+                24: (
+                    "- ثبت پیشینی پروتکل مرور دامنه‌ای در پایگاه Open Science Framework (OSF)، استناد دقیق و بی‌طرفانه به تمامی مطالعات و اعلام صریح عدم وجود تعارض منافع (بدون مداخله مستقیم بر آزمودنی انسانی یا حیوانی)."
+                ),
+                25: (
+                    "- حفظ امنیت و یکپارچگی پایگاه داده‌های کتاب‌شناختی با پشتیبان‌گیری رمزنگاری‌شده منظم؛ به دلیل ماهیت ثانویه و بدون مداخله بیولوژیک پژوهش، الزامات ایمنی زیستی آزمایشگاهی (BSL) موضوعیت ندارد."
+                ),
+                26: (
+                    "- ناهمگونی تعاریف پیامد در مطالعات اولیه و احتمال سوگیری انتشار (Publication Bias): مهار با جستجوی دامنه‌ای منابع خاکستری، جداسازی گزارش شواهد مستقیم از موازی و ثبت شفاف محدودیت‌های نگاشت."
+                ),
+                27: (
+                    "### پروتکل گام‌به‌گام اجرایی مرور دامنه‌ای (PRISMA-ScR & JBI Protocol)\n\n"
+                    "**گام ۱: ثبت پروتکل و طراحی استراتژی جستجو:** نهایی‌سازی چارچوب PCC و تدوین عبارت‌های بولین استانداردشده در پایگاه‌های PubMed، Scopus، Embase و Web of Science.\n\n"
+                    "**گام ۲: غربالگری دوفردی کور عنوان و چکیده:** انتقال رکوردها، حذف موارد تکراری و غربالگری مستقل توسط دو پژوهشگر در بستر Rayyan.\n\n"
+                    "**گام ۳: ارزیابی متن کامل و سنجش توافق:** بررسی متون کامل منطبق با معیارهای ورود و خروج و محاسبه ضریب توافق کاپای کوهن (Cohen's Kappa >= 0.80).\n\n"
+                    "**گام ۴: استخراج ساختاریافته داده‌ها (JBI Data Charting):** کالیبراسیون ماتریس استخراج بر روی ۱۰ مقاله و تکمیل استخراج اطلاعات جمعیت، مداخله، روش‌شناسی و پیامدها.\n\n"
+                    "**گام ۵: سنتز توصیفی و تدوین گزارش PRISMA-ScR:** تحلیل شکاف‌های دانشی، ترسیم جداول نگاشت و تدوین فلوچارت نهایی استاندارد."
+                ),
+            }
+
+        # =====================================================================
+        # ARCHETYPE 8: USABILITY & DIGITAL HEALTH (NIELSEN-LANDAUER & SUS)
+        # =====================================================================
+        elif archetype == "USABILITY_AND_DIGITAL_HEALTH":
+            model_specs = {
+                "model_name": target_model if target_model != "Standard Biological / Cellular Model" else "کاربران نهایی و متخصصان سلامت دیجیتال استفاده‌کننده از سامانه",
+                "authentication": "ارزیابی اکتشافی نیلسن (Nielsen Heuristics) و نسخه فارسی معتبرشده مقیاس کاربردپذیری سیستم (SUS)",
+                "sampling_strategy": "نمونه‌گیری هدفمند از کاربران بالینی و کارشناسان رابط کاربری برای آزمون کشف خطا و تکمیل تکالیف استاندارد",
+                "target_population": "کاربران هدف سامانه دیجیتال سلامت و متخصصان ارزیابی رابط کاربری",
+            }
+            exposure_regimen = {
+                "intervention_platform": f"ارزیابی نسخه تعاملی سامانه/ابزار {agt1} تحت سناریوهای استاندارد بالینی",
+            }
+            assays_and_controls = {
+                "primary_metric": "نمره کلی System Usability Scale (SUS 0-100)، نرخ تکمیل موفق تکلیف و تعداد خطاهای اکتشافی",
+            }
+            gene_expression_miqe = {
+                "guideline": "استاندارد بین‌المللی ISO 9241-11 و مدل کشف خطای نیلسن-لاندائر",
+            }
+            sample_size_biostatistics = {
+                "replicate_structure": "هر شرکت‌کننده ارزیابی‌شده به عنوان واحد مشاهده مستقل",
+                "sample_size_formula_name": "مدل ریاضی نیلسن-لاندائر P(n) = 1 - (1 - L)^n و نمونه کمی SUS",
+                "chow_equation": r"$$P(n) = 1 - (1 - L)^n \quad (L = 0.31 \implies P(10) = 97.6\%)$$",
+                "derivation": (
+                    "بر مبنای مدل کشف خطای کاربردپذیری نیلسن-لاندائر با نرخ کشف L = 0.31 به ازای هر کاربر، تعداد ۵ الی ۱۰ ارزیاب تخصصی بیش از ۸۴ تا ۹۷ درصد اشکالات رابط کاربری را شناسایی می‌نمایند؛ "
+                    "همچنین برای سنجش کمی پایدار پرسشنامه SUS حداقل ۳۰ کاربر نهایی وارد مطالعه می‌شوند."
+                ),
+                "statistical_test": "آمار توصیفی میانگین و انحراف معیار نمره SUS، درصد تکمیل تکالیف، زمان انجام تکلیف و رتبه‌بندی شدت اشکالات اکتشافی.",
+            }
+            combination_index_rules = {"software": "SPSS / R Statistical Environment"}
+            formatted_sections = {
+                13: (
+                    f"پژوهش حاضر یک مطالعه کاربردی-ارزیابی کاربردپذیری و سلامت دیجیتال (Usability & Digital Health Evaluation Study) پیرامون {model_specs['model_name']} است که با رویکرد ترکیبی کشف اشکالات رابط کاربری نیلسن و سنجش کمی مقیاس استاندارد SUS اجرا می‌شود."
+                ),
+                14: "مطالعه ارزیابی کاربردپذیری و طراحی کاربرمحور (Usability Evaluation Study — ISO 9241-11 / Nielsen-Landauer & SUS).",
+                15: f"جامعه پژوهش شامل کاربران هدف و کارشناسان استفاده از {model_specs['model_name']} در مراکز درمانی و آموزشی منتخب است.",
+                16: "بخش‌های بالینی و آزمایشگاه انفورماتیک پزشکی دانشگاه علوم پزشکی.",
+                17: "- کاربران فعال واجد تجربه کار با سامانه‌های سلامت دیجیتال و امضای رضایت‌نامه آگاهانه.",
+                18: "- عدم تکمیل بیش از ۲۰ درصد از سناریوهای آزمون تکلیف‌محور یا انصراف داوطلبانه.",
+                19: "- چک‌لیست ۱۰ اصل اکتشافی نیلسن، کاربرگ ثبت زمان/نرخ موفقیت تکالیف (Think-Aloud Protocol) و پرسشنامه استاندارد ۱۰ ماده‌ای SUS.",
+                20: "- روایی محتوایی و ترجمه بومی‌سازی‌شده سناریوهای کاربردپذیری و پرسشنامه SUS با تایید خبرگان انفورماتیک پزشکی.",
+                21: "- پایایی همسانی درونی پرسشنامه SUS با آلفای کرونباخ بالاتر از ۰.۸۰ و همسویی ارزیاب‌های اکتشافی.",
+                22: (
+                    "بر اساس مدل کشف خطای نیلسن-لاندائر $P(n) = 1 - (1 - L)^n$ با احتمال کشف پایه $L = 0.31$، شرکت ۵ ارزیاب متخصص حداقل ۸۴ درصد و ۱۰ ارزیاب بیش از ۹۷ درصد خطاهای طراحی را آشکار می‌سازد. "
+                    "علاوه بر این، در بخش کمی سنجش مقیاس کاربردپذیری سیستم (SUS) حداقل ۳۰ کاربر نهایی وارد مطالعه می‌شوند."
+                ),
+                23: (
+                    "تحلیل داده‌ها شامل محاسبه میانگین نمره SUS در مقیاس ۰ تا ۱۰۰ (آستانه پذیرش ۶۸)، درصد تکمیل موفق تکلیف (Task Completion Rate)، "
+                    "زمان میانگین اجرا، و دسته‌بندی شدت خطاهای اکتشافی نیلسن از ۰ تا ۴ در محیط نرم‌افزار SPSS/R انجام می‌گردد."
+                ),
+                24: "- اخذ رضایت آگاهانه از کاربران، حفظ محرمانگی تله‌متری تعامل و حذف کامل اطلاعات هویتی بیماران از محیط آزمون.",
+                25: "- پیاده‌سازی استانداردهای امنیت سایبری و رمزنگاری داده‌های تله‌متری آزمون بر روی سرور امن دانشگاهی.",
+                26: "- احتمال سوگیری آشنایی قبلی کاربران با ابزارهای مشابه: مهار با تخصیص وظایف استاندارد هم‌تراز و ارائه آموزش اولیه یکسان.",
+                27: (
+                    "### پروتکل گام‌به‌گام ارزیابی کاربردپذیری (Nielsen-Landauer & SUS)\n\n"
+                    "**گام ۱: طراحی سناریوهای بالینی و آزمون اکتشافی:** ارزیابی محیط سامانه بر مبنای ۱۰ اصل نیلسن توسط ۵ تا ۱۰ خبره.\n\n"
+                    "**گام ۲: اجرای آزمون تکلیف‌محور با کاربران نهایی (Think-Aloud):** ثبت دقیق زمان تکمیل، نرخ خطا و نرخ موفقیت در ۳۰ کاربر هدف.\n\n"
+                    "**گام ۳: تکمیل مقیاس SUS و تحلیل آمار توصیفی:** محاسبه نمره نهایی کاربردپذیری و اولویت‌بندی اصلاحات رابط کاربری."
+                ),
+            }
+
+        # =====================================================================
+        # FALLBACK FOR UNKNOWN / GENERAL ARCHETYPE (NO CELL-CULTURE CONTAMINATION)
+        # =====================================================================
+        elif archetype == "UNKNOWN_STUDY_ARCHETYPE":
+            model_specs = {"model_name": target_model, "authentication": "شیوه‌نامه پژوهشیار دانشگاه علوم پزشکی"}
+            exposure_regimen = {"protocol": f"ارزیابی مداخله یا متغیر {agt1} با روش‌شناسی استاندارد"}
+            assays_and_controls = {"control": "تعبیه گروه شاهد یا مقایسه متناسب با نوع مطالعه"}
+            gene_expression_miqe = {"guideline": "اصول گزارش‌دهی استاندارد متناسب با طراحی مطالعه"}
+            sample_size_biostatistics = {"sample_size_formula_name": "نیاز به تعیین صریح نوع مطالعه جهت انتخاب فرمول حجم نمونه", "derivation": "فرمول حجم نمونه بر اساس طراحی نهایی تاییدشده در گیت اول تعیین می‌گردد.", "statistical_test": "تحلیل توصیفی و استنباطی متناسب با مقیاس متغیرها"}
+            combination_index_rules = {"software": "R / SPSS"}
+            formatted_sections = {}
 
         # =====================================================================
         # ARCHETYPE 6: DEFAULT IN VITRO MOLECULAR & CELLULAR COMBINATION

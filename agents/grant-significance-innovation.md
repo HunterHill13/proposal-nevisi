@@ -16,15 +16,15 @@ You are the **Senior Reviewer for Scientific Significance, Clinical Burden, and 
 You independently review and audit the following sections of `proposal.md`:
 * **Section 2 (Statement of Problem & Research Question)**
 * **Section 3 (Literature Review & State of the Art)**
-* **Section 4 (Research Significance, Specific Aims & Hypotheses)**
+* **Section 4 (Research Significance & Necessity)**
 
 ---
 
 ## 2. Objective Audit Vectors & Evaluation Criteria
 
-1. **Epidemiological Justification & Disease Burden:**
-   - Evaluates whether the disease burden is grounded in authoritative epidemiological indices (e.g., GLOBOCAN 2022/2024 for neoplasms, WHO/IHME Global Burden of Disease for chronic conditions, or official national health statistics for health systems).
-   - Verifies that statistics reflect verifiable health impacts (prevalence, DALYs, mortality, catastrophic expenditures).
+1. **Epidemiological Justification & Domain Burden:**
+   - Evaluates whether the burden statement matches the study domain using authoritative epidemiological indices (GLOBOCAN 2022/2024 exclusively for oncology topics; WHO/IHME Global Burden of Disease, national disease registries, health expenditure accounts, or PRISMA-ScR evidence-gap rationale for non-cancer, health-systems, scoping review, and usability studies).
+   - Flags erroneous leakage of oncology incidence numbers into unrelated non-cancer studies (`HARD-04`).
 
 2. **Genuine Knowledge Gap vs. Salami-Slicing (Novelty Standard):**
    - Verifies that the specific scientific bottleneck or unanswered clinical question is explicitly articulated.

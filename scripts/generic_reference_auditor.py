@@ -3793,9 +3793,9 @@ class EvidenceDrivenParagraphBuilder:
                         # Academic Persian synthesis without raw English quotes (v11.4 Contextual Semantic Guard)
                         tier = study_record.get("evidence_applicability_tier") or study_record.get("applicability_tier") or study_record.get("evidence_role")
                         if tier in ["TIER_3_PARALLEL_MECHANISTIC_RATIONALE", "PARALLEL_RATIONALE", "MECHANISTIC_SUPPORT"]:
-                            parts.append("مستندات حاصل از این بررسی، اگرچه در بستر مدل زیستی متفاوتی ارزیابی شده‌اند، اما از حیث تبیین مسیرهای تنظیمی و مهار پیام‌رسانی سلولی، مبنای نظری و شواهد موازی بسیار ارزشمندی جهت توجیه مکانیسمی فرضیه پژوهش حاضر فراهم می‌سازند.")
+                            parts.append("مستندات حاصل از این بررسی، اگرچه در بستر بافتار یا مدل متفاوتی ارزیابی شده‌اند، اما از حیث تبیین سازوکارها و چارچوب روش‌شناختی، شواهد موازی ارزشمندی جهت توجیه علمی فرضیه پژوهش حاضر فراهم می‌سازند.")
                         else:
-                            parts.append("مستندات حاصل از ارزیابی تجربی این مطالعه موید مهار قابل توجه رشد سلولی، تعدیل مسیرهای تنظیمی و انطباق با اهداف فارماکولوژیک مداخله در شرایط کنترل‌شده آزمایشگاهی است.")
+                            parts.append("مستندات حاصل از ارزیابی این مطالعه موید یافته‌های کمی و روش‌شناختی مرتبط با متغیرهای پژوهش و انطباق با اهداف طراحی مطالعه در چارچوب استاندارد گزارش‌شده است.")
 
         # Limitations (Strictly if reported)
         limits = canonical["limitations"]["reported_limitations"]

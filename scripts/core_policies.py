@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 core_policies.py - Single Source of Truth Policy & Configuration Registry
-Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.2.0 (Universal Biomedical Architecture)
 
 Centralizes all non-negotiable institutional structures, temporal constraints,
-evidence scales, search boundaries, and study-design taxonomy.
+evidence scales, search boundaries, canonical archetype classifier,
+28-section parser, and NIH approval thresholds.
 Guarantees zero divergence across validator, docx builder, proposal generator,
 auditors, and test suites.
 """
 
 import os
+import re
 import json
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
 
 def get_project_metadata() -> Dict[str, Any]:
     """Dynamically loads single-source-of-truth project metadata."""
@@ -37,7 +39,7 @@ def get_project_metadata() -> Dict[str, Any]:
                     return data
             except Exception:
                 pass
-    v_val = "8.2.0"
+    v_val = "14.2.0"
     for vp in [os.path.join(current_dir, "..", "VERSION"), os.path.abspath("VERSION")]:
         if os.path.exists(vp):
             try:
@@ -48,8 +50,12 @@ def get_project_metadata() -> Dict[str, Any]:
     return {"project_name": "proposal-nevisi", "version_display": f"v{v_val}", "engine_version": v_val, "metrics": {}}
 
 PROJECT_METADATA = get_project_metadata()
-ENGINE_VERSION = "11.4.1"
-VERSION_DISPLAY = "v11.4.1"
+ENGINE_VERSION = PROJECT_METADATA.get("engine_version", "14.2.0")
+VERSION_DISPLAY = PROJECT_METADATA.get("version_display", f"v{ENGINE_VERSION}")
+
+# Canonical NIH / Heuristic Readiness Thresholds (1.0 = Best .. 9.0 = Worst)
+NIH_APPROVAL_SCORE_CEILING: float = 2.0
+NIH_EXCEPTIONAL_SCORE_CEILING: float = 1.5
 
 # Generalized Evidence Roles (v8.4 Section 9 - Distinct from Polarity)
 EVIDENCE_ROLES = [
@@ -578,9 +584,11 @@ STUDY_DESIGN_ROB_TOOL_MAP: Dict[str, str] = {
     "CONTROLLED_CLINICAL_STUDY": "ROBINS_I",
     "OBSERVATIONAL_COHORT_CASE_CONTROL": "NEWCASTLE_OTTAWA_SCALE",
     "IN_VIVO_ANIMAL": "SYRCLE_ANIMAL_ROB",
-    "IN_VITRO_EXPERIMENTAL": "IN_VITRO_REPLICATION_CRITERIA",
+    "IN_VITRO_EXPERIMENTAL": "TOXRTOOL_AND_OHAT_CRITERIA",
     "DIAGNOSTIC_ACCURACY_STUDY": "QUADAS_2",
     "SYSTEMATIC_REVIEW_META_ANALYSIS": "AMSTAR_2",
+    "SCOPING_REVIEW_EVIDENCE_SYNTHESIS": "PRISMA_SCR_JBI_NO_MANDATORY_ROB",
+    "USABILITY_DIGITAL_HEALTH": "NIELSEN_LANDAUER_AND_SUS",
     "METHODOLOGICAL_LANDMARK": "METHOD_VALIDATION_STANDARDS"
 }
 
@@ -1138,6 +1146,243 @@ NEGATIVE_SEARCH_CLAIM_BOUNDS: Dict[str, str] = {
     "SCOPE_BOUNDED_NEGATIVE": "No eligible study was identified within the defined search perimeter ({databases}, {dates}, {languages})",
     "UNWARRANTED_ABSOLUTE_NEGATIVE": "Prohibited leap from search retrieval absence to global non-existence ('it does not exist')"
 }
+
+
+# ==============================================================================
+# 16. CANONICAL ARCHETYPE CLASSIFIER & TOP-LEVEL 28-SECTION PARSER (v14.2.0)
+# ==============================================================================
+
+STUDY_ARCHETYPE_REGISTRY: Dict[str, Dict[str, Any]] = {
+    "scoping_review": {
+        "framework_code": "SCOPING_REVIEW",
+        "reporting_guideline": "PRISMA_SCR_JBI",
+        "rob_tool": "PRISMA_SCR_JBI_NO_MANDATORY_ROB",
+        "sample_size_basis": "Search Saturation & Screening Corpus (No Inferential Alpha/Power)"
+    },
+    "usability": {
+        "framework_code": "USABILITY_AND_DIGITAL_HEALTH",
+        "reporting_guideline": "USABILITY_NIELSEN_SUS",
+        "rob_tool": "NIELSEN_LANDAUER_AND_SUS",
+        "sample_size_basis": "Nielsen-Landauer Problem Discovery 1-(1-L)^n & SUS"
+    },
+    "health_systems": {
+        "framework_code": "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
+        "reporting_guideline": "STROBE_STATEMENT",
+        "rob_tool": "NEWCASTLE_OTTAWA_SCALE",
+        "sample_size_basis": "Cochran Complex Survey with Design Effect (DEFF) & SES Stratification"
+    },
+    "diagnostic": {
+        "framework_code": "DIAGNOSTIC_ACCURACY_AND_BIOMARKER",
+        "reporting_guideline": "STARD_2015",
+        "rob_tool": "QUADAS_2",
+        "sample_size_basis": "Buderer Sensitivity/Specificity Marginal Error Sample Size"
+    },
+    "in_vivo": {
+        "framework_code": "EXPERIMENTAL_ANIMAL",
+        "reporting_guideline": "ARRIVE_2_0_ANIMAL",
+        "rob_tool": "SYRCLE_ANIMAL_ROB",
+        "sample_size_basis": "Resource Equation (E = N - T - B, 10 <= E <= 20) & Factorial Power"
+    },
+    "clinical_rct": {
+        "framework_code": "CLINICAL_TRIAL",
+        "reporting_guideline": "CONSORT_2010",
+        "rob_tool": "COCHRANE_ROB2",
+        "sample_size_basis": "Two-Arm Superiority Sample Size (n=64/arm, N=128 at d=0.50; 10% Attrition Buffer)"
+    },
+    "epidemiological": {
+        "framework_code": "EPIDEMIOLOGICAL_OBSERVATIONAL",
+        "reporting_guideline": "STROBE_STATEMENT",
+        "rob_tool": "NEWCASTLE_OTTAWA_SCALE",
+        "sample_size_basis": "Cochran Prevalence / Cohort Events-Per-Variable Sample Size"
+    },
+    "in_vitro": {
+        "framework_code": "EXPERIMENTAL_IN_VITRO",
+        "reporting_guideline": "OECD_GCCP_CELL_CULTURE",
+        "rob_tool": "TOXRTOOL_AND_OHAT_CRITERIA",
+        "sample_size_basis": "G*Power Factorial ANOVA Power + Mead Resource Allocation"
+    },
+}
+
+_PERSIAN_ARABIC_DIGIT_TRANS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
+
+
+def normalize_digits_to_ascii(text: str) -> str:
+    """Converts Persian and Arabic-Indic numerals to ASCII digits."""
+    return (text or "").translate(_PERSIAN_ARABIC_DIGIT_TRANS)
+
+
+def parse_proposal_sections(proposal_input: Any) -> Dict[int, str]:
+    """
+    Canonical Pajooheshyar 28-section Markdown parser.
+    Locks top-level canonical section detection exclusively to `#` and `##` headings
+    (`1..28`) so nested `###` subheadings (e.g., `### 1. Disease Burden` or `### 13-1`)
+    cannot overwrite top-level Sections 1..28.
+    """
+    if isinstance(proposal_input, dict):
+        normalized: Dict[int, str] = {}
+        for k, v in proposal_input.items():
+            try:
+                idx = int(normalize_digits_to_ascii(str(k)).strip())
+                normalized[idx] = "" if v is None else str(v)
+            except ValueError:
+                continue
+        return normalized
+
+    md_text = "" if proposal_input is None else str(proposal_input)
+    sections: Dict[int, str] = {}
+    current_sec: Optional[int] = None
+    buffer: List[str] = []
+
+    top_header_re = re.compile(
+        r"^#{1,2}(?!#)\s*(?:بخش\s*|Section\s*)?([0-9\u06F0-\u06F9\u0660-\u0669]+)[\.\:\-\s]+(.+)$",
+        re.IGNORECASE,
+    )
+
+    for raw_line in md_text.splitlines():
+        stripped = raw_line.strip()
+        m = top_header_re.match(stripped)
+        if m:
+            sec_num_str = normalize_digits_to_ascii(m.group(1))
+            if sec_num_str.isdigit():
+                sec_num = int(sec_num_str)
+                if 1 <= sec_num <= 28:
+                    if current_sec is not None:
+                        sections[current_sec] = "\n".join(buffer).strip()
+                    current_sec = sec_num
+                    buffer = []
+                    continue
+        if current_sec is not None:
+            buffer.append(raw_line)
+
+    if current_sec is not None:
+        sections[current_sec] = "\n".join(buffer).strip()
+    return sections
+
+
+def _normalize_explicit_archetype_token(raw_val: str) -> Optional[str]:
+    """Maps explicit framework/study_family/archetype identifiers to canonical keys."""
+    if not raw_val:
+        return None
+    val = raw_val.strip().lower()
+    if any(k in val for k in ("scoping", "evidence_synthesis", "prisma_scr", "jbi_review")):
+        return "scoping_review"
+    if any(k in val for k in ("usability", "digital_health", "nielsen", "mhealth")):
+        return "usability"
+    if any(k in val for k in ("health_system", "health_policy", "health_econom")):
+        return "health_systems"
+    if "diagnostic" in val or "biomarker" in val or "quadas" in val or "stard" in val:
+        return "diagnostic"
+    if any(k in val for k in ("in_vivo", "animal")):
+        return "in_vivo"
+    if any(k in val for k in ("clinical_rct", "clinical_trial", "rct", "pico")):
+        return "clinical_rct"
+    if any(k in val for k in ("epidemiolog", "cross_sectional", "observational", "peco", "cohort", "case_control")):
+        return "epidemiological"
+    if any(k in val for k in ("in_vitro", "cell_culture", "factorial_in_vitro")):
+        return "in_vitro"
+    return None
+
+
+def classify_study_archetype(
+    text_or_context: Any = "",
+    sections: Optional[Dict[int, str]] = None,
+) -> str:
+    """
+    Canonical positive-matching archetype classifier across all 7 archetypes + usability.
+    Never falls back to `"in_vitro"` via boolean negation; returns `"unknown"` when
+    neither explicit context metadata nor unambiguous design/methodology markers match.
+    """
+    if isinstance(text_or_context, dict):
+        if not sections and all(isinstance(k, int) for k in text_or_context.keys()):
+            sections = text_or_context
+        else:
+            for key in ("study_family", "archetype", "framework", "design_type", "study_design", "methodological_framework"):
+                mapped = _normalize_explicit_archetype_token(str(text_or_context.get(key, "") or ""))
+                if mapped:
+                    return mapped
+
+    probe_chunks: List[str] = []
+    if isinstance(text_or_context, str):
+        probe_chunks.append(text_or_context)
+    elif isinstance(text_or_context, dict):
+        for key in ("topic", "title", "fa_title", "en_title", "research_title_fa", "research_title_en", "study_type", "primary_model", "domain", "methodology"):
+            val = text_or_context.get(key)
+            if val:
+                probe_chunks.append(str(val))
+        pop = text_or_context.get("population_or_model")
+        if isinstance(pop, dict) and pop.get("model_type"):
+            probe_chunks.append(str(pop.get("model_type")))
+
+    parsed_secs = parse_proposal_sections(sections) if sections is not None else {}
+    if not parsed_secs and isinstance(text_or_context, str) and "##" in text_or_context:
+        parsed_secs = parse_proposal_sections(text_or_context)
+
+    for sec_idx in (14, 1, 10, 13, 15, 11, 22, 23, 27):
+        if parsed_secs.get(sec_idx):
+            probe_chunks.append(parsed_secs[sec_idx])
+
+    combined = " ".join(probe_chunks).lower()
+    if not combined.strip():
+        return "unknown"
+
+    # Strip explicit anti-in-vitro disclaimer sentences so negative disclaimers do not trigger in_vitro
+    sanitized_for_in_vitro = re.sub(
+        r"(?:فاقد|بدون|عدم\s+استفاده\s+از|عدم\s+لزوم)\s+[^\n\.]*(?:کشت\s+سلول|برون‌تن|in\s+vitro|آزمایشگاهی)",
+        " ",
+        combined,
+    )
+
+    if (
+        re.search(r"\b(?:scoping\s+review|systematic\s+review|prisma-?scr|\bjbi\b|evidence\s+synthesis|umbrella\s+review|rapid\s+review)\b", combined)
+        or any(k in combined for k in ("مرور دامنه‌ای", "مرور دامنه ای", "مرور نظام‌مند", "مرور نظام مند", "مرور ساختاریافته", "سنتز شواهد", "مطالعه ثانویه", "پرتو پاتولوژی"))
+    ):
+        return "scoping_review"
+
+    if (
+        re.search(r"\b(?:usability|ux|ui|nielsen(?:-landauer)?|system\s+usability\s+scale|\bsus\b|mobile\s+health|mhealth|digital\s+health|telemedicine|ehealth)\b", combined)
+        or any(k in combined for k in ("کاربردپذیری", "سلامت دیجیتال", "رابط کاربری", "ارزیابی کاربردپذیری", "نرم‌افزار کاربردی سلامت", "ارزیابی اکتشافی نیلسن"))
+    ):
+        return "usability"
+
+    if (
+        re.search(r"\b(?:health\s+systems?|health\s+policy|catastrophic\s+health|out-of-pocket|\bche\b|\boop\b|\bkakwani\b|universal\s+health\s+coverage|who\s+whs)\b", combined)
+        or any(k in combined for k in ("نظام سلامت", "سیاست‌گذاری سلامت", "سیاستگذاری سلامت", "پرداخت از جیب", "هزینه‌های کمرشکن", "کمرشکن سلامت", "اقتصاد سلامت", "دسترسی مالی", "بهره‌وری نظام سلامت"))
+    ):
+        return "health_systems"
+
+    if (
+        re.search(r"\b(?:diagnostic\s+accuracy|sensitivity\s+and\s+specificity|\bstard\b|\bquadas-?2\b|\bbuderer\b|roc\s+curve|\bauc\b)\b", combined)
+        or any(k in combined for k in ("دقت تشخیصی", "حساسیت و ویژگی", "استاندارد طلایی تشخیصی", "بیومارکر تشخیصی", "شاخص تست تشخیصی"))
+    ):
+        return "diagnostic"
+
+    if (
+        re.search(r"\b(?:in\s+vivo|animal\s+model|xenograft|balb/c|wistar|sprague-dawley|syrcle|arrive(?:\s+2\.0)?)\b", combined)
+        or re.search(r"(?:^|[^\w\u0600-\u06FF])(?:موش(?:[\s\u200c]*ها(?:ی)?)?|رت(?:[\s\u200c]*ها(?:ی)?)?|خرگوش|خوکچه)(?:[^\w\u0600-\u06FF]|$)", combined)
+        or any(k in combined for k in ("درون‌تنی", "مدل حیوانی", "حیوانات آزمایشگاهی", "موش صحرایی", "موش نر", "موش آزمایشگاهی", "بافت حیوانی", "زنوگرافت"))
+    ):
+        return "in_vivo"
+
+    if (
+        re.search(r"\b(?:randomized\s+controlled\s+trial|\brct\b|clinical\s+trial|\bconsort\b|double-?blind|placebo)\b", combined)
+        or any(k in combined for k in ("کارآزمایی بالینی", "کارازمایی بالینی", "کارآزمایی تصادفی", "کارآزمایی کنترل‌شده", "کارآزمایی کنترل شده", "مداخله بالینی تصادفی"))
+    ):
+        return "clinical_rct"
+
+    if (
+        re.search(r"\b(?:cross-sectional|epidemiolog|prevalence|cohort|case-control|\bstrobe\b|newcastle-ottawa|\bcochran\b)\b", combined)
+        or any(k in combined for k in ("اپیدمیولوژیک", "مقطعی", "شیوع", "بروز", "همگروهی", "هم‌گروهی", "کوهورت", "مورد-شاهدی", "مورد شاهدی", "پیمایشی", "جمعیتی", "پرسشنامه‌ای"))
+    ):
+        return "epidemiological"
+
+    if (
+        re.search(r"\b(?:in\s+vitro|cell\s+culture|cell\s+line|cell_culture_in_vitro|cytotoxicity|\bic50\b|\bmtt\b|cck-?8|annexin\s+v|rt-?qpcr|\bqpcr\b|toxrtool|chou-talalay|compusyn|oecd\s+gccp)\b", sanitized_for_in_vitro)
+        or any(k in sanitized_for_in_vitro for k in ("برون‌تن", "برون تن", "کشت سلول", "رده سلولی", "رده‌های سلولی", "سلولی و مولکولی", "سمیت سلولی", "آپوپتوز", "فلوسایتومتری", "فلوسیتومتری", "چو-تالالای", "هم‌افزایی سلولی", "تکرار بیولوژیک"))
+    ):
+        return "in_vitro"
+
+    return "unknown"
+
 
 
 

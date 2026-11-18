@@ -1,4 +1,4 @@
-# Objective Quality & Scientific Rubric: Professor Namoosi (v14.1.0)
+# Objective Quality & Scientific Rubric: Professor Namoosi (v14.2.0)
 ## Objective Evaluation Criteria for Isolated Proposal Quality Auditing
 
 > **Scope:** This document is the exclusive and binding evaluation rubric executed by the isolated zero-context auditor subagent (`professor-namoosi-auditor`).  
@@ -45,12 +45,12 @@ Once all Hard Constraints pass, the isolated auditor verifies the following crit
 ### 2.3. Vancouver Citation Integrity & Monotonic Order
 - [ ] Citation numbering strictly starts at `[1]` and increments monotonically without gaps or unreferenced orphan claims.
 - [ ] 100% concordance between in-text citation markers `[n]` in Sections 2–3 and Reference `[n]` metadata in Section 28.
-- [ ] Adequate bibliographic depth (typically 15 to 40 authoritative references).
+- [ ] Adequate bibliographic depth (`15 to 25` authoritative references matching `MAX_FINAL_REFERENCES = 25`).
 
 ### 2.4. Zero-Bias Evidence Architecture & Epistemic Honesty
 - [ ] Dual-path literature retrieval executed (supporting vs. contradicting/adverse evidence).
 - [ ] If no negative or contradicting papers exist in international databases, an explicit publication bias caveat is injected into Sections 3 and 26.
-- [ ] Risk-of-bias framework matches the study archetype (QUADAS-2 for diagnostic, STROBE for observational, Cochrane RoB-2 for clinical trials, SYRCLE for animal studies).
+- [ ] Risk-of-bias framework matches the study archetype (`Cochrane RoB-2` / `CONSORT 2010` for clinical trials, `NOS` / `STROBE` for observational & health systems, `QUADAS-2` / `STARD 2015` for diagnostic, `SYRCLE` / `ARRIVE 2.0` for animal models, `ToxRTool` / `NTP OHAT` / `OECD GCCP` for in vitro, `PRISMA-ScR` / `JBI` with formal RoB omission note for scoping reviews, `Nielsen-Landauer` / `SUS` for usability).
 
 ### 2.5. Stylometry, Prose Cadence & Burstiness
 - [ ] Sentence length distribution exhibits healthy statistical variance (standard deviation $\sigma \ge 8.0$ words per sentence).

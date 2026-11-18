@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 mock_grant_review_panel.py - Multi-Agent Mock Grant Study Section & Inter-Section Semantic Drift Gate
-Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.2.0 (Universal Biomedical Architecture)
 
 Simulates an authentic academic grant review panel (Mock Study Section) based on
 NIH / NIMAD / Pajooheshyar competitive grant scoring rubrics:
@@ -12,10 +12,10 @@ NIH / NIMAD / Pajooheshyar competitive grant scoring rubrics:
    - Evaluates Replicate Structure, Statistical Models, Sample Size, Controls, and
      enforces Inter-Section Semantic Drift (Aims <-> Variables <-> Assays alignment).
 3. Reviewer 3 (Bioethics, Biosafety & Feasibility):
-   - Evaluates Ethical codes, Biosafety protocols, Timeline/Gantt realism, and Study limitations.
+   - Evaluates Ethical codes, Biosafety/Data Security protocols, Timeline/Gantt realism, and Study limitations.
 
 Scoring Scale: 1.0 (Exceptional) to 9.0 (Poor).
-Fundable Threshold: <= 3.5 overall score and zero critical flaws.
+Fundable Threshold: <= 2.0 overall score and zero critical flaws.
 Generates MOCK_GRANT_REVIEW_REPORT.md and MOCK_GRANT_REVIEW_REPORT.json.
 
 100% Domain-Agnostic: Zero hardcoded disease or chemical entities.
@@ -36,6 +36,12 @@ except ImportError:
     except ImportError:
         EGMStudySectionCoordinator = None
         EGMStudySectionResult = None
+
+try:
+    from core_policies import NIH_APPROVAL_SCORE_CEILING, classify_study_archetype
+except ImportError:  # pragma: no cover
+    NIH_APPROVAL_SCORE_CEILING = 2.0
+    classify_study_archetype = None
 
 
 @dataclass
@@ -289,12 +295,24 @@ class MockGrantReviewPanel:
             if has_heterogeneity:
                 strengths.append("مبنای تبارشناسی ژنتیکی و ناهمگونی مولکولی رده‌های سلولی انتخابی تبیین شده است.")
 
-        # Section 9: Hypotheses
+        # Section 9: Hypotheses & Exploratory Research Questions
         s9 = sections.get(9, "")
-        if any(k in s9 for k in ["فرضیه", "فرضیات", "آیا", "هم‌افزایی"]) or "synerg" in s9.lower():
-            strengths.append("فرضیات و سوالات پژوهش آزمون‌پذیر و متناظر با پرسش مرکزی طرح صورت‌بندی شده‌اند.")
+        s9_lower = s9.lower()
+        has_hypo_or_rq = (
+            any(
+                k in s9_lower
+                for k in [
+                    "فرضیه", "فرضیات", "آیا", "هم‌افزایی", "synerg",
+                    "سؤال", "سوال", "پرسش", "pcc", "دامنه‌ای", "کاربردپذیری",
+                    "ارزیابی", "بررسی", "شناسایی", "چگونه", "کدام", "؟", "?",
+                ]
+            )
+            and len(s9.strip()) >= 15
+        )
+        if has_hypo_or_rq:
+            strengths.append("فرضیات یا سوالات پژوهشی متناسب با کهن‌الگوی مطالعه و پرسش مرکزی طرح صورت‌بندی شده‌اند.")
         else:
-            critical_flaws.append("بخش فرضیات فاقد گزاره‌های دقیق آزمون‌پذیر یا سوالات کمی پژوهش است.")
+            critical_flaws.append("بخش فرضیات فاقد گزاره‌های دقیق آزمون‌پذیر یا سوالات پژوهش است.")
             score += 1.5
 
         if critical_flaws:
@@ -332,7 +350,10 @@ class MockGrantReviewPanel:
             "gene_protein_expression": ["بیان ژن", "پروتئین", "rt-pcr", "real-time pcr", "western blot", "الایزا", "elisa"],
             "cell_cycle": ["چرخه سلولی", "cell cycle", "sub-g1"],
             "health_economics_che": ["کمرشکن", "che", "هزینه", "مخارج", "oop", "فقرزایی", "out-of-pocket", "financial catastrophe"],
-            "risk_factors_epidemiology": ["عوامل خطر", "پیش‌بینی‌کننده", "رگرسیون", "odds ratio", "نسبت شانس", "ریسک"]
+            "risk_factors_epidemiology": ["عوامل خطر", "پیش‌بینی‌کننده", "رگرسیون", "odds ratio", "نسبت شانس", "ریسک"],
+            "scoping_review_pcc": ["مرور دامنه‌ای", "مرور حیطه‌ای", "چارتینگ", "پابمد", "اسکوپوس", "prisma", "pcc", "jbi", "scoping"],
+            "usability_digital_health": ["کاربردپذیری", "تفکر با صدای بلند", "ارزیابی اکتشافی", "usability", "nielsen", "heuristic", "think-aloud", "system usability scale"],
+            "diagnostic_accuracy": ["حساسیت و ویژگی", "دقت تشخیصی", "نقطه برش", "منحنی roc", "sensitivity", "specificity", "stard", "quadas"],
         }
 
         detected_aims = []
@@ -389,17 +410,37 @@ class MockGrantReviewPanel:
         else:
             strengths.append("تناظر معنایی و یکپارچگی بین اهداف اختصاصی، جدول متغیرها و آزمون‌های آزمایشگاهی ۱۰۰٪ برقرار است.")
 
+        methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
+        s14 = sections.get(14, "")
+        study_family = classify_study_archetype(context or "", sections=sections) if classify_study_archetype else ""
+        if not study_family or study_family == "unknown":
+            if any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"]):
+                study_family = "in_vitro"
+            else:
+                study_family = study_family or "unknown"
+        is_in_vitro = (study_family == "in_vitro")
+        is_in_vivo = (study_family == "in_vivo")
+
         s11 = sections.get(11, "")
-        if s11 and (("| مستقل |" not in s11 and "متغیر مستقل" not in s11) or ("| وابسته |" not in s11 and "متغیر وابسته" not in s11)):
-            critical_flaws.append("EMPTY_VARIABLE_TABLE: جدول متغیرهای بخش ۱۱ فاقد تعریف صریح متغیرهای مستقل و وابسته است.")
+        s11_lower = s11.lower()
+        has_var_roles = ("| مستقل |" in s11 or "متغیر مستقل" in s11) and ("| وابسته |" in s11 or "متغیر وابسته" in s11)
+        if not has_var_roles and study_family in ("scoping_review", "usability"):
+            has_var_roles = (
+                any(k in s11_lower for k in ["مفهوم", "concept", "زمینه", "context", "جمعیت", "population", "کاربردپذیری", "مقیاس sus"])
+                and "|" in s11
+            )
+        if s11 and not has_var_roles:
+            critical_flaws.append("EMPTY_VARIABLE_TABLE: جدول متغیرهای بخش ۱۱ فاقد تعریف صریح متغیرهای مستقل/وابسته یا عناصر PCC/کاربردپذیری است.")
             score += 1.5
 
         # 2. Controls and Assay Interference (AssayInterferencePolicy)
-        methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(21, '')} {sections.get(27, '')}".lower()
-        s14 = sections.get(14, "")
-        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
+
         if "کنترل" in methods_text or "control" in methods_text or "شاهد" in methods_text:
             strengths.append("طراحی کنترل‌های متناسب در متدولوژی لحاظ شده است.")
+        elif study_family == "scoping_review" and any(k in methods_text for k in ["دو داور", "داور سوم", "چارتینگ", "معیار ورود", "pcc", "prisma", "jbi"]):
+            strengths.append("سازوکار دو داور مستقل، چارتینگ استاندارد و معیارهای ورود در پروتکل مرور دامنه‌ای لحاظ شده است.")
+        elif study_family == "usability" and any(k in methods_text for k in ["سناریو", "تکلیف", "تفکر با صدای بلند", "نیلسن", "nielsen", "sus", "think-aloud"]):
+            strengths.append("پروتکل سناریومحور یکسان، تفکر با صدای بلند و ابزار استاندارد کاربردپذیری لحاظ شده است.")
         elif not is_in_vitro and any(k in methods_text for k in ["مخدوشگر", "تعدیل", "confound", "پایش", "سوگیری", "پروتکل"]):
             strengths.append("کنترل متغیرهای مخدوشگر یا سوگیری‌ها در روش‌شناسی لحاظ گردیده است.")
         elif not is_in_vitro:
@@ -410,58 +451,58 @@ class MockGrantReviewPanel:
             score += 1.5
 
         # 3. Assay Interference: Cell-Free Blank in MTT / CCK-8
-        if ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک", "بلانک", "کنترل"]):
+        if (is_in_vitro or is_in_vivo) and ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک", "بلانک", "کنترل"]):
             critical_flaws.append("ASSAY_INTERFERENCE_DEFECT: عدم تعبیه کنترل در سنجش تترازولیوم؛ پلی‌ساکاریدها یا آنتی‌اکسیدان‌ها ممکن است مستقیماً نمک تترازولیوم را احیا کنند و سیتوتوکسیستی کاذب ایجاد نمایند.")
             score += 1.2
-        elif ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک"]):
+        elif (is_in_vitro or is_in_vivo) and ("mtt" in methods_text or "cck-8" in methods_text) and not any(k in methods_text for k in ["cell-free blank", "بلانک بدون سلول", "کنترل بلانک"]):
             weaknesses.append("ASSAY_INTERFERENCE_ADVISORY: در سنجش‌های تترازولیوم، قید صریح کنترل بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر مستقیم احیای شیمیایی مواد بر نمک تترازولیوم الزامی است.")
             score += 0.3
 
         # 4. RoB-2 In Vitro Misapplication Guard
-        s14 = sections.get(14, "")
-        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"])
         full_text_lower = " ".join(sections.values()).lower()
         if is_in_vitro and bool(re.search(r"\b(rob-?2|cochrane\s+rob|cochrane\s+risk\s+of\s+bias)\b", full_text_lower)):
             if not any(k in full_text_lower for k in ["toxrtool", "ntp ohat", "givimp", "ecvam"]):
                 critical_flaws.append("ROB2_IN_VITRO_MISAPPLICATION: ابزار RoB-2 ککرین اختصاصاً برای کارآزمایی‌های بالینی انسانی تصادفی‌سازی‌شده طراحی شده است. برای مطالعات سلولی برون‌تن (In Vitro)، استفاده از RoB-2 فاقد وجاهت روش‌شناختی است و باید از چارچوب‌های استاندارد ToxRTool یا NTP OHAT استفاده شود.")
                 score += 1.5
 
-        # 5. qPCR / Gene Expression Rigor (MIQE Dual Reference Gene Check)
-        if any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن"]):
-            has_dual_refs = any(k in methods_text for k in ["دو ژن مرجع", "gapdh و actb", "actb و gapdh", "حداقل دو ژن"]) or ("gapdh" in methods_text and ("actb" in methods_text or "actin" in methods_text))
-            if not has_dual_refs:
-                weaknesses.append("MIQE_COMPLIANCE_DEFECT: بر اساس راهنمای بین‌المللی MIQE، سنجش‌های RT-qPCR باید حداقل بر پایه دو ژن مرجع داخلی پایدار (نظیر GAPDH و ACTB) نرمال‌سازی شوند نه صرفاً یک تک‌ژن.")
-                score += 0.5
+        # 5-8. Lab-Only Assay Checks (Gated strictly to in_vitro / in_vivo wet-lab archetypes)
+        if is_in_vitro or is_in_vivo:
+            # 5. qPCR / Gene Expression Rigor (MIQE Dual Reference Gene Check)
+            if any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن"]):
+                has_dual_refs = any(k in methods_text for k in ["دو ژن مرجع", "gapdh و actb", "actb و gapdh", "حداقل دو ژن"]) or ("gapdh" in methods_text and ("actb" in methods_text or "actin" in methods_text))
+                if not has_dual_refs:
+                    weaknesses.append("MIQE_COMPLIANCE_DEFECT: بر اساس راهنمای بین‌المللی MIQE، سنجش‌های RT-qPCR باید حداقل بر پایه دو ژن مرجع داخلی پایدار (نظیر GAPDH و ACTB) نرمال‌سازی شوند نه صرفاً یک تک‌ژن.")
+                    score += 0.5
 
-        # 6. Caspase-3 mRNA vs Active Proteolytic Cleavage Rigor
-        if any(k in methods_text for k in ["کاسپاز", "caspase", "casp3"]):
-            mentions_pcr = any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن", "mrna"])
-            mentions_cleavage = any(k in methods_text for k in ["برش پروتئینی", "برش پروتئولیتیک", "cleaved", "فعالیت آنزیمی", "annexin", "آنکسین", "وسترن بلات", "western"])
-            if mentions_pcr and not mentions_cleavage:
-                critical_flaws.append("CASPASE3_MRNA_INSUFFICIENCY: استناد صرف به افزایش بیان mRNA ژن CASP3 برای اثبات آپوپتوز ناکافی است؛ کاسپاز-۳ یک پروآنزیم غیرفعال ۳۲ کیلودالتونی است و آپوپتوز مستلزم سنجش برش پروتئولیتیک به قطعات فعال یا سنجش ارتوگونال با Annexin V/PI است.")
-                score += 1.2
-            elif mentions_cleavage:
-                strengths.append("سنجش ارتوگونال فعال‌سازی کاسپاز-۳ از طریق برش پروتئینی یا فلوسایتومتری Annexin V/PI تضمین شده است.")
+            # 6. Caspase-3 mRNA vs Active Proteolytic Cleavage Rigor
+            if any(k in methods_text for k in ["کاسپاز", "caspase", "casp3"]):
+                mentions_pcr = any(k in methods_text for k in ["qpcr", "rt-pcr", "real-time", "بیان ژن", "mrna"])
+                mentions_cleavage = any(k in methods_text for k in ["برش پروتئینی", "برش پروتئولیتیک", "cleaved", "فعالیت آنزیمی", "annexin", "آنکسین", "وسترن بلات", "western"])
+                if mentions_pcr and not mentions_cleavage:
+                    critical_flaws.append("CASPASE3_MRNA_INSUFFICIENCY: استناد صرف به افزایش بیان mRNA ژن CASP3 برای اثبات آپوپتوز ناکافی است؛ کاسپاز-۳ یک پروآنزیم غیرفعال ۳۲ کیلودالتونی است و آپوپتوز مستلزم سنجش برش پروتئولیتیک به قطعات فعال یا سنجش ارتوگونال با Annexin V/PI است.")
+                    score += 1.2
+                elif mentions_cleavage:
+                    strengths.append("سنجش ارتوگونال فعال‌سازی کاسپاز-۳ از طریق برش پروتئینی یا فلوسایتومتری Annexin V/PI تضمین شده است.")
 
-        # 7. Chou-Talalay Synergy 2-Phase Protocol Rigor
-        has_synergy = any(k in methods_text for k in ["هم‌افزایی", "سینرژی", "چو-تالالای", "chou-talalay", "compusyn", "synergyfinder"]) or bool(re.search(r"\bcombination\s+index\b", methods_text))
-        if has_synergy:
-            has_phase1 = any(k in methods_text for k in ["فاز اول", "منحنی‌های دوز-پاسخ منفرد", "دوز-پاسخ تک‌دارویی", "تک‌دارویی", "monotherapy", "serial dilution", "رقت متوالی", "ic50 منفرد", "شیب m"])
-            if not has_phase1:
-                weaknesses.append("CHOU_TALALAY_PROTOCOL_INCOMPLETE: در طراحی سنجش هم‌افزایی چو-تالالای، الزامی است که پیش از تیمار ترکیبی، فاز اول (ترسیم منحنی ۵ الی ۷ نقطه‌ای تک‌دارویی جهت استخراج دقیق IC50 و پارامترهای Dm و m در CompuSyn) تصریح گردد.")
-                score += 0.5
-            else:
-                strengths.append("پروتکل دوفازی استاندارد Chou-Talalay (فاز اول تک‌دارویی و فاز دوم نسبت ثابت هم‌توان) به درستی طراحی شده است.")
+            # 7. Chou-Talalay Synergy 2-Phase Protocol Rigor
+            has_synergy = any(k in methods_text for k in ["هم‌افزایی", "سینرژی", "چو-تالالای", "chou-talalay", "compusyn", "synergyfinder"]) or bool(re.search(r"\bcombination\s+index\b", methods_text))
+            if has_synergy:
+                has_phase1 = any(k in methods_text for k in ["فاز اول", "منحنی‌های دوز-پاسخ منفرد", "دوز-پاسخ تک‌دارویی", "تک‌دارویی", "monotherapy", "serial dilution", "رقت متوالی", "ic50 منفرد", "شیب m"])
+                if not has_phase1:
+                    weaknesses.append("CHOU_TALALAY_PROTOCOL_INCOMPLETE: در طراحی سنجش هم‌افزایی چو-تالالای، الزامی است که پیش از تیمار ترکیبی، فاز اول (ترسیم منحنی ۵ الی ۷ نقطه‌ای تک‌دارویی جهت استخراج دقیق IC50 و پارامترهای Dm و m در CompuSyn) تصریح گردد.")
+                    score += 0.5
+                else:
+                    strengths.append("پروتکل دوفازی استاندارد Chou-Talalay (فاز اول تک‌دارویی و فاز دوم نسبت ثابت هم‌توان) به درستی طراحی شده است.")
 
-        # 8. Apoptosis Positive Control Rigor
-        has_apoptosis = any(k in methods_text for k in ["آپوپتوز", "مرگ سلولی", "annexin", "آنکسین"])
-        if has_apoptosis:
-            has_pos_ctrl = any(k in methods_text for k in ["کنترل مثبت", "positive control", "استاروسپورین", "staurosporine"])
-            if not has_pos_ctrl:
-                weaknesses.append("APOPTOSIS_POSITIVE_CONTROL_MISSING: در سنجش‌های آپوپتوز و مرگ سلولی، تعبیه کنترل مثبت استاندارد (مانند استاروسپورین ۱ میکرومولار) جهت اعتبارسنجی کیت و گیت‌بندی فلوسایتومتری الزامی است.")
-                score += 0.4
-            else:
-                strengths.append("کنترل مثبت استاندارد آپوپتوز در پروتکل آزمایشگاهی لحاظ شده است.")
+            # 8. Apoptosis Positive Control Rigor
+            has_apoptosis = any(k in methods_text for k in ["آپوپتوز", "مرگ سلولی", "annexin", "آنکسین"])
+            if has_apoptosis:
+                has_pos_ctrl = any(k in methods_text for k in ["کنترل مثبت", "positive control", "استاروسپورین", "staurosporine"])
+                if not has_pos_ctrl:
+                    weaknesses.append("APOPTOSIS_POSITIVE_CONTROL_MISSING: در سنجش‌های آپوپتوز و مرگ سلولی، تعبیه کنترل مثبت استاندارد (مانند استاروسپورین ۱ میکرومولار) جهت اعتبارسنجی کیت و گیت‌بندی فلوسایتومتری الزامی است.")
+                    score += 0.4
+                else:
+                    strengths.append("کنترل مثبت استاندارد آپوپتوز در پروتکل آزمایشگاهی لحاظ شده است.")
 
         # 9. Section 22: Sample Size & Mathematical Coherence
         s22 = sections.get(22, "")
@@ -490,21 +531,33 @@ class MockGrantReviewPanel:
         if has_ttest_formula and claims_n3 and not has_mead_or_factorial:
             critical_flaws.append("BIOSTATISTICAL_SAMPLE_SIZE_CONTRADICTION: تناقض محاسباتی در حجم نمونه؛ فرمول مقایسه دو میانگین مستقل عدد n~7 تولید می‌کند، در حالی که ادعای n=3 شده است. در طرح‌های فاکتوریل سلولی الزاما باید از معادله تخصیص منابع مید (Mead: E=N-B-T) یا تحلیل توان اثر متقابل ANOVA فاکتوریل استفاده شود.")
             score += 1.5
-        elif ("n=" in s22_lower or "تکرار" in s22 or "فرمول" in s22 or "توان" in s22 or "mead" in s22_lower) and len(s22) >= 200:
-            strengths.append("روش محاسبه حجم نمونه با قید تکرارها و منطق بیواستاتیک مستند تشریح گردیده است.")
+        elif (
+            ("n=" in s22_lower or "تکرار" in s22 or "فرمول" in s22 or "توان" in s22 or "mead" in s22_lower or "cochran" in s22_lower or "کوکران" in s22)
+            and len(s22) >= 200
+        ) or (
+            any(k in s22_lower for k in ["prisma", "jbi", "اشباع", "saturation", "چارتینگ", "nielsen", "نیلسن", "1-(1-l)", "buderer", "بودرر"])
+            and len(s22.strip()) >= 80
+        ):
+            strengths.append("روش محاسبه/تعیین حجم نمونه یا پوشش شواهد با منطق متناسب با کهن‌الگو مستند تشریح گردیده است.")
         else:
-            weaknesses.append("بخش حجم نمونه نیازمند ارائه فرمول مشخص و تفکیک تکرارهای بیولوژیک و تکنیکال است.")
+            weaknesses.append("بخش حجم نمونه نیازمند ارائه فرمول مشخص یا چارچوب متناسب با نوع مطالعه (Mead/Cochran/Buderer/Nielsen/PRISMA-ScR) است.")
             score += 1.0
 
-        # 10. Section 23: Statistical Analysis & Factorial Interaction
+        # 10. Section 23: Statistical Analysis & Archetype Synthesis Plan
         s23 = sections.get(23, "")
         s23_lower = s23.lower()
-        if any(stat in s23_lower for stat in ["anova", "t-test", "معناداری", "نرمال", "compusyn", "spss", "p-value", "p<"]):
-            strengths.append("آزمون‌های آماری، سطح معناداری و نرم‌افزار تحلیلی به درستی تعیین شده‌اند.")
+        stat_tokens = [
+            "anova", "t-test", "معناداری", "نرمال", "compusyn", "spss", "stata", "p-value", "p<",
+            "لجستیک", "logistic", "کای", "chi-square", "رگرسیون", "regression",
+            "prisma", "jbi", "سنتز", "چارتینگ", "charting", "فراوانی", "توصیفی",
+            "کاپا", "kappa", "icc", "roc", "auc", "حساسیت", "ویژگی", "نمره sus", "میانگین",
+        ]
+        if any(stat in s23_lower for stat in stat_tokens):
+            strengths.append("روش‌های تحلیل آماری یا سنتز داده‌ها، شاخص‌های ارزیابی و ابزار تحلیلی به درستی تعیین شده‌اند.")
             if "فاکتوریل" in s23 or "two-way" in s23_lower or "برهم‌کنش" in s23 or "interaction" in s23_lower:
                 strengths.append("تحلیل اثر متقابل (Interaction Effect) با آزمون فاکتوریل به درستی پیش‌بینی شده است.")
         else:
-            critical_flaws.append("روش تجزیه و تحلیل داده فاقد نام آزمون آماری مشخص (مانند ANOVA یا آزمون ناپارامتری) است.")
+            critical_flaws.append("روش تجزیه و تحلیل داده فاقد نام آزمون آماری مشخص یا پروتکل سنتز شواهد/کاربردپذیری است.")
             score += 1.5
 
         if critical_flaws:
@@ -548,12 +601,15 @@ class MockGrantReviewPanel:
             weaknesses.append("ملاحظات اخلاقی مختصر است؛ اشاره به اصول کدهای ۳۱ گانه اخلاق زیستی کشور توصیه می‌شود.")
             score += 0.8
 
-        # Section 25: Biosafety & Security
+        # Section 25: Biosafety & Data Security
         s25 = sections.get(25, "")
-        if len(s25) >= 150:
-            strengths.append("نکات ایمنی زیستی، مهار آلودگی و حفاظت فردی و محیطی به درستی مورد توجه قرار گرفته است.")
+        sf_r3 = classify_study_archetype(context or "", sections=sections) if classify_study_archetype else ""
+        is_non_lab_r3 = sf_r3 in ("scoping_review", "usability", "health_systems", "epidemiological", "diagnostic", "clinical_rct")
+        has_data_sec = any(k in s25 for k in ["محرمانگی", "اطلاعات", "اخلاق", "ایمنی", "عدم مداخله", "مرور متون", "حفاظت داده", "رمزنگاری", "ناشناس", "کدگذاری"])
+        if len(s25) >= 150 or (is_non_lab_r3 and (len(s25.strip()) >= 40 or has_data_sec)):
+            strengths.append("نکات ایمنی، محرمانگی داده‌ها و حفاظت پروژه متناسب با ماهیت مطالعه رعایت شده است.")
         else:
-            weaknesses.append("پروتکل‌های ایمنی زیستی (Biosafety) و امحای پسماندهای بیولوژیک نیازمند تفصیل بیشتر است.")
+            weaknesses.append("پروتکل‌های ایمنی زیستی (Biosafety) یا حفاظت داده‌ها نیازمند تفصیل بیشتر است.")
             score += 0.5
 
         # Section 12: Gantt Chart & Schedule
@@ -611,7 +667,7 @@ class MockGrantReviewPanel:
         overall_score = round((r1.score + r2.score + r3.score) / 3.0, 2)
 
         # Funding Verdict
-        if overall_score <= 2.5 and crit_count == 0:
+        if overall_score <= NIH_APPROVAL_SCORE_CEILING and crit_count == 0:
             funding_verdict = "APPROVED_FUNDABLE"
             can_proceed = True
             exec_summary = (
@@ -803,7 +859,11 @@ class MockGrantReviewPanel:
                     reviewer_results=rev_map,
                     prioritized_findings=all_prioritized,
                     remediation_rounds_conducted=egm_data.get("remediation_rounds_conducted", 1),
-                    executive_summary_fa=egm_data.get("executive_summary_fa", "")
+                    executive_summary_fa=egm_data.get("executive_summary_fa", ""),
+                    structural_completeness_percent=egm_data.get(
+                        "structural_completeness_percent",
+                        egm_data.get("percentile", 90.0),
+                    ),
                 )
                 egm_md = EGMStudySectionCoordinator.generate_report_markdown(study_res)
                 with open(egm_md_path, "w", encoding="utf-8") as f:

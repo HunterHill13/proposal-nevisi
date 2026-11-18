@@ -902,6 +902,33 @@ class MeSHQueryExpander:
 
         return matched
 
+    _METHODOLOGY_STOPWORDS = frozenset({
+        "and", "the", "for", "with", "from", "against", "effect", "effects",
+        "study", "studies", "evaluation", "evaluate", "evaluating", "review",
+        "scoping", "systematic", "usability", "protocol", "method", "methods",
+        "methodology", "assessment", "assessing", "survey", "analysis",
+        "comparison", "compare", "comparing", "role", "impact", "based",
+        "using", "use", "determining", "determination", "investigation",
+        "cross", "sectional", "case", "control", "random", "randomized",
+        " بررسي".strip(), "بررسی", "ارزیابی", "مرور", "دامنه‌ای", "دامنه", "حیطه‌ای",
+        "کاربردپذیری", "مقایسه", "تعیین", "مطالعه", "سنجش", "تاثیر", "اثر",
+        "روش", "طرح", "پژوهش",
+    })
+
+    @staticmethod
+    def _entity_terms(ent: Dict[str, Any]) -> List[str]:
+        terms = [f'"{ent["mesh"]}"[MeSH Terms]']
+        for s in ent.get("synonyms", [])[:3]:
+            terms.append(f'"{s}"[Title/Abstract]')
+        return terms
+
+    @classmethod
+    def _is_valid_query_token(cls, tok: str) -> bool:
+        clean = (tok or "").strip()
+        if len(clean) <= 1 or re.search(r'[\u0600-\u06FF]', clean):
+            return False
+        return clean.lower() not in cls._METHODOLOGY_STOPWORDS
+
     @classmethod
     def build_tier1_precision_mesh_query(
         cls,
@@ -909,42 +936,91 @@ class MeSHQueryExpander:
         custom_agents: Optional[List[str]] = None
     ) -> str:
         """
-        Builds Tier 1 Precision MeSH Boolean Query:
-        Combines (MeSH Descriptor OR synonyms[Title/Abstract]) for each entity,
-        ANDed together with pharmacological or clinical intervention agents.
+        Builds Tier 1 Precision MeSH Boolean Query capped at <= 3 semantic AND blocks:
+        Block 1 (Disease / Condition / Population) AND
+        Block 2 (Intervention / Exposure / Health-System / Primary Agent) AND
+        Block 3 (Outcome / Mechanism / Diagnostic / Delivery / Secondary Agent).
         Guarantees 0% false cancer fallback for non-cancer topics.
         """
+        b1_cats = {"disease", "organism"}
+        b2_cats = {"pharmacology", "therapy", "health_economics"}
+        b3_cats = {"mechanism", "diagnostic", "delivery"}
+
+        b1_terms: List[str] = []
+        b2_terms: List[str] = []
+        b3_terms: List[str] = []
+        seen_meshes = set()
+        seen_raw = set()
+
         entities = cls.extract_mesh_entities(text_or_topic)
-        clauses = []
-
-        # Build MeSH clauses
         for ent in entities:
-            mesh_term = ent["mesh"]
-            syns = ent.get("synonyms", [])
-            terms = [f'"{mesh_term}"[MeSH Terms]']
-            for s in syns[:3]:
-                terms.append(f'"{s}"[Title/Abstract]')
-            clauses.append("(" + " OR ".join(terms) + ")")
+            seen_meshes.add(ent["mesh"])
+            for s in ent.get("synonyms", []):
+                seen_raw.add(s.lower())
+            seen_raw.add(ent["mesh"].lower())
+            cat = ent.get("category", "mechanism")
+            terms = cls._entity_terms(ent)
+            if cat in b1_cats:
+                b1_terms.extend(terms)
+            elif cat in b2_cats:
+                b2_terms.extend(terms)
+            else:
+                b3_terms.extend(terms)
 
-        # Add explicit agent/compound clauses (strictly English/ASCII tokens to protect NCBI API)
         raw_agents = list(custom_agents or [])
-        agents = [ag.strip() for ag in raw_agents if ag and not re.search(r'[\u0600-\u06FF]', ag) and len(ag.strip()) > 1]
-        if not agents:
-            # Extract Latin/English chemical or clinical tokens from topic if not in MeSH
+        candidate_tokens: List[str] = []
+        for ag in raw_agents:
+            if not ag:
+                continue
+            ag_clean = str(ag).strip()
+            if ag_clean.lower() in cls._METHODOLOGY_STOPWORDS:
+                continue
+            mapped = cls.map_concept_to_mesh(ag_clean)
+            if mapped:
+                if mapped["mesh"] not in seen_meshes:
+                    seen_meshes.add(mapped["mesh"])
+                    seen_raw.add(mapped["mesh"].lower())
+                    terms = cls._entity_terms(mapped)
+                    cat = mapped.get("category", "pharmacology")
+                    if cat in b1_cats:
+                        b1_terms.extend(terms)
+                    elif cat in b2_cats:
+                        b2_terms.extend(terms)
+                    else:
+                        b3_terms.extend(terms)
+            elif cls._is_valid_query_token(ag_clean):
+                candidate_tokens.append(ag_clean)
+
+        if not raw_agents:
             en_tokens = re.findall(r'[A-Za-z][A-Za-z0-9_\-\+]{2,}', text_or_topic)
             for tok in en_tokens:
-                if tok.lower() not in ["and", "the", "for", "with", "from", "against", "effect", "study", "evaluation"]:
-                    if not any(tok.lower() in [ent["mesh"].lower()] + [s.lower() for s in ent.get("synonyms", [])] for ent in entities):
-                        agents.append(tok)
+                if cls._is_valid_query_token(tok) and tok.lower() not in seen_raw:
+                    candidate_tokens.append(tok)
 
-        for ag in agents[:3]:
-            clauses.append(f'("{ag}"[Title/Abstract] OR "{ag}"[MeSH Terms])')
+        for tok in candidate_tokens[:3]:
+            tok_l = tok.lower()
+            if tok_l in seen_raw:
+                continue
+            seen_raw.add(tok_l)
+            agent_terms = [f'"{tok}"[Title/Abstract]', f'"{tok}"[MeSH Terms]']
+            if not b2_terms:
+                b2_terms.extend(agent_terms)
+            elif not b3_terms:
+                b3_terms.extend(agent_terms)
+            else:
+                b2_terms.extend(agent_terms)
 
-        if not clauses:
+        blocks = []
+        for bucket in (b1_terms, b2_terms, b3_terms):
+            deduped = list(dict.fromkeys(bucket))
+            if deduped:
+                blocks.append("(" + " OR ".join(deduped) + ")")
+
+        if not blocks:
             # Dynamic neutral clean fallback - NEVER falls back to cancer or apoptosis on unmapped topics
             return '("Biomedical Research"[Title/Abstract] OR "Clinical Protocol"[Title/Abstract]) AND "Health"[Title/Abstract]'
 
-        return " AND ".join(clauses)
+        return " AND ".join(blocks[:3])
 
     @classmethod
     def build_tier2_fallback_query(
@@ -953,37 +1029,90 @@ class MeSHQueryExpander:
         custom_agents: Optional[List[str]] = None
     ) -> str:
         """
-        Builds Tier 2 Broad Fallback Query.
-        Prioritizes primary condition and interventions; guarantees 0% cancer fallback.
+        Builds Tier 2 Broad Fallback Query capped at <= 3 clauses in B1 -> B2 -> B3 priority order.
+        Guarantees 0% cancer fallback.
         """
-        entities = cls.extract_mesh_entities(text_or_topic)
-        keywords = []
+        b1_cats = {"disease", "organism"}
+        b2_cats = {"pharmacology", "therapy", "health_economics"}
+        b3_cats = {"mechanism", "diagnostic", "delivery"}
 
+        b1_kws: List[str] = []
+        b2_kws: List[str] = []
+        b3_kws: List[str] = []
+        seen_meshes = set()
+
+        entities = cls.extract_mesh_entities(text_or_topic)
         cat_order = {
-            "disease": 0, "health_economics": 1, "diagnostic": 2,
-            "pharmacology": 3, "mechanism": 4, "therapy": 5, "organism": 6, "delivery": 7
+            "disease": 0, "organism": 1,
+            "pharmacology": 2, "therapy": 3, "health_economics": 4,
+            "mechanism": 5, "diagnostic": 6, "delivery": 7,
         }
         sorted_entities = sorted(entities, key=lambda e: cat_order.get(e.get("category", "mechanism"), 8))
 
         for ent in sorted_entities:
-            keywords.append(ent["mesh"].split(",")[0])  # Primary name
-
-        for ent in sorted_entities:
-            if ent.get("synonyms"):
-                keywords.append(ent["synonyms"][0])
+            seen_meshes.add(ent["mesh"])
+            primary = ent["mesh"].split(",")[0]
+            cat = ent.get("category", "mechanism")
+            if cat in b1_cats:
+                b1_kws.append(primary)
+            elif cat in b2_cats:
+                b2_kws.append(primary)
+            else:
+                b3_kws.append(primary)
 
         if custom_agents:
-            clean_custom = [ag.strip() for ag in custom_agents if ag and not re.search(r'[\u0600-\u06FF]', ag) and len(ag.strip()) > 1]
-            keywords.extend(clean_custom)
+            for ag in custom_agents:
+                if not ag:
+                    continue
+                ag_clean = str(ag).strip()
+                if ag_clean.lower() in cls._METHODOLOGY_STOPWORDS:
+                    continue
+                mapped = cls.map_concept_to_mesh(ag_clean)
+                if mapped:
+                    if mapped["mesh"] not in seen_meshes:
+                        seen_meshes.add(mapped["mesh"])
+                        primary = mapped["mesh"].split(",")[0]
+                        cat = mapped.get("category", "pharmacology")
+                        if cat in b1_cats:
+                            b1_kws.append(primary)
+                        elif cat in b2_cats:
+                            b2_kws.append(primary)
+                        else:
+                            b3_kws.append(primary)
+                elif cls._is_valid_query_token(ag_clean):
+                    if not b2_kws:
+                        b2_kws.append(ag_clean)
+                    else:
+                        b3_kws.append(ag_clean)
         else:
             en_tokens = re.findall(r'[A-Za-z][A-Za-z0-9_\-\+]{2,}', text_or_topic)
             for tok in en_tokens:
-                if tok.lower() not in ["and", "the", "for", "with", "from", "against", "effect", "study", "evaluation"]:
-                    keywords.append(tok)
+                if cls._is_valid_query_token(tok):
+                    if not b2_kws:
+                        b2_kws.append(tok)
+                    else:
+                        b3_kws.append(tok)
 
-        unique_kws = list(dict.fromkeys(keywords))
+        # Pick in B1 -> B2 -> B3 priority order, capped at <= 3 total clauses
+        ordered_kws: List[str] = []
+        for bucket in (b1_kws, b2_kws, b3_kws):
+            for kw in bucket:
+                if kw not in ordered_kws:
+                    ordered_kws.append(kw)
+                    break  # One representative clause per block first
+        if len(ordered_kws) < 3:
+            for bucket in (b1_kws, b2_kws, b3_kws):
+                for kw in bucket:
+                    if kw not in ordered_kws:
+                        ordered_kws.append(kw)
+                        if len(ordered_kws) >= 3:
+                            break
+                if len(ordered_kws) >= 3:
+                    break
+
+        unique_kws = list(dict.fromkeys(ordered_kws))[:3]
         if len(unique_kws) >= 2:
-            return " AND ".join(f'"{k}"' for k in unique_kws[:4])
+            return " AND ".join(f'"{k}"' for k in unique_kws)
         elif unique_kws:
             return f'"{unique_kws[0]}" AND ("evaluation" OR "clinical" OR "outcomes")'
         return '"biomedical clinical evaluation" AND "protocol outcome"'

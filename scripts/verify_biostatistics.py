@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-verify_biostatistics.py - Rigorous Computational Biostatistical & Sample Size Validator (v14.1.0)
+verify_biostatistics.py - Rigorous Computational Biostatistical & Sample Size Validator (v14.2.0)
 Part of Proposal-Nevisi Engine.
 
 Features:
-- Dynamic parametric sample size calculation across 6 research archetypes.
+- Dynamic parametric sample size calculation across 7+ study archetypes (+ usability).
 - Unknown study families strictly evaluated as UNVERIFIED (never false PASS).
 - Rigorous extraction of alpha, power, effect size, variance, cluster design effect (DEFF), and attrition.
 - Full mathematical validation replacing hardcoded constant checks.
@@ -29,14 +29,20 @@ class BiostatisticalValidator:
     @classmethod
     def parse_section_22(cls, markdown_text: str) -> str:
         """Extracts text for Section 22 (Sample Size / روش نمونه‌گیری و حجم نمونه)."""
-        pattern = r'(?m)^##\s*(?:بخش\s*)?۲۲[\s\.:\-_]+(.*?)(?=^##|\Z)'
+        pattern = r'(?im)^#{1,2}(?!#)\s*(?:(?:بخش|Section)\s+)?(?:22|۲۲)[\s\.:\-_]+(.*?)(?=^#{1,2}(?!#)|\Z)'
         m = re.search(pattern, markdown_text, re.DOTALL)
         if m:
             return m.group(1).strip()
-        
+
+        # Support 14-section subsection format (### 13-9 / ### ۱۳-۹)
+        sub_pattern = r'(?im)^#{2,4}\s*(?:(?:بخش|Section)\s+)?(?:13|۱۳)[.\-–—](?:9|۹)(?:[\s\.:\-_]+(.*?))?(?=^#{1,4}|\Z)'
+        m_sub = re.search(sub_pattern, markdown_text, re.DOTALL)
+        if m_sub:
+            return (m_sub.group(1) or "").strip()
+
         # Fallback to English heading or general keyword
-        alt_pattern = r'(?m)^##\s*(?:Section\s*22|Sample\s*Size|حجم\s*نمونه)[\s\.:\-_]+(.*?)(?=^##|\Z)'
-        m_alt = re.search(alt_pattern, markdown_text, re.DOTALL | re.IGNORECASE)
+        alt_pattern = r'(?im)^#{1,2}(?!#)\s*(?:Section\s*22|Sample\s*Size|حجم\s*نمونه)[\s\.:\-_]+(.*?)(?=^#{1,2}(?!#)|\Z)'
+        m_alt = re.search(alt_pattern, markdown_text, re.DOTALL)
         if m_alt:
             return m_alt.group(1).strip()
 
@@ -268,7 +274,7 @@ class BiostatisticalValidator:
         # ---------------------------------------------------------
         elif any(term in family_clean for term in ["usability", "service_design", "digital_health", "کاربردپذیری"]):
             metrics["formula_type"] = "Nielsen & Landauer Usability Problem Discovery + SUS Scale"
-            has_usability = bool(re.search(r'(nielsen|landauer|نلسون|لاندور|sus|کاربردپذیری|usability)', sec_lower))
+            has_usability = bool(re.search(r'(nielsen|landauer|نلسون|نیلسن|لاندور|لاندائور|\bsus\b|کاربردپذیری|usability|1\s*-\s*\(1\s*-\s*l\))', sec_lower))
             metrics["formula_found"] = has_usability
             metrics["calculated_benchmark_n"] = 40
 
@@ -308,13 +314,19 @@ class BiostatisticalValidator:
 
         # General alpha / power audit (Only applicable to inferential hypothesis testing studies)
         is_review = any(term in family_clean for term in ["scoping", "systematic", "review", "synthesis", "مرور"])
-        if not is_review:
+        is_usability = any(term in family_clean for term in ["usability", "service_design", "digital_health", "کاربردپذیری"])
+        claims_comparative_test = any(
+            k in sec_lower for k in ["مقایسه دو گروه", "گروه کنترل", "تفاوت معنادار", "anova", "t-test", "mann-whitney", "کارآزمایی", "comparative trial"]
+        )
+        if is_review:
+            strengths.append("Alpha / Power hypothesis testing parameters correctly omitted as study is an evidence synthesis / scoping review.")
+        elif is_usability and not claims_comparative_test:
+            strengths.append("Alpha / Power inferential hypothesis testing parameters exempted for discovery-only Nielsen-Landauer usability evaluation (1-(1-L)^n).")
+        else:
             if not has_alpha:
                 issues.append("MISSING_ALPHA_SIGNIFICANCE: Alpha significance level (e.g., alpha=0.05) is not explicitly stated.")
             if not has_power:
                 issues.append("MISSING_POWER_SPECIFICATION: Statistical power (e.g., power>=0.80) is not explicitly documented.")
-        else:
-            strengths.append("Alpha / Power hypothesis testing parameters correctly omitted as study is an evidence synthesis / scoping review.")
 
         # Final verdict determination
         if metrics["coherence_status"] == "UNVERIFIED":
@@ -330,7 +342,7 @@ class BiostatisticalValidator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Computational Biostatistical Sample Size Validator (v14.1.0)")
+    parser = argparse.ArgumentParser(description="Computational Biostatistical Sample Size Validator (v14.2.0)")
     parser.add_argument("--proposal", help="Path to proposal markdown file (.md)")
     parser.add_argument("--section22", help="Direct text of Section 22")
     parser.add_argument("--study-family", default="health_systems", help="Research study family archetype")
@@ -358,7 +370,7 @@ def main():
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print("=" * 65)
-        print("BIOSTATISTICAL & SAMPLE SIZE VALIDATION AUDIT (v14.1.0)")
+        print("BIOSTATISTICAL & SAMPLE SIZE VALIDATION AUDIT (v14.2.0)")
         print("=" * 65)
         print(f"Study Family : {result['study_family']}")
         print(f"Formula Type : {result['formula_type']}")

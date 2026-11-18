@@ -4,7 +4,7 @@
 Master Persian Academic Word Document (.docx) Generator for Proposal-Nevisi Skill
 Implements the approved, publication-grade academic layout:
 - Dubai typography (10.5pt body, 1.15 line spacing)
-- Official Cover Page with University header, title card, 5-member team table, and submission box
+- Official Cover Page with University header, bilingual title card, dynamic structural metadata table, and neutral running chrome
 - Navy (#1A365D) 14pt Bold Section Headings (H1) with classic 55-character blue line (─────────────────────────────────────────────────────── #2B6CB0)
 - Burgundy (#742A2A) 11.5pt Bold Subheadings (H2 / ###)
 - Steel Blue / Navy (#2B6CB0) 10.5pt Bold Level 3 Subheadings (H3 / ####)
@@ -304,11 +304,42 @@ def add_numbered_p(doc, num, text):
     return p
 
 def add_callout_box(doc, text):
-    """Epistemic transparency or policy note callout box with teal border and light fill."""
-    clean_q = text.replace('>', '').replace('[!NOTE]', '').strip()
-    clean_q = re.sub(r'^\*?\*?شفافیت معرفتی پیرامون سوگیری انتشار(?:\s*\(Publication Bias\))?:?\*?\*?:?\s*', '', clean_q).strip()
-    if not clean_q:
+    """Epistemic transparency, custom heading, or methodological note callout box with teal border and light fill."""
+    raw_clean = text.replace('>', '').replace('[!NOTE]', '').strip()
+    if not raw_clean:
         return None
+
+    is_pub_bias = bool(
+        re.search(
+            r'(?:سوگیری\s+انتشار|publication\s+bias|صفر\s+مطالعه|negative\s+evidence|شواهد\s+منفی)',
+            raw_clean,
+            re.IGNORECASE,
+        )
+    )
+    prefix_label = ""
+    body_text = raw_clean
+
+    if is_pub_bias:
+        body_text = re.sub(
+            r'^(?:◄\s*)?\*?\*?شفافیت معرفتی پیرامون سوگیری انتشار(?:\s*\(Publication Bias\))?:?\*?\*?:?\s*',
+            '',
+            raw_clean,
+        ).strip()
+        if not body_text:
+            body_text = raw_clean
+        prefix_label = "◄ شفافیت معرفتی پیرامون سوگیری انتشار (Publication Bias): "
+    else:
+        m_bold = re.match(r'^(?:◄\s*)?\*\*([^*]+?)\*\*:?\s*(.+)$', raw_clean)
+        m_arrow = re.match(r'^◄\s*([^:]+):\s*(.+)$', raw_clean)
+        if m_bold:
+            prefix_label = f"◄ {m_bold.group(1).strip().rstrip(':')}: "
+            body_text = m_bold.group(2).strip()
+        elif m_arrow:
+            prefix_label = f"◄ {m_arrow.group(1).strip()}: "
+            body_text = m_arrow.group(2).strip()
+        else:
+            prefix_label = "◄ یادداشت روش‌شناختی: "
+
     p = doc.add_paragraph()
     apply_rtl_justify(p, space_before=5, space_after=5)
     pPr = p._p.get_or_add_pPr()
@@ -317,8 +348,8 @@ def add_callout_box(doc, text):
     </w:pBdr>''')
     pPr.append(pBdr)
     pPr.append(parse_xml(f'<w:shd {nsdecls("w")} w:fill="F0F4F8"/>'))
-    add_r(p, "◄ شفافیت معرفتی پیرامون سوگیری انتشار (Publication Bias): ", font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
-    add_formatted_bidi_text(p, clean_q, font_name="Dubai", size_pt=10, default_italic=True, color_rgb=(0x2D, 0x37, 0x48))
+    add_r(p, prefix_label, font_name="Dubai", size_pt=10.5, bold=True, color_rgb=(0x0D, 0x5C, 0x75))
+    add_formatted_bidi_text(p, body_text, font_name="Dubai", size_pt=10, default_italic=True, color_rgb=(0x2D, 0x37, 0x48))
     return p
 
 def add_formula_box(doc, formula_text, explanation=None):
@@ -449,8 +480,155 @@ def render_styled_table(doc, table_lines):
 
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
-def render_official_cover_page(doc, main_title: str, english_title: Optional[str] = None):
-    """Generates the official Pajooheshyar cover page with national medical research header, title card, and protocol metadata."""
+_ARCHETYPE_COVER_MAP: Dict[str, Dict[str, str]] = {
+    "scoping_review": {
+        "archetype_label": "مرور دامنه‌ای نقادانه و سنتز شواهد (PRISMA-ScR & JBI Framework)",
+        "appraisal_framework": "عدم ارزیابی ریسک سوگیری فردی به دلیل ماهیت نگاشت شواهد (مطابق راهنمای رسمی PRISMA-ScR و JBI)",
+    },
+    "usability": {
+        "archetype_label": "ارزیابی کاربردپذیری و سلامت دیجیتال (Nielsen-Landauer & SUS)",
+        "appraisal_framework": "ممیزی اکتشافی کاربردپذیری نیلسن (Nielsen Heuristics) و مقیاس استاندارد SUS",
+    },
+    "health_systems": {
+        "archetype_label": "پژوهش نظام سلامت و اقتصاد سلامت (WHO WHS & NHA)",
+        "appraisal_framework": "گایدلاین مشاهده‌ای STROBE و مقیاس ارزیابی کیفیت نیوکاسل-اتاوا (NOS)",
+    },
+    "epidemiological": {
+        "archetype_label": "مطالعه اپیدمیولوژیک و همه‌گیرشناسی تحلیلی (STROBE Framework)",
+        "appraisal_framework": "گایدلاین بین‌المللی STROBE و مقیاس ریسک سوگیری نیوکاسل-اتاوا (NOS)",
+    },
+    "clinical_rct": {
+        "archetype_label": "کارآزمایی بالینی تصادفی‌سازی‌شده (CONSORT 2010 Clinical Trial)",
+        "appraisal_framework": "ابزار ریسک سوگیری ککرین نسخه ۲ (Cochrane RoB-2) و استاندارد CONSORT 2010",
+    },
+    "diagnostic": {
+        "archetype_label": "مطالعه دقت تشخیصی و نشانگر زیستی (STARD 2015 Diagnostic)",
+        "appraisal_framework": "ابزار ارزیابی ریسک سوگیری مطالعات تشخیصی (QUADAS-2) و گایدلاین STARD 2015",
+    },
+    "in_vivo": {
+        "archetype_label": "مطالعه تجربی درون‌تنی مدل حیوانی (ARRIVE 2.0 In Vivo)",
+        "appraisal_framework": "ابزار ریسک سوگیری مطالعات حیوانی SYRCLE و گایدلاین بین‌المللی ARRIVE 2.0",
+    },
+    "in_vitro": {
+        "archetype_label": "مطالعه تجربی برون‌تن سلولی و مولکولی (OECD GCCP & MIQE)",
+        "appraisal_framework": "ابزار کیفی مطالعات سلولی ToxRTool / NTP OHAT و استاندارد زیست‌فناوری آزمایشگاهی",
+    },
+    "unknown": {
+        "archetype_label": "طرح پژوهشی علوم پزشکی منطبق با چارچوب سامانه پژوهشیار",
+        "appraisal_framework": "چارچوب ممیزی علمی و بیواستاتیک متناسب با طراحی مطالعه",
+    },
+}
+
+
+def extract_proposal_metadata(md_text: str) -> Dict[str, str]:
+    """Extracts cover-page metadata dynamically from proposal Markdown via core_policies."""
+    from core_policies import classify_study_archetype, parse_proposal_sections
+
+    sections = parse_proposal_sections(md_text)
+    sec1 = sections.get(1, "")
+
+    fa_title = ""
+    en_title = ""
+    if sec1:
+        m_fa = re.search(
+            r"(?:عنوان\s*فارسی(?:\s*\([^\)]*\))?\s*:?\s*\**\s*(?:\r?\n)?)\s*([^\n]+)",
+            sec1,
+            re.IGNORECASE,
+        )
+        if m_fa:
+            fa_title = re.sub(r'^[*▪•\-\s]+|\**$', '', m_fa.group(1)).strip()
+
+        m_en = re.search(
+            r"(?:عنوان\s*انگلیسی(?:\s*\([^\)]*\))?\s*:?\s*\**\s*(?:\r?\n)?)\s*([A-Za-z0-9][^\n]+)",
+            sec1,
+            re.IGNORECASE,
+        )
+        if m_en:
+            en_title = re.sub(r'^[*▪•\-\s]+|\**$', '', m_en.group(1)).strip()
+
+        if not fa_title:
+            for sline in sec1.splitlines():
+                clean_l = re.sub(r'^[*▪•\-\s]+', '', sline).strip()
+                if clean_l and "عنوان" not in clean_l and not re.match(r'^[A-Za-z]', clean_l):
+                    fa_title = clean_l
+                    break
+
+    if not fa_title:
+        m_h1 = re.search(r'^#\s+(.+)$', md_text, re.MULTILINE)
+        if m_h1:
+            cand = m_h1.group(1).strip()
+            if not cand.startswith("پروپوزال طرح تحقیقاتی دانشگاهی"):
+                fa_title = cand
+
+    sec_for_type = dict(sections)
+    if len(sections) <= 15 and 14 in sec_for_type and "منابع" in sec_for_type.get(14, ""):
+        sec_for_type.pop(14, None)
+
+    archetype = classify_study_archetype(md_text if not sec_for_type else "", sections=sec_for_type)
+    if archetype == "unknown":
+        archetype = classify_study_archetype(md_text)
+    arch_info = _ARCHETYPE_COVER_MAP.get(archetype, _ARCHETYPE_COVER_MAP["unknown"])
+
+    probe_domain = f"{fa_title} {en_title} {sections.get(2, '')[:500]}".lower()
+    if archetype == "health_systems" or any(k in probe_domain for k in ("هزینه‌های کمرشکن", "اقتصاد سلامت", "نظام سلامت", "سیاست‌گذاری", "kakwani", "catastrophic health")):
+        domain_label = "سیاست‌گذاری سلامت، اپیدمیولوژی و اقتصاد سلامت"
+    elif archetype == "usability" or any(k in probe_domain for k in ("کاربردپذیری", "سلامت دیجیتال", "اپلیکیشن", "رابط کاربری", "usability", "mhealth")):
+        domain_label = "انفورماتیک پزشکی، سلامت دیجیتال و مهندسی فاکتورهای انسانی"
+    elif any(k in probe_domain for k in ("ویروس", "واکسن", "پاتوژن", "عفون", "viral", "vaccine", "infection")):
+        domain_label = "میکروب‌شناسی پزشکی، ایمونولوژی و بیماری‌های عفونی"
+    elif any(k in probe_domain for k in ("سرطان", "تومور", "نئوپلاسم", "کارسینوما", "انکولوژی", "cancer", "neoplasm", "tumor")):
+        domain_label = "انکولوژی، فارماکولوژی و علوم زیست‌پزشکی"
+    elif any(k in probe_domain for k in ("قلب", "عروق", "پرفشاری", "فشار خون", "cardio", "heart", "hypertension")):
+        domain_label = "بیماری‌های قلب و عروق، پزشکی بالینی و فیزیوپاتولوژی"
+    elif any(k in probe_domain for k in ("مغز", "اعصاب", "آلزایمر", "پارکینسون", "neuro", "brain", "cognitive")):
+        domain_label = "علوم اعصاب، نورولوژی بالینی و شناختی"
+    elif any(k in probe_domain for k in ("دیابت", "انسولین", "غدد", "diabetes", "endocrine", "metabolic")):
+        domain_label = "بیماری‌های غدد درون‌ریز، متابولیسم و علوم بالینی"
+    else:
+        domain_label = "علوم پزشکی، بالینی و بهداشت عمومی"
+
+    sec16 = sections.get(16, "")
+    study_location = "مرکز تحقیقات و واحدهای مجری مصوب دانشگاه علوم پزشکی"
+    if sec16:
+        for loc_line in sec16.splitlines():
+            clean_loc = re.sub(r'^[*▪•\-\s]+', '', loc_line).replace("**", "").strip()
+            if clean_loc and len(clean_loc) > 8 and not clean_loc.startswith("<!--"):
+                first_sent = re.split(r'[\.\n]', clean_loc)[0].strip()
+                study_location = first_sent[:107] + "..." if len(first_sent) > 110 else first_sent
+                break
+
+    sec_cnt = len(sections)
+    if sec_cnt >= 20 or sec_cnt == 0:
+        sections_count_label = "دقیقاً ۲۸ بخش کامل منطبق بر آخرین شیوه‌نامه مصوب وزارت بهداشت"
+    else:
+        sections_count_label = f"ساختار {sec_cnt} بخشی پژوهشیار (منطبق بر شیوه‌نامه مصوب)"
+
+    return {
+        "fa_title": fa_title,
+        "english_title": en_title,
+        "project_category": "طرح تحقیقاتی مصوب دانشگاهی",
+        "archetype_key": archetype,
+        "archetype_label": arch_info["archetype_label"],
+        "domain_label": domain_label,
+        "study_location": study_location,
+        "appraisal_framework": arch_info["appraisal_framework"],
+        "sections_count_label": sections_count_label,
+    }
+
+
+def render_official_cover_page(
+    doc,
+    main_title: str,
+    english_title: Optional[str] = None,
+    meta_info: Optional[Dict[str, str]] = None,
+):
+    """Generates the official Pajooheshyar cover page with national medical research header, title card, and dynamic protocol metadata."""
+    meta = dict(meta_info or {})
+    effective_fa_title = main_title
+    if meta.get("fa_title") and (not effective_fa_title or effective_fa_title.startswith("پروپوزال طرح تحقیقاتی دانشگاهی")):
+        effective_fa_title = meta["fa_title"]
+    effective_en_title = english_title or meta.get("english_title") or ""
+
     p_gov = doc.add_paragraph()
     apply_rtl_center(p_gov, space_before=4, space_after=1)
     add_r(p_gov, "جمهوری اسلامی ایران", font_name="Dubai", size_pt=11.0, bold=True, color_rgb=(0x4A, 0x55, 0x68))
@@ -484,14 +662,14 @@ def render_official_cover_page(doc, main_title: str, english_title: Optional[str
 
     pt2 = cell_t.add_paragraph()
     apply_rtl_center(pt2, space_before=2, space_after=4)
-    add_r(pt2, main_title, font_name="Dubai", size_pt=11.5, bold=True, color_rgb=(0x1A, 0x20, 0x2C))
+    add_r(pt2, effective_fa_title, font_name="Dubai", size_pt=11.5, bold=True, color_rgb=(0x1A, 0x20, 0x2C))
 
-    if english_title:
+    if effective_en_title:
         pt3 = cell_t.add_paragraph()
         pt3.alignment = WD_ALIGN_PARAGRAPH.CENTER
         pt3.paragraph_format.space_before = Pt(2)
         pt3.paragraph_format.space_after = Pt(2)
-        add_r(pt3, english_title, font_name="Times New Roman", size_pt=9.5, italic=True, color_rgb=(0x4A, 0x55, 0x68), is_rtl=False)
+        add_r(pt3, effective_en_title, font_name="Times New Roman", size_pt=9.5, italic=True, color_rgb=(0x4A, 0x55, 0x68), is_rtl=False)
 
     p_thdr = doc.add_paragraph()
     apply_rtl_right(p_thdr, space_before=8, space_after=4)
@@ -499,12 +677,12 @@ def render_official_cover_page(doc, main_title: str, english_title: Optional[str
 
     meta_headers = ["شاخص متدولوژیک و اجرایی", "مشخصات و استاندارد مصوب طرح"]
     meta_rows = [
-        ["نوع طرح پژوهشی", "طرح تحقیقاتی مصوب دانشگاهی"],
-        ["کهن‌الگوی متدولوژیک", "مرور دامنه‌ای نقادانه و سنتز شواهد (PRISMA-ScR & JBI Framework)"],
-        ["حوزه تخصصی و گرایش", "بیوتکنولوژی دارویی، ویروس‌شناسی پزشکی و ایمونولوژی"],
-        ["محل اجرای مصوب", "مرکز تحقیقات بیوتکنولوژی دارویی، دانشگاه علوم پزشکی"],
-        ["چارچوب ارزیابی نقادانه", "عدم ارزیابی ریسک سوگیری به دلیل ماهیت نگاشت شواهد (مطابق راهنمای رسمی PRISMA-ScR)"],
-        ["تعداد بخش‌های رسمی", "دقیقاً ۲۸ بخش کامل منطبق بر آخرین شیوه‌نامه مصوب وزارت بهداشت"]
+        ["نوع طرح پژوهشی", meta.get("project_category", "طرح تحقیقاتی مصوب دانشگاهی")],
+        ["کهن‌الگوی متدولوژیک", meta.get("archetype_label", _ARCHETYPE_COVER_MAP["unknown"]["archetype_label"])],
+        ["حوزه تخصصی و گرایش", meta.get("domain_label", "علوم پزشکی، بالینی و بهداشت عمومی")],
+        ["محل اجرای مصوب", meta.get("study_location", "مرکز تحقیقات و واحدهای مجری مصوب دانشگاه علوم پزشکی")],
+        ["چارچوب ارزیابی نقادانه", meta.get("appraisal_framework", _ARCHETYPE_COVER_MAP["unknown"]["appraisal_framework"])],
+        ["تعداد بخش‌های رسمی", meta.get("sections_count_label", "دقیقاً ۲۸ بخش کامل منطبق بر آخرین شیوه‌نامه مصوب وزارت بهداشت")]
     ]
 
     t_meta = doc.add_table(rows=len(meta_rows) + 1, cols=2)
@@ -537,7 +715,7 @@ def render_official_cover_page(doc, main_title: str, english_title: Optional[str
 
     doc.add_page_break()
 
-def build_proposal_docx(md_path: str, output_docx_path: str, font_name: str = "Dubai"):
+def build_proposal_docx(md_path: str, output_docx_path: str, font_name: str = "Dubai", meta_info: Optional[Dict[str, str]] = None):
     doc = Document()
 
     for s in doc.sections:
@@ -552,14 +730,18 @@ def build_proposal_docx(md_path: str, output_docx_path: str, font_name: str = "D
 
         hp = s.header.paragraphs[0]
         apply_rtl_right(hp, space_before=0, space_after=0)
-        add_r(hp, "رویداد ملی ایده‌پردازی جوانی جمعیت | کمیته تحقیقات دانشجویی — سند مصوب پروپوزال", font_name="Dubai", size_pt=8.5, color_rgb=(0x71, 0x80, 0x96))
+        add_r(hp, "پروپوزال طرح پژوهشی مصوب دانشگاهی | شیوه‌نامه رسمی وزارت بهداشت", font_name="Dubai", size_pt=8.5, color_rgb=(0x71, 0x80, 0x96))
 
         fp = s.footer.paragraphs[0]
         apply_rtl_center(fp, space_before=0, space_after=0)
-        add_r(fp, "پروپوزال رسمی مصوب دانشگاه علوم پزشکی بقیه‌الله (عج)", font_name="Dubai", size_pt=8.5, color_rgb=(0xA0, 0xAE, 0xC0))
+        add_r(fp, "سند رسمی پروپوزال پژوهشی — سامانه پژوهشیار", font_name="Dubai", size_pt=8.5, color_rgb=(0xA0, 0xAE, 0xC0))
 
     with open(md_path, 'r', encoding='utf-8') as f:
         md_text = f.read()
+
+    resolved_meta = extract_proposal_metadata(md_text)
+    if meta_info:
+        resolved_meta.update({k: v for k, v in meta_info.items() if v})
 
     lines = md_text.splitlines()
 
@@ -587,18 +769,31 @@ def build_proposal_docx(md_path: str, output_docx_path: str, font_name: str = "D
         if not stripped or stripped == '---':
             continue
 
-        if (('۱۴.' in stripped or '14.' in stripped) or ('۲۸.' in stripped or '28.' in stripped)) and 'منابع' in stripped:
+        if re.match(r'^#{1,2}\s*(?:(?:۱۴|14)|(?:۲۸|28))[\.\:\-\s]+.*منابع', stripped):
             is_refs = True
 
         if stripped.startswith('# '):
             title_text = stripped[2:].strip()
             if is_full_proposal and not cover_rendered:
-                render_official_cover_page(doc, title_text)
+                render_official_cover_page(
+                    doc,
+                    title_text,
+                    english_title=resolved_meta.get("english_title"),
+                    meta_info=resolved_meta,
+                )
                 cover_rendered = True
             else:
                 add_title(doc, title_text)
             continue
         elif stripped.startswith('## '):
+            if is_full_proposal and not cover_rendered:
+                render_official_cover_page(
+                    doc,
+                    resolved_meta.get("fa_title") or "پروپوزال طرح تحقیقاتی دانشگاهی",
+                    english_title=resolved_meta.get("english_title"),
+                    meta_info=resolved_meta,
+                )
+                cover_rendered = True
             h1_text = stripped[3:].strip()
             add_h1(doc, h1_text, with_blue_line=is_full_proposal)
             continue
@@ -661,20 +856,31 @@ def build_proposal_docx(md_path: str, output_docx_path: str, font_name: str = "D
 
 class DocxBuilder:
     @classmethod
-    def build_docx_from_markdown(cls, md_content_or_path: str, output_docx_path: str, font_name: str = "Dubai"):
-        cls.build_docx(md_content_or_path, output_docx_path, font_name=font_name)
+    def build_docx_from_markdown(
+        cls,
+        md_content_or_path: str,
+        output_docx_path: str,
+        font_name: str = "Dubai",
+        meta_info: Optional[Dict[str, str]] = None,
+    ):
+        cls.build_docx(md_content_or_path, output_docx_path, font_name=font_name, meta_info=meta_info)
 
     @classmethod
-    def build_docx(cls, md_content_or_path: str, output_docx_path: str, font_name: str = "Dubai"):
+    def build_docx(
+        cls,
+        md_content_or_path: str,
+        output_docx_path: str,
+        font_name: str = "Dubai",
+        meta_info: Optional[Dict[str, str]] = None,
+    ):
         if os.path.isfile(md_content_or_path):
-            build_proposal_docx(md_content_or_path, output_docx_path, font_name=font_name)
+            build_proposal_docx(md_content_or_path, output_docx_path, font_name=font_name, meta_info=meta_info)
         else:
-            temp_dir = tempfile.gettempdir()
-            temp_md = os.path.join(temp_dir, "temp_proposal_input.md")
-            with open(temp_md, "w", encoding="utf-8") as tf:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as tf:
                 tf.write(md_content_or_path)
+                temp_md = tf.name
             try:
-                build_proposal_docx(temp_md, output_docx_path, font_name=font_name)
+                build_proposal_docx(temp_md, output_docx_path, font_name=font_name, meta_info=meta_info)
             finally:
                 if os.path.exists(temp_md):
                     os.remove(temp_md)

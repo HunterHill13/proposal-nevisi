@@ -122,6 +122,10 @@ class PreEmptiveRiskOfBiasMitigator:
             sf = context.get("study_family") or context.get("framework")
             if sf:
                 sf_lower = str(sf).lower()
+                if any(k in sf_lower for k in ["scoping", "prisma-scr", "prisma_scr", "jbi", "evidence_synthesis"]):
+                    return "scoping_review"
+                if any(k in sf_lower for k in ["usability", "heuristic", "nielsen", "digital_health"]) or re.search(r'\bsus\b', sf_lower):
+                    return "usability"
                 if any(k in sf_lower for k in ["diagnostic", "biomarker", "stard", "quadas"]):
                     return "diagnostic"
                 if any(k in sf_lower for k in ["health_system", "health_policy", "health_econom", "che", "oop"]):
@@ -141,6 +145,10 @@ class PreEmptiveRiskOfBiasMitigator:
         s1 = sections.get(1, "").lower()
         combined = f"{s1} {s14} {s13} {s15}"
 
+        if any(k in combined for k in ["مرور دامنه‌ای", "مرور حیطه‌ای", "مرور نظام‌مند", "scoping review", "prisma-scr", "jbi", "evidence synthesis", "مرور متون"]):
+            return "scoping_review"
+        if any(k in combined for k in ["کاربردپذیری", "ارزیابی اکتشافی", "نیلسن", "تفکر با صدای بلند"]) or re.search(r'\b(?:usability|heuristic|nielsen|sus|ueq|think-aloud)\b', combined):
+            return "usability"
         if any(k in combined for k in ["تشخیصی", "diagnostic", "quadas", "stard", "roc", "حساسیت و ویژگی"]):
             return "diagnostic"
         if any(k in combined for k in ["هزینه", "کمرشکن", "نظام سلامت", "اقتصاد سلامت", "che", "oop", "بیمه"]):
@@ -149,6 +157,8 @@ class PreEmptiveRiskOfBiasMitigator:
             return "epidemiological"
         if any(k in combined for k in ["کارآزمایی بالینی", "clinical trial", "rct", "consort", "بیماران"]):
             return "clinical_rct"
+        if any(k in combined for k in ["کشت سلول", "رده سلولی", "in vitro", "برون‌تن", "cell line", "cell culture"]):
+            return "in_vitro"
         if any(k in combined for k in ["حیوان", "موش", "رت", "in vivo", "animal", "arrive"]):
             return "in_vivo"
         return "in_vitro"
@@ -159,10 +169,53 @@ class PreEmptiveRiskOfBiasMitigator:
         sections: Dict[int, str],
         study_family: str = "in_vitro"
     ) -> BiasDomainEvaluation:
-        """Domain 1: Selection Bias (QUADAS-2 Spectrum Bias / STROBE Sampling / RoB-2 Randomization)."""
+        """Domain 1: Selection Bias (QUADAS-2 / STROBE / RoB-2 / PRISMA-ScR / Usability)."""
         methods_text = f"{sections.get(13, '')} {sections.get(15, '')} {sections.get(17, '')} {sections.get(22, '')} {sections.get(27, '')}".lower()
         strengths = []
         vulnerabilities = []
+
+        # 0. Scoping Review & Evidence Synthesis Archetype (PRISMA-ScR / JBI Eligibility & Coverage)
+        if study_family == "scoping_review":
+            has_multi_db = any(t in methods_text for t in ["pubmed", "scopus", "web of science", "embase", "پابمد", "اسکوپوس", "پایگاه"])
+            has_elig = len(sections.get(17, "")) >= 30 or any(t in methods_text for t in ["pcc", "واجد شرایط", "inclusion", "معیار ورود"])
+            if has_multi_db and has_elig:
+                risk = "LOW_RISK"
+                strengths.append("جستجوی فراگیر چندپایگاهی همراه با معیارهای شفاف ورود/خروج بر پایه PCC جهت مهار سوگیری انتخاب متون (PRISMA-ScR) پیش‌بینی شده است.")
+            elif has_multi_db or has_elig:
+                risk = "SOME_CONCERNS"
+                strengths.append("چارچوب انتخاب منابع تعریف شده است اما تنوع پایگاه‌ها و ادبیات خاکستری نیازمند تصریح بیشتر است.")
+                vulnerabilities.append("احتمال جاافتادن بخشی از شواهد خاکستری در انتخاب متون.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("فهرست دقیق پایگاه‌های اطلاعاتی و معیارهای واجد شرایط بودن متون نیازمند تکمیل است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_1_SELECTION_BIAS",
+                domain_title_fa="سوگیری انتخاب متون و پوشش جستجو (PRISMA-ScR Selection & Coverage Bias)",
+                domain_title_en="Selection Bias: Multi-Database Coverage & Eligibility Criteria (PRISMA-ScR)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="درج فهرست حداقل ۳ پایگاه بین‌المللی به همراه معیارهای دقیق PCC در بخش ۱۷ و ۲۲ توصیه می‌شود."
+            )
+
+        # 0b. Usability & Digital Health Archetype (Nielsen / SUS Sampling)
+        if study_family == "usability":
+            has_target = any(t in methods_text for t in ["کاربر", "پرسونا", "متخصص", "پزشک", "پرستار", "بیمار", "ارزیاب", "nielsen", "نیلسن"])
+            if has_target:
+                risk = "LOW_RISK"
+                strengths.append("جامعه کاربران هدف و معیارهای ورود ارزیابان متناسب با پروتکل نیلسن/SUS برای مهار سوگیری انتخاب تعریف شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("ویژگی‌های کاربران هدف و سطح آشنایی دیجیتال آنان برای جلوگیری از سوگیری انتخاب نیازمند شفاف‌سازی است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_1_SELECTION_BIAS",
+                domain_title_fa="سوگیری انتخاب کاربران و ارزیابان (Usability Sampling Bias)",
+                domain_title_en="Selection Bias: Target User / Evaluator Sampling (Nielsen-Landauer / SUS)",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="مشخص کردن پروفایل کاربران هدف و سواد دیجیتال شرکت‌کنندگان در بخش ۱۵ و ۱۷ توصیه می‌شود."
+            )
 
         # 1. Diagnostic Accuracy Archetype (QUADAS-2 Domain 1: Patient Selection & Spectrum Bias Guard)
         if study_family == "diagnostic":
@@ -246,6 +299,42 @@ class PreEmptiveRiskOfBiasMitigator:
         strengths = []
         vulnerabilities = []
 
+        if study_family == "scoping_review":
+            has_proto = any(t in methods_text for t in ["پروتکل", "jbi", "prisma", "فرم", "چارتینگ", "charting", "جستجو", "کلیدواژه"])
+            if has_proto:
+                risk = "LOW_RISK"
+                strengths.append("پروتکل یکپارچه جستجو و فرم استاندارد استخراج داده‌ها (Data Charting) بر پایه راهنمای JBI/PRISMA-ScR تعریف شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("فرآیند استانداردسازی فرم استخراج داده و کلیدواژه‌های جستجو نیازمند شفاف‌سازی بیشتر است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_2_PERFORMANCE_BIAS",
+                domain_title_fa="سوگیری اجرای جستجو و یکنواختی استخراج (PRISMA-ScR Extraction Bias)",
+                domain_title_en="Performance Bias: Standardized Search & Data Charting Conduct",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="تدوین فرم استاندارد چارتینگ داده‌ها و کلیدواژه‌های همسان در بخش ۱۳ و ۱۹ توصیه می‌شود."
+            )
+
+        if study_family == "usability":
+            has_tasks = any(t in methods_text for t in ["سناریو", "تکلیف", "پروتکل", "think-aloud", "تفکر با صدای بلند", "نیلسن", "nielsen", "یکسان"])
+            if has_tasks:
+                risk = "LOW_RISK"
+                strengths.append("اجرای سناریوهای وظیفه‌محور یکسان و دستورالعمل همسان‌سازی‌شده آزمون کاربردپذیری پیش‌بینی شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("استانداردسازی ترتیب سناریوها و دستورالعمل تسهیل‌گر نیازمند تکمیل است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_2_PERFORMANCE_BIAS",
+                domain_title_fa="سوگیری اجرای سناریوهای کاربردپذیری (Task Protocol Consistency)",
+                domain_title_en="Performance Bias: Standardized Task Scenarios & Facilitator Conduct",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="تشریح سناریوهای وظیفه‌محور یکسان و اجتناب از هدایت کاربر در بخش ۱۳ و ۲۷ توصیه می‌شود."
+            )
+
         if study_family == "diagnostic":
             has_index_proto = any(t in methods_text for t in ["پروتکل استاندارد", "کیت کالیبره", "دستورالعمل سازنده", "نقطه برش", "cut-off"])
             if has_index_proto:
@@ -307,11 +396,87 @@ class PreEmptiveRiskOfBiasMitigator:
         )
 
     @classmethod
-    def evaluate_detection_bias(cls, sections: Dict[int, str]) -> BiasDomainEvaluation:
-        """Domain 3: Detection Bias (Blinded outcome assessment / masked evaluation)."""
+    def evaluate_detection_bias(
+        cls,
+        sections: Dict[int, str],
+        study_family: str = "in_vitro"
+    ) -> BiasDomainEvaluation:
+        """Domain 3: Detection Bias (Blinded outcome assessment / dual screening / objective scoring)."""
         methods_text = f"{sections.get(13, '')} {sections.get(19, '')} {sections.get(20, '')} {sections.get(27, '')}".lower()
         strengths = []
         vulnerabilities = []
+
+        if study_family == "scoping_review":
+            has_dual = any(t in methods_text for t in ["دو داور", "دو پژوهشگر", "مستقل", "داور سوم", "چارتینگ", "charting", "کاپا", "kappa"])
+            if has_dual:
+                risk = "LOW_RISK"
+                strengths.append("غربالگری و استخراج داده‌ها توسط دو داور مستقل با سازوکار حل اختلاف از طریق داور سوم پیش‌بینی شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("تصریح غربالگری مستقل توسط دو داور و داور سوم حل اختلاف توصیه می‌شود.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_3_DETECTION_BIAS",
+                domain_title_fa="سوگیری ارزیابی و غربالگری متون (Detection / Screening Bias)",
+                domain_title_en="Detection Bias: Independent Dual Screening & Data Charting",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="درج غربالگری مستقل دو داور و رفع اختلاف با داور سوم در بخش ۲۷ توصیه می‌شود."
+            )
+
+        if study_family == "usability":
+            has_metric = any(t in methods_text for t in ["sus", "نیلسن", "nielsen", "چک‌لیست", "نمره", "امتیاز", "متریک", "ضبط", "خطا"])
+            if has_metric:
+                risk = "LOW_RISK"
+                strengths.append("ارزیابی پیامدهای کاربردپذیری بر پایه چک‌لیست استاندارد و سنجه کمی انجام می‌شود.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("مشخص کردن شاخص کمی خطا، زمان تکمیل و نمره SUS/نیلسن توصیه می‌شود.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_3_DETECTION_BIAS",
+                domain_title_fa="سوگیری تشخیص خطاهای کاربردپذیری (Detection / Rating Bias)",
+                domain_title_en="Detection Bias: Objective Usability Metrics & Standardized Scoring",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="تعیین شاخص‌های کمی خطا و رتبه‌بندی شدت مشکلات نیلسن در بخش ۱۹ و ۲۰ توصیه می‌شود."
+            )
+
+        if study_family == "diagnostic":
+            has_blinding = any(t in methods_text for t in ["کور", "بدون اطلاع", "مستقل", "blinded", "استاندارد طلایی", "مرجع"])
+            if has_blinding:
+                risk = "LOW_RISK"
+                strengths.append("ارزیابی مستقل و کور آزمون شاخص و استاندارد مرجع پیش‌بینی شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("عدم اطلاع ارزیاب آزمون شاخص از نتیجه استاندارد مرجع نیازمند تصریح است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_3_DETECTION_BIAS",
+                domain_title_fa="سوگیری تشخیص و تفسیر آزمون (QUADAS-2 Reference/Index Blinding)",
+                domain_title_en="Detection Bias: Blinded Reference Standard & Index Test Evaluation",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="قید تفسیر کور بین آزمون شاخص و استاندارد مرجع در بخش ۱۳ و ۲۷ الزامی است."
+            )
+
+        if study_family in ("health_systems", "epidemiological"):
+            has_obj = any(t in methods_text for t in ["پرسشنامه", "his", "پرونده", "ثبت", "استاندارد", "کور", "خودکار", "الکترونیک"])
+            if has_obj:
+                risk = "LOW_RISK"
+                strengths.append("استفاده از ابزار استاندارد و داده‌های ثبت‌شده عینی جهت مهار سوگیری سنجش پیامد پیش‌بینی شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("تصریح اعتبارسنجی ابزار ثبت و کدگذاری مستقل پیامدها توصیه می‌شود.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_3_DETECTION_BIAS",
+                domain_title_fa="سوگیری اندازه‌گیری و تشخیص پیامد (Measurement / Detection Bias)",
+                domain_title_en="Detection Bias: Standardized Registry & Blinded Outcome Ascertainment",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="استفاده از ابزار معتبر و کدگذاری مستقل تحلیل‌گر داده را در بخش ۱۹ و ۲۰ تصریح کنید."
+            )
 
         has_blinding = any(t in methods_text for t in ["کورسازی", "کور", "blinding", "masked", "اپراتور نابینا", "ناظر کور", "عدم اطلاع ارزیاب"])
         has_objective = any(t in methods_text for t in ["اسپکتروفتومتر", "فلوسایتومتری", "الایزا ریدر", "دستگاه خودکار", "سیستم آنالیز دیجیتال", "نانودراپ"])
@@ -338,12 +503,75 @@ class PreEmptiveRiskOfBiasMitigator:
         )
 
     @classmethod
-    def evaluate_attrition_bias(cls, sections: Dict[int, str]) -> BiasDomainEvaluation:
+    def evaluate_attrition_bias(
+        cls,
+        sections: Dict[int, str],
+        study_family: str = "in_vitro"
+    ) -> BiasDomainEvaluation:
         """Domain 4: Attrition Bias (Pre-hoc exclusion criteria & handling missing data)."""
         s18 = sections.get(18, "").lower()
         s23 = sections.get(23, "").lower()
         strengths = []
         vulnerabilities = []
+
+        if study_family == "scoping_review":
+            has_excl = len(s18) >= 40 or any(t in s18 for t in ["خروج", "مقالات", "حذف", "عدم دسترسی", "زبان", "تکراری"])
+            has_flow = any(t in f"{s23} {sections.get(27, '').lower()}" for t in ["prisma", "فلوچارت", "چارتینگ", "مستند", "غربالگری", "سنتز"])
+            if has_excl and has_flow:
+                risk = "LOW_RISK"
+                strengths.append("معیارهای خروج متون و مستندسازی دلایل حذف در نمودار جریان PRISMA-ScR تعریف شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("ثبت دلایل حذف مقالات تمام‌متن در فلوچارت PRISMA-ScR نیازمند تصریح است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_4_ATTRITION_BIAS",
+                domain_title_fa="سوگیری ریزش و ثبت دلایل حذف متون (PRISMA Flow & Exclusion Audit)",
+                domain_title_en="Attrition Bias: Pre-specified Literature Exclusions & PRISMA Flow Documentation",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="قید ثبت دلایل حذف مطالعات در مرحله متن کامل در بخش ۱۸ و ۲۷ توصیه می‌شود."
+            )
+
+        if study_family == "usability":
+            has_excl = len(s18) >= 30 or any(t in s18 for t in ["انصراف", "خروج", "ناتمام", "شرکت‌کننده", "حذف"])
+            if has_excl:
+                risk = "LOW_RISK"
+                strengths.append("ضوابط خروج شرکت‌کنندگان و مدیریت وظایف ناتمام در بخش ۱۸ و ۲۳ مشخص شده است.")
+            else:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("ثبت نرخ تکمیل وظایف و نحوه گزارش موارد انصراف نیازمند توضیح است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_4_ATTRITION_BIAS",
+                domain_title_fa="سوگیری ریزش کاربران و داده‌های ناتمام (Attrition Bias)",
+                domain_title_en="Attrition Bias: Dropout Handling & Incomplete Task Documentation",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="نحوه گزارش‌دهی انصراف شرکت‌کنندگان و نرخ ناکامی سناریوها را در بخش ۱۸ و ۲۳ درج کنید."
+            )
+
+        if study_family in ("clinical_rct", "epidemiological", "health_systems", "diagnostic"):
+            has_excl = len(s18) >= 40 and any(t in s18 for t in ["خروج", "حذف", "افت", "انصراف", "معیار", "نقص"])
+            has_handle = any(t in s23 for t in ["پرت", "گمشده", "ناقص", "missing", "itt", "قصد درمان", "حذف", "حساسیت", "تحلیل"])
+            if has_excl and has_handle:
+                risk = "LOW_RISK"
+                strengths.append("معیارهای خروج پیشینی و نحوه مدیریت آماری داده‌های گمشده یا انصراف نمونه‌ها مشخص شده است.")
+            elif has_excl or has_handle:
+                risk = "SOME_CONCERNS"
+                vulnerabilities.append("تصریح روش برخورد با داده‌های گمشده یا تحلیل قصد درمان (ITT) در بخش ۲۳ توصیه می‌شود.")
+            else:
+                risk = "HIGH_RISK"
+                vulnerabilities.append("معیارهای خروج و مدیریت ریزش نمونه‌ها مشخص نگردیده است.")
+            return BiasDomainEvaluation(
+                domain_id="DOMAIN_4_ATTRITION_BIAS",
+                domain_title_fa="سوگیری ریزش نمونه‌ها و داده‌های گمشده (Attrition Bias)",
+                domain_title_en="Attrition Bias: Pre-specified Exclusions & Incomplete Outcome Data",
+                risk_level=risk,
+                strengths=strengths,
+                vulnerabilities=vulnerabilities,
+                remediation_fa="تعریف دقیق معیارهای خروج در بخش ۱۸ و شیوه مدیریت داده‌های گمشده در بخش ۲۳ الزامی است."
+            )
 
         has_exclusion = (len(s18) >= 100 and any(t in s18 for t in ["آلودگی", "خروج", "حذف", "پرت", "افت", "معیار"]))
         has_data_handling = any(t in s23 for t in ["پرت", "داده‌های گمشده", "outlier", "missing", "حذف", "نرمال", "itt", "تحلیل"])
@@ -370,15 +598,20 @@ class PreEmptiveRiskOfBiasMitigator:
         )
 
     @classmethod
-    def evaluate_reporting_bias(cls, sections: Dict[int, str]) -> BiasDomainEvaluation:
+    def evaluate_reporting_bias(
+        cls,
+        sections: Dict[int, str],
+        study_family: str = "in_vitro"
+    ) -> BiasDomainEvaluation:
         """Domain 5: Reporting Bias (Pre-registration on OSF/IRCT & selective reporting guard)."""
         full_text = " ".join(sections.values()).lower()
         strengths = []
         vulnerabilities = []
 
-        has_prereg = any(t in full_text for t in ["ثبت", "پیش‌ثبت", "osf", "irct", "کد اخلاق", "پژوهشیار", "سامانه", "ثبت پروتکل"])
+        has_prereg = any(t in full_text for t in ["ثبت", "پیش‌ثبت", "osf", "irct", "کد اخلاق", "پژوهشیار", "سامانه", "ثبت پروتکل", "prospero"])
         s6 = sections.get(6, "")
-        has_predefined_aims = len(s6) >= 40 or any(t in s6 for t in ["هدف", "تعیین", "سنجش", "بررسی", "۱"])
+        s9 = sections.get(9, "")
+        has_predefined_aims = len(s6) >= 40 or len(s9) >= 40 or any(t in s6 for t in ["هدف", "تعیین", "سنجش", "بررسی", "۱"])
 
         if has_prereg and has_predefined_aims:
             risk = "LOW_RISK"
@@ -391,6 +624,11 @@ class PreEmptiveRiskOfBiasMitigator:
             risk = "HIGH_RISK"
             vulnerabilities.append("اهداف مطالعه مبهم است و خطر گزارش‌دهی انتخابی نتایج مثبت (HARKing) وجود دارد.")
 
+        remediation_msg = (
+            "ثبت پیشینی پروتکل مرور دامنه‌ای در OSF یا JBI و سامانه پژوهشیار جهت جلوگیری از گزارش انتخابی توصیه می‌شود."
+            if study_family == "scoping_review"
+            else "درج تعهد پیش‌ثبت متدولوژی در سامانه مصوب پژوهشیار / OSF جهت ممانعت از سوگیری گزارش انتخابی در بخش ۲۴ الزامی است."
+        )
         return BiasDomainEvaluation(
             domain_id="DOMAIN_5_REPORTING_BIAS",
             domain_title_fa="سوگیری گزارش‌دهی انتخابی نتایج (Reporting Bias)",
@@ -398,7 +636,7 @@ class PreEmptiveRiskOfBiasMitigator:
             risk_level=risk,
             strengths=strengths,
             vulnerabilities=vulnerabilities,
-            remediation_fa="درج تعهد پیش‌ثبت متدولوژی در سامانه مصوب پژوهشیار / OSF جهت ممانعت از سوگیری گزارش انتخابی در بخش ۲۴ الزامی است."
+            remediation_fa=remediation_msg
         )
 
     # =========================================================================
@@ -411,15 +649,15 @@ class PreEmptiveRiskOfBiasMitigator:
         proposal_input: Any,
         context: Optional[Dict[str, Any]] = None
     ) -> RiskOfBiasAuditResult:
-        """Conducts full 5-domain Cochrane/SYRCLE Pre-emptive Risk of Bias audit."""
+        """Conducts adaptive 5-domain Pre-emptive Risk of Bias audit across study archetypes."""
         sections = cls.parse_sections(proposal_input)
         sf = cls.detect_study_family(sections, context=context)
 
         d1 = cls.evaluate_selection_bias(sections, study_family=sf)
         d2 = cls.evaluate_performance_bias(sections, study_family=sf)
-        d3 = cls.evaluate_detection_bias(sections)
-        d4 = cls.evaluate_attrition_bias(sections)
-        d5 = cls.evaluate_reporting_bias(sections)
+        d3 = cls.evaluate_detection_bias(sections, study_family=sf)
+        d4 = cls.evaluate_attrition_bias(sections, study_family=sf)
+        d5 = cls.evaluate_reporting_bias(sections, study_family=sf)
 
         domains = {
             "SELECTION_BIAS": d1,
@@ -433,35 +671,45 @@ class PreEmptiveRiskOfBiasMitigator:
         some_concerns = [d.domain_title_fa for d in domains.values() if d.risk_level == "SOME_CONCERNS"]
 
         # In Vitro Specific Quality Check (ToxRTool / NTP OHAT / GIVIMP Standards)
-        s14 = sections.get(14, "")
-        is_in_vitro = any(k in s14.lower() for k in ["in vitro", "برون‌تن", "سلولی", "کشت سلول"]) or (context and "in_vitro" in str(context.get("framework", "")).lower())
         full_text_lower = " ".join(sections.values()).lower()
-        if is_in_vitro:
+        if sf == "in_vitro":
             # Detect Cochrane RoB-2 misapplication on cell culture studies
             has_rob2_misapplied = any(k in full_text_lower for k in ["cochrane rob-2", "rob-2", "rob 2"]) and not any(k in full_text_lower for k in ["toxrtool", "ntp ohat", "givimp", "ecvam"])
             if has_rob2_misapplied:
                 high_risk.append("ROB2_IN_VITRO_MISAPPLICATION: ابزار RoB-2 ککرین مخصوص کارآزمایی‌های بالینی انسانی است و کاربرد آن در مطالعه سلولی برون‌تن غیرمجاز است. چارچوب استاندارد ToxRTool یا NTP OHAT جایگزین گردید.")
 
+        framework_labels = {
+            "in_vitro": "ToxRTool / NTP OHAT / GIVIMP",
+            "in_vivo": "SYRCLE / ARRIVE 2.0",
+            "clinical_rct": "Cochrane RoB-2 / CONSORT",
+            "diagnostic": "QUADAS-2 / STARD",
+            "epidemiological": "STROBE / Newcastle-Ottawa",
+            "health_systems": "STROBE / CHEERS-WHO",
+            "scoping_review": "PRISMA-ScR / JBI Evidence Synthesis",
+            "usability": "Nielsen-Landauer / SUS Quality Framework",
+        }
+        fw_label = framework_labels.get(sf, "Adapted Risk of Bias Standard")
+
         if len(high_risk) == 0 and len(some_concerns) <= 1:
             overall_risk = "LOW_RISK"
             is_acceptable = True
             exec_summary = (
-                "پروپوزال از حیث مهار سیستماتیک سوگیری‌های آزمایشگاهی (استاندارد ترکیبی ToxRTool / SYRCLE / Cochrane) در رتبه ممتاز (Low Risk of Bias) "
-                "قرار دارد. تدابیر تصادفی‌سازی، کورسازی، پنهان‌سازی تخصیص و شفافیت خروج نمونه‌ها به صورت استاندارد لحاظ گردیده است."
+                f"پروپوزال از حیث مهار سیستماتیک سوگیری‌های پژوهشی (چارچوب {fw_label}) در رتبه ممتاز (Low Risk of Bias) "
+                "قرار دارد و تمهیدات شفافیت و کنترل سوگیری متناسب با کهن‌الگوی مطالعه پیش‌بینی گردیده است."
             )
         elif len(high_risk) == 0:
             overall_risk = "MODERATE_RISK"
             is_acceptable = True
             exec_summary = (
-                f"پروپوزال دارای ریسک سوگیری متوسط (Some Concerns) است. در حوزه‌های ({', '.join(some_concerns)}) "
-                "تدابیر کلی پیش‌بینی شده اما برای نیل به استانداردهای تراز اول گرنت‌ها، شفاف‌سازی کورسازی و تخصیص تصادفی توصیه می‌گردد."
+                f"پروپوزال در چارچوب ({fw_label}) دارای ریسک سوگیری متوسط (Some Concerns) است. در حوزه‌های ({', '.join(some_concerns)}) "
+                "تدابیر کلی پیش‌بینی شده اما تکمیل جزئیات استانداردسازی توصیه می‌گردد."
             )
         else:
             overall_risk = "HIGH_RISK"
             is_acceptable = False
             exec_summary = (
-                f"پروپوزال در حوزه‌های ({', '.join(high_risk)}) دارای ریسک بالای سوگیری (High Risk of Bias) تشخیص داده شد. "
-                "تعبیه صریح استانداردهای کورسازی و تصادفی‌سازی پیش از ارسال نهایی طرح الزامی است."
+                f"پروپوزال در چارچوب ({fw_label}) و حوزه‌های ({', '.join(high_risk)}) دارای ریسک بالای سوگیری تشخیص داده شد. "
+                "تعبیه صریح استانداردهای کنترلی متناسب پیش از ارسال نهایی طرح الزامی است."
             )
 
         return RiskOfBiasAuditResult(
@@ -727,11 +975,17 @@ class BaselinePaperQualityAuditor:
 
     @classmethod
     def render_markdown_table(cls, evaluations: List[Dict[str, Any]], framework: Optional[str] = None) -> str:
-        """Renders an academic Risk of Bias summary table for Dossier or Section 3, supporting ToxRTool for in vitro."""
+        """Renders an adaptive academic Risk of Bias summary table across study archetypes."""
         if not evaluations:
             return "_هیچ مقاله‌ای برای ارزیابی ریسک سوگیری ثبت نشده است._"
 
-        is_in_vitro = bool(framework and any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell"]))
+        fw_lower = str(framework or "").lower()
+        is_in_vitro = any(k in fw_lower for k in ["in_vitro", "in vitro", "cell"])
+        is_scoping = any(k in fw_lower for k in ["scoping", "prisma", "jbi"])
+        is_diagnostic = any(k in fw_lower for k in ["diagnostic", "quadas", "stard"])
+        is_observational_or_usability = any(
+            k in fw_lower for k in ["health_system", "epidemiol", "strobe", "usability", "nielsen", "sus"]
+        )
 
         if is_in_vitro:
             badge_map = {
@@ -742,6 +996,39 @@ class BaselinePaperQualityAuditor:
             }
             header = (
                 "| ردیف | مرجع و شناسه استناد | خلوص و شناسنامه مداخله (D1) | اصالت و سلامت مدل (D2) | کنترل‌ها و دقت کمی (D3) | تکرارپذیری و جامعیت (D4) | سطح اعتبار کیفی ToxRTool |\n"
+                "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            )
+        elif is_scoping:
+            badge_map = {
+                "LOW_RISK": "🟢 منطبق با PCC",
+                "SOME_CONCERNS": "🟡 نیازمند تدقیق",
+                "UNCLEAR_RISK": "⚪ گزارش‌نشده در چکیده",
+                "HIGH_RISK": "🔴 محدودیت روش‌شناختی"
+            }
+            header = (
+                "| ردیف | مرجع و شناسه استناد | مطابقت با هدف/PCC (D1) | شفافیت جستجو/نمونه (D2) | کنترل خطا/استخراج (D3) | تکرارپذیری/محدودیت (D4) | ارزیابی کیفیت JBI |\n"
+                "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            )
+        elif is_diagnostic:
+            badge_map = {
+                "LOW_RISK": "🟢 کم‌ریسک",
+                "SOME_CONCERNS": "🟡 مبهم/متوسط",
+                "UNCLEAR_RISK": "⚪ گزارش‌نشده در چکیده",
+                "HIGH_RISK": "🔴 پرریسک"
+            }
+            header = (
+                "| ردیف | مرجع و شناسه استناد | انتخاب بیمار/طیف (D1) | اجرای آزمون شاخص (D2) | استاندارد مرجع و کورسازی (D3) | جریان و زمان‌بندی (D4) | ریسک کلی QUADAS-2 |\n"
+                "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
+            )
+        elif is_observational_or_usability:
+            badge_map = {
+                "LOW_RISK": "🟢 کم‌ریسک",
+                "SOME_CONCERNS": "🟡 مبهم/متوسط",
+                "UNCLEAR_RISK": "⚪ گزارش‌نشده در چکیده",
+                "HIGH_RISK": "🔴 پرریسک"
+            }
+            header = (
+                "| ردیف | مرجع و شناسه استناد | چارچوب نمونه‌گیری (D1) | دقت ابزار/سناریو (D2) | کنترل مخدوش‌گر/خطا (D3) | گزارش‌دهی و تکرارپذیری (D4) | سطح کیفیت STROBE/JBI |\n"
                 "| :---: | :--- | :---: | :---: | :---: | :---: | :---: |\n"
             )
         else:

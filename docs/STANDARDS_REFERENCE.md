@@ -1,6 +1,6 @@
 # Proposal-Nevisi Standards & Specifications Reference Manual
-**Version:** 14.1.0  
-**Scope:** Iranian Ministry of Health (Pajooheshyar) Proposal Architecture, 6-Archetype Study Polymorphism, Typography & OMML Specifications.
+**Version:** 14.2.0  
+**Scope:** Iranian Ministry of Health (Pajooheshyar) Proposal Architecture, 7-Archetype Study Polymorphism (+ Usability), Typography & OMML Specifications.
 
 ---
 
@@ -41,21 +41,21 @@ Every academic medical research proposal must strictly contain exactly 28 canoni
 
 ---
 
-## 2. Six-Archetype Study Polymorphism Matrix
+## 2. Seven-Archetype (+ Usability) Study Polymorphism Matrix
 
-The proposal generation engine dynamically adapts all 28 sections based on the study archetype:
+The proposal generation engine dynamically adapts all 28 sections based on the resolved canonical study archetype:
 
 ```
                             ┌────────────────────────────────────────┐
                             │    Study Archetype Classifier          │
                             └───────────────────┬────────────────────┘
                                                 │
-         ┌───────────────┬──────────────────────┼──────────────────────┬────────────────┐
-         ▼               ▼                      ▼                      ▼                ▼
-   clinical_rct       in_vivo                in_vitro            health_systems  epidemiological
-   - CONSORT 2010     - ARRIVE 2.0           - MIQE / ATCC       - WHO WHS/NHA   - STROBE
-   - Chow & Wang      - Mead Resource Eq.    - CompuSyn CI       - Cochran+DEFF  - Prevalence
-   - ANCOVA / ITT     - Repeated ANOVA       - 2-Way ANOVA       - AOR / Kakwani - Multivariable
+    ┌────────────┬────────────┬────────────┬────┴───────┬──────────────┬───────────────┬────────────┐
+    ▼            ▼            ▼            ▼            ▼              ▼               ▼            ▼
+clinical_rct  in_vivo     in_vitro   health_systems epidemiological diagnostic   scoping_review  usability
+- CONSORT     - ARRIVE 2  - MIQE/GCCP - WHO WHS/NHA - STROBE      - STARD 2015 - PRISMA-ScR/JBI - Nielsen-SUS
+- N=128 (64)  - Mead Eq.  - ToxRTool  - Cochran+DEFF - Prevalence - Buderer    - Search Satur.  - 1-(1-L)^n
+- ANCOVA/ITT  - Rep.ANOVA - 2W-ANOVA  - AOR/Kakwani  - Regression - ROC / AUC  - Kappa/ICC/RD   - SUS Score
 ```
 
 ### Archetype Invariants:
@@ -96,11 +96,23 @@ The proposal generation engine dynamically adapts all 28 sections based on the s
    - **Analysis:** Receiver Operating Characteristic (ROC) curve analysis, Area Under the Curve (AUC), positive/negative predictive values (PPV/NPV), Youden Index cutoff determination.
    - **Ethics:** Blinded evaluation of index test and gold standard reference; human tissue biorepository consent.
 
+7. **`scoping_review` (Scoping Review & Evidence Synthesis — PRISMA-ScR & JBI):**
+   - **Framework:** PRISMA-ScR (Tricco 2018) and Joanna Briggs Institute (JBI, Peters 2020) Population–Concept–Context (PCC) methodology; explicit formal Risk-of-Bias (RoB-2) omission statement per PRISMA-ScR Item 12 unless critical appraisal is explicitly justified.
+   - **Sample Size:** Multi-database search comprehensiveness (`>= 3` international databases) and evidence saturation tracking; omits inferential alpha, statistical power ($1-\beta$), and Cochran formulas.
+   - **Analysis:** PRISMA-ScR flow charting, dual-reviewer inter-rater agreement (Cohen's $\kappa$ / ICC), thematic/quantitative charting, and pooled descriptive risk difference (RD) summaries where appropriate.
+   - **Ethics:** Exempt secondary synthesis registration (OSF/PROSPERO protocol transparency) and unbiased conflict-of-interest reporting.
+
+8. **`usability` (Usability & Digital Health Evaluation — Nielsen-Landauer & SUS):**
+   - **Framework:** Nielsen-Landauer heuristic problem discovery model and System Usability Scale (SUS) validation for clinical software, mHealth, and digital workflows.
+   - **Sample Size:** Nielsen-Landauer discovery curve $P(n) = 1 - (1 - L)^n$ ($L \approx 0.31$ per evaluator -> $n \ge 5\text{--}15$ usability testers; comparative SUS arms sized via Cohen's $d$ when inferential).
+   - **Analysis:** Task completion rate, time-on-task, heuristic severity ratings, and aggregate SUS score ($0\text{--}100$).
+   - **Ethics:** IRB exempt/minimal-risk consent, screen/telemetry anonymization, and PDPA/data privacy protection.
+
 ---
 
 ## 3. MeSH Query Expansion & Dual-Path Balanced Search
 
-The search engine (`scripts/mesh_query_expander.py` and `scripts/generic_search_planner.py`) incorporates 130+ standardized MeSH descriptors across 11 clinical fields:
+The search engine (`scripts/mesh_query_expander.py` and `scripts/generic_search_planner.py`) incorporates **119 standardized MeSH descriptors across 19 specialized branches**:
 1. **Oncology & Hematology:** Neoplasms, Carcinoma, Leukemia, Apoptosis, Antineoplastic Agents.
 2. **Cardiovascular Medicine:** Myocardial Infarction, Heart Failure, Hypertension, Atherosclerosis.
 3. **Nephrology & Urology:** Acute Kidney Injury, Renal Insufficiency Chronic, Glomerulonephritis.
@@ -122,7 +134,7 @@ For any interventional or therapeutic topic, the engine queries both positive ef
 
 ## 4. Microsoft Word (.docx) Typesetting & Visual Standards
 
-Documents compiled by `build_canonical_proposal_docx.py` conform to the official Pajooheshyar visual stylesheet:
+Documents compiled by `scripts/docx_builder.py` conform to the official Pajooheshyar visual stylesheet:
 
 ### Typography & Palette:
 - **Primary Corporate Font:** Dubai (دبی) with 10.5pt regular body text, color Charcoal (`#2D3748`), line spacing 1.15.
@@ -142,13 +154,14 @@ Documents compiled by `build_canonical_proposal_docx.py` conform to the official
 
 ---
 
-## 5. Quality Rubric & Hard Gates (HARD-01 to HARD-06)
+## 5. Quality Rubric & Hard Gates (HARD-01 to HARD-07)
 
-Evaluations performed by `resources/rubrics/professor-namoosi-rubric.md` and the 7-subagent study section enforce the following red lines:
+Evaluations performed by `resources/rubrics/professor-namoosi-rubric.md` and the 7-subagent study section enforce the following binary rejection red lines:
 
-- **`HARD-01: UNGROUNDED_PARAMETRIC_EXTRAPOLATION`**: Injecting diseases, cell lines, drugs, or numerical values completely unsupported by the cited literature.
-- **`HARD-02: PHANTOM_REFERENCE_EXTERNAL_DRIFT`**: Fabricating PMIDs, DOIs, or referencing phantom textbooks (e.g., Harrison's) not indexed in verified databases.
-- **`HARD-03: CRITICAL_CUTOFF_OMISSION`**: Omitting required clinical laboratory cutoffs, effect size parameters, $\alpha$ levels, or power thresholds.
-- **`HARD-04: INSTRUCTOR_EXAM_ALERT_OMISSION`**: Omitting direct university guidelines, required Pajooheshyar section numbers, or mandatory methodological constraints.
-- **`HARD-05: LATEX_MATH_SYNTAX_LEAKAGE`**: Allowing raw LaTeX tokens (`\frac`, `\sqrt`, `$$`) to leak into the Word document instead of native OMML formulas.
-- **`HARD-06: BANNED_CLICHE_AND_META_LEAKAGE`**: Including colloquial AI conversational disclaimers ("As an AI assistant...", "In this proposal I have generated...") or shallow boilerplate cliches.
+- **`HARD-01: DATA_INVARIANT_VIOLATION`**: Modifying, rounding, hallucinating, or introducing ungrounded numbers (doses, $IC_{50}$ concentrations, test statistics, $p$-values, adjusted odds ratios, epidemiological statistics, or reference IDs).
+- **`HARD-02: PHANTOM_CITATION_VIOLATION`**: Any synthetic reference, citation lacking a verifiable PMID or DOI, or paper nonexistent in PubMed/Europe PMC.
+- **`HARD-03: PIPELINE_BYPASS_VIOLATION`**: Bypassing the official pipeline (`run_research_pipeline.py`) or failing to produce all 28 canonical Pajooheshyar section headings.
+- **`HARD-04: CROSS_DOMAIN_ENTITY_LEAKAGE`**: Leakage of cell-culture/oncology entities (`cell seeding`, `MTT`, `apoptosis`, `IC50`, `cell-free blank`, `Chou-Talalay`) into non-laboratory archetypes (health systems, epidemiology, clinical trials, diagnostic, scoping review, usability).
+- **`HARD-05: LATEX_LEAKAGE_IN_WORD`**: Allowing raw LaTeX tokens (`\frac`, `\sqrt`, `$$`) to leak into rendered Word body text instead of native OMML formulas (`<m:oMath>`).
+- **`HARD-06: BANNED_CLICHE_AND_META_LEAKAGE`**: Formulaic machine transition cliches or extraneous conversational AI self-disclosures leaking into proposal manuscripts.
+- **`HARD-07: WORD_VISUAL_STANDARD_VIOLATION`**: Deviation from approved Word typography standards: missing dynamic cover header, unstyled raw Markdown tokens (`**`), or soft line breaks (`<w:br/>`) inside justified prose.

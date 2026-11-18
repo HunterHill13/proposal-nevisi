@@ -504,14 +504,36 @@ class ProposalGenerator:
         model_dict = data.get("research_problem_model", data)
         fa_title = data.get("research_title_fa") or data.get("title_fa") or rpm_obj.get("research_title_fa") or "طرح تحقیقاتی علوم پزشکی"
         en_title = data.get("research_title_en") or data.get("title_en") or rpm_obj.get("research_title_en") or "Medical Research Proposal"
-        framework = data.get("framework") or model_dict.get("framework", "EXPERIMENTAL_IN_VITRO")
+        raw_fw = data.get("framework") or model_dict.get("framework") or ""
+        framework = raw_fw or "EXPERIMENTAL_IN_VITRO"
         studies = data.get("studies", [])
 
         cond = model_dict.get("target_condition", {})
         cond_name = cond.get("name_fa", cond.get("name_en", "بیماری یا وضعیت هدف"))
         cond_en = cond.get("name_en", "Target Condition")
-        sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم بیولوژیک هدف")
+        sys_name = model_dict.get("population_or_model", {}).get("primary_system", "سیستم یا جامعه هدف")
         interventions = model_dict.get("interventions_or_exposures") or model_dict.get("interventions") or data.get("interventions_or_exposures") or data.get("interventions") or []
+
+        from core_policies import classify_study_archetype
+        _cls_ctx = {
+            "study_family": data.get("study_family") or "",
+            "framework": raw_fw if (raw_fw and raw_fw not in ("EXPERIMENTAL_IN_VITRO", "MECHANISTIC")) or classify_study_archetype(f"{fa_title} {en_title} {cond_en}") == "unknown" else "",
+            "topic": f"{fa_title} {en_title} {cond_en}",
+            "population_or_model": model_dict.get("population_or_model"),
+        }
+        archetype = classify_study_archetype(_cls_ctx)
+        if archetype == "unknown" and raw_fw in ("EXPERIMENTAL_IN_VITRO", "MECHANISTIC"):
+            archetype = "in_vitro"
+
+        is_review = (archetype == "scoping_review")
+        is_usability = (archetype == "usability")
+        is_health_sys = (archetype == "health_systems")
+        is_epidemiol = (archetype == "epidemiological")
+        is_clinical = (archetype == "clinical_rct")
+        is_diagnostic = (archetype == "diagnostic")
+        is_in_vivo = (archetype == "in_vivo")
+        is_in_vitro = (archetype == "in_vitro")
+        is_unknown = (archetype == "unknown")
 
         # Parse potential subsections from methodology_text
         meth_combined = data.get("methodology_text", "")
@@ -603,13 +625,54 @@ class ProposalGenerator:
                         f"با استفاده از توصیف‌گرهای موضوعی استاندارد (MeSH) تا تاریخ جاری، صفر یافته (0 hits) برای این مداخله به ثبت رسیده است."
                     )
 
-            layered_problem = [
-                f"### ۱. بار بیماری و اهمیت اپیدمیولوژیک\n{epi_text} علی‌رغم پیشرفت‌های تشخیصی و راهبردهای موجود، کنترل موثر و کاهش پیامدهای سیستمیک بیماری همچنان نیازمند رویکردهای درمانی نوین و هدفمند می‌باشد{cite_burden}.",
-                f"### ۲. وضعیت فعلی دانش و درمان‌های استاندارد موجود\nدر حال حاضر، گزینه‌های متداول بر پایه مداخلات استاندارد شیمی‌درمانی یا دارویی استوارند. با وجود اثربخشی اولیه، چالش‌های عمده‌ای نظیر مقاومت دارویی، پاسخ ناکافی در بلندمدت و عوارض جانبی سیستمیک مانع از دستیابی به پاسخ درمانی مطلوب و پایدار می‌گردند{cite_direct}.",
-                f"### ۳. مبانی بیولوژیک و شواهد تجربی مداخله پژوهش\nشواهد تجربی و پژوهش‌های سلولی-مولکولی حاکی از پتانسیل فارماکولوژیک قابل توجه مداخله {agt1} در تعدیل مسیرهای تنظیمی، القای آپوپتوز و مهار تکثیر سلول‌های پاتولوژیک در سیستم مدل {sys_name} است{cite_mech}." + (f" افزون بر این، فرضیه تلفیق درمانی همزمان با {agt2} با هدف ایجاد هم‌افزایی فارماکولوژیک و کاهش سمیت دوزهای منفرد توسعه یافته است." if agt2 else ""),
-                f"### ۴. چالش‌ها، سمیت و محدودیت‌های ایمنی زیستی\nتعیین دقیق پنجره درمانی، آستانه دوز ایمن و بررسی احتمال عوارض سیتوتوکسیک در بافت‌های نرمال از الزامات کلیدی پیش‌بالینی است{cite_safety}. بررسی دقیق مرزهای ایمنی زیستی و کنترل تداخلات سنجش‌های آزمایشگاهی جهت تفکیک مرگ برنامه‌ریزی‌شده از نکروز غیراختصاصی ضرورت دارد.",
-                f"### ۵. ضرورت انجام پژوهش، شکاف شواهد و اصالت طرح (Novelty & Research Gap)\nعلیرغم یافته‌های اولیه پراکنده، خلأهای جدی در زمینه کمی‌سازی دقیق برهم‌کنش غلظت-پاسخ، تایید ارتوگونال آپوپتوز و اعتبارسنجی مکانیسمی در سیستم {sys_name} وجود دارد. {neg_search_log} از این رو، پژوهش حاضر به عنوان یک مطالعه پیشگام (First-in-Class Study) جهت پاسخ به این شکاف تجربی تدوین شده است."
-            ]
+            if is_in_vitro:
+                layered_problem = [
+                    f"### ۱. بار بیماری و اهمیت اپیدمیولوژیک\n{epi_text} علی‌رغم پیشرفت‌های تشخیصی و راهبردهای موجود، کنترل موثر و کاهش پیامدهای سیستمیک بیماری همچنان نیازمند رویکردهای درمانی نوین و هدفمند می‌باشد{cite_burden}.",
+                    f"### ۲. وضعیت فعلی دانش و درمان‌های استاندارد موجود\nدر حال حاضر، گزینه‌های متداول بر پایه مداخلات دارویی استاندارد استوارند. با وجود اثربخشی اولیه، چالش‌های عمده‌ای نظیر مقاومت دارویی، پاسخ ناکافی در بلندمدت و عوارض جانبی سیستمیک مانع از دستیابی به پاسخ درمانی مطلوب و پایدار می‌گردند{cite_direct}.",
+                    f"### ۳. مبانی بیولوژیک و شواهد تجربی مداخله پژوهش\nشواهد تجربی و پژوهش‌های سلولی-مولکولی حاکی از پتانسیل فارماکولوژیک قابل توجه مداخله {agt1} در تعدیل مسیرهای تنظیمی، القای آپوپتوز و مهار تکثیر سلول‌های پاتولوژیک در سیستم مدل {sys_name} است{cite_mech}." + (f" افزون بر این، فرضیه تلفیق درمانی همزمان با {agt2} با هدف ایجاد هم‌افزایی فارماکولوژیک و کاهش سمیت دوزهای منفرد توسعه یافته است." if agt2 else ""),
+                    f"### ۴. چالش‌ها، سمیت و محدودیت‌های ایمنی زیستی\nتعیین دقیق پنجره درمانی، آستانه دوز ایمن و بررسی احتمال عوارض سیتوتوکسیک در بافت‌های نرمال از الزامات کلیدی پیش‌بالینی است{cite_safety}. بررسی دقیق مرزهای ایمنی زیستی و کنترل تداخلات سنجش‌های آزمایشگاهی جهت تفکیک مرگ برنامه‌ریزی‌شده از نکروز غیراختصاصی ضرورت دارد.",
+                    f"### ۵. ضرورت انجام پژوهش، شکاف شواهد و اصالت طرح (Novelty & Research Gap)\nعلیرغم یافته‌های اولیه پراکنده، خلأهای جدی در زمینه کمی‌سازی دقیق برهم‌کنش غلظت-پاسخ، تایید ارتوگونال آپوپتوز و اعتبارسنجی مکانیسمی در سیستم {sys_name} وجود دارد. {neg_search_log} از این رو، پژوهش حاضر به عنوان یک مطالعه پیشگام جهت پاسخ به این شکاف تجربی تدوین شده است."
+                ]
+            elif is_review:
+                layered_problem = [
+                    f"### ۱. بار علمی و سلامت جامعه در زمینه {cond_name}\n{epi_text} پراکندگی شواهد منتشرشده در خصوص {agt1}" + (f" و {agt2}" if agt2 else "") + f" در حوزه {cond_name} نیازمند نگاشت جامع و ساختاریافته دانش موجود است{cite_burden}.",
+                    f"### ۲. وضعیت فعلی شواهد و ناهمگونی مطالعات پیشین\nمطالعات اولیه موجود در طراحی روش‌شناختی، تعاریف پیامد و شاخص‌های گزارش‌دهی ناهمگونی قابل توجهی دارند و مرور دامنه‌ای یکپارچه جهت ترسیم نقشه شواهد فراهم نشده است{cite_direct}.",
+                    f"### ۳. منطق چارچوب PCC و نگاشت شواهد\nمرور دامنه‌ای حاضر بر مبنای استاندارد PRISMA-ScR و چارچوب PCC موسسه JBI به دسته‌بندی شواهد اثربخشی و ایمنی {agt1} می‌پردازد{cite_mech}.",
+                    f"### ۴. محدودیت‌های سنتز پیشین و سوگیری انتشار\nتجمیع روایی بدون راهبرد جستجوی چندپایگاهی می‌تواند به غفلت از گزارش‌های منفی یا خاکستری بینجامد{cite_safety}.",
+                    f"### ۵. ضرورت پژوهش، شکاف دانشی و گزارش جستجوی منفی\n{neg_search_log} بنابراین اجرای یک مرور دامنه‌ای نظام‌مند جهت شفاف‌سازی نقشه شواهد و راهنمایی پژوهش‌های آتی ضروری است."
+                ]
+            elif is_usability:
+                layered_problem = [
+                    f"### ۱. اهمیت مهندسی فاکتورهای انسانی و سلامت دیجیتال\n{epi_text} موفقیت پذیرش سامانه‌های سلامت دیجیتال مرتبط با {cond_name} به طور مستقیم به کاربردپذیری و سهولت کاربری وابسته است{cite_burden}.",
+                    f"### ۲. چالش‌های تعاملی سامانه‌های موجود\nبسیاری از ابزارهای نرم‌افزاری سلامت با بار شناختی بالا، خطاهای جریان کاری و نرخ ترک بالا در کاربران بالینی روبرو هستند{cite_direct}.",
+                    f"### ۳. رویکرد ارزیابی اکتشافی نیلسن و مقیاس SUS\nتلفیق آزمون تکلیف‌محور و ارزیابی اکتشافی با {agt1} امکان شناسایی ساختاریافته گلوگاه‌های طراحی را فراهم می‌آورد{cite_mech}.",
+                    f"### ۴. پیامدهای خطای رابط کاربری بر ایمنی بیمار\nنقص‌های کاربردپذیری در محیط‌های مراقبتی می‌تواند منجر به خطاهای ثبت اطلاعات و تاخیر در تصمیم‌گیری شود{cite_safety}.",
+                    f"### ۵. ضرورت و نوآوری پژوهش\n{neg_search_log} ارزیابی جامع کاربردپذیری بر پایه مدل نیلسن-لاندائر و مقیاس SUS مبنای علمی برای بهینه‌سازی ابزار فراهم می‌آورد."
+                ]
+            elif is_health_sys or is_epidemiol:
+                layered_problem = [
+                    f"### ۱. بار اپیدمیولوژیک و اقتصادی-اجتماعی {cond_name}\n{epi_text} پیامدهای جمعیت‌شناختی و بار مالی ناشی از {cond_name} فشار فزاینده‌ای بر خانوارها و نظام سلامت وارد می‌سازد{cite_burden}.",
+                    f"### ۲. وضعیت فعلی شاخص‌ها و پوشش خدمات سلامت\nتفاوت‌های منطقه‌ای، شکاف‌های پوشش بیمه‌ای و عوامل خطر زمینه‌ای نیازمند سنجش دقیق با ابزارهای استاندارد اپیدمیولوژیک و اقتصاد سلامت است{cite_direct}.",
+                    f"### ۳. عوامل تعیین‌کننده و مبانی سیاستی پژوهش\nبررسی متغیرهای {agt1} در جمعیت {sys_name} الگوهای نابرابری و پیش‌بینی‌کننده‌های مواجهه را روشن می‌سازد{cite_mech}.",
+                    f"### ۴. محدودیت داده‌های جاری و سوگیری‌های ثبت\nنبود داده‌های تفکیکی مبتنی بر نمونه‌گیری خوشه‌ای یا تعدیل مخدوشگرها تصمیم‌گیری سیاستی را با خطا مواجه می‌سازد{cite_safety}.",
+                    f"### ۵. ضرورت انجام پژوهش و گزارش جستجوی منفی\n{neg_search_log} این پژوهش با طراحی دقیق STROBE/WHO WHS شواهد معتبر جهت برنامه‌ریزی کلان سلامت تولید می‌کند."
+                ]
+            elif is_diagnostic:
+                layered_problem = [
+                    f"### ۱. اهمیت بالینی و بار تشخیص دیرهنگام {cond_name}\n{epi_text} تاخیر یا خطای تشخیصی در {cond_name} پیامدهای درمانی و هزینه‌های مراقبت را افزایش می‌دهد{cite_burden}.",
+                    f"### ۲. محدودیت روش‌های تشخیصی متداول\nروش‌های مرجع فعلی ممکن است تهاجمی، پرهزینه یا واجد حساسیت ناکافی در مراحل اولیه باشند{cite_direct}.",
+                    f"### ۳. مبانی آزمون شاخص تشخیصی ({agt1})\nارزیابی حساسیت، ویژگی و سطح زیر منحنی ROC برای {agt1} در جمعیت {sys_name} ظرفیت غربالگری سریع را می‌سنجد{cite_mech}.",
+                    f"### ۴. چالش‌های طیف بیماران و راستی‌آزمایی\nپرهیز از سوگیری طیف و تضمین اجرای کور آزمون استاندارد طلایی از شروط اصلی اعتبار نتایج تشخیصی است{cite_safety}.",
+                    f"### ۵. ضرورت و شکاف شواهد تشخیصی\n{neg_search_log} تعیین نقطه برش بهینه بر پایه شاخص یودن و استاندارد STARD 2015 ضرورت اجرایی طرح را توجیه می‌کند."
+                ]
+            else:
+                layered_problem = [
+                    f"### ۱. بار بالینی و اهمیت سلامت {cond_name}\n{epi_text} بهبود پیامدهای بالینی و کارایی مداخلات در {cond_name} همچنان از اولویت‌های نظام سلامت است{cite_burden}.",
+                    f"### ۲. وضعیت فعلی مراقبت‌های استاندارد\nمداخلات استاندارد موجود با ناهمگونی پاسخ و نیاز به ارزیابی دقیق‌تر اثربخشی و ایمنی در شرایط واقعی روبرو هستند{cite_direct}.",
+                    f"### ۳. منطق علمی مداخله و جمعیت هدف ({sys_name})\nارزیابی ساختارمند {agt1} در {sys_name} امکان برآورد دقیق اندازه اثر و شاخص‌های پیامد را فراهم می‌کند{cite_mech}.",
+                    f"### ۴. ملاحظات ایمنی و پایش پیامدها\nپایش همزمان رخدادهای نامطلوب و کنترل متغیرهای مخدوشگر برای اعتبار بالینی نتایج الزامی است{cite_safety}.",
+                    f"### ۵. ضرورت انجام پژوهش و شکاف شواهد\n{neg_search_log} از این رو تدوین این پژوهش منطبق بر استانداردهای بین‌المللی روش‌شناسی برای پاسخ به شکاف موجود ضروری است."
+                ]
             problem_text = "\n\n".join(layered_problem)
 
         gap_summary = ""
@@ -652,18 +715,25 @@ class ProposalGenerator:
                 lit_paras.append(para)
             lit_content = "\n\n".join(lit_paras)
 
-            # Append Academic Baseline Literature Risk of Bias Matrix Table
-            try:
-                from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
-                rob_evals = BaselinePaperQualityAuditor.evaluate_corpus(studies[:25])
-                rob_table = BaselinePaperQualityAuditor.render_markdown_table(rob_evals, framework=framework)
+            # Append Academic Baseline Literature Risk of Bias Matrix Table (Omitted in Scoping Reviews per PRISMA-ScR)
+            if is_review:
                 lit_content += (
-                    "\n\n### جدول ارزیابی کیفیت و ریسک سوگیری مقالات پایه (Baseline Literature Risk of Bias Audit)\n\n"
-                    "جهت تضمین استحکام معرفت‌شناختی و سنجش اعتبار شواهد استنادشده، کیفیت روش‌شناختی مقالات پایه بر مبنای معیارهای بین‌المللی ارزیابی گردید:\n\n"
-                    + rob_table
+                    "\n\n### چارچوب ارزیابی نقادانه در مرور دامنه‌ای (PRISMA-ScR Appraisal Note)\n\n"
+                    "مطابق بند ۱۲ راهنمای رسمی PRISMA-ScR (Tricco و همکاران، ۲۰۱۸) و دستورالعمل موسسه JBI، به دلیل ماهیت نگاشت شواهد در مرورهای دامنه‌ای، "
+                    "ارزیابی کمی ریسک سوگیری فردی مطالعات (مانند Cochrane RoB-2) الزامی نیست و تمرکز بر جامعیت پوشش شواهد و توافق استخراج داده‌ها است."
                 )
-            except Exception:
-                pass
+            else:
+                try:
+                    from pre_emptive_risk_of_bias_mitigator import BaselinePaperQualityAuditor
+                    rob_evals = BaselinePaperQualityAuditor.evaluate_corpus(studies[:25])
+                    rob_table = BaselinePaperQualityAuditor.render_markdown_table(rob_evals, framework=framework)
+                    lit_content += (
+                        "\n\n### جدول ارزیابی کیفیت و ریسک سوگیری مقالات پایه (Baseline Literature Risk of Bias Audit)\n\n"
+                        "جهت تضمین استحکام معرفت‌شناختی و سنجش اعتبار شواهد استنادشده، کیفیت روش‌شناختی مقالات پایه بر مبنای معیارهای بین‌المللی ارزیابی گردید:\n\n"
+                        + rob_table
+                    )
+                except Exception:
+                    pass
 
             # Append Epistemic Caveat & Publication Bias Transparency (Principle 28)
             dossier_obj = data.get("proposal_research_dossier")
@@ -691,12 +761,25 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         imp_text = data.get("importance_and_necessity_text", "")
         if not imp_text:
-            imp_text = (
-                f"۱. شیوع فزاینده و عوارض بالینی و اقتصادی ناشی از {cond_name}.\n"
-                f"۲. محدودیت‌های درمانی موجود و نیاز مبرم به شناسایی عوامل زیستی کم‌عارضه با سمیت انتخابی.\n"
-                f"۳. ضرورت ارزیابی فارماکودینامیک و مکانیسمی مداخلات در سیستم مدل {sys_name}.\n"
-                f"۴. فراهم‌آوری شواهد پایه و استاندارد متدولوژیک جهت فازهای پیش‌بالینی و کاربردی بعدی."
-            )
+            if is_in_vitro:
+                imp_text = (
+                    f"۱. شیوع فزاینده و عوارض بالینی و اقتصادی ناشی از {cond_name}.\n"
+                    f"۲. محدودیت‌های درمانی موجود و نیاز مبرم به شناسایی عوامل زیستی کم‌عارضه با سمیت انتخابی.\n"
+                    f"۳. ضرورت ارزیابی فارماکودینامیک و مکانیسمی مداخلات در سیستم مدل {sys_name}.\n"
+                    f"۴. فراهم‌آوری شواهد پایه و استاندارد متدولوژیک جهت فازهای پیش‌بالینی و کاربردی بعدی."
+                )
+            elif is_review:
+                imp_text = (
+                    f"۱. پراکندگی و ناهمگونی شواهد منتشرشده پیرامون {cond_name}.\n"
+                    f"۲. نیاز مبرم به نقشه‌برداری ساختارمند شواهد منطبق بر چارچوب PRISMA-ScR و JBI.\n"
+                    f"۳. شناسایی شکاف‌های پژوهشی اولویت‌دار جهت هدایت مطالعات اولیه و کارآزمایی‌های آتی."
+                )
+            else:
+                imp_text = (
+                    f"۱. اهمیت بالینی و بار سلامت ناشی از {cond_name}.\n"
+                    f"۲. نیاز به تولید شواهد مستند و دقیق متناسب با شرایط بومی در {sys_name}.\n"
+                    f"۳. فراهم‌آوری مبنای علمی قابل اتکا برای تصمیم‌گیری بالینی و سیاست‌گذاری سلامت."
+                )
         md_parts.append("## ۴. اهمیت وضرورت تحقیق\n" + imp_text + "\n\n---")
 
         # -------------------------------------------------------------
@@ -735,8 +818,13 @@ class ProposalGenerator:
             outcomes = model_dict.get("primary_outcomes", [])
             for idx, out in enumerate(outcomes, 1):
                 oname = out.get("name") if isinstance(out, dict) else str(out)
-                aims.append(f"{idx}. تعیین تاثیر مواجهه با مداخله بر میزان {oname} در {sys_name}.")
-            aims.append(f"{len(aims)+1}. تعیین غلظت‌های موثر، آستانه ایمنی و تغییرات وابسته به زمان و دوز مداخله.")
+                aims.append(f"{idx}. تعیین و ارزیابی میزان {oname} مرتبط با مداخله در {sys_name}.")
+            if is_in_vitro or is_in_vivo:
+                aims.append(f"{len(aims)+1}. تعیین غلظت‌های موثر، آستانه ایمنی و تغییرات وابسته به زمان و دوز مداخله.")
+            elif is_review:
+                aims.append(f"{len(aims)+1}. شناسایی شکاف‌های شواهد و تعیین میزان توافق استخراج داده‌ها بر اساس چارچوب JBI PCC.")
+            else:
+                aims.append(f"{len(aims)+1}. تحلیل ارتباط متغیرهای زمینه‌ای و عوامل تعدیل‌کننده با پیامد نهایی در {sys_name}.")
             spec_text = "\n".join(aims)
         md_parts.append("## ۶. اهداف جزیی (تعیین تاثیر متغیر مستقل روی متغیر وابسته)\n" + spec_text + "\n\n---")
 
@@ -753,11 +841,18 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         app_text = data.get("applied_objectives_text", "")
         if not app_text:
-            app_text = (
-                "۱. ارائه شواهد تجربی و آزمایشگاهی متقن جهت راهنمایی مطالعات پیش‌بالینی و بالینی آینده.\n"
-                "۲. کمک به تصمیم‌گیری بالینی و پروتکل‌های درمانی مبتنی بر شواهد در مراکز پژوهشی و درمانی.\n"
-                "۳. فراهم‌سازی مبنای علمی جهت طراحی فرمولاسیون‌ها یا رژیم‌های درمانی بهینه با حداقل عوارض جانبی."
-            )
+            if is_in_vitro or is_in_vivo:
+                app_text = (
+                    "۱. ارائه شواهد تجربی و آزمایشگاهی متقن جهت راهنمایی مطالعات پیش‌بالینی و بالینی آینده.\n"
+                    "۲. کمک به تصمیم‌گیری بالینی و پروتکل‌های درمانی مبتنی بر شواهد در مراکز پژوهشی و درمانی.\n"
+                    "۳. فراهم‌سازی مبنای علمی جهت طراحی فرمولاسیون‌ها یا رژیم‌های درمانی بهینه با حداقل عوارض جانبی."
+                )
+            else:
+                app_text = (
+                    "۱. ارائه شواهد علمی و بالینی مستند جهت بهینه‌سازی تصمیم‌گیری و راهنماهای اجرایی مراکز درمانی.\n"
+                    "۲. شناسایی اولویت‌های مداخله و ارتقای کیفیت مراقبت یا سیاست‌گذاری سلامت در نظام سلامت کشور.\n"
+                    "۳. فراهم‌سازی بستر دانشی استاندارد برای طراحی مطالعات تکمیلی و کاربردی آتی."
+                )
         md_parts.append("## ۸. اهداف کاربردی\n" + app_text + "\n\n---")
 
         # -------------------------------------------------------------
@@ -765,7 +860,40 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         hyp_text = data.get("hypotheses_and_questions_text", "")
         if not hyp_text:
-            if len(interventions) >= 2:
+            if is_review:
+                hyp_text = (
+                    f"### سوالات هدایت‌کننده پژوهش (JBI PCC Guiding Questions):\n"
+                    f"۱. طیف، طراحی روش‌شناختی و توزیع شواهد منتشرشده پیرامون {cond_name} در پایگاه‌های بین‌المللی چگونه است؟\n"
+                    f"۲. پیامدهای کلیدی اثربخشی و ایمنی گزارش‌شده در مطالعات اولیه و شکاف‌های دانشی موجود کدامند؟"
+                )
+            elif is_usability:
+                hyp_text = (
+                    f"### سوالات و فرضیات پژوهش:\n"
+                    f"۱. کدام اصول اکتشافی نیلسن بیشترین نرخ خطای کاربردپذیری را در تعامل با سامانه نشان می‌دهند؟\n"
+                    f"۲. میانگین نمره کاربردپذیری سیستم (SUS) در کاربران نهایی به آستانه قابل قبول (>= 68) می‌رسد."
+                )
+            elif is_diagnostic:
+                hyp_text = (
+                    f"### فرضیات تحقیق:\n"
+                    f"۱. آزمون شاخص در تشخیص {cond_name} واجد حساسیت و ویژگی قابل قبول (AUC >= 0.80) نسبت به استاندارد طلایی است.\n\n"
+                    f"### سوالات تحقیق:\n"
+                    f"۱. نقطه برش بهینه بر اساس شاخص یودن و مقادیر ارزش اخباری مثبت و منفی کدامند؟"
+                )
+            elif is_health_sys or is_epidemiol:
+                hyp_text = (
+                    f"### فرضیات تحقیق:\n"
+                    f"۱. بین متغیرهای زمینه‌ای/اقتصادی-اجتماعی و پیامد مطالعه در {sys_name} ارتباط آماری معنادار وجود دارد.\n\n"
+                    f"### سوالات تحقیق:\n"
+                    f"۱. میزان شیوع پیامد هدف و عوامل پیش‌بینی‌کننده مستقل آن پس از تعدیل مخدوشگرها چقدر است؟"
+                )
+            elif is_clinical:
+                hyp_text = (
+                    f"### فرضیات تحقیق:\n"
+                    f"۱. مداخله مورد مطالعه در مقایسه با گروه شاهد موجب بهبود معنادار پیامد اولیه در بیماران {cond_name} می‌گردد.\n\n"
+                    f"### سوالات تحقیق:\n"
+                    f"۱. تفاوت میانگین یا نسبت بروز پیامد اولیه و عوارض جانبی میان دو بازوی کارآزمایی چگونه است؟"
+                )
+            elif is_in_vitro and len(interventions) >= 2:
                 a_n = interventions[0].get("name", "مداخله اول")
                 b_n = interventions[1].get("name", "مداخله دوم")
                 hyp_analysis = CombinationHypothesisEngine.analyze(a_n, b_n, cond_name, studies)
@@ -777,12 +905,17 @@ class ProposalGenerator:
                     f"۱. آیا مواجهه همزمان واجد اثر هم‌افزا (CI < 1.0) بر شاخص‌های سلولی در {sys_name} است؟\n"
                     f"۲. تغییرات کمی پارامترهای دوز-پاسخ در مواجهه ترکیبی نسبت به تک‌عاملی چگونه است؟"
                 )
-            else:
+            elif is_in_vitro or is_in_vivo:
                 hyp_text = (
                     f"### فرضیات تحقیق:\n"
                     f"۱. مواجهه با مداخله موجب تغییر معنی‌دار شاخص‌های پیامد در {sys_name} خواهد شد.\n\n"
                     f"### سوالات تحقیق:\n"
-                    f"۱. میزان غلظت موثر نیمی از حداکثر (IC50) مداخله در مقاطع زمانی مختلف چقدر است؟"
+                    f"۱. میزان دوز یا غلظت موثر مداخله در مقاطع ارزیابی چقدر است؟"
+                )
+            else:
+                hyp_text = (
+                    f"### سوالات و فرضیات پژوهش:\n"
+                    f"۱. متغیر مستقل مورد بررسی دارای تاثیر یا ارتباط معنادار با پیامدهای اصلی در {sys_name} است."
                 )
         md_parts.append("## ۹. فرضیات و سوالات\n" + hyp_text + "\n\n---")
 
@@ -791,12 +924,19 @@ class ProposalGenerator:
         # -------------------------------------------------------------
         ach_text = data.get("achievements_text", "")
         if not ach_text:
-            ach_text = (
-                "۱. تولید و ثبت داده‌های تجربی دست اول پیرامون رفتار فارماکودینامیک مداخله در سیستم مدل.\n"
-                "۲. تعیین کمی و ریاضی شاخص‌های برهم‌کنش، دوزهای ایمن و آستانه اثربخشی زیستی.\n"
-                "۳. انتشار حداقل یک مقاله پژوهشی در ژورنال‌های معتبر بین‌المللی نمایه ISI/Scopus.\n"
-                "۴. توسعه زیرساخت و دانش فنی پروتکل‌های سنجش زیستی در آزمایشگاه تحقیقاتی دانشگاه."
-            )
+            if is_in_vitro or is_in_vivo:
+                ach_text = (
+                    "۱. تولید و ثبت داده‌های تجربی دست اول پیرامون رفتار فارماکودینامیک مداخله در سیستم مدل.\n"
+                    "۲. تعیین کمی و ریاضی شاخص‌های برهم‌کنش، دوزهای ایمن و آستانه اثربخشی زیستی.\n"
+                    "۳. انتشار حداقل یک مقاله پژوهشی در ژورنال‌های معتبر بین‌المللی نمایه ISI/Scopus.\n"
+                    "۴. توسعه زیرساخت و دانش فنی پروتکل‌های سنجش زیستی در آزمایشگاه تحقیقاتی دانشگاه."
+                )
+            else:
+                ach_text = (
+                    "۱. تولید داده‌ها و شواهد بومی معتبر قابل استناد برای تصمیم‌گیری بالینی و سلامت عمومی.\n"
+                    "۲. انتشار مقاله اصیل پژوهشی در مجلات معتبر نمایه Scopus/PubMed.\n"
+                    "۳. ارائه توصیه‌های کاربردی و متدولوژیک جهت ارتقای کیفیت مراقبت و پژوهش‌های آتی."
+                )
         md_parts.append("## ۱۰. دستاورد ها (چه دستاوردی ازین تحقیق خواهیم داشت)\n" + ach_text + "\n\n---")
 
         # -------------------------------------------------------------
@@ -825,24 +965,51 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             meth_overview = cp_dict.get("formatted_sections_fa", {}).get(13) or cp_dict.get("formatted_sections_fa", {}).get("13")
         if not meth_overview:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 meth_overview = (
                     f"طرح پژوهشی حاضر یک مطالعه کاربردی-مقطعی توصیفی-تحلیلی در حوزه اقتصاد سلامت و سیاست‌گذاری سلامت است "
-                    f"که جهت ارزیابی مواجهه با هزینه‌های کمرشکن سلامت (CHE) و پرداخت‌های مستقیم از جیب (OOP) بر روی جامعه هدف بیماران مبتلا به {cond_name} اجرا می‌گردد. "
+                    f"که جهت ارزیابی مواجهه با هزینه‌های کمرشکن سلامت (CHE) و پرداخت‌های مستقیم از جیب (OOP) بر روی جامعه هدف مرتبط با {cond_name} "
+                    f"با کنترل دقیق متغیرهای مخدوشگر و سوگیری‌ها بر پایه پروتکل استاندارد اجرا می‌گردد. "
                     f"گردآوری داده‌ها با پرسشنامه استاندارد WHO WHS و تطبیق صورتحساب‌های بستری با سامانه اطلاعات بیمارستانی (HIS) انجام شده "
                     f"و عوامل موثر با رگرسیون لجستیک چندمتغیره و نابرابری توزیع با شاخص تمرکز تحلیل می‌گردد."
                 )
-            else:
-                is_in_vitro = any(k in str(framework).lower() for k in ["in_vitro", "in vitro", "cell", "سلول"])
-                bias_framework = "ToxRTool / NTP OHAT In Vitro Data Quality Framework" if is_in_vitro else "Cochrane RoB-2 / SYRCLE"
+            elif is_review:
                 meth_overview = (
-                    f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری ({bias_framework}) طراحی گردیده است. "
+                    f"طرح حاضر یک مرور دامنه‌ای و سنتز شواهد مبتنی بر راهنمای PRISMA-ScR و چارچوب JBI PCC پیرامون {cond_name} است. "
+                    f"جستجوی جامع چندپایگاهی (PubMed، Scopus، Embase، Web of Science)، غربالگری دوفردی مستقل و استخراج ساختاریافته داده‌ها بدون نیاز به مداخله بالینی یا آزمایشگاهی انجام می‌شود."
+                )
+            elif is_usability:
+                meth_overview = (
+                    f"پژوهش حاضر یک مطالعه ارزیابی کاربردپذیری و فاکتورهای انسانی پیرامون {cond_name} است که با تلفیق ارزیابی اکتشافی نیلسن و آزمون تکلیف‌محور کاربران و مقیاس SUS اجرا می‌گردد."
+                )
+            elif is_diagnostic:
+                meth_overview = (
+                    f"طرح حاضر یک مطالعه دقت تشخیصی منطبق بر راهنمای STARD 2015 و ابزار QUADAS-2 جهت مقایسه آزمون شاخص با استاندارد طلایی مرجع در {cond_name} است."
+                )
+            elif is_clinical:
+                meth_overview = (
+                    f"پژوهش حاضر یک کارآزمایی بالینی تصادفی‌سازی‌شده کنترل‌دار منطبق بر استاندارد CONSORT 2010 و Cochrane RoB-2 بر روی بیماران مبتلا به {cond_name} با پیگیری ساختاریافته و تحلیل ITT است."
+                )
+            elif is_epidemiol:
+                meth_overview = (
+                    f"پژوهش حاضر یک مطالعه اپیدمیولوژیک تحلیلی منطبق بر راهنمای STROBE و مقیاس کیفیت NOS در جمعیت {sys_name} برای برآورد شیوع و عوامل خطر تعدیل‌شده می‌باشد."
+                )
+            elif is_in_vivo:
+                meth_overview = (
+                    f"پژوهش حاضر یک مطالعه پیش‌بالینی درون‌تنی بر روی مدل حیوانی منطبق بر راهنمای ARRIVE 2.0 و ابزار SYRCLE با رعایت کامل اصول 3Rs اجرا می‌شود."
+                )
+            elif is_in_vitro:
+                meth_overview = (
+                    f"پروتکل اجرایی پژوهش حاضر در چارچوب یک مطالعه تجربی آزمایشگاهی ({framework}) مطابق استانداردهای بازتولیدپذیری و مهار سیستماتیک سوگیری (ToxRTool / NTP OHAT In Vitro Data Quality Framework) طراحی گردیده است. "
                     f"مراحل اجرایی شامل آماده‌سازی مدل‌های زیستی در {sys_name}، رقت‌سازی استاندارد و تیمار زمان‌بندی‌شده، "
                     f"تخصیص شرایط آزمایشی و تیمارها به صورت تصادفی ساختاریافته (Randomized Block Design) و با کدگذاری نمونه‌ها (Coded Vials / Allocation Concealment) توسط ناظر مستقل، "
                     f"کنترل دقیق حلال ناقل (Vehicle Control با غلظت DMSO کمتر از ۰.۱٪ جهت پیشگیری از سمیت پس‌زمینه)، "
                     f"سنجش‌های بیولوژیک با کورسازی ارزیاب و اپراتور دستگاه نسبت به گروه‌ها (Blinded Outcome Assessment)، "
                     f"و در نهایت تحلیل آماری و مدلسازی برهم‌کنش فارماکولوژیک می‌باشد."
+                )
+            else:
+                meth_overview = (
+                    f"طرح پژوهشی حاضر مطابق استانداردهای روش‌شناختی علوم پزشکی و ساختار مصوب پژوهشیار پیرامون {cond_name} و در جامعه {sys_name} طراحی و اجرا می‌گردد."
                 )
         md_parts.append("## ۱۳. روش اجرا\n" + meth_overview + "\n\n---")
 
@@ -854,17 +1021,24 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_14 = cp_dict.get("formatted_sections_fa", {}).get(14) or cp_dict.get("formatted_sections_fa", {}).get("14")
         if not sec_14:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_review:
+                sec_14 = "مطالعه ثانویه از نوع مرور دامنه‌ای و سنتز شواهد (Scoping Review — PRISMA-ScR & JBI Framework)."
+            elif is_usability:
+                sec_14 = "مطالعه کاربردی ارزیابی کاربردپذیری و مهندسی سلامت دیجیتال (Usability Evaluation Study — Nielsen & SUS)."
+            elif is_health_sys:
                 sec_14 = "مطالعه کاربردی-مقطعی مبتنی بر جامعه از نوع توصیفی-تحلیلی و اقتصاد سلامت (Cross-sectional Health Systems & Health Economics Study)."
-            elif "EPIDEMIOL" in fw_upper or "OBSERV" in fw_upper:
-                sec_14 = "مطالعه مشاهده‌ای تحلیلی مقطعی مبتنی بر جمعیت (Observational Analytical Cross-Sectional Study)."
-            elif "CLINICAL" in fw_upper or "RCT" in fw_upper:
-                sec_14 = "کارآزمایی بالینی تصادفی‌سازی‌شده کنترل‌دار دوسوکور (Double-blind Randomized Controlled Trial: RCT)."
-            elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper:
-                sec_14 = "مطالعه تجربی مداخله‌ای پیش‌بالینی در مدل حیوانی درون‌تنی (In Vivo Animal Experimental Study)."
+            elif is_diagnostic:
+                sec_14 = "مطالعه دقت تشخیصی مقطعی در برابر استاندارد طلایی مرجع (Diagnostic Accuracy Study — STARD 2015)."
+            elif is_epidemiol:
+                sec_14 = "مطالعه مشاهده‌ای تحلیلی مقطعی مبتنی بر جمعیت (Observational Analytical Cross-Sectional Study — STROBE)."
+            elif is_clinical:
+                sec_14 = "کارآزمایی بالینی تصادفی‌سازی‌شده کنترل‌دار دوسوکور (Double-blind Randomized Controlled Trial: RCT — CONSORT 2010)."
+            elif is_in_vivo:
+                sec_14 = "مطالعه تجربی مداخله‌ای پیش‌بالینی در مدل حیوانی درون‌تنی (In Vivo Animal Experimental Study — ARRIVE 2.0)."
+            elif is_in_vitro:
+                sec_14 = "مطالعه بنیادی-کاربردی از نوع تجربی آزمایشگاهی در شرایط برون‌تن (In Vitro Experimental Study)."
             else:
-                sec_14 = f"مطالعه بنیادی-کاربردی از نوع تجربی آزمایشگاهی در شرایط برون‌تن (In Vitro Experimental Study)."
+                sec_14 = "مطالعه پژوهشی علوم پزشکی منطبق با چارچوب روش‌شناختی مصوب پژوهشیار."
         md_parts.append("## ۱۴. نوع مطالعه\n" + sec_14 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -875,32 +1049,45 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_15 = cp_dict.get("formatted_sections_fa", {}).get(15) or cp_dict.get("formatted_sections_fa", {}).get("15")
         if not sec_15:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_15 = (
-                    f"جامعه آماری پژوهش حاضر شامل کلیه بیماران مبتلا به {cond_name} و خانوارهای تحت پوشش آنها می‌باشد که در بازه زمانی اجرای مطالعه به بیمارستان‌ها و مراکز تشخیصی-درمانی منتخب مراجعه نموده‌اند.\n\n"
+                    f"جامعه آماری پژوهش حاضر شامل کلیه بیماران و خانوارهای مرتبط با {cond_name} می‌باشد که در بازه زمانی اجرای مطالعه به بیمارستان‌ها و مراکز تشخیصی-درمانی منتخب مراجعه نموده‌اند.\n\n"
                     f"▪ **چارچوب ساختارمند متدولوژی (PECO Framework):**\n\n"
                     f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
                     f"| :--- | :--- |\n"
-                    f"| **P (Population)** | بیماران مبتلا به {cond_name} و خانوارهای تحت سرپرستی |\n"
-                    f"| **E (Exposure)** | مواجهه با بار مالی و هزینه‌های درمانی (خدمات بستری، سرپایی، دارویی) |\n"
+                    f"| **P (Population)** | خانوارها و بیماران مراجعه‌کننده مرتبط با {cond_name} |\n"
+                    f"| **E (Exposure)** | مواجهه با بار مالی و هزینه‌های درمانی (خدمات بستری، سرپایی، دارویی و تشخیصی) |\n"
                     f"| **C (Comparator)** | مقایسه دهک‌های درآمدی/هزینه‌ای و وضعیت پوشش بیمه پایه و تکمیلی |\n"
                     f"| **O (Outcomes)** | نرخ مواجهه با هزینه‌های کمرشکن سلامت (CHE) و سهم پرداخت از جیب (OOP) |\n\n"
                     f"نمونه‌گیری به شیوه خوشه‌ای چندمرحله‌ای با تخصیص متناسب در بین مراکز درمانی دولتی و خصوصی انجام خواهد شد."
                 )
-            else:
-                # Generate PICO/PECO structured matrix aligned with study design
-                is_clinical = framework in ["PICO", "CLINICAL_TRIAL", "COHORT"] or any(k in str(framework).lower() for k in ["human", "patient", "clinical"])
-                framework_label = "PICO" if is_clinical else "PECO"
-                pop_label = "جامعه بیماران / جمعیت هدف (Population)" if is_clinical else "سیستم سلولی / مدل بیولوژیک (Population/Model)"
-                exp_label = "مداخله دارویی / بالینی (Intervention)" if is_clinical else "مواجهه / مداخله تجربی (Exposure/Intervention)"
-                comp_label = "گروه کنترل / دارونما (Comparator/Placebo)" if is_clinical else "کنترل منفی / حلال ناقل (Comparator/Vehicle)"
-                out_label = "پیامدهای اولیه و بالینی (Primary Outcomes)" if is_clinical else "پیامدهای مولکولی و آپوپتوز (Outcomes)"
-
+            elif is_review:
+                sec_15 = (
+                    f"جامعه پژوهش شامل کلیه مطالعات اولیه علمی و بالینی منتشرشده در پایگاه‌های معتبر بین‌المللی مرتبط با {cond_name} "
+                    f"در چارچوب سه‌گانه JBI PCC (Population: {sys_name}، Concept: {cond_name}، Context: بافتارهای پژوهشی و بالینی مرتبط) است."
+                )
+            elif is_usability:
+                sec_15 = (
+                    f"جامعه مورد مطالعه شامل کاربران نهایی و متخصصان سلامت دیجیتال بهره‌بردار از سامانه هدف ({sys_name}) در مراکز منتخب دانشگاه علوم پزشکی می‌باشد."
+                )
+            elif is_clinical or is_epidemiol or is_diagnostic:
+                sec_15 = (
+                    f"جامعه مورد مطالعه شامل کلیه بیماران یا شرکت‌کنندگان واجد شرایط مرتبط با {cond_name} ({sys_name}) مراجعه‌کننده به مراکز درمانی و آموزشی منتخب است "
+                    f"که بر اساس چارچوب استاندارد {'PICO' if is_clinical else 'STARD' if is_diagnostic else 'PECO / STROBE'} وارد پژوهش می‌شوند."
+                )
+            elif is_in_vivo:
+                sec_15 = (
+                    f"جامعه یا مدل پژوهش شامل حیوانات آزمایشگاهی استاندارد ({sys_name}) نگهداری‌شده در شرایط کنترل‌شده دمایی و چرخه نوری مطابق دستورالعمل ARRIVE 2.0 است."
+                )
+            elif is_in_vitro:
+                framework_label = "PECO"
+                pop_label = "سیستم سلولی / مدل بیولوژیک (Population/Model)"
+                exp_label = "مواجهه / مداخله تجربی (Exposure/Intervention)"
+                comp_label = "کنترل منفی / حلال ناقل (Comparator/Vehicle)"
+                out_label = "پیامدهای مولکولی و آپوپتوز (Outcomes)"
                 outcomes_list = model_dict.get("primary_outcomes", [])
                 outcomes_str = "، ".join(o.get("name") if isinstance(o, dict) else str(o) for o in outcomes_list) if outcomes_list else "زیست‌پذیری، آپوپتوز و شاخص‌های مولکولی"
                 interventions_str = " و ".join(ag.get("name") if isinstance(ag, dict) else str(ag) for ag in interventions) if interventions else "مداخلات تجربی طرح"
-
                 pico_table = (
                     f"▪ **چارچوب ساختارمند متدولوژی ({framework_label} Framework):**\n\n"
                     f"| مؤلفه ساختاری | شرح عملیاتی در مطالعه حاضر |\n"
@@ -910,30 +1097,19 @@ class ProposalGenerator:
                     f"| **C ({comp_label})** | گروه دست‌نخورده، کنترل منفی حلال ناقل (DMSO < 0.1%) و کنترل بدون سلول |\n"
                     f"| **O ({out_label})** | {outcomes_str} |\n\n"
                 )
-                sys_cond_lower = f"{sys_name} {cond_name} {cond_en} {fa_title}".lower()
-                if any(k in sys_cond_lower for k in ["ریه", "nsclc", "h1299", "p53-null", "f-12k"]):
-                    het_text = (
-                        "به منظور ارزیابی وابستگی مکانیسم اثر به مسیرهای تنظیمی کلیدی، رده‌های سلولی بر مبنای تفاوت در وضعیت موتاسیونی ژن‌های هدف "
-                        "(نظیر وضعیت موتاسیونی ژن‌های انکوژنیک و پروتئین p53 وحشی در مقایسه با رده سلولی فاقد p53 یا p53-null) انتخاب شده‌اند. "
-                        "همچنین رده سلولی نرمال دیپلوئید به عنوان مدل کنترلی غیربدخیم جهت تعیین شاخص انتخاب‌پذیری (Selectivity Index: SI) مورد استفاده قرار می‌گیرد.\n\n"
-                        "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
-                        "به منظور حفظ ویژگی‌های فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت اختصاصی توصیه شده توسط ATCC "
-                        "(بر پایه شناسنامه بیولوژیک در محیط‌های F-12K، EMEM یا RPMI-1640 به همراه ۱۰٪ سرم جنین گاوی FBS و ۱٪ پنی‌سیلین-استرپتومایسین) کشت داده می‌شوند."
-                    )
-                else:
-                    het_text = (
-                        f"به منظور ارزیابی دقیق مکانیسم اثر و وابستگی پاسخ به مسیرهای پیام‌رسانی درون‌سلولی، {sys_name} بر مبنای شناسنامه ژنتیکی و پروفایل موتاسیونی مسیرهای تنظیمی کلیدی (نظیر وضعیت ژن‌های سرکوبگر تومور p53 و مسیرهای بقای سلولی) انتخاب گردیده است. "
-                        "همچنین رده سلولی نرمال هم‌بافت به عنوان مدل کنترلی غیربدخیم جهت محاسبه دقیق شاخص انتخاب‌پذیری (Selectivity Index: SI = IC50 Normal / IC50 Target) مورد استفاده قرار می‌گیرد.\n\n"
-                        "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
-                        "به منظور حفظ پایداری فنوتایپی و پیشگیری از رانش تمایزی، هر رده سلولی منحصراً در محیط کشت پایه اختصاصی مصوب بانک سلولی مرجع (ATCC) "
-                        "(نظیر محیط‌های استاندارد DMEM یا RPMI-1640 غنی‌شده با ۱۰٪ سرم جنین گاوی FBS غیرفعال‌شده با حرارت و ۱٪ آنتی‌بیوتیک پنی‌سیلین-استرپتومایسین در دمای ۳۷ درجه سانتی‌گراد و ۵٪ CO2) کشت داده می‌شود."
-                    )
+                het_text = (
+                    f"به منظور ارزیابی دقیق مکانیسم اثر و وابستگی پاسخ به مسیرهای پیام‌رسانی درون‌سلولی، {sys_name} بر مبنای شناسنامه ژنتیکی و پروفایل موتاسیونی مسیرهای تنظیمی کلیدی انتخاب گردیده است.\n\n"
+                    "▪ **محیط‌های کشت استاندارد مصوب ATCC:**\n"
+                    "هر رده سلولی منحصراً در محیط کشت پایه اختصاصی مصوب بانک سلولی مرجع (ATCC) غنی‌شده با ۱۰٪ سرم جنین گاوی (FBS) در دمای ۳۷ درجه سانتی‌گراد و ۵٪ CO2 کشت داده می‌شود."
+                )
                 sec_15 = (
                     pico_table +
-                    f"مدل زیستی و سیستم هدف مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر (نظیر انستیتو پاستور ایران یا ATCC) دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی.\n\n"
+                    f"مدل زیستی و سیستم هدف مستقر در {sys_name} تهیه شده از بانک‌های سلولی معتبر دارای شناسنامه تاییدشده به همراه کنترل سالم بافتی جهت ارزیابی پنجره ایمنی.\n\n"
                     "▪ **مبنای تبارشناسی ژنتیکی رده‌های سلولی (Molecular Heterogeneity Rationale):**\n" +
                     het_text
                 )
+            else:
+                sec_15 = f"جامعه پژوهش شامل واحدهای مشاهداتی یا شرکت‌کنندگان واجد شرایط مرتبط با {cond_name} ({sys_name}) می‌باشد."
         md_parts.append("## ۱۵. جامعه مورد مطالعه\n" + sec_15 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -944,13 +1120,18 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_16 = cp_dict.get("formatted_sections_fa", {}).get(16) or cp_dict.get("formatted_sections_fa", {}).get("16")
         if not sec_16:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper or "EPIDEMIOL" in fw_upper or "CLINICAL" in fw_upper:
+            if is_review:
+                sec_16 = "پایگاه‌های الکترونیک نمایه‌سازی علمی بین‌المللی (PubMed/MEDLINE، Scopus، Embase، Web of Science) در مرکز تحقیقات دانشگاه علوم پزشکی."
+            elif is_usability:
+                sec_16 = "بخش‌های بالینی و آزمایشگاه انفورماتیک پزشکی و فاکتورهای انسانی دانشگاه علوم پزشکی."
+            elif is_health_sys or is_epidemiol or is_clinical or is_diagnostic:
                 sec_16 = "بیمارستان‌ها، مراکز درمانی، درمانگاه‌های تخصصی سرپایی و مراکز جامع خدمات سلامت منتخب تحت پوشش دانشگاه علوم پزشکی."
-            elif "IN_VIVO" in fw_upper:
+            elif is_in_vivo:
                 sec_16 = "مرکز نگهداری و پرورش حیوانات آزمایشگاهی و آزمایشگاه فیزیولوژی و فارماکولوژی دانشکده علوم پزشکی."
-            else:
+            elif is_in_vitro:
                 sec_16 = "آزمایشگاه تحقیقات سلولی و مولکولی و آزمایشگاه جامع تحقیقاتی دانشکده علوم پزشکی."
+            else:
+                sec_16 = "مراکز تحقیقاتی و درمانی منتخب وابسته به دانشگاه علوم پزشکی."
         md_parts.append("## ۱۶. محل انجام مطالعه\n" + sec_16 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -961,15 +1142,31 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_17 = cp_dict.get("formatted_sections_fa", {}).get(17) or cp_dict.get("formatted_sections_fa", {}).get("17")
         if not sec_17:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_17 = (
-                    f"- تشخیص قطعی بیماری {cond_name} مستند به پرونده پزشکی و گزارش پاتولوژی معتبر.\n"
-                    "- گذشت حداقل ۳ ماه از آغاز مراحل درمانی فعال (شیمی‌درمانی، رادیوتراپی یا بستری جراحی).\n"
+                    f"- تشخیص بالینی یا ثبت رسمی خدمت در پرونده پزشکی و سامانه HIS برای جامعه هدف مرتبط با {cond_name}.\n"
+                    "- استقرار صورتحساب هزینه‌های سلامت و مراجعه در دوره ارزیابی مراکز درمانی منتخب.\n"
                     "- سکونت خانوار در حوزه جغرافیایی تحت پوشش پژوهش.\n"
                     "- اعلام رضایت آگاهانه کتبی جهت شرکت در مصاحبه و تکمیل پرسشنامه توسط بیمار یا سرپرست قانونی خانوار."
                 )
-            else:
+            elif is_review:
+                sec_17 = (
+                    f"- مطالعات اصیل منتشرشده مرتبط با چارچوب JBI PCC پیرامون {cond_name}.\n"
+                    "- دسترسی به متن کامل و گزارش داده‌های کمی یا کیفی جهت استخراج ساختاریافته."
+                )
+            elif is_usability:
+                sec_17 = "- کاربران نهایی و متخصصان سلامت دیجیتال واجد سابقه کار با سامانه‌های درمانی و امضای رضایت‌نامه آگاهانه."
+            elif is_diagnostic or is_clinical or is_epidemiol:
+                sec_17 = (
+                    f"- بیماران یا شرکت‌کنندگان واجد تشخیص یا معیار بالینی مرتبط با {cond_name} مراجعه‌کننده به مراکز منتخب.\n"
+                    "- اخذ رضایت آگاهانه کتبی و تکمیل معیارهای پایه مطالعه."
+                )
+            elif is_in_vivo:
+                sec_17 = (
+                    "- حیوانات آزمایشگاهی هم‌سن و هم‌جنس با وزن استاندارد و سلامت تاییدشده پس از دوره ۷ روزه سازگاری.\n"
+                    "- نگهداری در شرایط استاندارد خانه حیوانات منطبق با ARRIVE 2.0."
+                )
+            elif is_in_vitro:
                 sec_17 = (
                     "- تطابق کامل با ویژگی‌های جمعیت/مدل بر مبنای چارچوب PICO/PECO مطالعه.\n"
                     "- مدل‌های زیستی با درصد زیست‌پذیری اولیه بالای ۹۵ درصد (تایید شده با آزمون تریپان بلو).\n"
@@ -978,6 +1175,8 @@ class ProposalGenerator:
                     "- استفاده از سلول‌ها در محدوده پاساژ استاندارد (پاساژهای بین ۳ الی ۱۰) جهت حفظ ویژگی‌های ژنتیکی و فنوتایپی.\n"
                     "- مواد مداخله با درجه خلوص آنالیتیکال استاندارد (Analytical Standard با خلوص بالای ۹۵٪ از کمپانی‌های معتبر)."
                 )
+            else:
+                sec_17 = f"- کلیه واحدها یا پرونده‌های واجد معیارهای پژوهش پیرامون {cond_name} در {sys_name}."
         md_parts.append("## ۱۷. معیار های ورود به مطالعه\n" + sec_17 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -988,15 +1187,19 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_18 = cp_dict.get("formatted_sections_fa", {}).get(18) or cp_dict.get("formatted_sections_fa", {}).get("18")
         if not sec_18:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys or is_epidemiol:
                 sec_18 = (
                     "- عدم تمایل یا انصراف بیمار یا سرپرست خانوار در هر مرحله از تکمیل پرسشنامه.\n"
-                    "- ناقص بودن بیش از ۲۰ درصد از اقلام هزینه‌ای کلیدی بدون امکان راستی‌آزمایی متقابل با سامانه اطلاعات بیمارستانی (HIS).\n"
-                    "- دریافت خدمات درمانی در خارج از کشور در طول دوره ارزیابی.\n"
-                    "- فوت بیمار قبل از امکان اعتبارسنجی صورتحساب‌های درمانی."
+                    "- ناقص بودن بیش از ۲۰ درصد از اقلام کلیدی بدون امکان راستی‌آزمایی متقابل با سامانه اطلاعات بیمارستانی (HIS).\n"
+                    "- مخدوش بودن پرونده یا انصراف آگاهانه از ادامه پیگیری."
                 )
-            else:
+            elif is_review:
+                sec_18 = "- سرمقاله‌ها، نامه‌های به سردبیر بدون داده اولیه، چکیده همایش‌های فاقد متن کامل و مطالعات تکراری همپوشان."
+            elif is_usability:
+                sec_18 = "- انصراف کاربر در میانه آزمون یا ناقص ماندن بیش از ۲۰ درصد از تکالیف سناریوی کاربردپذیری."
+            elif is_diagnostic or is_clinical or is_in_vivo:
+                sec_18 = "- بروز عوارض جدی نیازمند قطع مداخله، خروج داوطلبانه از مطالعه، یا نقص غیرقابل ترمیم داده‌های پایه."
+            elif is_in_vitro:
                 sec_18 = (
                     "- مشاهده هرگونه آلودگی میکروبی یا تغییرات ریخت‌شناسی غیرمعمول در چاهک‌های کشت.\n"
                     "- افت زیست‌پذیری کنترل منفی سلولی به کمتر از ۹۰ درصد در طول دوره آزمایش.\n"
@@ -1004,6 +1207,8 @@ class ProposalGenerator:
                     "- حذف چاهک‌های دارای نقص فنی آشکار مطابق معیارهای از پیش تعریف‌شده بدون انتخاب گزینشی داده‌ها.\n"
                     "- شناسایی و مدیریت داده‌های پرت (Outliers) بر مبنای آزمون آماری گرابز (Grubbs' Test) در سطح معناداری ۰.۰۱ و عدم اعمال حذف سلیقه‌ای."
                 )
+            else:
+                sec_18 = "- خروج داوطلبانه یا نقص بیش از ۲۰ درصد از داده‌های متغیر اصلی پژوهش."
         md_parts.append("## ۱۸. معیار های خروج از مطالعه\n" + sec_18 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1014,14 +1219,27 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_19 = cp_dict.get("formatted_sections_fa", {}).get(19) or cp_dict.get("formatted_sections_fa", {}).get("19")
         if not sec_19:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_19 = (
                     "- پرسشنامه استاندارد ارزیابی هزینه‌های سلامت و بهره‌مندی از خدمات درمانی (برگرفته از WHO World Health Survey و NHA).\n"
                     "- چک‌لیست استخراج داده‌های هزینه‌ای از پرونده‌های الکترونیک سلامت و سامانه اطلاعات بیمارستانی (HIS).\n"
                     "- نرم‌افزارهای تحلیلی آماری و اقتصاد سلامت Stata 17 و R 4.3 جهت مدلسازی چندمتغیره و استخراج شاخص تمرکز."
                 )
-            else:
+            elif is_review:
+                sec_19 = (
+                    "- چک‌لیست ۲۲ گانه رسمی PRISMA-ScR و فرم ساختارمند استخراج داده موسسه JBI.\n"
+                    "- سامانه غربالگری آنلاین Rayyan یا Covidence و نرم‌افزار R جهت سنجش توافق و رسم نمودار."
+                )
+            elif is_usability:
+                sec_19 = "- چک‌لیست ۱۰ اصل اکتشافی نیلسن، کاربرگ ثبت تکلیف (Think-Aloud Protocol) و پرسشنامه استاندارد ۱۰ ماده‌ای SUS."
+            elif is_diagnostic or is_clinical or is_epidemiol:
+                sec_19 = (
+                    "- چک‌لیست استاندارد استخراج داده‌های بالینی (eCRF) و ابزارهای کالیبره‌شده اندازه‌گیری پیامد بالینی.\n"
+                    "- نرم‌افزارهای تحلیلی SPSS و R Statistical Environment."
+                )
+            elif is_in_vivo:
+                sec_19 = "- ترازوی دیجیتال دقیق، کیت‌های بیوشیمیایی سرمی، میکروتوم و تجهیزات آسیب‌شناسی بافتی استاندارد."
+            elif is_in_vitro:
                 sec_19 = (
                     "- دستگاه اسپکتروفتومتر و میکروپلیت ریدر الایزا مجهز به فیلترهای استاندارد با اعمال تصحیح بلانک بدون سلول (Cell-Free Blank Correction).\n"
                     "- دستگاه فلوسایتومتر با لیزرهای تحریک استاندارد جهت تفکیک آپوپتوز و نکروز با رنگ‌آمیزی دوتایی Annexin V-FITC / PI.\n"
@@ -1029,6 +1247,8 @@ class ProposalGenerator:
                     "- میکروسکوپ اینورت مجهز به سیستم عکس‌برداری دیجیتال و نرم‌افزار ImageJ جهت آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay).\n"
                     "- سیستم Real-Time PCR جهت سنجش بیان کمی ژن‌ها و نرم‌افزارهای تحلیلی GraphPad Prism و CompuSyn."
                 )
+            else:
+                sec_19 = "- فرم ساختارمند جمع‌آوری داده‌ها و ابزارهای معتبر سنجش متناسب با متغیرهای بخش ۱۱."
         md_parts.append("## ۱۹. ابزار های گردآوری اطلاعات\n" + sec_19 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1039,20 +1259,24 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_20 = cp_dict.get("formatted_sections_fa", {}).get(20) or cp_dict.get("formatted_sections_fa", {}).get("20")
         if not sec_20:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_20 = (
-                    "- ارزیابی روایی صوری و محتوایی کمی با محاسبه نسبت روایی محتوا (CVR) و شاخص روایی محتوا (CVI) توسط پانل خبرگان اقتصاد سلامت و متخصصان انکولوژی.\n"
+                    "- ارزیابی روایی صوری و محتوایی کمی با محاسبه نسبت روایی محتوا (CVR) و شاخص روایی محتوا (CVI) توسط پانل خبرگان اقتصاد سلامت و نظام سلامت.\n"
                     "- اجرای مطالعه مقدماتی (Pilot) بر روی ۳۰ خانوار جهت اطمینان از وضوح، روانی و فهم دقیق سوالات پرسشنامه.\n"
                     "- بازبینی روزانه پرسشنامه‌های تکمیل‌شده توسط ناظر علمی پروژه."
                 )
-            else:
+            elif is_review:
+                sec_20 = "- بازبینی راهبرد جستجوی بولین بر اساس استاندارد PRESS و کالیبراسیون فرم استخراج JBI روی ۱۰ درصد مقالات."
+            elif is_usability or is_epidemiol or is_clinical or is_diagnostic:
+                sec_20 = "- ارزیابی روایی محتوایی و صوری ابزارها توسط پانل خبرگان (CVI > 0.80, CVR > 0.78) و کالیبراسیون ابزارهای اندازه‌گیری بالینی پیش از شروع پژوهش."
+            elif is_in_vitro or is_in_vivo:
                 sec_20 = (
                     "- کالیبراسیون دوره‌ای دستگاه‌های اندازه‌گیری با فیلترهای مرجع و ذرات کالیبراسیون استاندارد.\n"
                     "- ارزیابی کمّی و کیفی RNA استخراج‌شده با اسپکتروفتومتر نانودراپ (نسبت A260/A280 بین ۱.۸ الی ۲.۰) و شاخص سلامت RNA (RIN >= 7).\n"
-                    "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب (Melting Curve) با کارایی تکثیر استاندارد ۹۰ الی ۱۱۰ درصد.\n"
-                    "- احراز هویت سلولی با آنالیز پروفایل STR و استفاده از نمونه‌های کنترل منفی، کنترل بدون الگو (NTC) و کنترل‌های مثبت استاندارد."
+                    "- اعتبارسنجی پرایمرها با بلاست در NCBI و تایید تک‌پیک بودن منحنی ذوب (Melting Curve) با کارایی تکثیر استاندارد ۹۰ الی ۱۱۰ درصد."
                 )
+            else:
+                sec_20 = "- تایید روایی صوری و محتوایی ابزار جمع‌آوری داده‌ها توسط پانل متخصصان."
         md_parts.append("## ۲۰. تعیین اعتبار ابزار گردآوری\n" + sec_20 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1063,13 +1287,20 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_21 = cp_dict.get("formatted_sections_fa", {}).get(21) or cp_dict.get("formatted_sections_fa", {}).get("21")
         if not sec_21:
-            sec_21 = (
-                "- تامین کلیه کیت‌ها، آنتی‌بادی‌ها و مواد شیمیایی از کمپانی‌های مرجع معتبر (مانند Sigma-Aldrich / Merck / Gibco) با کد کاتالوگ مشخص.\n"
-                "- نرمال‌سازی داده‌های بیان ژن با استفاده از ژن مرجع داخلی پایدار (GAPDH / ACTB) مطابق استاندارد بین‌المللی MIQE.\n"
-                "- اجرای کلیه آزمون‌ها در حداقل سه تکرار بیولوژیکی کاملاً مستقل در روزهای مجزا.\n"
-                "- لحاظ نمودن حداقل سه تکرار تکنیکی (Triplicate) در هر پلیت برای هر غلظت آزمایشی.\n"
-                "- محاسبه ضریب تغییرات درون‌آزمونی (Intra-assay CV) و بین‌آزمونی (Inter-assay CV) و پذیرش داده‌ها صرفاً با CV کمتر از ۱۰ درصد."
-            )
+            if is_review:
+                sec_21 = "- محاسبه ضریب توافق بین دو داور مستقل (Cohen's Kappa >= 0.80) و رفع عدم توافق توسط پژوهشگر ارشد سوم."
+            elif is_health_sys or is_epidemiol or is_usability:
+                sec_21 = "- محاسبه همسانی درونی پرسشنامه‌ها با آلفای کرونباخ (> 0.80) و ثبات آزمون-بازآزمون با ضریب همبستگی درون‌طبقه‌ای (ICC)."
+            elif is_clinical or is_diagnostic or is_in_vivo:
+                sec_21 = "- استانداردسازی پروتکل اجرایی برای کلیه ارزیابان و محاسبه ضریب همبستگی درون‌طبقه‌ای (ICC) و ضریب تغییرات درون‌آزمونی (< 10%)."
+            elif is_in_vitro:
+                sec_21 = (
+                    "- تامین کلیه کیت‌ها، آنتی‌بادی‌ها و مواد شیمیایی از کمپانی‌های مرجع معتبر با کد کاتالوگ مشخص.\n"
+                    "- نرمال‌سازی داده‌های بیان ژن با استفاده از دو ژن مرجع داخلی پایدار (GAPDH و ACTB) مطابق استاندارد بین‌المللی MIQE.\n"
+                    "- اجرای کلیه آزمون‌ها در حداقل سه تکرار بیولوژیکی کاملاً مستقل در روزهای مجزا با سه تکرار تکنیکی (CV < 10%)."
+                )
+            else:
+                sec_21 = "- پایش پایایی اندازه‌گیری‌ها با آزمون-بازآزمون و کنترل تکرارپذیری داده‌ها."
         md_parts.append("## ۲۱. تعیین ابزار گردآوری\n" + sec_21 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1080,60 +1311,77 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_22 = cp_dict.get("formatted_sections_fa", {}).get(22) or cp_dict.get("formatted_sections_fa", {}).get("22")
 
-        if not sec_22 or not any(re.search(p, sec_22) for p in [r'\frac', r'n\s*=', r'Mead', r'Z_', r'E\s*=']):
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
-                # Health Systems & Policy (Health Economics): Cochran's Formula with Design Effect
+        has_valid_s22 = bool(sec_22) and any(
+            re.search(p, sec_22, re.IGNORECASE)
+            for p in [
+                r'\\frac', r'n\s*=', r'\bMead\b', r'Z_', r'E\s*=',
+                r'\bPRISMA\b', r'\bJBI\b', r'\bBuderer\b', r'\bNielsen\b',
+                r'1\s*-\s*\(1\s*-\s*L\)', r'اشباع\s+شواهد'
+            ]
+        )
+        if not has_valid_s22:
+            if is_review:
+                sec_22 = (
+                    "در مطالعات مرور دامنه‌ای منطبق با راهنمای رسمی PRISMA-ScR (Tricco 2018) و موسسه Joanna Briggs (JBI)، "
+                    "محاسبه حجم نمونه استنباطی با فرمول کوکران، آلفا یا توان آماری موضوعیت ندارد. "
+                    "کفایت حجم داده‌ها بر اساس جامعیت جستجو و اشباع شواهد (Search Saturation) در حداقل چهار پایگاه داده بین‌المللی تا استخراج کلیه مطالعات واجد شرایط تضمین می‌گردد."
+                )
+            elif is_usability:
+                sec_22 = (
+                    r"تعیین حجم نمونه در این مطالعه کاربردپذیری بر مبنای مدل ریاضی نیلسن-لاندائر ($P(n) = 1 - (1 - L)^n$) با احتمال کشف پایه $L = 0.31$ انجام شده است "
+                    r"که با حضور $n = 10$ ارزیاب بیش از ۹۷.۶ درصد خطاهای رابط کاربری شناسایی می‌شود. علاوه بر آن، برای سنجش کمی مقیاس استاندارد SUS حداقل ۳۰ کاربر نهایی وارد مطالعه می‌گردند."
+                )
+            elif is_diagnostic:
+                sec_22 = (
+                    "محاسبه حجم نمونه بر اساس فرمول استاندارد بودرر (Buderer's Formula, 1996) جهت مطالعات دقت تشخیصی با فرض حساسیت و ویژگی مورد انتظار ۸۵٪، شیوع بیماری ۲۰٪ و حاشیه خطای مطلق ۵٪ ($d = 0.05$) در سطح اطمینان ۹۵٪ انجام می‌پذیرد:\n\n"
+                    r"$$n = \frac{Z_{1-\alpha/2}^2 \cdot Se(1-Se)}{d^2 \cdot \text{Prev}}$$"
+                    "\n\nبر این اساس حجم نمونه کل در دامنه بالینی معتبر محاسبه و با ۱۰٪ حاشیه ریزش تثبیت می‌گردد."
+                )
+            elif is_health_sys:
                 sec_22 = (
                     "تعیین حجم نمونه بر مبنای استاندارد بین‌المللی فرمول کوکران برای متغیرهای کیفی-نسبتی با لحاظ ضریب اثر طرح خوشه‌ای (DEFF) صورت پذیرفته است:\n\n"
                     r"$$n = \frac{Z_{1-\alpha/2}^2 \cdot p(1-p)}{d^2} \times DEFF$$"
-                    "\n\nدر این رابطه $Z_{1-\alpha/2} = 1.96$ معادل سطح اطمینان ۹۵٪، $p = 0.50$ به عنوان محافظه‌کارانه‌ترین نسبت جهت حصول بیشینه واریانس و بزرگ‌ترین حجم نمونه ایمن، "
-                    "و $d = 0.05$ دقت مطلوب برآورد (خطای مجاز ۵٪) است. "
-                    "بر این اساس حجم نمونه پایه $n_{base} = \frac{1.96^2 \times 0.50 \times (1 - 0.50)}{0.05^2} = 384.16 \approx 385$ خانوار/بیمار حاصل می‌گردد. "
-                    "با در نظر گرفتن ضریب اثر طرح خوشه‌ای ($DEFF = 1.5$) ناشی از نمونه‌گیری خوشه‌ای چندمرحله‌ای، حجم نمونه به $n_{cluster} = 385 \times 1.5 = 577.5 \approx 578$ نفر افزایش می‌یابد. "
-                    "نهایتاً با لحاظ ۱۰٪ احتمال عدم پاسخ یا پرسشنامه‌های مخدوش، حجم نمونه نهایی به صورت زیر تثبیت می‌گردد:\n\n"
+                    "\n\nدر این رابطه $Z_{1-\\alpha/2} = 1.96$ معادل سطح اطمینان ۹۵٪، $p = 0.50$ و $d = 0.05$ دقت مطلوب برآورد است. "
+                    r"بر این اساس حجم نمونه پایه $n_{base} = \frac{1.96^2 \times 0.50 \times (1 - 0.50)}{0.05^2} = 384.16 \approx 385$ خانوار/بیمار حاصل می‌گردد. "
+                    "با در نظر گرفتن ضریب اثر طرح خوشه‌ای ($DEFF = 1.5$)، حجم نمونه به $n_{cluster} = 578$ نفر و با لحاظ ۱۰٪ عدم پاسخ به ۶۴۲ خانوار/بیمار می‌رسد:\n\n"
                     r"$$n_{final} = \frac{n_{cluster}}{1 - 0.10} = \frac{578}{0.90} \approx 642 \text{ خانوار/بیمار}$$"
                 )
-            elif "EPIDEMIOLOG" in fw_upper or "OBSERVATIONAL" in fw_upper:
-                # Observational Epidemiology: Cochran's Formula for Observational Surveys
+            elif is_epidemiol:
                 sec_22 = (
                     "محاسبه حجم نمونه بر مبنای فرمول استاندارد کوکران برای مطالعات مشاهده‌ای صورت پذیرفته است:\n\n"
                     r"$$n = \frac{Z_{1-\alpha/2}^2 \cdot P(1-P)}{d^2}$$"
                     "\n\nدر این رابطه $Z = 1.96$ معادل اطمینان ۹۵٪، $P = 0.50$ برای حصول بیشترین حجم نمونه و $d = 0.05$ دقت برآورد است. "
                     "حجم پایه ۳۸۵ نفر محاسبه شده و با احتساب ۱۰٪ ریزش، تعداد نهایی به ۴۲۸ شرکت‌کننده تعدیل می‌گردد."
                 )
-            elif framework in ["EXPERIMENTAL_ANIMAL", "ANIMAL_IN_VIVO"] or "ANIMAL" in fw_upper:
-                # In Vivo Animal: Festing (2002) & ARRIVE Guidelines (Mead's Resource Equation)
+            elif is_in_vivo:
                 sec_22 = (
                     "تعیین حجم نمونه در مطالعه حیوانی بر مبنای راهنمای بین‌المللی ARRIVE Guidelines و معادله تخصیص منابع فستینگ (Festing & Altman, 2002; Festing, 2006) انجام می‌پذیرد:\n\n"
                     r"$$E = N - B - T$$"
                     "\n\nدر این رابطه، $N$ کل حیوانات آزمایشگاهی، $B$ اثر بلوک‌بندی و $T$ درجات آزادی تیمارها است. "
-                    "طبق استاندارد جهانی Festing، مقدار درجات آزادی خطا ($E$) باید در بازه $10 \le E \le 20$ قرار گیرد تا هم توان آماری آزمون ($1-\beta \ge 0.80$) تضمین گردد و هم از هدررفت اخلاقی حیوانات جلوگیری شود. "
-                    "با فرض ۴ بازوی آزمایشی و ۶ سر حیوان در هر گروه ($N = 24$)، مقدار $E = 24 - 1 - 3 = 20$ حاصل می‌شود. با احتساب ۱۰٪ نرخ تلفات احتمالی ($Attrition Rate$)، حجم نهایی نمونه‌ها تثبیت می‌گردد."
+                    "طبق استاندارد جهانی Festing، مقدار درجات آزادی خطا ($E$) باید در بازه $10 \\le E \\le 20$ قرار گیرد. "
+                    "با فرض ۴ بازوی آزمایشی و ۶ سر حیوان در هر گروه ($N = 24$)، مقدار $E = 24 - 1 - 3 = 20$ حاصل می‌شود."
                 )
-            elif framework in ["PICO", "CLINICAL_TRIAL", "COHORT", "HUMAN"] or "CLINICAL" in fw_upper:
-                # Clinical Trial / Human Cohort: Chow et al. (2017) Sample Size Calculations in Clinical Research
+            elif is_clinical:
                 sec_22 = (
-                    "محاسبه حجم نمونه بر اساس استاندارد مرجع کارآزمایی‌های بالینی چو و وانگ (Chow, Shao, Wang, & Lokhnygina, 2017 - *Sample Size Calculations in Clinical Research*) جهت مقایسه دو گروه موازی انجام می‌پذیرد:\n\n"
-                    r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2} = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2}$$"
-                    "\n\nدر این معادله با در نظر گرفتن توان آماری ۸۰٪ ($1-\beta = 0.80$ معادل $Z_{1-\beta} = 0.84$)، ضریب خطای نوع اول دوطرفه ۵٪ ($\alpha = 0.05$ معادل $Z_{1-\alpha/2} = 1.96$) و اندازه اثر استاندارد کوهن ($Cohen's\ d = \Delta / \sigma$) بر مبنای تفاوت حداقل معنادار بالینی (MCID) مستخرج از کارآزمایی‌های پایه، حجم نمونه محاسبه و با لحاظ ۱۰٪ احتمال ریزش نمونه‌ها تعدیل می‌گردد."
+                    "محاسبه حجم نمونه بر اساس استاندارد مرجع کارآزمایی‌های بالینی چو و وانگ (Chow, Shao, Wang, & Lokhnygina, 2017) جهت مقایسه دو گروه موازی با تکیه بر حداقل تفاوت معنادار بالینی (MCID) انجام می‌پذیرد:\n\n"
+                    r"$$n = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2 \cdot \sigma^2}{\Delta^2} = \frac{2(Z_{1-\alpha/2} + Z_{1-\beta})^2}{d^2} = \frac{2(1.96 + 0.84)^2}{0.50^2} \approx 64\text{ per arm } (N = 128)$$"
+                    "\n\nدر این معادله، $\\Delta$ بیانگر حداقل تفاوت معنادار بالینی (MCID) و $\\sigma$ انحراف معیار جمعیت هدف است که با توان آماری ۸۰٪ ($1-\\beta = 0.80, Z_{1-\\beta} = 0.84$)، سطح خطای نوع اول دوطرفه ۵٪ ($\\alpha = 0.05, Z_{1-\\alpha/2} = 1.96$) "
+                    "و اندازه اثر استاندارد ($d = \\Delta / \\sigma = 0.50$)، حجم نمونه پایه برابر $n = 64$ بیمار در هر بازو و مجموعاً $N = 128$ بیمار محاسبه می‌گردد (با لحاظ ۱۰٪ ریزش احتمالی، حدود ۷۱ بیمار در هر گروه و جمعاً ۱۴۲ بیمار غربالگری می‌شود)."
                 )
-            else:
-                # In Vitro Cellular Combination: G*Power Factorial ANOVA & Mead Resource Allocation (for 10-condition matrix)
+            elif is_in_vitro:
                 sec_22 = (
                     "تعیین حجم نمونه در این مطالعه سلولی بر مبنای راهنماهای بین‌المللی بازتولیدپذیری آزمایشگاهی NIH (NIH Notice NOT-OD-15-103)، "
                     "معادله تخصیص منابع فستینگ و مید (Mead's Resource Equation; Festing, 2006) و محاسبه مستقل توان آنالیز واریانس فاکتوریل صورت پذیرفته است:\n\n"
                     r"$$E = N - B - T$$"
-                    "\n\nدر این رابطه، $N$ کل واحدهای تجربی مستقل در ماتریس آزمون فاکتوریل ($N = 10 \times 3 = 30$ با احتساب ۱ گروه کنترل حلال، ۴ سطح دوز مرجع تک‌دارویی و ۵ ترکیب با نسبت ثابت هم‌توان)، "
+                    "\n\nدر این رابطه، $N$ کل واحدهای تجربی مستقل در ماتریس آزمون فاکتوریل ($N = 10 \\times 3 = 30$ با احتساب ۱ گروه کنترل حلال، ۴ سطح دوز مرجع تک‌دارویی و ۵ ترکیب با نسبت ثابت هم‌توان)، "
                     "$B$ درجات آزادی اثر بلوک‌بندی آزمایشگاهی ($B = k_{blocks} - 1 = 3 - 1 = 2$ به ازای ۳ روز کاری مستقل) و $T$ درجات آزادی کل شرایط تیماری ($T = 10 - 1 = 9$) است. "
-                    "بر این اساس، درجات آزادی خطای آزمون به صورت $E = 30 - 2 - 9 = 19$ محاسبه می‌شود که دقیقاً در محدوده بهینه استاندارد بین‌المللی ($10 \le E \le 20$) قرار دارد و تضمین‌کننده کفایت درجات آزادی برآورد واریانس خطا بدون هدررفت غیرضروری مواد آزمایشگاهی است.\n\n"
+                    "بر این اساس، درجات آزادی خطای آزمون به صورت $E = 30 - 2 - 9 = 19$ محاسبه می‌شود که دقیقاً در محدوده بهینه استاندارد بین‌المللی ($10 \\le E \\le 20$) قرار دارد.\n\n"
                     "▪ **محاسبه مستقل توان آماری (Statistical Power Analysis):**\n"
-                    "لازم به تاکید است که معادله مید صرفاً یک قاعده تجربی جهت بررسی کفایت درجات آزادی خطا است و جایگزین محاسبه توان آزمون نمی‌باشد. "
-                    "توان آماری به صورت مستقل بر پایه آزمون تحلیل واریانس دوطرفه فاکتوریل (Two-Way Factorial ANOVA) و توزیع $F$ نامرکزی در نرم‌افزار G*Power محاسبه شده است: "
-                    "در شرایط کنترل‌شده کشت سلولی که انحراف معیار درون‌گروهی کمتر از ۱۰٪ است، برای سنجش کنتراست اصلی برهم‌کنش هم‌افزایی ($df_{effect} = 1, df_{error} = 19$) در برابر آستانه اندازه اثر بزرگ کوهن ($f \\ge 0.40$؛ اندازه اثر بیولوژیک هدف در مهار ۵۰ درصدی IC50 معادل $f = 0.58$ و پارامتر نامرکزی $\\lambda = N \\cdot f^2 = 10.1$)، در سطح خطای نوع اول دوطرفه $\\alpha = 0.05$ و حجم نمونه کل $N = 30$ "
-                    "(حاصل از حداقل ۳ تکرار بیولوژیکی کاملاً مستقل در روزها و پاساژهای مجزا؛ $n = 3$ Biological Replicates)، "
-                    "توان آماری دقیق آزمون به ۸۵.۲ درصد ($1 - \\beta = 0.852 > 0.80$) می‌رسد که استاندارد طلایی مطالعات تجربی را برآورده می‌سازد. "
-                    "کلیه تکرارهای تکنیکی درون‌پلیتی (Technical Triplicates) نیز به منظور پیشگیری از خطای شبه‌تکرار (Pseudo-Replication Fallacy) به صورت میانگین یک واحد تجربی لحاظ می‌گردند."
+                    r"توان آماری به صورت مستقل بر پایه آزمون تحلیل واریانس دوطرفه فاکتوریل در نرم‌افزار G*Power محاسبه شده است: برای سنجش کنتراست اصلی برهم‌کنش ($df_{effect} = 1, df_{error} = 19$) با اندازه اثر هدف ($f = 0.58$، $\lambda = N \cdot f^2 = 10.1$)، $\alpha = 0.05$ و $N = 30$ (شامل $n = 3$ Biological Replicates — جهت پیشگیری از خطای تکرار کاذب / Pseudo-Replication)، توان آماری دقیق آزمون به ۸۵.۲ درصد ($1 - \beta = 0.852 > 0.80$) می‌رسد."
+                )
+            else:
+                sec_22 = (
+                    "تعیین حجم نمونه بر اساس طراحی نهایی مطالعه پس از تثبیت شاخص تغییرپذیری متغیر پیامد و سطح اطمینان استاندارد ($\alpha = 0.05$) در گام روش‌شناسی انجام می‌شود."
                 )
         md_parts.append("## ۲۲. حجم نمونه و روش محاسبه آن\n" + sec_22 + "\n\n---")
 
@@ -1145,27 +1393,57 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_23 = cp_dict.get("formatted_sections_fa", {}).get(23) or cp_dict.get("formatted_sections_fa", {}).get("23")
         if not sec_23:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_23 = (
                     "- گزارش شاخص‌های آمار توصیفی (فراوانی، درصد، میانگین، انحراف معیار و صدک‌های هزینه‌ای).\n"
-                    "- آزمون شاپیرو-ویلک جهت بررسی توزیع نرمال متغیرهای مالی و استفاده از آزمون‌های ناپارامتری (من-ویتنی و کروسکال-والیس) در صورت چولگی داده‌ها.\n"
+                    "- آزمون شاپیرو-ویلک جهت بررسی توزیع نرمال متغیرهای مالی و استفاده از آزمون‌های ناپارامتری در صورت چولگی داده‌ها.\n"
                     "- محاسبه نسبت خانوارهای مواجه با هزینه‌های کمرشکن سلامت (CHE) بر مبنای رویکرد رسمی سازمان جهانی بهداشت (WHO: 10% total spending & 40% capacity to pay).\n"
-                    "- تحلیل عوامل پیش‌بینی‌کننده با مدل رگرسیون لجستیک چندمتغیره (Multivariable Logistic Regression) و گزارش نسبت‌های شانس تعدیل‌شده (Adjusted Odds Ratio: AOR) به همراه فاصله اطمینان ۹۵٪.\n"
-                    "- ارزیابی نابرابری در توزیع بار مالی از طریق محاسبه شاخص تمرکز (Concentration Index) و رسم منحنی تمرکز (Concentration Curve).\n"
-                    "- تحلیل‌های آماری در نرم‌افزارهای Stata نسخه ۱۷ یا R نسخه ۴.۳ انجام شده و سطح معنی‌داری p < 0.05 لحاظ خواهد شد."
+                    "- تحلیل عوامل پیش‌بینی‌کننده با مدل رگرسیون لجستیک چندمتغیره و گزارش نسبت‌های شانس تعدیل‌شده (AOR) با فاصله اطمینان ۹۵٪.\n"
+                    "- ارزیابی نابرابری در توزیع بار مالی از طریق محاسبه شاخص تمرکز و شاخص کاکوانی در Stata/R در سطح معناداری p < 0.05."
                 )
-            else:
+            elif is_review:
+                sec_23 = (
+                    "- گزارش جریان غربالگری و انتخاب مطالعات بر اساس نمودار PRISMA-ScR.\n"
+                    "- سنجش توافق دو داور با ضریب کاپای کوهن (Cohen's Kappa >= 0.80) و ICC.\n"
+                    "- طبقه‌بندی توصیفی ویژگی‌های مطالعات و خلاصه‌سازی اختلاف خطر (Risk Difference) با فاصله اطمینان ۹۵٪ در محیط R."
+                )
+            elif is_usability:
+                sec_23 = (
+                    "- محاسبه میانگین، میانه و انحراف معیار نمره مقیاس استاندارد SUS در دامنه ۰ تا ۱۰۰.\n"
+                    "- گزارش درصد تکمیل موفق تکلیف، زمان اجرا و رتبه‌بندی فراوانی خطاهای اکتشافی نیلسن در SPSS/R."
+                )
+            elif is_diagnostic:
+                sec_23 = (
+                    "- تشکیل جدول توافقی ۲×۲ و محاسبه حساسیت، ویژگی، PPV و NPV در برابر استاندارد طلایی.\n"
+                    "- ترسیم منحنی ROC، محاسبه AUC با فاصله اطمینان ۹۵٪ و تعیین نقطه برش بهینه با شاخص یودن و آزمون مک‌نمار در R/MedCalc (p < 0.05)."
+                )
+            elif is_epidemiol:
+                sec_23 = (
+                    "- گزارش آمار توصیفی، برآورد شیوع با فاصله اطمینان ۹۵٪ و آزمون کای-اسکوئر/تی مستقل.\n"
+                    "- برازش مدل رگرسیون لجستیک یا پواسون چندمتغیره جهت برآورد AOR تعدیل‌شده در SPSS/Stata (p < 0.05)."
+                )
+            elif is_clinical:
+                sec_23 = (
+                    "- اجرای تحلیل قصد درمان (Intention-to-Treat: ITT) و تحلیل پروتکل (PP) بر اساس راهنمای CONSORT.\n"
+                    "- مقایسه بازوهای درمانی با آزمون تی مستقل، تحلیل کوواریانس (ANCOVA) و مدل بقای کاپلان-مایر در SPSS/R (p < 0.05)."
+                )
+            elif is_in_vivo:
+                sec_23 = (
+                    "- بررسی توزیع نرمال داده‌ها با آزمون شاپیرو-ویلک و مقایسه میانگین گروه‌ها با تحلیل واریانس یک‌طرفه یا مکرر (Repeated Measures ANOVA) و آزمون تعقیبی توکی در سطح p < 0.05."
+                )
+            elif is_in_vitro:
                 ci_explanation = ""
                 if len(interventions) >= 2:
                     ci_explanation = f"\n- تفسیر و طبقه‌بندی ریاضی شاخص ترکیب (CI) بر اساس استاندارد واحد:\n{SynergyMetricConfig.get_unified_narrative_fa()}"
                 sec_23 = (
                     "- بررسی نرمال بودن توزیع داده‌ها با آزمون شاپیرو-ویلک (Shapiro-Wilk) و همگنی واریانس‌ها با آزمون لون (Levene).\n"
                     "- تحلیل مقایسه میانگین‌ها و ارزیابی اثر متقابل غلظت‌ها با آنالیز واریانس دوطرفه فاکتوریل (Two-way Factorial ANOVA with interaction effect) و آزمون تعقیبی توکی (Tukey's post-hoc).\n"
-                    "- کمی‌سازی نسبی بیان ژن‌ها مطابق فرمول استاندارد لیواک ($2^{-\Delta\Delta C_t}$) با نرمال‌سازی همزمان نسبت به حداقل دو ژن مرجع داخلی پایدار (GAPDH و ACTB) منطبق با استانداردهای MIQE.\n"
+                    r"- کمی‌سازی نسبی بیان ژن‌ها مطابق فرمول استاندارد لیواک ($2^{-\Delta\Delta C_t}$) با نرمال‌سازی همزمان نسبت به حداقل دو ژن مرجع داخلی پایدار (GAPDH و ACTB) منطبق با استانداردهای MIQE." + "\n"
                     f"- محاسبه ریاضی شاخص ترکیب (CI) با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder).{ci_explanation}\n"
                     "- سطح معنی‌داری آماری در کلیه آزمون‌ها p < 0.05 در نظر گرفته خواهد شد."
                 )
+            else:
+                sec_23 = "- تحلیل آماری داده‌ها با استفاده از آمار توصیفی و آزمون‌های استنباطی متناسب با مقیاس متغیرها در SPSS/R در سطح معناداری p < 0.05."
         md_parts.append("## ۲۳. روش تجزیه و تحلیل داده\n" + sec_23 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1176,49 +1454,47 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_24 = cp_dict.get("formatted_sections_fa", {}).get(24) or cp_dict.get("formatted_sections_fa", {}).get("24")
         if not sec_24:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_24 = (
                     "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه علوم پزشکی.\n"
                     "- اخذ رضایت‌آگاهانه کتبی از بیماران یا سرپرستان قانونی خانوار پس از تبیین کامل اهداف و اختیاری بودن مشارکت.\n"
                     "- حفظ اکید محرمانگی هویت و داده‌های اقتصادی و بالینی خانوارها با کدگذاری ناشناس (De-identified Coding).\n"
                     "- انطباق کامل با موازین بیانیه هلسینکی و دستورالعمل‌های کشوری حفاظت از داده‌های سلامت."
                 )
-            elif "DIAGNOSTIC" in fw_upper or "STARD" in fw_upper or "BIOMARKER" in fw_upper:
+            elif is_review:
+                sec_24 = (
+                    "- مطالعه حاضر یک مرور دامنه‌ای بر روی منابع علمی منتشرشده است، فاقد هرگونه مداخله انسانی یا حیوانی می‌باشد و جهت اخذ کد معافیت/تاییدیه به کمیته اخلاق دانشگاه ارائه می‌گردد.\n"
+                    "- رعایت کامل اصول امانت علمی، شفافیت گزارش‌دهی PRISMA-ScR، پیش‌ثبت پروتکل در OSF و اعلام عدم تعارض منافع."
+                )
+            elif is_usability:
+                sec_24 = (
+                    "- اخذ کد اخلاق و رضایت آگاهانه کتبی از کاربران شرکت‌کننده و تضمین عدم استفاده از اطلاعات واقعی هویتی بیماران."
+                )
+            elif is_diagnostic:
                 sec_24 = (
                     "- اخذ کد مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه علوم پزشکی.\n"
-                    "- اخذ رضایت‌آگاهانه کتبی از کلیه بیماران پیش از نمونه‌گیری بالینی.\n"
-                    "- کدگذاری محرمانه و بی‌نام نمونه‌ها جهت حفظ حریم خصوصی بیماران.\n"
-                    "- انطباق کامل با دستورالعمل‌های بیانیه هلسینکی."
+                    "- اخذ رضایت‌آگاهانه کتبی از کلیه بیماران پیش از نمونه‌گیری بالینی و کدگذاری بی‌نام نمونه‌ها."
                 )
-            elif "EPIDEMIOL" in fw_upper or "OBSERV" in fw_upper or "STROBE" in fw_upper:
+            elif is_epidemiol:
                 sec_24 = (
-                    "- اخذ تاییدیه و کد مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه علوم پزشکی.\n"
-                    "- اخذ رضایت‌آگاهانه کتبی و شفاف از کلیه شرکت‌کنندگان.\n"
-                    "- رعایت کامل محرمانگی داده‌ها و بی‌نام‌سازی پرسشنامه‌ها با کدهای اختصاصی.\n"
-                    "- انطباق کامل با موازین بیانیه هلسینکی."
+                    "- اخذ تاییدیه و کد مصوب از کمیته منطقه‌ای اخلاق و رضایت‌آگاهانه کتبی از شرکت‌کنندگان با تضمین محرمانگی داده‌ها."
                 )
-            elif "CLINICAL" in fw_upper or "RCT" in fw_upper or "CONSORT" in fw_upper:
+            elif is_clinical:
                 sec_24 = (
-                    "- اخذ تاییدیه رسمی از کمیته ملی/منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی.\n"
-                    "- پیش‌ثبت رسمی پروتکل در مرکز کارآزمایی‌های بالینی ایران (IRCT) پیش از ورود نخستین بیمار.\n"
-                    "- اخذ رضایت‌آگاهانه کتبی معتبر از تمامی بیماران منطبق بر بیانیه هلسینکی و اصول ICH-GCP.\n"
-                    "- تشکیل کمیته مستقل پایش داده و ایمنی (DSMB)."
+                    "- اخذ تاییدیه رسمی از کمیته اخلاق در پژوهش‌های زیست‌پزشکی و پیش‌ثبت رسمی در مرکز کارآزمایی‌های بالینی ایران (IRCT).\n"
+                    "- اخذ رضایت‌آگاهانه کتبی منطبق بر بیانیه هلسینکی و اصول ICH-GCP به همراه کمیته مستقل پایش ایمنی (DSMB)."
                 )
-            elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper or "ARRIVE" in fw_upper:
+            elif is_in_vivo:
                 sec_24 = (
-                    "- اخذ تاییدیه و کد اختصاصی اخلاق کار با حیوانات آزمایشگاهی از کمیته اخلاق زیست‌پزشکی دانشگاه.\n"
-                    "- رعایت دقیق اصول سه‌گانه 3Rs (Replacement, Reduction, Refinement).\n"
-                    "- پایش مستمر نقاط پایانی انسانی (Humane Endpoints) جهت پیشگیری از رنج حیوانات.\n"
-                    "- اجرای اتانازی بدون درد در پایان مطالعه مطابق با استانداردهای AVMA."
+                    "- اخذ تاییدیه اخلاق کار با حیوانات آزمایشگاهی و رعایت اصول سه‌گانه 3Rs (Replacement, Reduction, Refinement) و اتانازی بدون درد AVMA."
                 )
-            else:
+            elif is_in_vitro:
                 sec_24 = (
                     "- اخذ کد اخلاق مصوب از کمیته منطقه‌ای اخلاق در پژوهش‌های زیست‌پزشکی دانشگاه.\n"
-                    "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی و ثبت دقیق اصالت نمونه‌ها.\n"
-                    "- تعهد به شفافیت کامل داده‌ها، امانتداری علمی و پیش‌ثبت پروتکل مطالعه در سامانه پژوهشیار.\n"
-                    "- تعهد به عدم استفاده از نمونه‌های انسانی بدون رضایت آگاهانه و رعایت بیانیه هلسینکی."
+                    "- رعایت استانداردهای ملی و بین‌المللی استفاده از رده‌های زیستی، ثبت اصالت نمونه‌ها و بیانیه هلسینکی."
                 )
+            else:
+                sec_24 = "- اخذ کد اخلاق مصوب دانشگاهی، محرمانگی داده‌ها و رعایت موازین بیانیه هلسینکی."
         md_parts.append("## ۲۴. ملاحظلات اخلاقی در صورت نیاز\n" + sec_24 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1229,37 +1505,30 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_25 = cp_dict.get("formatted_sections_fa", {}).get(25) or cp_dict.get("formatted_sections_fa", {}).get("25")
         if not sec_25:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper or "EPIDEMIOL" in fw_upper:
+            if is_health_sys or is_epidemiol or is_review or is_usability:
                 sec_25 = (
-                    "- حفاظت از امنیت داده‌های الکترونیک و پایگاه‌های اطلاعاتی با استانداردهای رمزنگاری (AES-256).\n"
-                    "- محدودسازی سطح دسترسی به فایل‌های خام پرسشنامه‌ها صرفاً به مجری اصلی طرح.\n"
-                    "- نگهداری امن و خرد کردن اسناد فیزیکی و کاغذی مصاحبه‌ها پس از ثبت نهایی و اعتبارسنجی دیجیتال با سامانه HIS."
+                    "- حفاظت از امنیت داده‌های الکترونیک و پایگاه‌های اطلاعاتی با استانداردهای رمزنگاری (AES-256) و پشتیبان‌گیری منظم.\n"
+                    "- محدودسازی دسترسی به داده‌های خام صرفاً به مجری اصلی طرح و بی‌نام‌سازی کامل رکوردها."
                 )
-            elif "DIAGNOSTIC" in fw_upper or "STARD" in fw_upper or "BIOMARKER" in fw_upper:
+            elif is_diagnostic:
                 sec_25 = (
-                    "- انجام مراحل آزمایشگاهی تحت شرایط سطح ایمنی زیستی ۲ (BSL-2) به دلیل کار با نمونه‌های بیولوژیک انسانی.\n"
-                    "- استفاده از تجهیزات کامل حفاظت فردی (PPE)، هودهای بیولوژیک استاندارد و سیفتی‌باکس.\n"
-                    "- اتوکلاو نمودن کلیه پسماندهای زیستی عفونی پیش از دفع نهایی."
+                    "- انجام مراحل آزمایشگاهی تحت شرایط سطح ایمنی زیستی ۲ (BSL-2) و اتوکلاو پسماندهای زیستی."
                 )
-            elif "CLINICAL" in fw_upper or "RCT" in fw_upper or "CONSORT" in fw_upper:
+            elif is_clinical:
                 sec_25 = (
-                    "- نگهداری داروهای کارآزمایی در شرایط استاندارد زنجیره سرد با ثبت پیوسته دما و سیستم ثبت ردیابی بچ نامبر.\n"
-                    "- ثبت الکترونیک داده‌ها در سامانه امن eCRF با رمزنگاری AES-256 و ثبت لاگ تمامی تغییرات (Audit Trail).\n"
-                    "- گزارش فوری هرگونه رخداد نامطلوب جدی (SAE) به کمیته اخلاق ظرف ۲۴ ساعت."
+                    "- نگهداری داروهای کارآزمایی در زنجیره سرد استاندارد و ثبت الکترونیک داده‌ها در سامانه رمزنگاری‌شده eCRF همراه با گزارش فوری رخدادهای نامطلوب."
                 )
-            elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper or "ARRIVE" in fw_upper:
+            elif is_in_vivo:
                 sec_25 = (
-                    "- نگهداری حیوانات در شرایط تهویه استاندارد با فیلتر هپا (HEPA) و مدیریت کنترل بو و ذرات معلق.\n"
-                    "- رعایت نکات حفاظت زیستی سطح ۲ (BSL-2) در مواجهه با مواد شیمیایی و ترشحات بیولوژیک.\n"
-                    "- امحاء و دفع بهداشتی لاشه‌ها و پسماندهای عفونی خانه حیوانات از طریق اتوکلاو و کوره‌سوزی استاندارد دانشگاه."
+                    "- نگهداری حیوانات با تهویه هپا (HEPA)، حفاظت زیستی BSL-2 و دفع بهداشتی پسماندها مطابق استاندارد دانشگاه."
                 )
-            else:
+            elif is_in_vitro:
                 sec_25 = (
                     "- انجام کلیه آزمایش‌های کشت سلولی و زیستی منحصراً در آزمایشگاه سطح ایمنی زیستی ۲ (BSL-2) زیر هودهای لامینار کلاس ۲.\n"
-                    "- اتوکلاو نمودن و بی‌خطرسازی کلیه پسماندهای عفونی و پساب‌ها پیش از خروج طبق پروتکل‌های حفاظت زیستی دانشگاه.\n"
-                    "- استفاده الزامی اپراتور از تجهیزات حفاظت فردی کامل (PPE شامل دستکش، گان، ماسک و محافظ صورت)."
+                    "- اتوکلاو نمودن پسماندهای عفونی و استفاده الزامی اپراتور از تجهیزات حفاظت فردی کامل (PPE)."
                 )
+            else:
+                sec_25 = "- حفاظت از امنیت و یکپارچگی داده‌های پژوهش و رعایت دستورالعمل‌های ایمنی محیط اجرا."
         md_parts.append("## ۲۵. نحوه رعایت نکات امنیتی و حفاظت پروژه در صورت نیاز\n" + sec_25 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1270,43 +1539,32 @@ class ProposalGenerator:
             cp_dict = data.get("cohesive_protocol") or {}
             sec_26 = cp_dict.get("formatted_sections_fa", {}).get(26) or cp_dict.get("formatted_sections_fa", {}).get("26")
         if not sec_26:
-            fw_upper = str(framework).upper()
-            if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+            if is_health_sys:
                 sec_26 = (
-                    "- سوگیری یادآوری در اعلام هزینه‌ها (Recall Bias): کنترل از طریق محدودسازی دوره یادآوری سرپایی به ۱ ماه و تطبیق هزینه‌های بستری با اسناد رسمی صورتحساب HIS.\n"
-                    "- عدم تمایل احتمالی برخی خانوارها به افشای دقیق درآمدها: مهار با استفاده از روش محاسبه مخارج مصرفی خانوار (Consumption Expenditure) به جای درآمد اعلامی طبق راهنمای رسمی بانک جهانی و WHO.\n"
-                    "- عدم دسترسی یکپارچه به تعرفه‌های خدمات در تمام مراکز درمانی بخش خصوصی و لزوم استعلام مستقیم فاکتورها."
+                    "- سوگیری یادآوری در اعلام هزینه‌ها (Recall Bias): کنترل با تطبیق صورتحساب رسمی HIS.\n"
+                    "- برآورد مخارج مصرفی خانوار طبق راهنمای WHO برای افزایش دقت داده‌های درآمدی."
                 )
-            elif "DIAGNOSTIC" in fw_upper or "STARD" in fw_upper or "BIOMARKER" in fw_upper:
+            elif is_review:
                 sec_26 = (
-                    "- سوگیری طیف (Spectrum Bias): مهار از طریق ورود متوالی کلیه مراجعین مشکوک با طیف‌های مختلف علائم بالینی.\n"
-                    "- سوگیری راستی‌آزمایی (Verification Bias): مهار از طریق الزام به اجرای استاندارد طلایی مرجع روی تمام شرکت‌کنندگان.\n"
-                    "- خطاهای پیش‌تحلیلی در جمع‌آوری و نگهداری نمونه‌ها: مهار با دستورالعمل مدون یکپارچه پیش‌آزمایشی (SOP)."
+                    "- ناهمگونی روش‌شناختی مطالعات اولیه و سوگیری انتشار احتمالی: مهار با جستجوی جامع چندپایگاهی و تفکیک شواهد مستقیم از موازی."
                 )
-            elif "EPIDEMIOL" in fw_upper or "OBSERV" in fw_upper or "STROBE" in fw_upper:
+            elif is_usability:
+                sec_26 = "- آشنایی قبلی متفاوت کاربران با ابزارهای دیجیتال: مهار با آموزش همسان پیش از آزمون."
+            elif is_diagnostic:
+                sec_26 = "- سوگیری طیف و راستی‌آزمایی: مهار با ورود متوالی بیماران مشکوک و اجرای کور استاندارد طلایی روی همه آزمودنی‌ها."
+            elif is_epidemiol:
+                sec_26 = "- سوگیری انتخاب و یادآوری و متغیرهای مخدوش‌کننده: مهار با نمونه‌گیری تصادفی و رگرسیون چندمتغیره."
+            elif is_clinical:
+                sec_26 = "- ریزش بیماران و عدم پایبندی به مداخله: مهار با پیگیری ساختاریافته و تحلیل قصد درمان (ITT)."
+            elif is_in_vivo:
+                sec_26 = "- تفاوت‌های بیولوژیک بین‌گونه‌ای و جایگاهی قفس: مهار با تصادفی‌سازی موقعیت قفس و رعایت دوره آرام‌سازی."
+            elif is_in_vitro:
                 sec_26 = (
-                    "- سوگیری انتخاب (Selection Bias): کنترل با روش نمونه‌گیری تصادفی و به حداقل رساندن نرخ عدم پاسخ.\n"
-                    "- سوگیری یادآوری (Recall Bias): کنترل با استفاده از سوالات عینی با دوره‌های یادآوری کوتاه و تطبیق با اسناد پزشکی.\n"
-                    "- متغیرهای مخدوش‌کننده (Confounders): شناسایی و کنترل از طریق تحلیل‌های چندمتغیره رگرسیون لجستیک و برازش نمره تمایل."
-                )
-            elif "CLINICAL" in fw_upper or "RCT" in fw_upper or "CONSORT" in fw_upper:
-                sec_26 = (
-                    "- ریزش بیماران در طول پیگیری (Loss to Follow-up): مهار با پیگیری‌های منظم تلفنی و تحلیل مبتنی بر قصد درمان (ITT).\n"
-                    "- عدم پایبندی به رژیم دارویی (Non-adherence): پایش دقیق از طریق شمارش قرص‌ها و دفترچه ثبت مصرف روزانه دارو توسط بیمار.\n"
-                    "- چالش کورسازی: مهار با استفاده از دارونماهای کاملاً مشابه از نظر شکل، رنگ، طعم و بسته‌بندی."
-                )
-            elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper or "ARRIVE" in fw_upper:
-                sec_26 = (
-                    "- تفاوت‌های بیولوژیک بین‌گونه‌ای (Interspecies Translation): مهار از طریق انتخاب مدل حیوانی تاییدشده با همگونی ساختاری بالا با انسان.\n"
-                    "- سوگیری جایگاهی در اتاق حیوانات (Cage Location Effect): مهار با چرخش تصادفی موقعیت قفس‌ها در قفسه‌ها.\n"
-                    "- اثرات استرس جابجایی و دستکاری: مهار از طریق آموزش اپراتور و رعایت دوره آرام‌سازی پیش از اندازه‌گیری‌ها."
+                    "- چالش حلالیت آبی ترکیبات (کنترل با DMSO < 0.1%) و نوسانات پاساژهای سلولی (محدودسازی بین پاساژ ۳ الی ۱۰).\n"
+                    "- مرزهای تعمیم‌پذیری برون‌تن و ضرورت تایید فارماکوکینتیک درون‌تنی و بالینی در فازهای آتی."
                 )
             else:
-                sec_26 = (
-                    "- چالش حلالیت آبی ترکیبات: کنترل دقیق حلال ناقل (DMSO < 0.1%) جهت ممانعت از سمیت پس‌زمینه حلال.\n"
-                    "- نوسانات حساسیت در پاساژهای سلولی: محدودسازی پاساژهای سلولی بین ۳ الی ۱۰ و رصد پیوسته مورفولوژی و غربالگری دوره‌ای مایکوپلاسما.\n"
-                    "- مرزهای تعمیم‌پذیری برون‌تن: تصریح بر اینکه تایید فارماکوکینتیک و پیامدهای سم‌شناسی درون‌تنی در بیماران، مستلزم ارزیابی‌های فارماکوکینتیک درون‌تنی (In Vivo) و کارآزمایی‌های بالینی آینده می‌باشد."
-                )
+                sec_26 = "- محدودیت‌های احتمالی گردآوری داده‌ها و مخدوشگرهای زمینه‌ای همراه با تمهیدات تحلیلی تعدیل‌کننده."
         md_parts.append("## ۲۶. مشکلات و محدودیت ها\n" + sec_26 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1319,63 +1577,58 @@ class ProposalGenerator:
             if cp_sec27:
                 sec_27 = cp_sec27
             else:
-                fw_upper = str(framework).upper()
-                if "HEALTH_SYSTEM" in fw_upper or "HEALTH_POLICY" in fw_upper or "ECONOM" in fw_upper:
+                if is_health_sys:
                     sec_27 = (
-                        "۱. بومی‌سازی و اعتبارسنجی ابزار سنجش هزینه‌های سلامت (برگرفته از WHO WHS و NHA) و تعیین روایی و پایایی در مطالعه راهنما.\n"
-                        "۲. اجرای نمونه‌گیری تصادفی خوشه‌ای چندمرحله‌ای در مراکز درمانی دولتی و خصوصی منتخب تا سقف حجم نمونه مصوب ($n = 642$).\n"
-                        "۳. انجام مصاحبه‌های چهره‌به‌چهره ساختارمند با بیماران یا سرپرستان خانوار و ثبت دقیق هزینه‌های مستقیم درمانی، مستقیم غیردرمانی و غیرمستقیم.\n"
-                        "۴. اعتبارسنجی متقابل داده‌های هزینه‌ای بستری با استعلام صورتحساب‌های رسمی از سامانه اطلاعات بیمارستانی (HIS) جهت مهار سوگیری یادآوری.\n"
-                        "۵. پاکسازی، ممیزی و ورود دوگانه داده‌ها و مدیریت مقادیر گمشده با روش‌های استاندارد آماری.\n"
-                        "۶. مدلسازی اقتصاد سلامت در Stata/R، محاسبه شاخص‌های CHE و OOP، برازش رگرسیون لجستیک چندمتغیره و رسم منحنی تمرکز کاکوانی."
+                        "۱. بومی‌سازی و اعتبارسنجی ابزار سنجش هزینه‌های سلامت (WHO WHS و NHA).\n"
+                        "۲. اجرای نمونه‌گیری تصادفی خوشه‌ای چندمرحله‌ای در مراکز درمانی منتخب ($n = 642$).\n"
+                        "۳. انجام مصاحبه‌های ساختارمند و تطبیق صورتحساب‌ها با سامانه HIS.\n"
+                        "۴. مدلسازی اقتصاد سلامت در Stata/R، محاسبه CHE، OOP و منحنی کاکوانی."
                     )
-                elif "DIAGNOSTIC" in fw_upper or "STARD" in fw_upper or "BIOMARKER" in fw_upper:
+                elif is_review:
                     sec_27 = (
-                        "۱. طراحی پروتکل منطبق بر بیانیه STARD 2015 و اخذ تاییدیه کمیته اخلاق زیست‌پزشکی.\n"
-                        "۲. ورود متوالی بیماران مشکوک واجد شرایط به مطالعه تا سقف حجم نمونه مصوب ($n = 725$).\n"
-                        "۳. اخذ نمونه‌های بیولوژیک بالینی، کدگذاری دوگانه بی‌نام و نگهداری در شرایط استاندارد زنجیره سرد.\n"
-                        "۴. اندازه‌گیری بیومارکر با آزمون شاخص و اجرای همزمان آزمون استاندارد طلایی مرجع توسط ارزیابان مستقل دوسوکور.\n"
-                        "۵. ممیزی داده‌ها در پایگاه اطلاعاتی دوگانه و رفع مغایرت‌ها.\n"
-                        "۶. تشکیل جدول توافقی ۲×۲، محاسبه حساسیت، ویژگی، PPV، NPV، رسم منحنی ROC و تعیین نقطه برش بهینه بر مبنای شاخص یودن."
+                        "۱. تدوین و ثبت پروتکل مرور دامنه‌ای مطابق چک‌لیست PRISMA-ScR و چارچوب PCC در OSF.\n"
+                        "۲. جستجوی جامع در پایگاه‌های PubMed، Scopus، Embase و Web of Science و حذف تکراری‌ها.\n"
+                        "۳. غربالگری دوفردی مستقل عنوان، چکیده و متن کامل در Rayyan و سنجش توافق کاپا (>= 0.80).\n"
+                        "۴. استخراج داده‌ها با کاربرگ استاندارد JBI و نگاشت توصیفی/کمی یافته‌ها."
                     )
-                elif "EPIDEMIOL" in fw_upper or "OBSERV" in fw_upper or "STROBE" in fw_upper:
+                elif is_usability:
                     sec_27 = (
-                        "۱. تدوین و اعتبارسنجی ابزار گردآوری داده‌ها منطبق با راهنمای STROBE.\n"
-                        "۲. نمونه‌گیری تصادفی از جامعه هدف بر مبنای حجم نمونه مصوب ($n = 428$).\n"
-                        "۳. جمع‌آوری داده‌ها از طریق مصاحبه ساختارمند و بررسی پرونده‌های بهداشتی.\n"
-                        "۴. پاکسازی، کنترل کیفیت و ممیزی داده‌ها.\n"
-                        "۵. تحلیل آماری توصیفی، تحلیل دومتغیره و برازش مدل‌های رگرسیون لجستیک چندمتغیره جهت استخراج نسبت شانس تعدیل‌شده."
+                        "۱. طراحی سناریوهای بالینی استاندارد و اجرای ارزیابی اکتشافی نیلسن ($n = 5$..$10$ خبره).\n"
+                        "۲. اجرای آزمون تکلیف‌محور کاربران نهایی با پروتکل Think-Aloud و تکمیل مقیاس SUS ($n \\ge 30$).\n"
+                        "۳. تحلیل نمره SUS، نرخ موفقیت و اولویت‌بندی اصلاحات رابط کاربری."
                     )
-                elif "CLINICAL" in fw_upper or "RCT" in fw_upper or "CONSORT" in fw_upper:
+                elif is_diagnostic:
                     sec_27 = (
-                        "۱. اخذ تاییدیه اخلاق زیست‌پزشکی و پیش‌ثبت رسمی در سامانه IRCT.\n"
-                        "۲. ارزیابی معیارهای ورود و خروج در بیماران مراجعه‌کننده و اخذ رضایت آگاهانه کتبی.\n"
-                        "۳. تخصیص تصادفی بیماران به بازوهای موازی مداخله و شاهد با کدهای کورسازی‌شده.\n"
-                        "۴. تجویز رژیم‌های درمانی و پایش منظم اثربخشی بالینی و رخدادهای نامطلوب.\n"
-                        "۵. ممیزی فرم‌های eCRF، قفل پایگاه داده و کدگشایی آماری.\n"
-                        "۶. تحلیل آماری مبتنی بر قصد درمان (ITT) و نگارش گزارش نهایی مطابق با راهنمای CONSORT."
+                        "۱. طراحی پروتکل منطبق بر STARD 2015 و ورود متوالی بیماران مشکوک ($n = 725$).\n"
+                        "۲. اجرای مستقل و کور آزمون شاخص و استاندارد طلایی مرجع.\n"
+                        "۳. ترسیم جدول ۲×۲، منحنی ROC و تعیین نقطه برش بهینه با شاخص یودن."
                     )
-                elif "IN_VIVO" in fw_upper or "ANIMAL" in fw_upper or "ARRIVE" in fw_upper:
+                elif is_epidemiol:
                     sec_27 = (
-                        "۱. سازگاری و قرنطینه حیوانات آزمایشگاهی در خانه حیوانات به مدت ۷ روز پیش از مداخله در شرایط استاندارد.\n"
-                        "۲. تخصیص تصادفی حیوانات به بازوهای آزمایشی (هر گروه ۶ سر، کل N = 24 بر مبنای معادله فستینگ).\n"
-                        "۳. اعمال مداخلات درمانی طبق جدول دوزینگ بر پایه mg/kg با سرنگ‌های کالیبره.\n"
-                        "۴. پایش منظم وزن، رفتار و رصد شاخص‌های نقاط پایانی انسانی.\n"
-                        "۵. اتانازی اخلاقی در پایان دوره، خونگیری جهت بیومارکرهای سرمی و جداسازی بافت‌های هدف.\n"
-                        "۶. ارزیابی‌های آسیب‌شناسی بافتی (H&E) و آماری به شیوه دوسوکور."
+                        "۱. تدوین و اعتبارسنجی چک‌لیست منطبق با راهنمای STROBE و نمونه‌گیری تصادفی ($n = 428$).\n"
+                        "۲. گردآوری داده‌های دموگرافیک و پیامد و برازش رگرسیون لجستیک چندمتغیره (AOR)."
                     )
-                else:
+                elif is_clinical:
+                    sec_27 = (
+                        "۱. اخذ کد اخلاق و پیش‌ثبت در IRCT و غربالگری بیماران ($n = 64$ در هر بازو، مجموعاً $N = 128$).\n"
+                        "۲. تخصیص تصادفی و کورسازی بازوها، پیگیری بالینی و تحلیل آماری Intention-to-Treat (ITT)."
+                    )
+                elif is_in_vivo:
+                    sec_27 = (
+                        "۱. سازگاری ۷ روزه حیوانات و تخصیص تصادفی به گروه‌های آزمایشی (هر گروه ۶ سر، $N = 24$).\n"
+                        "۲. اعمال دوزینگ استاندارد بر پایه mg/kg، پایش نقاط پایانی انسانی و ارزیابی بافت‌شناسی."
+                    )
+                elif is_in_vitro:
                     sec_27 = (
                         "۱. کشت و نگهداری استاندارد سیستم‌های زیستی در محیط‌های اختصاصی مصوب ATCC در انکوباتور ۳۷ درجه و ۵ درصد CO2.\n"
                         "۲. بذرپاشی سلول‌ها در پلیت‌های ۹۶ چاهکی به همراه چاهک‌های بلانک بدون سلول (Cell-Free Blank) جهت کسر اثر احیای مستقیم و تداخل نوری.\n"
-                        "۳. فاز اول (تک‌دارویی و منحنی‌های دوز-پاسخ منفرد): ارزیابی غلظت‌های منفرد هر مداخله در ۵ الی ۷ رقت متوالی (Serial Dilutions) جهت ترسیم منحنی اثر-دوز، محاسبه دقیق مقادیر IC50، شیب منحنی اثر متوالی (m) و دوز اثر میانه (Dm) با همبستگی خطی (r > 0.95).\n"
-                        "۴. فاز دوم (طراحی ترکیبی Chou-Talalay): اعمال غلظت‌های ترکیبی با نسبت‌های ثابت هم‌توان (Constant Ratio: 0.25x, 0.5x, 1.0x, 2.0x, 4.0x IC50) بر پایه مقادیر مستخرج از فاز اول، در کنار گروه کنترل منفی حلال ناقل (DMSO < 0.1%) در مقاطع ۲۴، ۴۸ و ۷۲ ساعت.\n"
-                        "۵. سنجش زیست‌پذیری با آزمون متابولیک (MTT) و تصحیح جذب نوری نسبت به بلانک بدون سلول.\n"
-                        "۶. اعتبارسنجی ارتوگونال آپوپتوز با فلوسایتومتری Annexin V-FITC / PI و کنترل مثبت استاندارد آپوپتوز (استاروسپورین ۱ میکرومولار) جهت تفکیک مراحل اولیه و تاخیری آپوپتوز از نکروز غیراختصاصی.\n"
-                        "۷. ارزیابی فعال‌سازی آبشار کاسپاز با سنجش برش پروتئولیتیک پروکاسپاز-۳ به قطعات فعال ۱۷ و ۱۲ کیلودالتونی جهت تایید فعال‌سازی پروتئینی همگام با رصد تغییرات بیان mRNA در Real-Time PCR.\n"
-                        "۸. اجرای آزمون بقای کلونوژنیک ۱۴ روزه (Clonogenic Survival Assay) جهت ارزیابی توان بقای نامحدود سلولی طبق پروتکل استاندارد نیچر (Franken et al. 2006).\n"
-                        "۹. ثبت داده‌های کمی و مدلسازی ریاضی هم‌افزایی با نرم‌افزارهای تخصصی فارماکولوژی (CompuSyn / SynergyFinder)."
+                        "۳. فاز اول (تک‌دارویی و منحنی‌های دوز-پاسخ منفرد): ارزیابی غلظت‌های منفرد هر مداخله در ۵ الی ۷ رقت متوالی جهت محاسبه مقادیر IC50.\n"
+                        "۴. فاز دوم (طراحی ترکیبی Chou-Talalay): اعمال غلظت‌های ترکیبی با نسبت‌های ثابت هم‌توان (0.25x..4x IC50) و کنترل حلال (DMSO < 0.1%).\n"
+                        "۵. سنجش زیست‌پذیری با MTT، تایید ارتوگونال آپوپتوز با فلوسایتومتری Annexin V-FITC / PI و کنترل مثبت استاروسپورین، و برش پروتئولیتیک فعال کاسپاز-۳ (زیرا پروکاسپاز-۳ یک زیموژن غیرفعال ۳۲ کیلودالتونی است و برش فعال آن سنجیده می‌شود).\n"
+                        "۶. اجرای آزمون بقای کلونوژنیک ۱۴ روزه و بیان ژن RT-qPCR با دو ژن مرجع GAPDH و ACTB و مدلسازی CompuSyn."
                     )
+                else:
+                    sec_27 = "۱. اجرای گام‌به‌گام جمع‌آوری داده‌ها، ممیزی کیفیت و تحلیل آماری نهایی مطابق پروتکل پژوهش."
         md_parts.append("## ۲۷. روش انجام طرح، شیوه اجرایی مراحل طرح و چگونگی جمع آوری اطلاعات\n" + sec_27 + "\n\n---")
 
         # -------------------------------------------------------------
@@ -1504,7 +1757,12 @@ class ProposalGenerator:
         val_result = ProposalStructureValidator.validate_proposal_text(md_content)
         
         # Build final DOCX with Native OMML Math Engine integrated
-        DocxBuilder.build_docx(md_content, docx_path)
+        _rpm_m = data.get("research_problem_model") or {}
+        _cover_meta = {
+            "fa_title": data.get("research_title_fa") or _rpm_m.get("research_title_fa") or "",
+            "english_title": data.get("research_title_en") or _rpm_m.get("research_title_en") or "",
+        }
+        DocxBuilder.build_docx(md_content, docx_path, meta_info=_cover_meta)
 
         # Conduct EQUATOR Network & Biological Resource Authentication Audit
         equator_result = EquatorComplianceAuditor.audit_proposal(md_content, data)

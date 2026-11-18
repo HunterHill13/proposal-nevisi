@@ -1,16 +1,16 @@
 # Proposal-Nevisi 🔬📄
-### Universal Evidence-Driven Medical Research, Cognitive Study Section Panel & Autonomous Proposal Pipeline (v14.1.0)
-### موتور خودکار و جامع پژوهش زیست‌پزشکی، هیئت داوران گرنت ۷ پرسونایی شناختی، جستجوی دومسیره ضدسوگیری، تزاروس ۱۳۰+ عنوانی MeSH، ممیزی تطبیقی QUADAS-2/STROBE و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۴.۱.۰)
+### Universal Evidence-Driven Medical Research, Cognitive Study Section Panel & Autonomous Proposal Pipeline (v14.2.0)
+### موتور خودکار و جامع پژوهش زیست‌پزشکی، هیئت داوران گرنت ۷ پرسونایی شناختی، جستجوی دومسیره ضدسوگیری، تزاروس ۱۱۹ عنوانی MeSH، ممیزی تطبیقی QUADAS-2/STROBE/PRISMA-ScR و تدوین پروپوزال‌های علوم پزشکی (نسخه ۱۴.۲.۰)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
-[![Version: 14.1.0](https://img.shields.io/badge/Version-14.1.0-blue.svg)](VERSION)
-[![Unified Tests: 561/561 Passed](https://img.shields.io/badge/Unified%20Tests-561%2F561%20Passed-success.svg)](#unified-multi-tier-test-harness)
+[![Version: 14.2.0](https://img.shields.io/badge/Version-14.2.0-blue.svg)](VERSION)
+[![Unified Tests: 569 Passed](https://img.shields.io/badge/Unified%20Tests-569%20Passed-success.svg)](#unified-multi-tier-test-harness)
 [![Master Release Gate: Passed](https://img.shields.io/badge/Master%20Gate-100%25%20Verified-success.svg)](#master-release-gate-43-criteria)
 [![Pajooheshyar 28 Sections Compliant](https://img.shields.io/badge/Pajooheshyar-28%20Sections%20Complete-teal.svg)](#layer-2-structural-compliance)
 [![Native OMML Equations](https://img.shields.io/badge/DOCX%20Math-Native%20OMML%20XML-purple.svg)](#layer-4-formatting--typesetting)
 [![Cognitive Study Section: 7 Personas](https://img.shields.io/badge/Cognitive%20Study%20Section-7%20Subagents-purple.svg)](#egm-powered-grant-study-section)
-[![MeSH Thesaurus: 130+ Descriptors](https://img.shields.io/badge/MeSH%20Thesaurus-130%2B%20Descriptors%20in%2011%20Fields-blue.svg)](#mesh-thesaurus-expansion)
+[![MeSH Thesaurus: 119 Descriptors](https://img.shields.io/badge/MeSH%20Thesaurus-119%20Descriptors%20in%2019%20Branches-blue.svg)](#mesh-thesaurus-expansion)
 [![Zero Bias: Dual--Path Search](https://img.shields.io/badge/Zero%20Bias-Dual--Path%20Search%20%26%20Epistemic%20Caveat-darkgreen.svg)](#zero-bias-dual-path-search)
 [![Closed-Loop Critic-Refine](https://img.shields.io/badge/Closed--Loop-Iterative%20Remediation-orange.svg)](#iterative-remediation-engine)
 [![Author Manuscript Standard: Verified](https://img.shields.io/badge/Author%20Manuscript%20Standard-Zero%20AI%20Leakage-green.svg)](#scientific-academic-humanizer)
@@ -22,9 +22,9 @@
 ---
 
 <a name="english"></a>
-## English Documentation (v14.1.0)
+## English Documentation (v14.2.0)
 
-**Proposal-Nevisi (v14.1.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v14.1.0 integrates Zero-Bias Dual-Path Literature Search (Efficacy + Safety/Contradiction/Null) with automated Epistemic Caveat Injection, an Expanded MeSH Thesaurus (130+ descriptors across 11 clinical categories), Adaptive Risk of Bias Auditing (QUADAS-2 Domain 1 for diagnostic studies, STROBE representative sampling frame for observational studies, alongside Cochrane RoB-2 and SYRCLE), the 7-Subagent Cognitive Grant Study Section (Significance, Biostatistics, Evidence Entailment, Feasibility, Ethics, Academic Style & Voice, SRO Synthesizer), Multi-Domain Polymorphism across 6 Research Archetypes, Native OMML Mathematical Formatting (<m:f>, <m:rad>), and the Clean Author Manuscript Delivery Standard (strictly eliminating conversational AI disclosure boilerplate from final submitted manuscripts)**.
+**Proposal-Nevisi (v14.2.0)** is an autonomous, publication-grade academic research proposal drafting framework and **Topic-Agnostic Research-Grade Medical Literature & Proposal Engine**. Built upon foundational architectures from AIPOCH (`aipoch/medical-research-skills`), K-Dense (`K-Dense-AI/claude-scientific-writer`), and the SciFact claim-evidence framework (AllenAI / Wadden et al.), **v14.2.0 integrates Zero-Bias Dual-Path Literature Search (Efficacy + Safety/Contradiction/Null) with automated Epistemic Caveat Injection, an Expanded MeSH Thesaurus (119 descriptors across 19 specialized branches with <= 3 semantic AND blocks), Adaptive Risk of Bias Auditing (QUADAS-2, STROBE/NOS, Cochrane RoB-2/CONSORT, SYRCLE/ARRIVE 2.0, ToxRTool/OHAT, PRISMA-ScR/JBI, and Nielsen-Landauer/SUS), the 7-Subagent Cognitive Grant Study Section (Significance, Biostatistics, Evidence Entailment, Feasibility, Ethics, Academic Style & Voice, SRO Synthesizer), Full Multi-Domain Polymorphism across all 7 Canonical Research Archetypes (+ Usability), Native OMML Mathematical Formatting (<m:f>, <m:rad>), Metadata-Driven Word Cover Chrome, and the Clean Author Manuscript Delivery Standard (strictly eliminating conversational AI disclosure boilerplate from final submitted manuscripts)**.
 
 It completely eliminates AI literature hallucination, Frankenstein/chimera methodology stitching, cross-cancer epidemiology overfitting, DOI digit drift, biostatistical sample-size drift, and abstract-only truncation through an immutable research dossier, cohesive methodology subagents, live Crossref/PubMed verification, iterative surgical patching, and post-draft blind grant peer review.
 
@@ -37,7 +37,7 @@ flowchart TD
     subgraph Stage1 ["۱. مرحله اول: ۲ ساب‌ایجنت تخصصی پیش از نگارش (Stage 1: Parallel Pre-Draft Subagents)"]
         A["کاربر: عنوان پژوهش به فارسی + کلیدواژه‌های انگلیسی"] --> B["MeSHQueryExpander<br>• نگاشت به سرعنوان‌های MeSH<br>• فیلتر ۱۰۰٪ کاراکترهای غیرلاتین"]
         B --> S1["ساب‌ایجنت ۱: ارزیابی کمی شواهد (Evidence & Quantitative RCS Subagent)<br>• جستجوی چندمرحله‌ای PubMed / Europe PMC / OpenAlex<br>• امتیازدهی PaperQA2 RCS (0-10) و استخراج مقادیر کمی (AOR, CHE, IC50, p-value)<br>• بار بیماری (GLOBOCAN / WHO GBD / نظام سلامت) + تدوین farsi_synthesis_summary"]
-        B --> S2["ساب‌ایجنت ۲: متدولوژی ضد کیمرا (Methodology & Anti-Chimera Subagent)<br>• مطالعه مرجع اصلی (Primary Anchor Protocol) در ۶ کهن‌الگو (STROBE/CONSORT/ARRIVE/GCCP/STARD/WHO)<br>• جدول متغیرهای بخش ۱۱ + کنترل‌های اختصاصی و مشخصات مدل/جامعه<br>• قفل ریاضی حجم نمونه (کوکران و DEFF / چو و وانگ / معادله مید E=19 و G*Power)"]
+        B --> S2["ساب‌ایجنت ۲: متدولوژی ضد کیمرا (Methodology & Anti-Chimera Subagent)<br>• مطالعه مرجع اصلی (Primary Anchor Protocol) در ۷ کهن‌الگو + کاربردپذیری (STROBE/CONSORT/ARRIVE/GCCP/STARD/WHO/PRISMA-ScR/SUS)<br>• جدول متغیرهای بخش ۱۱ + کنترل‌های اختصاصی و مشخصات مدل/جامعه<br>• قفل ریاضی حجم نمونه (کوکران و DEFF / چو و وانگ / معادله مید E=19 / Buderer / Nielsen / اشباع شواهد)"]
         S1 & S2 --> SPEC["ادغام عمیق بدون اتلاف در فایل مشخصات طرح<br>PROPOSAL_SPEC.json (--spec-file Deep-Merge)"]
     end
 
@@ -266,7 +266,7 @@ The engine enforces 43 fail-closed release criteria before approving proposals:
 <a name="unified-multi-tier-test-harness"></a>
 ### Unified Multi-Tier Test Harness
 
-The engine includes 27 comprehensive test suites with **561 / 561 tests passing (100% Pass Rate)** verified dynamically via Python's `unittest` test discovery:
+The engine includes 35 test suites (`test_*.py`) with **569 / 569 tests passing (100% Pass Rate)** verified dynamically via Python's `unittest` test discovery:
 
 ```powershell
 uv run python tests/run_all_tests.py
@@ -282,16 +282,17 @@ uv run python tests/run_all_tests.py
 - **Suite 8: Scientific Academic Humanizer & Persian Typography Engine Suite (`test_scientific_academic_humanizer.py`)** - 8 tests verifying `DataInvariantGate` fail-closed entity locking, 30+ Persian AI cliches eradication, and sentence length burstiness calibration ($\sigma \ge 8.0$).
 - **Suite 9: Dossier Persistence & CLI Suite (`test_dossier_persistence_and_cli.py`)** - 3 tests verifying round-trip JSON serialization, CLI runner for mock grant reviews, and section patcher.
 - **Suite 10: Cognitive Study Section & Academic Voice Suite (`test_v140_cognitive_study_section.py`)** - 8 tests auditing the 7-subagent cognitive study section, biostatistical verification script, and humanizer burstiness.
-- **Suites 11–27:** Property invariants, strict schema audits (`additionalProperties: false`), EQUATOR compliance, RoB-2 mitigation, OMML math engines, and typography linters.
+- **Suite 11: v14.2.0 Seven-Archetype Polymorphism & Forensic Suite (`test_v142_seven_archetypes_and_forensic_fixes.py`)** - 8 tests verifying all 7 archetypes + usability across all modules, fail-closed unknown handling, subheading immunity, 3-branch callouts, dynamic cover metadata, and MeSH `<= 3` block cap.
+- **Additional Suites (35 `test_*.py` modules total):** Property invariants, strict schema audits (`additionalProperties: false`), EQUATOR compliance, RoB mitigation, OMML math engines, and typography linters.
 
 ---
 
 <a name="فارسی"></a>
-## مستندات فارسی (نسخه ۱۴.۱.۰)
+## مستندات فارسی (نسخه ۱۴.۲.۰)
 
-پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۴.۱.۰)** یک سیستم خودکار، پیشرفته، چندایجنت، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، بهداشت، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است. این سیستم کاملاً مستقل از موضوع (Domain-Agnostic) بوده و از ۶ کهن‌الگوی پژوهشی (نظام سلامت و اقتصاد سلامت، اپیدمیولوژی، کارآزمایی بالینی، مدل حیوانی، آزمایشگاهی برون‌تن و تشخیصی) پشتیبانی می‌کند.
+پلتفرم **پروپوزال‌نویسی (Proposal-Nevisi نسخه ۱۴.۲.۰)** یک سیستم خودکار، پیشرفته، چندایجنت، ضدتشخیص هوش مصنوعی و مبتنی بر شواهد واقعی (Evidence-Driven) برای تدوین پروپوزال‌های پژوهشی علوم پزشکی، بهداشت، داروسازی، دندان‌پزشکی و زیست‌پزشکی مطابق با استاندارد رسمی معاونت پژوهشی و سامانه **پژوهشیار** است. این سیستم کاملاً مستقل از موضوع (Domain-Agnostic) بوده و از ۷ کهن‌الگوی پژوهشی (+ ارزیابی کاربردپذیری و سلامت دیجیتال: نظام سلامت و اقتصاد سلامت، اپیدمیولوژی، کارآزمایی بالینی، مدل حیوانی، آزمایشگاهی برون‌تن، دقت تشخیصی، مرور دامنه‌ای PRISMA-ScR/JBI و کاربردپذیری SUS) پشتیبانی می‌کند.
 
-نسخه ۱۴.۱.۰ به **هیئت داوران گرنت ۷ پرسونایی شناختی (EGM Cognitive Study Section)** با داوری زیرو کانتکست و نمره‌دهی جامع Heuristic Completeness Score، **سیستم جستجوی دومسیره ضدسوگیری (Zero-Bias Dual-Path Search)** با تزریق هوشمند بند شفافیت معرفتی (`Epistemic Caveat Injection`)، **تزاروس گسترش‌یافته MeSH شامل ۱۳۰+ توصیف‌گر استاندارد در ۱۱ شاخه تخصصی پزشکی**، **ممیزی انطباقی ریسک سوگیری بر پایه QUADAS-2 (سوگیری طیف) و STROBE (چارچوب نمونه‌گیری)**، **موتور فرمول‌نویسی بومی ریاضی مایکروسافت ورد (Native OMML Math Engine)**، **استاندارد تحویل دست‌نوشته تمیز نویسنده (حذف کامل اشاره به تولید با هوش مصنوعی در متن پروپوزال)** و **سوئیت آزمون ۵۶۱ تستی پویا (۱۰۰٪ قبولی)** مجهز شده است.
+نسخه ۱۴.۲.۰ به **هیئت داوران گرنت ۷ پرسونایی شناختی (EGM Cognitive Study Section)** با داوری زیرو کانتکست و نمره‌دهی جامع Structural Completeness / Heuristic Readiness Score (تاییدیه $\le 2.0$)، **سیستم جستجوی دومسیره ضدسوگیری (Zero-Bias Dual-Path Search)** با تزریق هوشمند بند شفافیت معرفتی (`Epistemic Caveat Injection`)، **تزاروس استاندارد MeSH شامل ۱۱۹ توصیف‌گر در ۱۹ شاخه تخصصی پزشکی**، **ممیزی انطباقی ریسک سوگیری و گایدلاین‌های گزارش‌دهی (CONSORT/STROBE/STARD/ARRIVE/PRISMA-ScR/ToxRTool/SUS)**، **موتور فرمول‌نویسی بومی ریاضی مایکروسافت ورد (Native OMML Math Engine)** با جدول جلد پویای مبتنی بر متادیتای طرح و **استاندارد تحویل دست‌نوشته تمیز نویسنده** مجهز شده است.
 
 نسخه ۱۱.۵.۱ با ادغام **معماری ساب‌ایجنت‌های شناختی (Cognitive Multi-Agent Architecture)**، **موتور علمی ضدتشخیص هوش مصنوعی و انسانی‌ساز آکادمیک (ScientificAcademicHumanizer v11.5)**، **موتور چرخه بسته داوری و اصلاح پیوسته (Closed-Loop Critic-Refine Remediation)**، **ایمن‌سازی ده‌گانه در برابر ممیزی داوران خارجی (10-Pillar Adversarial Immunization)**، **استعلام زنده Crossref API** و **حذف کامل نشت متن انگلیسی در پیشینه پژوهش**، کلیه خطاهای متدولوژیک، بیواستاتیک و تکیه‌کلام‌های هوش مصنوعی را به صورت قطعی ریشه‌کن کرده است.
 
@@ -409,7 +410,7 @@ uv run python scripts/docx_builder.py "./output/proposal.md" "./output/proposal.
 
 ### وضعیت آزمون‌های کنترل کیفیت نرم‌افزاری
 
-سیستم دارای ۲۷ سوئیت آزمون مستقل با **۵۴۱ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
+سیستم دارای ۳۵ سوئیت آزمون مستقل (`test_*.py`) با **۵۶۹ تست فعال** است که همگی با **۱۰۰٪ قبولی** پاس می‌شوند:
 
 ```powershell
 uv run python tests/run_all_tests.py

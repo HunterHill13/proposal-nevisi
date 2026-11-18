@@ -35,10 +35,17 @@
         "PICO",
         "PECO",
         "DIAGNOSTIC",
+        "DIAGNOSTIC_ACCURACY_AND_BIOMARKER",
         "PROGNOSTIC",
         "MECHANISTIC",
         "EXPERIMENTAL_IN_VITRO",
-        "EXPERIMENTAL_ANIMAL"
+        "EXPERIMENTAL_ANIMAL",
+        "CLINICAL_TRIAL",
+        "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
+        "EPIDEMIOLOGICAL_OBSERVATIONAL",
+        "SCOPING_REVIEW",
+        "USABILITY_AND_DIGITAL_HEALTH",
+        "USABILITY"
       ]
     },
     "target_condition": {
@@ -77,10 +84,13 @@
           "type": "string",
           "enum": [
             "HUMAN_CLINICAL",
+            "HEALTH_SYSTEM_POPULATION",
             "ANIMAL_IN_VIVO",
             "CELL_CULTURE_IN_VITRO",
             "EX_VIVO_TISSUE",
-            "IN_SILICO"
+            "IN_SILICO",
+            "EVIDENCE_SYNTHESIS_CORPUS",
+            "DIGITAL_HEALTH_USERS"
           ]
         },
         "primary_system": {
@@ -118,10 +128,15 @@
             "type": "string",
             "enum": [
               "PRIMARY_AGENT",
+              "SECONDARY_AGENT",
               "ADJUVANT_AGENT",
               "REFERENCE_DRUG",
+              "REFERENCE_STANDARD",
               "EXPOSURE_FACTOR",
-              "INDEX_TEST"
+              "INDEX_TEST",
+              "PRIMARY_OUTCOME_VARIABLE",
+              "PCC_CONCEPT",
+              "SYSTEM_INTERVENTION"
             ]
           },
           "mesh_terms": {
@@ -161,7 +176,10 @@
               "POSITIVE_CONTROL",
               "PLACEBO",
               "STANDARD_OF_CARE",
-              "GOLD_STANDARD"
+              "GOLD_STANDARD",
+              "HISTORICAL_BASELINE",
+              "NO_COMPARATOR_PCC",
+              "ALTERNATIVE_WORKFLOW"
             ]
           }
         },
@@ -191,7 +209,12 @@
               "MORTALITY",
               "SENSITIVITY",
               "SPECIFICITY",
-              "HAZARD_RATIO"
+              "HAZARD_RATIO",
+              "PREVALENCE",
+              "ROC_AUC",
+              "CHE_INCIDENCE",
+              "USABILITY_SUS",
+              "EVIDENCE_MAP"
             ]
           },
           "measurement_unit": {
@@ -285,6 +308,21 @@
         }
       },
       "additionalProperties": false
+    },
+    "specific_objectives": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "endpoints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "decomposition": {
+      "type": "object"
     }
   },
   "additionalProperties": false

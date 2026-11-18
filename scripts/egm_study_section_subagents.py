@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 egm_study_section_subagents.py - EGM-Powered Academic Grant Study Section
-Proposal-Nevisi Engine v14.0 (Elephant-Goldfish Model Hybrid Architecture)
+Proposal-Nevisi Engine v14.2.0 (Elephant-Goldfish Model Hybrid Architecture)
 
 Implements the 6-Persona Goldfish Grant Study Section:
 1. grant-significance-innovation (Skeptical Architect / YAGNI - derived from egm-zoom-out)
@@ -26,6 +26,22 @@ import re
 import json
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Tuple, Union
+
+try:
+    from core_policies import (
+        NIH_APPROVAL_SCORE_CEILING,
+        classify_study_archetype,
+        parse_proposal_sections as _core_parse_sections,
+    )
+except ImportError:  # pragma: no cover
+    NIH_APPROVAL_SCORE_CEILING = 2.0
+    classify_study_archetype = None
+    _core_parse_sections = None
+
+try:
+    from verify_biostatistics import BiostatisticalValidator
+except ImportError:  # pragma: no cover
+    BiostatisticalValidator = None
 
 
 @dataclass
@@ -104,6 +120,11 @@ class EGMStudySectionResult:
     prioritized_findings: List[GoldfishFinding]
     remediation_rounds_conducted: int
     executive_summary_fa: str
+    structural_completeness_percent: Optional[float] = None
+
+    def __post_init__(self):
+        if self.structural_completeness_percent is None:
+            self.structural_completeness_percent = float(self.percentile)
 
     @property
     def total_blockers(self) -> int:
@@ -118,11 +139,17 @@ class EGMStudySectionResult:
         return sum(1 for f in self.prioritized_findings if f.severity == "Nit" and not f.remediated)
 
     def to_dict(self) -> Dict[str, Any]:
+        sc_pct = (
+            self.structural_completeness_percent
+            if self.structural_completeness_percent is not None
+            else self.percentile
+        )
         return {
             "overall_nih_score": round(self.overall_nih_score, 2),
             "funding_verdict": self.funding_verdict,
             "can_proceed": self.can_proceed,
             "percentile": round(self.percentile, 1),
+            "structural_completeness_percent": round(sc_pct, 1),
             "remediation_rounds_conducted": self.remediation_rounds_conducted,
             "total_blockers": self.total_blockers,
             "total_majors": self.total_majors,
@@ -140,22 +167,26 @@ class EGMStudySectionCoordinator:
     def parse_proposal_sections(cls, markdown_text: str) -> Dict[int, str]:
         """Extracts canonical 28 sections from Pajooheshyar markdown proposal text."""
         sections: Dict[int, str] = {}
-        # Matches patterns like "## ۱. موضوع" or "## 1. موضوع" or "### ۱ - موضوع"
-        pattern = r'(?:^|\n)#{1,3}\s*([۰-۹0-9]+)[\.\-\s]+([^\n]+)\n(.*?)(?=(?:\n#{1,3}\s*[۰-۹0-9]+[\.\-\s]+)|$)'
-        matches = re.findall(pattern, markdown_text, re.DOTALL)
-        
-        fa_to_en = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
-        for num_str, title, content in matches:
-            try:
-                norm_num = int(num_str.translate(fa_to_en))
-                sections[norm_num] = content.strip()
-            except ValueError:
-                continue
+        if _core_parse_sections is not None:
+            sections = _core_parse_sections(markdown_text)
+
+        if not sections:
+            # Restrict top-level headings to # or ## only so ### subsections (e.g. ### 1. بار بیماری) never overwrite Section 1
+            pattern = r'(?:^|\n)#{1,2}(?!#)\s*(?:(?:بخش|Section)\s+)?([۰-۹0-9]+)[\.\-\:\s]+([^\n]*)\n(.*?)(?=(?:\n#{1,2}(?!#)\s*(?:(?:بخش|Section)\s+)?[۰-۹0-9]+[\.\-\:\s]+)|$)'
+            matches = re.findall(pattern, markdown_text, re.DOTALL | re.IGNORECASE)
+
+            fa_to_en = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
+            for num_str, title, content in matches:
+                try:
+                    norm_num = int(num_str.translate(fa_to_en))
+                    if 1 <= norm_num <= 28:
+                        sections[norm_num] = content.strip()
+                except ValueError:
+                    continue
 
         # Fallback if headers are formatted differently
         if not sections:
             for sec_num in range(1, 29):
-                # Search for section number explicitly
                 sec_pat = rf'(?:بخش|قسمت)?\s*(?:{sec_num}|{cls._to_fa_digits(sec_num)})[\.\-\:\s]+(.*?)(?=(?:بخش|قسمت)?\s*(?:{sec_num+1}|{cls._to_fa_digits(sec_num+1)})[\.\-\:\s]+|$)'
                 m = re.search(sec_pat, markdown_text, re.DOTALL)
                 if m:
@@ -267,56 +298,120 @@ class EGMStudySectionCoordinator:
         weaknesses: List[str] = []
 
         sec9 = sections.get(9, "")
+        sec11 = sections.get(11, "")
         sec13 = sections.get(13, "")
         sec14 = sections.get(14, "")
         sec22 = sections.get(22, "")
         sec23 = sections.get(23, "")
         sec27 = sections.get(27, "")
-        combined = f"{sec9}\n{sec13}\n{sec14}\n{sec22}\n{sec23}\n{sec27}".lower()
+        combined = f"{sec9}\n{sec11}\n{sec13}\n{sec14}\n{sec22}\n{sec23}\n{sec27}".lower()
 
-        paraphrase = "متدولوژی طرح بر مبنای طراحی ساختاریافته، تعیین حجم نمونه فرموله‌شده و آزمون‌های آماری مرتبط تنظیم گردیده است."
+        data_dict = data or {}
+        explicit_sf = str(data_dict.get("study_family") or data_dict.get("framework") or "").strip()
+        if explicit_sf.lower() in {"unknown", "unsupported", "invalid"}:
+            study_family = "unknown"
+        elif explicit_sf and classify_study_archetype is not None:
+            inferred_explicit = classify_study_archetype({"framework": explicit_sf}, sections=sections)
+            study_family = inferred_explicit if inferred_explicit != "unknown" else explicit_sf.lower()
+        elif classify_study_archetype is not None:
+            study_family = classify_study_archetype(f"{sections.get(1, '')} {sec14} {sec22}", sections=sections)
+            if study_family == "unknown" and ("کوکران" in sec22.lower() or "cochran" in sec22.lower()):
+                study_family = "epidemiological"
+        else:
+            study_family = "unknown"
+
+        paraphrase = "متدولوژی طرح بر مبنای طراحی ساختاریافته، تعیین حجم نمونه/پوشش شواهد متناسب با کهن‌الگو و برنامه تحلیل مرتبط تنظیم گردیده است."
 
         # Audit Vector 1: Sample Size Formula & Parameters (Sec 22)
-        has_formula = bool(re.search(r'(فرمول|cochran|کوکران|مید|mead|g\*power|حجم\s+نمونه\s*=|n\s*=|حجم\s+نمونه\s+برابر|توان\s+آزمون|سطح\s+اطمینان)', sec22.lower()))
+        has_formula = bool(re.search(
+            r'(فرمول|cochran|کوکران|مید|mead|g\*power|حجم\s+نمونه\s*=|n\s*=|حجم\s+نمونه\s+برابر|توان\s+آزمون|سطح\s+اطمینان|\bprisma(?:-scr)?\b|\bjbi\b|\bbuderer\b|\bnielsen\b|\bsus\b|اشباع|چارتینگ|1\s*-\s*\(1\s*-\s*l\))',
+            sec22.lower()
+        ))
         if has_formula:
-            strengths.append("فرمول محاسباتی حجم نمونه همراه با پارامترهای آماری (آلفا، بتا و توان آزمون) ارائه شده است.")
+            strengths.append("فرمول/چارچوب محاسباتی حجم نمونه متناسب با کهن‌الگو همراه با پارامترهای مرتبط ارائه شده است.")
         else:
             findings.append(GoldfishFinding(
                 issue_name="MISSING_SAMPLE_SIZE_FORMULA",
                 severity="Blocker",
                 reviewer_lens="grant-methodology-biostatistics",
                 affected_scope="بخش ۲۲ (حجم نمونه)",
-                discrepancy_description="حجم نمونه فاقد فرمول ریاضی مشخص، پارامترهای آلفا، توان آزمون و مبنای محاسبه عددی است.",
-                rationale_recommendation="درج فرمول کوکران، تخصیص منابع مید یا نرم‌افزار G*Power به همراه مقادیر دقیق پارامترها."
+                discrepancy_description="حجم نمونه فاقد فرمول ریاضی مشخص، چارچوب اشباع شواهد/نیلسن یا مبنای محاسبه عددی است.",
+                rationale_recommendation="درج فرمول کوکران، مید، بودرر، G*Power یا چارچوب PRISMA-ScR / Nielsen متناسب با نوع مطالعه."
             ))
-            weaknesses.append("ضعف در توجیه ریاضی حجم نمونه")
+            weaknesses.append("ضعف در توجیه ریاضی یا چارچوب حجم نمونه")
+
+        # Computational Biostatistical Verification (verify_biostatistics)
+        if BiostatisticalValidator is not None and sec22.strip():
+            # For unsupported explicit unknown family, check directly; map health_systems/epidemiological consistently
+            bio_res = BiostatisticalValidator.verify_sample_size(sec22, study_family)
+            raw_issues = bio_res.get("issues", []) or []
+            hard_prefixes = (
+                "UNSUPPORTED_STUDY_FAMILY",
+                "MISSING_COCHRAN_FORMULA",
+                "INSUFFICIENT_COCHRAN_SAMPLE_SIZE",
+                "INSUFFICIENT_SAMPLE_SIZE_AFTER_DEFF",
+                "MISSING_CLINICAL_TRIAL_SAMPLE_SIZE_FORMULA",
+                "INSUFFICIENT_TRIAL_SAMPLE_SIZE",
+                "MEAD_EQUATION_DEGREE_OUT_OF_BOUNDS",
+                "MISSING_MEAD_RESOURCE_EQUATION",
+                "MISSING_BUDERER_DIAGNOSTIC_FORMULA",
+                "MISSING_USABILITY_SAMPLE_SIZE_FORMULA",
+                "MISSING_REVIEW_FRAMEWORK",
+            )
+            hard_issues = [iss for iss in raw_issues if any(iss.startswith(p) for p in hard_prefixes)]
+            # Preserve Cochran cross-sectional CI prevalence surveys omitting power without blocking
+            is_cochran_ci_survey = (
+                study_family in ("epidemiological", "health_systems")
+                and bio_res.get("formula_found")
+                and not any(i.startswith("MISSING_COCHRAN") for i in raw_issues)
+            )
+            if bio_res.get("coherence_status") == "UNVERIFIED" or (hard_issues and not is_cochran_ci_survey) or hard_issues:
+                # Filter redundant message when MISSING_SAMPLE_SIZE_FORMULA was already added
+                if has_formula or bio_res.get("coherence_status") == "UNVERIFIED":
+                    findings.append(GoldfishFinding(
+                        issue_name="BIOSTATISTICAL_VALIDATION_FAILURE",
+                        severity="Blocker",
+                        reviewer_lens="grant-methodology-biostatistics",
+                        affected_scope="بخش ۲۲ (راستی‌آزمایی محاسباتی حجم نمونه)",
+                        discrepancy_description="; ".join(hard_issues or raw_issues[:2]),
+                        rationale_recommendation="اصلاح پارامترهای فرمول حجم نمونه متناسب با کهن‌الگوی مطالعه و تطابق کامل با خروجی BiostatisticalValidator."
+                    ))
+                    weaknesses.append("خطای محاسباتی یا عدم انطباق کهن‌الگو در حجم نمونه")
 
         # Audit Vector 2: Statistical Plan Appropriateness (Sec 23)
-        has_stat = bool(re.search(r'(آزمون|رگرسیون|anova|t-test|مربع\s+کای|chi-square|log-rank|spss|stata|تحلیل\s+آماری|p-value|فاصله\s+اطمینان)', sec23.lower()))
+        has_stat = bool(re.search(
+            r'(آزمون|رگرسیون|anova|t-test|مربع\s+کای|کای[\s\-]*اسکوئر|chi-square|log-rank|spss|stata|تحلیل\s+آماری|p-value|فاصله\s+اطمینان|\bprisma(?:-scr)?\b|\bjbi\b|\bkappa\b|\bicc\b|سنتز|چارتینگ|لجستیک|حساسیت|ویژگی|\broc\b|\bauc\b|توصیفی|میانگین|فراوانی)',
+            sec23.lower()
+        ))
         if has_stat:
-            strengths.append("برنامه تحلیل آماری شفاف شامل نوع آزمون‌ها و شاخص معناداری تعیین شده است.")
+            strengths.append("برنامه تحلیل داده/آماری شفاف و متناسب با نوع مطالعه تعیین شده است.")
         else:
             findings.append(GoldfishFinding(
                 issue_name="VAGUE_STATISTICAL_ANALYSIS_PLAN",
                 severity="Blocker",
                 reviewer_lens="grant-methodology-biostatistics",
                 affected_scope="بخش ۲۳ (روش تجزیه و تحلیل داده)",
-                discrepancy_description="طرح تحلیل داده فاقد ذکر آزمون‌های آماری استنباطی متناسب با نوع متغیرها و فرضیات است.",
-                rationale_recommendation="تعیین صریح آزمون‌های نرمالیته، مقایسه میانگین‌ها/نسبت‌ها و مدل‌های چندمتغیره در بسته آماری."
+                discrepancy_description="طرح تحلیل داده فاقد ذکر روش‌های آماری استنباطی یا چارچوب سنتز/چارتینگ متناسب با طراحی مطالعه است.",
+                rationale_recommendation="تعیین صریح آزمون‌های آماری، رگرسیون/ROC یا پروتکل سنتز PRISMA-ScR/JBI متناسب با نوع مطالعه."
             ))
 
-        # Audit Vector 3: Controls and Confounders
+        # Audit Vector 3: Controls, Confounders, or Scoping/Usability Rigor
         has_controls = bool(re.search(r'(کنترل|شاهد|مخدوشگر|blank|vehicle|دارونما|placebo|confound|عوامل\s+مداخله‌گر)', combined))
+        if not has_controls and study_family == "scoping_review":
+            has_controls = any(k in combined for k in ["دو داور", "داور سوم", "چارتینگ", "pcc", "prisma", "jbi", "معیار ورود"])
+        elif not has_controls and study_family == "usability":
+            has_controls = any(k in combined for k in ["نیلسن", "تفکر با صدای بلند", "سناریو", "تکلیف"]) or bool(re.search(r'\b(?:nielsen|sus)\b', combined))
+
         if has_controls:
-            strengths.append("گروه‌های کنترل مناسب و پیش‌بینی متغیرهای مداخله‌گر/مخدوشگر لحاظ شده است.")
+            strengths.append("سازوکارهای کنترل سوگیری، گروه‌های شاهد یا تضمین کیفیت روش‌شناختی متناسب با کهن‌الگو لحاظ شده است.")
         else:
             findings.append(GoldfishFinding(
                 issue_name="UNSPECIFIED_CONTROL_GROUPS_OR_CONFOUNDERS",
                 severity="Major",
                 reviewer_lens="grant-methodology-biostatistics",
                 affected_scope="بخش ۱۱ و ۲۷ (متغیرها و روش اجرا)",
-                discrepancy_description="گروه‌های شاهد/کنترل منفی و مخدوشگرهای آماری احتمالی به وضوح مشخص نشده‌اند.",
-                rationale_recommendation="مشخص کردن کنترل دارونما/حلال/منفی و تعریف مخدوشگرهای زمینه‌ای جهت تعدیل در آنالیز چندمتغیره."
+                discrepancy_description="گروه‌های شاهد/کنترل منفی یا مخدوشگرها و مکانیسم کنترل خطا به وضوح مشخص نشده‌اند.",
+                rationale_recommendation="مشخص کردن گروه‌های کنترل، مخدوشگرهای زمینه‌ای یا پروتکل کنترل سوگیری متناسب با کهن‌الگو."
             ))
 
         score = 1.1
@@ -439,7 +534,7 @@ class EGMStudySectionCoordinator:
         paraphrase = "امکان‌پذیری فنی و اجرایی پروژه شامل جدول زمان‌بندی مراحل، محل اجرای تحقیق و ابزارهای گردآوری تبیین شده است."
 
         # Audit Vector 1: Gantt Chart / Timeline Feasibility (Sec 12)
-        has_timeline = bool(re.search(r'(ماه|هفته|جدول|زمان‌بندی|گانت|مرحله|phase|duration)', sec12.lower()))
+        has_timeline = bool(re.search(r'(ماه|هفته|جدول|زمان‌بندی|گانت|مرحله|فاز|phase|duration)', sec12.lower()))
         if has_timeline and len(sec12.split()) >= 15:
             strengths.append("مراحل اجرایی کار در جدول زمان‌بندی تفکیک شده است.")
         else:
@@ -504,7 +599,10 @@ class EGMStudySectionCoordinator:
         paraphrase = "ملاحظات اخلاقی و الزامات رازداری داده‌ها در انطباق با کدهای اخلاق زیست‌پزشکی ارزیابی گردید."
 
         # Audit Vector 1: Bioethics Statement (Sec 24)
-        has_ethics = bool(re.search(r'(اخلاق|هلسینکی|helsinki|رضایت|محرمان|کمیته\s+اخلاق|کد\s+اخلاق|irb)', combined))
+        has_ethics = bool(re.search(
+            r'(اخلاق|هلسینکی|helsinki|رضایت|محرمان|کمیته\s+اخلاق|کد\s+اخلاق|irb|معافیت\s+اخلاق|فاقد\s+هرگونه\s+مداخله\s+انسانی|تعارض\s+منافع)',
+            combined
+        ))
         if has_ethics:
             strengths.append("پروتکل ملاحظات اخلاقی شامل رضایت‌نامه، کدهای بین‌المللی و رازداری پیش‌بینی شده است.")
         else:
@@ -572,7 +670,9 @@ class EGMStudySectionCoordinator:
         sec2 = sections.get(2, '')
         sec3 = sections.get(3, '')
         sec4 = sections.get(4, '')
+        sec6 = sections.get(6, '')
         sec12 = sections.get(12, '')
+        sec13 = sections.get(13, '')
         sec26 = sections.get(26, '')
         sec27 = sections.get(27, '')
         full_text = '\n'.join(sections.values())
@@ -636,19 +736,28 @@ class EGMStudySectionCoordinator:
         else:
             sigma = 8.0
 
-        # Audit Vector 3: Concrete Lab / Operational Grounding (Layer 3)
-        if sec12:
-            has_grounding = bool(re.search(r'(\d+\s*(?:میلی|میکرو|mg|ml|μm|nm|ساعت|روزه?|درصد|%|rpm|سانتی‌گراد|c°))', sec12, re.I))
+        # Audit Vector 3: Concrete Lab / Clinical / Protocol Operational Grounding (Layer 3)
+        ops_text = f"{sec13}\n{sec27}".strip()
+        ops_scope = 'بخش ۱۳ و ۲۷ (روش اجرا)'
+        if not ops_text:
+            ops_text = sec12
+            ops_scope = 'بخش ۱۲ (روش اجرا)'
+        if ops_text:
+            has_grounding = bool(re.search(
+                r'(\d+\s*(?:میلی|میکرو|mg|ml|μm|nm|ساعت|روزه?|درصد|%|rpm|سانتی‌گراد|c°|ماه|هفته|دقیقه|نفر|خانوار|مطالعه))|\b(?:pubmed|scopus|web\s+of\s+science|embase|pcc|sus|irct|deff|his|cochran|prisma|jbi|nielsen)\b',
+                ops_text,
+                re.I,
+            ))
             if has_grounding:
-                strengths.append('پروتکل اجرایی و آزمایشگاهی به صورت ملموس دارای ارقام، غلظت‌ها و زمان‌بندی دقیق است.')
+                strengths.append('پروتکل اجرایی پژوهش دارای مشخصات عملیاتی دقیق (مقادیر عددی، پایگاه‌ها، ابزارها یا بازه‌های زمانی) است.')
             else:
                 findings.append(GoldfishFinding(
                     issue_name='ABSTRACT_METHODOLOGY_DESCRIPTION',
                     severity='Nit',
                     reviewer_lens='grant-academic-style-voice',
-                    affected_scope='بخش ۱۲ (روش اجرا)',
-                    discrepancy_description='روش اجرا بیش از حد کلی توصیف شده و فاقد مقادیر عملیاتی دقیق (غلظت، دما، یا بازه زمانی) است.',
-                    rationale_recommendation='تصریح مقادیر عددی دقیق، غلظت محلول‌ها و بازه‌های زمانی انکوباسیون یا سنجش.'
+                    affected_scope=ops_scope,
+                    discrepancy_description='روش اجرا بیش از حد کلی توصیف شده و فاقد مشخصات عملیاتی ملموس (مقادیر عددی، ابزار استاندارد یا زمان‌بندی) است.',
+                    rationale_recommendation='تصریح مقادیر عددی دقیق، نام پایگاه‌ها/ابزارها، غلظت‌ها یا بازه‌های زمانی اجرا.'
                 ))
 
         # Audit Vector 4: Zero Premature Certainty (Layer 4)
@@ -667,14 +776,15 @@ class EGMStudySectionCoordinator:
             strengths.append('لحن نگارش کاملاً علمی، کالیبره‌شده و بدون ادعای قطعیت زودهنگام است.')
 
         # Audit Vector 5: Non-repetitive List Traps in Aims (Layer 5)
-        if sec4:
-            repeated_openers = re.findall(r'(?:^|\n)\s*[-*•\d\.]+\s*(تعیین|بررسی|شناسایی|سنجش)', sec4)
+        aims_text = sec6 or sec4
+        if aims_text:
+            repeated_openers = re.findall(r'(?:^|\n)\s*[-*•\d\.]+\s*(تعیین|بررسی|شناسایی|سنجش)', aims_text)
             if len(repeated_openers) >= 6 and len(set(repeated_openers)) == 1:
                 findings.append(GoldfishFinding(
                     issue_name='REPETITIVE_AIM_LIST_OPENERS',
                     severity='Nit',
                     reviewer_lens='grant-academic-style-voice',
-                    affected_scope='بخش ۴ (اهداف اختصاصی)',
+                    affected_scope='بخش ۶ (اهداف اختصاصی)',
                     discrepancy_description=f'تکرار بیش از حد یک فعل یکسان در آغاز بندهای اهداف ({repeated_openers[0]}).',
                     rationale_recommendation='طبیعی‌سازی ساختار فهرست با افعال متنوع و دسته‌بندی فازبندی‌شده اهداف.'
                 ))
@@ -753,12 +863,12 @@ class EGMStudySectionCoordinator:
 
         overall_score = min(max(round(overall_score, 2), 1.0), 9.0)
 
-        # Funding verdict based on competitive heuristic cutoffs
-        if overall_score <= 2.5 and blocker_count == 0:
+        # Funding verdict based on canonical ceiling (<= 2.0 APPROVED_FUNDABLE)
+        if overall_score <= NIH_APPROVAL_SCORE_CEILING and blocker_count == 0:
             funding_verdict = "APPROVED_FUNDABLE"
             can_proceed = True
             percentile = max(100.0 - (overall_score - 1.0) * 15.0, 85.0)
-            exec_summary = f"پروپوزال موفق به کسب امتیاز جامعیت ساختاری برجسته {overall_score}/9.0 (کالیبره بر مقیاس رقابتی NIH) و رتبه استثنایی بدون خطای بحرانی گردید و با اولویت حداکثری شایسته تصویب و تخصیص گرنت تشخیص داده شد."
+            exec_summary = f"پروپوزال موفق به کسب امتیاز جامعیت ساختاری برجسته {overall_score}/9.0 (آستانه مصوب <= {NIH_APPROVAL_SCORE_CEILING}) بدون خطای بحرانی گردید و حائز شرایط تایید تشخیص داده شد."
         elif overall_score <= 4.0 or blocker_count > 0:
             funding_verdict = "REVISION_REQUIRED"
             can_proceed = False
@@ -778,7 +888,8 @@ class EGMStudySectionCoordinator:
             reviewer_results=reviewer_results,
             prioritized_findings=prioritized_findings,
             remediation_rounds_conducted=remediation_round,
-            executive_summary_fa=exec_summary
+            executive_summary_fa=exec_summary,
+            structural_completeness_percent=percentile,
         )
 
     @classmethod
@@ -813,9 +924,14 @@ class EGMStudySectionCoordinator:
         md.append("> **تذکر شفافیت:** نمره حاضر شاخص جامعیت ساختاری و روش‌شناختی (Heuristic Completeness Score) مبتنی بر شبیه‌سازی هوشمند هیئت داوران بوده و نباید به عنوان تاییدیه رسمی نهادهای حاکمیتی گرنت تفسیر شود.")
         md.append("")
         md.append(f"**عنوان طرح پژوهشی:** {proposal_title}")
-        md.append(f"**معماری ارزیابی:** EGM v13.0 (Elephant-Goldfish Multi-Agent Swarm)")
+        md.append(f"**معماری ارزیابی:** EGM v14.2.0 (Elephant-Goldfish Multi-Agent Swarm)")
         md.append(f"**امتیاز جامعیت ساختاری و روش‌شناختی (Heuristic Completeness / NIH Impact Score):** `{result.overall_nih_score} / 9.0`")
-        md.append(f"**رتبه درصدی مصوب:** `صدک {result.percentile:.1f}%`")
+        sc_pct = (
+            result.structural_completeness_percent
+            if result.structural_completeness_percent is not None
+            else result.percentile
+        )
+        md.append(f"**شاخص جامعیت ساختاری (Structural Completeness Index):** `{sc_pct:.1f}%`")
         md.append(f"**وضعیت نهایی تخصیص بودجه:** **{result.funding_verdict}**")
         md.append(f"**تعداد دورهای اصلاحی طی‌شده:** `{result.remediation_rounds_conducted}`")
         md.append("")

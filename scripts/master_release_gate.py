@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """
 master_release_gate.py - Master Verification & Release Gate Script
-Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.2.0 (Universal Biomedical Architecture)
 
 Enforces:
-1. Single Source of Truth version synchronization across VERSION, project_metadata.json, and core_policies.py.
+1. Single Source of Truth version synchronization across VERSION, project_metadata.json, and core_policies.ENGINE_VERSION.
 2. Dynamic test discovery and strict accounting invariants (reported == discovered, passed + failed + error + skip == total).
 3. 100% Mutation score across 10 deliberate scientific defect mutations.
 4. Zero hardcoded domain leakage in all generic engine scripts.
@@ -27,10 +27,12 @@ if PROJECT_ROOT not in sys.path:
 
 
 def audit_version_sync() -> Dict[str, Any]:
-    """Phase 1: Audits Single Source of Truth for versions."""
+    """Phase 1: Audits Single Source of Truth for versions via direct core_policies import."""
     version_file = os.path.join(PROJECT_ROOT, "VERSION")
     metadata_file = os.path.join(PROJECT_ROOT, "project_metadata.json")
-    core_policies_file = os.path.join(PROJECT_ROOT, "scripts", "core_policies.py")
+    scripts_dir = os.path.join(PROJECT_ROOT, "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
 
     with open(version_file, "r", encoding="utf-8") as f:
         version_str = f.read().strip()
@@ -39,9 +41,9 @@ def audit_version_sync() -> Dict[str, Any]:
         meta_dict = json.load(f)
         meta_version = meta_dict.get("engine_version", "").strip()
 
-    with open(core_policies_file, "r", encoding="utf-8") as f:
-        cp_content = f.read()
-        has_cp_version = version_str in cp_content
+    import core_policies
+    cp_engine_version = str(getattr(core_policies, "ENGINE_VERSION", "")).strip()
+    has_cp_version = (cp_engine_version == version_str)
 
     is_sync = (version_str == meta_version) and has_cp_version
     return {
@@ -49,6 +51,7 @@ def audit_version_sync() -> Dict[str, Any]:
         "passed": is_sync,
         "version": version_str,
         "metadata_version": meta_version,
+        "core_policies_version": cp_engine_version,
         "core_policies_synced": has_cp_version
     }
 
@@ -430,7 +433,7 @@ def audit_6_tier_hierarchy(t_res: Dict[str, Any], m_res: Dict[str, Any], r_res: 
     """Phase 5: Asserts and logs the 6-tier software & scientific testing hierarchy."""
     tiers = [
         ("Tier 1: Smoke Tests (Module Importability & Registry)", True, "All 33 engine modules cleanly import without side-effects"),
-        ("Tier 2: Unit Tests (Isolated Module Behavioral Assertions)", t_res["passed_tests"] >= 350, f"{t_res['passed_tests']} unit tests passed across 13 test suites"),
+        ("Tier 2: Unit Tests (Isolated Module Behavioral Assertions)", t_res["passed_tests"] >= 350, f"{t_res['passed_tests']} unit tests passed across full test suite"),
         ("Tier 3: Adversarial & Mutation Stress Tests", m_res["passed"] and m_res["mutation_score_pct"] == 100.0, "10/10 deliberate mutations killed; negative controls rejected"),
         ("Tier 4: Multi-Module Integration Gates", r_res["passed"], f"{r_res['passed_criteria']}/{r_res['total_criteria']} criteria verified across 4 layers"),
         ("Tier 5: End-to-End Proposal & DOCX XML Verification", True, "Native OMML <m:oMath> verified in word/document.xml with 0 LaTeX leakage"),
@@ -440,8 +443,15 @@ def audit_6_tier_hierarchy(t_res: Dict[str, Any], m_res: Dict[str, Any], r_res: 
 
 
 def main():
+    scripts_dir = os.path.join(PROJECT_ROOT, "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    try:
+        from core_policies import VERSION_DISPLAY as _VD
+    except Exception:
+        _VD = "v14.2.0"
     print("===========================================================================")
-    print("PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE (v9.2)")
+    print(f"PROPOSAL-NEVISI ENGINE: MASTER RESEARCH-GRADE RELEASE GATE ({_VD})")
     print("===========================================================================\n")
 
     # 1. Version Sync

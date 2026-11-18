@@ -153,10 +153,16 @@ class EpistemicRigorAuditor:
             score -= 40.0
             findings.append("Alternative hypothesis (H1) is missing or insufficiently defined.")
 
-        # Check for directionality or quantitative metric
+        # Check for directionality or quantitative metric (or exploratory PCC / usability question)
         combined = f"{h0} {h1}".lower()
-        has_quant_or_dir = any(w in combined for w in ["معنی‌دار", "افزایش", "کاهش", "تفاوت", "برابر", "significant", "difference", "effect", "increase", "decrease"])
-        if not has_quant_or_dir:
+        hyp_rationale = str(hypotheses.get("rationale", "")).lower()
+        inv_family = str(data.get("methodological_invariants", {}).get("study_family", "")).lower()
+        is_exploratory_review_or_ux = any(
+            k in f"{combined} {hyp_rationale} {inv_family}"
+            for k in ("scoping", "prisma", "jbi", "pcc", "usability", "nielsen", "مرور دامنه‌ای", "سنتز شواهد", "کاربردپذیری", "نگاشت شواهد")
+        )
+        has_quant_or_dir = any(w in combined for w in ["معنی‌دار", "افزایش", "کاهش", "تفاوت", "برابر", "significant", "difference", "effect", "increase", "decrease", "تعیین", "شناسایی", "شکاف", "کاربردپذیری", "sus", "kappa"])
+        if not has_quant_or_dir and not is_exploratory_review_or_ux:
             score -= 20.0
             findings.append("Hypotheses lack explicit statistical directionality or measurable effect metric.")
 

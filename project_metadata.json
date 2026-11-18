@@ -1,9 +1,9 @@
 {
   "project_name": "proposal-nevisi",
-  "engine_version": "14.1.0",
-  "version_display": "v14.1.0",
+  "engine_version": "14.2.0",
+  "version_display": "v14.2.0",
   "release_channel": "stable",
-  "semantic_release_date": "2026-11-15",
+  "semantic_release_date": "2026-11-18",
   "architecture": {
     "paradigm": "Universal Evidence-Driven Medical Research, EGM Hybrid Goldfish Swarm Study Section, Cognitive Multi-Agent Architecture, Anti-AI Humanization & Proposal Engine",
     "topic_agnostic": true,
@@ -16,25 +16,29 @@
       "enabled": true,
       "personas_count": 7,
       "zero_context_isolation": true,
-      "scoring_scale": "NIH Heuristic Completeness 1.0 to 9.0"
+      "scoring_scale": "NIH Heuristic Completeness 1.0 to 9.0 (Approval <= 2.0, Exceptional <= 1.5)"
     },
     "epistemic_rigor_audit_dimensions": 6,
-    "anti_ai_humanizer_version": "14.1.0",
+    "anti_ai_humanizer_version": "14.2.0",
     "burstiness_calibration_engine": true,
     "data_invariant_gate_fail_closed": true,
     "remediation_max_iterations": 10,
     "zero_bias_dual_path_search": true,
-    "mesh_thesaurus_descriptors_count": 130,
+    "mesh_thesaurus_descriptors_count": 119,
+    "mesh_thesaurus_branches_count": 19,
     "adaptive_risk_of_bias": [
-      "QUADAS-2",
-      "STROBE",
-      "Cochrane_RoB2",
-      "SYRCLE"
+      "QUADAS-2 (Diagnostic)",
+      "STROBE / NOS (Observational & Health Systems)",
+      "Cochrane_RoB2 / CONSORT (Clinical RCT)",
+      "SYRCLE / ARRIVE_2.0 (Animal In Vivo)",
+      "ToxRTool / NTP_OHAT / OECD_GCCP (Cell Culture In Vitro)",
+      "PRISMA-ScR / JBI (Scoping Review — Formal RoB Optional/Omitted)",
+      "Nielsen-Landauer / SUS (Usability & Digital Health)"
     ],
     "true_citation_graph_snowballing": true
   },
   "metrics": {
-    "total_unified_tests": 561,
+    "total_unified_tests": 569,
     "mutation_score_pct": 100.0,
     "mandatory_proposal_sections": 28,
     "search_strategy_layers_count": 12,
@@ -50,10 +54,15 @@
     "PECO",
     "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
     "EPIDEMIOLOGICAL_OBSERVATIONAL",
+    "EPIDEMIOLOGICAL_CROSS_SECTIONAL",
     "CLINICAL_RCT",
+    "CLINICAL_TRIAL",
     "EXPERIMENTAL_ANIMAL",
     "EXPERIMENTAL_IN_VITRO",
     "DIAGNOSTIC",
+    "DIAGNOSTIC_ACCURACY_AND_BIOMARKER",
+    "SCOPING_REVIEW",
+    "USABILITY_AND_DIGITAL_HEALTH",
     "PROGNOSTIC",
     "MECHANISTIC"
   ]

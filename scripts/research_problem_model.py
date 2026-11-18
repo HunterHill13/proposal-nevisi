@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
 research_problem_model.py - Dynamic Topic Decomposition & Framework Selection
-Proposal-Nevisi Engine v14.0 (Universal Biomedical Architecture)
+Proposal-Nevisi Engine v14.2.0 (Universal Biomedical Architecture)
 
 Transforms raw user research topics into structured, framework-aligned
-Research Problem Models across oncology, cardiology, infectious diseases,
-immunology, diagnostics, and basic experimental biomedicine.
+Research Problem Models across all 7 canonical archetypes (+ usability).
 """
 
 import json
@@ -18,10 +17,16 @@ SUPPORTED_FRAMEWORKS = [
     "PICO",                # Interventional clinical studies
     "PECO",                # Environmental / occupational exposure studies
     "DIAGNOSTIC",          # Index test vs reference standard in target condition
+    "DIAGNOSTIC_ACCURACY_AND_BIOMARKER",
     "PROGNOSTIC",          # Risk prediction / prognostic factor studies
     "MECHANISTIC",         # Signaling cascades, pathway modulation, basic biology
     "EXPERIMENTAL_IN_VITRO", # Cell culture, biochemical assays, viability, synergy
-    "EXPERIMENTAL_ANIMAL"    # In vivo preclinical animal models
+    "EXPERIMENTAL_ANIMAL",   # In vivo preclinical animal models
+    "CLINICAL_TRIAL",
+    "HEALTH_SYSTEMS_AND_HEALTH_POLICY",
+    "EPIDEMIOLOGICAL_OBSERVATIONAL",
+    "SCOPING_REVIEW",
+    "USABILITY_AND_DIGITAL_HEALTH"
 ]
 
 SUPPORTED_DOMAINS = [
@@ -156,14 +161,21 @@ class ResearchProblemModel:
             ev_questions.append({"category": "SAFETY", "question": f"What are the serious adverse events, incidence of toxicities, and discontinuation rates associated with {agt_str}?"})
             ev_questions.append({"category": "DOSE_AND_DURATION", "question": f"What is the optimal therapeutic dosage, administration schedule, and treatment duration for {agt_str}?"})
             ev_questions.append({"category": "COMPARATIVE_EFFECTIVENESS", "question": f"How does the clinical efficacy of {agt_str} compare against current standard-of-care comparators?"})
-        elif self.framework == "DIAGNOSTIC":
+        elif self.framework in ["SCOPING_REVIEW", "EVIDENCE_SYNTHESIS"]:
+            ev_questions.append({"category": "PCC_MAPPING", "question": f"What primary evidence exists mapping {agt_str} across {system} for {cond} within the PRISMA-ScR/JBI framework?"})
+            ev_questions.append({"category": "INTER_RATER_AGREEMENT", "question": f"What reporting consistency, outcome metrics, and methodological gaps characterize existing studies of {agt_str}?"})
+            ev_questions.append({"category": "SAFETY_SPECTRUM", "question": f"What adverse event frequencies or risk differences are reported across comparative evaluations of {agt_str}?"})
+        elif self.framework in ["USABILITY", "USABILITY_AND_DIGITAL_HEALTH"]:
+            ev_questions.append({"category": "HEURISTIC_DEFECTS", "question": f"What usability heuristics and task failure bottlenecks occur when end-users interact with {agt_str} in {system}?"})
+            ev_questions.append({"category": "SUS_BENCHMARK", "question": f"Does {agt_str} achieve benchmark System Usability Scale (SUS >= 68) and high task completion rates in clinical workflows?"})
+        elif self.framework in ["DIAGNOSTIC", "DIAGNOSTIC_ACCURACY_AND_BIOMARKER"]:
             ev_questions.append({"category": "ACCURACY", "question": f"What are the pooled sensitivity, specificity, and diagnostic likelihood ratios of {agt_str} for detecting {cond}?"})
             ev_questions.append({"category": "ROC_AUC", "question": f"What is the area under the ROC curve (AUC) and diagnostic discriminatory ability against the reference standard?"})
             ev_questions.append({"category": "THRESHOLD", "question": f"What is the pre-specified optimal diagnostic cutoff threshold and inter-assay reproducibility?"})
-        elif self.framework in ["PECO", "OBSERVATIONAL"]:
-            ev_questions.append({"category": "ASSOCIATION", "question": f"Is exposure to {agt_str} independently associated with altered risk or incidence of {cond}?"})
-            ev_questions.append({"category": "CONFOUNDING", "question": f"Do observed effect estimates persist after multivariable adjustment for demographic and clinical confounders?"})
-            ev_questions.append({"category": "DOSE_RESPONSE", "question": f"Is there an observable biological gradient or duration-dependent exposure response?"})
+        elif self.framework in ["PECO", "OBSERVATIONAL", "EPIDEMIOLOGICAL_OBSERVATIONAL", "HEALTH_SYSTEMS_AND_HEALTH_POLICY"]:
+            ev_questions.append({"category": "ASSOCIATION", "question": f"Is exposure/policy {agt_str} independently associated with altered risk or burden of {cond}?"})
+            ev_questions.append({"category": "CONFOUNDING", "question": f"Do observed effect estimates persist after multivariable adjustment for demographic and socioeconomic confounders?"})
+            ev_questions.append({"category": "DOSE_RESPONSE", "question": f"Is there an observable gradient or stratified disparity across target subgroups?"})
         elif self.framework == "PROGNOSTIC":
             ev_questions.append({"category": "PROGNOSTIC_VALUE", "question": f"Does {agt_str} provide independent risk stratification and time-to-event prognostic discrimination in {cond}?"})
             ev_questions.append({"category": "CALIBRATION_DISCRIMINATION", "question": f"What is the C-index and calibration slope of prognostic models incorporating {agt_str}?"})
@@ -193,7 +205,13 @@ class ProblemModelBuilder:
     def infer_framework(domain: str, title: str, system_type: str) -> str:
         """Dynamically determines the appropriate framework without forcing PICO."""
         title_lower = title.lower()
-        if "diagnostic" in title_lower or "sensitivity" in title_lower or "biomarker" in title_lower:
+        if "scoping review" in title_lower or "systematic review" in title_lower or "prisma-scr" in title_lower or "jbi" in title_lower or "مرور دامنه‌ای" in title_lower or "سنتز شواهد" in title_lower:
+            return "SCOPING_REVIEW"
+        if "usability" in title_lower or "digital health" in title_lower or "کاربردپذیری" in title_lower or system_type == "DIGITAL_HEALTH_USERS":
+            return "USABILITY_AND_DIGITAL_HEALTH"
+        if "health expenditure" in title_lower or "health system" in title_lower or "نظام سلامت" in title_lower or "هزینه‌های کمرشکن" in title_lower:
+            return "HEALTH_SYSTEMS_AND_HEALTH_POLICY"
+        if "diagnostic" in title_lower or "sensitivity" in title_lower or "biomarker" in title_lower or "دقت تشخیصی" in title_lower:
             return "DIAGNOSTIC"
         if "prognos" in title_lower or "survival" in title_lower or "risk score" in title_lower:
             return "PROGNOSTIC"
@@ -201,9 +219,9 @@ class ProblemModelBuilder:
             return "EXPERIMENTAL_IN_VITRO"
         if "animal" in title_lower or "mice" in title_lower or "rat" in title_lower or system_type == "ANIMAL_IN_VIVO":
             return "EXPERIMENTAL_ANIMAL"
-        if "exposure" in title_lower or "environmental" in title_lower or "occupational" in title_lower:
+        if "exposure" in title_lower or "environmental" in title_lower or "occupational" in title_lower or "prevalence" in title_lower or "شیوع" in title_lower:
             return "PECO"
-        if "patient" in title_lower or "clinical trial" in title_lower or "randomized" in title_lower:
+        if "patient" in title_lower or "clinical trial" in title_lower or "randomized" in title_lower or "کارآزمایی بالینی" in title_lower:
             return "PICO"
         return "MECHANISTIC"
 
